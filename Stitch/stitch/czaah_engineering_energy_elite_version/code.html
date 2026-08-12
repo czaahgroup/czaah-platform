@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Engineering &amp; Energy | CZAAH Sovereign Group</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&amp;family=Raleway:wght@200;300;400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#fbe193",
+              "surface-tint": "#e6c364",
+              "surface": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "error-container": "#93000a",
+              "tertiary-fixed": "#dde1ff",
+              "surface-container": "#201f1f",
+              "primary-fixed-dim": "#e6c364",
+              "on-primary-fixed-variant": "#584400",
+              "inverse-primary": "#755b00",
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-lowest": "#0e0e0e",
+              "inverse-on-surface": "#313030",
+              "secondary-container": "#584707",
+              "on-tertiary-fixed-variant": "#35437e",
+              "on-tertiary-container": "#2e3b77",
+              "on-primary": "#3d2e00",
+              "primary": "#e6c364",
+              "surface-dim": "#131313",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#dec57a",
+              "on-surface": "#e5e2e1",
+              "on-secondary-container": "#cfb76e",
+              "on-surface-variant": "#d0c5b2",
+              "surface-bright": "#3a3939",
+              "surface-container-highest": "#353534",
+              "on-error": "#690005",
+              "surface-variant": "#353534",
+              "background": "#131313",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "secondary-fixed-dim": "#dec57a",
+              "outline": "#99907e",
+              "on-secondary": "#3c2f00",
+              "tertiary-container": "#9ba8eb",
+              "on-primary-container": "#503d00",
+              "primary-fixed": "#ffe08f",
+              "outline-variant": "#4d4637",
+              "on-error-container": "#ffdad6",
+              "tertiary": "#b9c4ff",
+              "on-tertiary-fixed": "#041451",
+              "on-tertiary": "#1e2b66",
+              "surface-container-high": "#2a2a2a",
+              "on-background": "#e5e2e1",
+              "surface-container-low": "#1c1b1b",
+              "primary-container": "#c9a84c",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#241a00"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-12 py-6 bg-neutral-950/80 backdrop-blur-xl z-50">
+<div class="text-2xl font-serif tracking-[0.2em] text-[#E6C364]">CZAAH</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-[#E6C364] border-b border-[#E6C364]/40 pb-1 text-sm tracking-widest transition-colors duration-500" href="#">Sectors</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] text-sm transition-colors duration-500" href="#">Services</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] text-sm transition-colors duration-500" href="#">Insights</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] text-sm transition-colors duration-500" href="#">Membership</a>
+</div>
+<div class="flex items-center space-x-8">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-2 text-xs font-bold tracking-widest uppercase hover:scale-95 transition-all duration-300">Inquire</button>
+<span class="material-symbols-outlined text-primary cursor-pointer" data-icon="lock">lock</span>
+</div>
+</nav>
+<!-- SideNavBar (Suppressed for high-level landing, but included logic for desktop presence) -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full pt-32 w-64 bg-[#0E0E0E] border-r border-neutral-800/30 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.5)] z-40">
+<div class="px-8 mb-12">
+<h2 class="text-[#E6C364] text-lg font-bold tracking-tight">Services</h2>
+<p class="text-neutral-500 text-[10px] uppercase tracking-widest">Institutional Excellence</p>
+</div>
+<nav class="flex-1">
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:bg-neutral-800/20 transition-all hover:text-neutral-200 group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="handshake">handshake</span>
+<span class="text-sm font-medium tracking-tighter">Partnership</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:bg-neutral-800/20 transition-all hover:text-neutral-200" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="account_balance">account_balance</span>
+<span class="text-sm font-medium tracking-tighter">Government</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:bg-neutral-800/20 transition-all hover:text-neutral-200" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="shield">shield</span>
+<span class="text-sm font-medium tracking-tighter">Security</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:bg-neutral-800/20 transition-all hover:text-neutral-200" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="payments">payments</span>
+<span class="text-sm font-medium tracking-tighter">Payments</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:bg-neutral-800/20 transition-all hover:text-neutral-200" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="flight_takeoff">flight_takeoff</span>
+<span class="text-sm font-medium tracking-tighter">Migration</span>
+</a>
+</nav>
+</aside>
+<main class="lg:pl-64">
+<!-- Hero Section -->
+<section class="relative h-screen flex flex-col justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10"></div>
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="High-tech engineering blueprints and industrial infrastructure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAky5vvicol-MOsXr3XhzGzlufnTxVXXghaxktA2m2vBppRm5PByqjQa7jU3OnSF1Z9rFLUt56Rq9_6dY5Y2lnM8bLnVZFTclmcfxXnu2D-ncEnxVpHD5BJ-CcO3IJ8fa41-4Zc30Oa-6ZFYykcCK75biwbxfevSjUx_epxImGJChdPMWt3Hwk2m4sfWOJVagVvnb9JkaAOVaoOFBO5pr6s1-9DaMiQAnZqrZHLKAjXY08LxSpLYSUm-aG3Ar7eqsIErj9CSkL8l2X4"/>
+</div>
+<div class="relative z-20 px-12 md:px-24 editorial-grid w-full">
+<div class="col-span-12 lg:col-span-8">
+<span class="text-primary-fixed tracking-[0.4em] uppercase text-xs mb-6 block font-medium">Sector Profile: 04</span>
+<h1 class="font-headline text-5xl md:text-7xl lg:text-8xl text-on-surface leading-tight mb-8">
+                        The Sovereignty <br/> <span class="text-primary italic">of Infrastructure</span>
+</h1>
+<p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed mb-12">
+                        CZAAH Sovereign Group integrates precision engineering with sustainable energy frameworks, delivering the backbone of modern institutional landscapes.
+                    </p>
+<div class="flex space-x-8">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-12 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-transform active:scale-95">Explore Portfolio</button>
+<button class="border border-outline-variant/40 hover:border-primary/100 px-12 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all">Strategic Inquiry</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Institutional Pillars Bento Grid -->
+<section class="py-32 px-12 md:px-24 bg-surface">
+<div class="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div>
+<h2 class="font-headline text-4xl mb-4">Integrated Systems</h2>
+<p class="text-on-surface-variant max-w-md">Our engineering division operates at the intersection of mechanical precision and digital intelligence.</p>
+</div>
+<div class="h-px bg-outline-variant/30 flex-1 mx-12 hidden md:block"></div>
+<span class="font-headline text-primary-fixed text-6xl opacity-20 italic">Precision</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-1 grid-rows-2 h-auto md:h-[800px]">
+<!-- Solar Power -->
+<div class="md:col-span-2 bg-surface-container-low group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent z-10"></div>
+<img class="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-700 group-hover:scale-105" data-alt="Modern solar panel array reflecting twilight sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvT6kZ2hHrLWeGgSXcYnbhRvx-GG7u1K9NU6vRy5a6fPsXMIGxaXBmwgi2LEuABEYRUxff1jX-WHPPFt6YFKG90wjWmrAVIo74vxyAlzNLlm71vbFUcjv_I1jt5xAV5a6JqoX18FxGJnuytQMleui_oAINi7cUbfnlhxduKgYQRVvdtqVcUDORcVW9s04bnE1PjEVQKRLhhF75JshgvofoEOvwf9r-_pgRZExJfenLeTB_C7HYGWnAUQ5iZk-fxJR0DJYT0JoiRR9b"/>
+<div class="relative z-20 p-12 flex flex-col h-full justify-end">
+<span class="text-primary text-xs tracking-widest uppercase mb-2">Sustainable Energy</span>
+<h3 class="font-headline text-3xl mb-4">Solar Infrastructure</h3>
+<p class="text-on-surface-variant max-w-sm mb-6 text-sm">Industrial-scale photovoltaic arrays managed via proprietary sovereign energy grids.</p>
+<a class="text-primary text-xs tracking-widest uppercase font-bold flex items-center group/link" href="#">
+                            Case Studies <span class="material-symbols-outlined ml-2 text-sm transition-transform group-hover/link:translate-x-2" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- HVAC Systems -->
+<div class="bg-surface-container p-12 border border-outline-variant/10 flex flex-col justify-between">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="ac_unit">ac_unit</span>
+<div>
+<h3 class="font-headline text-2xl mb-4">Climate Control</h3>
+<p class="text-on-surface-variant text-sm font-light">Precision HVAC solutions for server environments and institutional headquarters.</p>
+</div>
+</div>
+<!-- Elevators -->
+<div class="bg-surface-container-highest p-12 border border-outline-variant/10 flex flex-col justify-between">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="elevator">elevator</span>
+<div>
+<h3 class="font-headline text-2xl mb-4">Vertical Mobility</h3>
+<p class="text-on-surface-variant text-sm font-light">High-speed, regenerative elevator systems engineered for the world's tallest structures.</p>
+</div>
+</div>
+<!-- Digital Infrastructure -->
+<div class="md:col-span-2 bg-surface-container-low group relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent z-10"></div>
+<img class="absolute inset-0 w-full h-full object-cover opacity-30 transition-transform duration-700 group-hover:scale-105" data-alt="Close up of futuristic circuit board with golden lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn3-v9c0ORSfLPSC67zG0IOBdUTdw_3jZZfkZCh6MYIxWl6gJ7cWyzChBvv0n3Z4Mqp7eeM7vlU1_igcwhxcJ_iVogkfsarItTMpBhDBPn13TsNnWO7eDyvm5onXRL0x8xYbl07DbF_HkIH8luDv8BRcKbilvxfpzEe3A7R3t9AdADzD5XiuAzv8DtSgv1eAmmVsebJ8TWtpayfeGEqVBSXLxyMSpUEFRcvG_RBofZrKqtIAMg_wFN8QkDmbxH2bSOD4ulQsJjTxTW"/>
+<div class="relative z-20 p-12 flex flex-col h-full justify-end">
+<span class="text-primary text-xs tracking-widest uppercase mb-2">Smart Systems</span>
+<h3 class="font-headline text-3xl mb-4">Energy Grids</h3>
+<p class="text-on-surface-variant max-w-md mb-6 text-sm">Automated energy distribution networks utilizing AI to optimize load and reduce institutional footprint.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Global Partners / OEM Section -->
+<section class="py-32 px-12 md:px-24 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col items-center text-center mb-24">
+<h2 class="font-headline text-4xl md:text-5xl mb-6">Global OEM Partnerships</h2>
+<div class="w-24 h-px bg-primary mb-8"></div>
+<p class="text-on-surface-variant max-w-2xl text-lg font-light italic">
+                        "Excellence is never achieved in isolation. We align with the world's most prestigious manufacturers to guarantee sovereign standards."
+                    </p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-12 items-center opacity-60 hover:opacity-100 transition-opacity">
+<div class="flex flex-col items-center">
+<div class="font-headline text-xl text-on-surface tracking-[0.3em] mb-2">KONE</div>
+<span class="text-[10px] text-primary tracking-widest uppercase">Lead Mobility Partner</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="font-headline text-xl text-on-surface tracking-[0.3em] mb-2">DAIKIN</div>
+<span class="text-[10px] text-primary tracking-widest uppercase">Climate Systems</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="font-headline text-xl text-on-surface tracking-[0.3em] mb-2">SIEMENS</div>
+<span class="text-[10px] text-primary tracking-widest uppercase">Grid Automation</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="font-headline text-xl text-on-surface tracking-[0.3em] mb-2">LONGI</div>
+<span class="text-[10px] text-primary tracking-widest uppercase">Solar Innovation</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Investment Call to Action -->
+<section class="py-40 px-12 md:px-24 bg-surface relative overflow-hidden">
+<!-- Glow background -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="relative z-10 max-w-4xl mx-auto text-center">
+<h2 class="font-headline text-5xl md:text-6xl mb-12">Invest in the <span class="italic">Foundation</span></h2>
+<p class="text-on-surface-variant text-xl font-light mb-16 leading-relaxed">
+                    Our Energy &amp; Engineering portfolio represents a high-yield, low-volatility opportunity for institutional capital to anchor into physical assets with digital-age efficiency.
+                </p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-6">
+<a class="w-full md:w-auto bg-gradient-to-br from-primary to-primary-container text-on-primary px-16 py-5 text-sm font-bold tracking-[0.2em] uppercase transition-all hover:shadow-[0_0_30px_-5px_rgba(230,195,100,0.3)]" href="#">Request Prospectus</a>
+<a class="w-full md:w-auto border border-outline-variant/40 px-16 py-5 text-sm font-bold tracking-[0.2em] uppercase hover:bg-surface-container-high transition-all" href="#">Direct Engagement</a>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full px-12 py-20 bg-[#050505] border-t border-neutral-900 flex flex-col items-center space-y-8">
+<div class="font-serif text-[#E6C364] tracking-widest text-3xl">CZAAH</div>
+<div class="flex flex-wrap justify-center gap-8 md:gap-16">
+<a class="text-neutral-600 hover:text-[#E6C364] text-xs tracking-[0.15em] uppercase transition-opacity" href="#">Privacy Policy</a>
+<a class="text-neutral-600 hover:text-[#E6C364] text-xs tracking-[0.15em] uppercase transition-opacity" href="#">Terms of Engagement</a>
+<a class="text-neutral-600 hover:text-[#E6C364] text-xs tracking-[0.15em] uppercase transition-opacity" href="#">Global Compliance</a>
+<a class="text-neutral-600 hover:text-[#E6C364] text-xs tracking-[0.15em] uppercase transition-opacity" href="#">Contact</a>
+</div>
+<div class="pt-8 text-neutral-600 text-[10px] tracking-[0.2em] uppercase opacity-50">
+                © 2024 CZAAH Sovereign Group. All Rights Reserved.
+            </div>
+</footer>
+</main>
+<!-- Mobile Bottom Nav -->
+<nav class="md:hidden fixed bottom-0 w-full bg-[#0E0E0E]/90 backdrop-blur-lg border-t border-neutral-800/30 flex justify-around py-4 px-6 z-50">
+<a class="flex flex-col items-center text-[#E6C364]" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Sectors</span>
+</a>
+<a class="flex flex-col items-center text-neutral-500" href="#">
+<span class="material-symbols-outlined" data-icon="engineering">engineering</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Services</span>
+</a>
+<a class="flex flex-col items-center text-neutral-500" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Insights</span>
+</a>
+<a class="flex flex-col items-center text-neutral-500" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Login</span>
+</a>
+</nav>
+</body></html>

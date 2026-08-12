@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Education Sector | THE GILDED VAULT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed-dim": "#dec57a",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-tint": "#e6c364",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#e6c364",
+                        "on-secondary-fixed-variant": "#564505",
+                        "on-surface": "#e5e2e1",
+                        "on-background": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#35437e",
+                        "surface-variant": "#353534",
+                        "surface-bright": "#3a3939",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "on-tertiary": "#1e2b66",
+                        "primary-fixed-dim": "#e6c364",
+                        "on-tertiary-fixed": "#041451",
+                        "surface": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#313030",
+                        "secondary-container": "#584707",
+                        "tertiary": "#b9c4ff",
+                        "error": "#ffb4ab",
+                        "tertiary-container": "#9ba8eb",
+                        "surface-dim": "#131313",
+                        "primary-container": "#c9a84c",
+                        "secondary": "#dec57a",
+                        "outline-variant": "#4d4637",
+                        "on-secondary-container": "#cfb76e",
+                        "on-primary-fixed": "#241a00",
+                        "surface-container-highest": "#353534",
+                        "on-secondary": "#3c2f00",
+                        "tertiary-fixed-dim": "#b9c3ff",
+                        "on-primary": "#3d2e00",
+                        "on-tertiary-container": "#2e3b77",
+                        "primary-fixed": "#ffe08f",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-primary": "#755b00",
+                        "on-primary-container": "#503d00",
+                        "tertiary-fixed": "#dde1ff",
+                        "outline": "#99907e",
+                        "on-secondary-fixed": "#231b00",
+                        "background": "#131313",
+                        "on-surface-variant": "#d0c5b2",
+                        "on-primary-fixed-variant": "#584400",
+                        "secondary-fixed": "#fbe193",
+                        "on-error": "#690005"
+                    },
+                    fontFamily: {
+                        "headline": ["Cinzel", "serif"],
+                        "body": ["Raleway", "sans-serif"],
+                        "label": ["Raleway", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+            font-family: 'Raleway', sans-serif;
+        }
+        .cinzel { font-family: 'Cinzel', serif; }
+        .bg-obsidian { background-color: #050505; }
+        .text-glow { text-shadow: 0 0 15px rgba(230, 195, 100, 0.3); }
+    </style>
+</head>
+<body class="selection:bg-primary/30 selection:text-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center px-8 py-4 max-w-full shadow-2xl shadow-black/50">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent cinzel">
+            THE GILDED VAULT
+        </div>
+<div class="hidden md:flex gap-12 items-center">
+<a class="text-amber-400 font-bold border-b border-amber-400 pb-1 text-sm tracking-widest uppercase cinzel" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase cinzel" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase cinzel" href="#">Investments</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-neutral-400 hover:text-amber-200 text-sm tracking-widest uppercase cinzel transition-all">Member Login</button>
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary px-6 py-2.5 text-sm font-bold tracking-widest uppercase cinzel shadow-lg shadow-primary/10 hover:scale-[1.02] active:scale-95 transition-all">
+                Schedule Consultation
+            </button>
+</div>
+</nav>
+<!-- Hero Section: Cinematic Asymmetry -->
+<section class="relative min-h-screen flex items-center pt-24 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Cinematic modern university architecture at dusk" class="w-full h-full object-cover opacity-40 grayscale" data-alt="Modern university campus architecture in low light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNid8hiQbIq2eTDLpRTETaCyoqZmEvfkFPhVgzatrFIEHd_Up8et5ejdJzMZiSPyfQuUd-h_lnbYcbSbbnKrTJ2LChM3vv9LErGzkNcZUrRXUkCNAQBhM6K2GXwV6LnlTdsvJlOl2Z5Xz35RbarPVHQ01dkED7MJ6OF1RqPM0xw4IgvudV_u4kFpQKNfWG7grgfSFFdKi-czg58EIsHx51PJzoYzar9YDWtN0_S1RMYyGoDl_yxtFCBoHt7_Xfhjjmwzv7HFTS9suv"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-background to-transparent"></div>
+</div>
+<div class="container mx-auto px-12 relative z-10 grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-8 lg:col-span-6">
+<span class="text-primary tracking-[0.4em] uppercase text-sm mb-6 block font-bold">Sector Portfolio</span>
+<h1 class="cinzel text-6xl md:text-8xl font-black leading-tight text-white mb-8 tracking-tighter">
+                    EDUCATING <br/> <span class="text-primary text-glow">SOVEREIGNS</span>
+</h1>
+<p class="text-on-surface-variant text-lg md:text-xl leading-relaxed max-w-xl mb-12 font-light">
+                    Harnessing Pakistan's demographic youth bulge through institutional excellence. We bridge the infrastructure gap between raw potential and global leadership.
+                </p>
+<div class="flex gap-8 items-center">
+<div class="h-[1px] w-24 bg-primary/40"></div>
+<span class="cinzel text-primary tracking-widest text-sm uppercase">230 Million Potentials</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Demographics Metric: The Progress Micro-Glow -->
+<section class="py-32 bg-surface">
+<div class="container mx-auto px-12">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-24">
+<div class="space-y-6">
+<h3 class="cinzel text-primary text-3xl font-bold">Youth Density</h3>
+<p class="text-on-surface-variant text-sm tracking-wide leading-relaxed">64% of Pakistan's population is under the age of 30, representing the world's most concentrated demographic dividend.</p>
+<div class="pt-4">
+<div class="w-full h-[1px] bg-outline-variant relative">
+<div class="absolute top-0 left-0 h-[1px] bg-gradient-to-r from-primary to-primary-container w-[64%] shadow-[0_0_8px_rgba(230,195,100,0.8)]"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] text-primary tracking-tighter uppercase">
+<span>Current Capacity</span>
+<span>Target Potential</span>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<h3 class="cinzel text-primary text-3xl font-bold">Infrastructure Gap</h3>
+<p class="text-on-surface-variant text-sm tracking-wide leading-relaxed">The demand for Tier-1 higher education exceeds current institutional supply by a factor of twelve.</p>
+<div class="pt-4">
+<div class="w-full h-[1px] bg-outline-variant relative">
+<div class="absolute top-0 left-0 h-[1px] bg-gradient-to-r from-primary to-primary-container w-[12%] shadow-[0_0_8px_rgba(230,195,100,0.8)]"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] text-primary tracking-tighter uppercase">
+<span>Available Seats</span>
+<span>Eligible Students</span>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<h3 class="cinzel text-primary text-3xl font-bold">Global Mobility</h3>
+<p class="text-on-surface-variant text-sm tracking-wide leading-relaxed">Investment in standardized vocational training unlocks international labor markets for the regional workforce.</p>
+<div class="pt-4">
+<div class="w-full h-[1px] bg-outline-variant relative">
+<div class="absolute top-0 left-0 h-[1px] bg-gradient-to-r from-primary to-primary-container w-[88%] shadow-[0_0_8px_rgba(230,195,100,0.8)]"></div>
+</div>
+<div class="flex justify-between mt-2 text-[10px] text-primary tracking-tighter uppercase">
+<span>Skill Alignment</span>
+<span>Market Readiness</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Core Pillars: Bento Grid -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="container mx-auto px-12">
+<div class="flex justify-between items-end mb-20">
+<div class="max-w-2xl">
+<h2 class="cinzel text-5xl font-bold text-white mb-6 uppercase">Strategic Pillars</h2>
+<p class="text-on-surface-variant">Our deployment of capital follows a rigorous institutional framework designed to scale with precision.</p>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-6">
+<!-- University Partnerships -->
+<div class="col-span-12 md:col-span-8 group relative overflow-hidden bg-surface h-[500px]">
+<img alt="Ivy league style library" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-105 transition-transform duration-700" data-alt="Grand traditional university library interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxA9ncjl_n8jTU8hq_hffo8uddH3f_8iJvFGCnostVUWSWf8INSUsdzOui-EUzEZ1Rt7b1cWpaMefW-CSe4IrhmNMAAGzG5L4-U5yxnzoE5JQxYMElgdEUzENkuh2MvK5KVGB3T1AdYs-1-w0tuf3VFwjaOlktl8Q9hiOKMRU5z3oqNVITe8Y1UHvuGuHTxwZMZFfmBG8rn3fc2e9Qs-ob8rksfTsgsa0502XYFJmOo0ROYAFaSEFPFKVtmYiAKAttldfSKXQgw1Y9"/>
+<div class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent"></div>
+<div class="relative h-full p-12 flex flex-col justify-end">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="school">school</span>
+<h3 class="cinzel text-3xl text-white mb-4 uppercase tracking-widest">University Partnerships</h3>
+<p class="text-on-surface-variant max-w-md">Collaborating with the world's leading academic institutions to establish satellite campuses and research hubs in South Asia.</p>
+</div>
+</div>
+<!-- Campus Development -->
+<div class="col-span-12 md:col-span-4 group relative overflow-hidden bg-surface h-[500px]">
+<img alt="Modern office architecture" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-105 transition-transform duration-700" data-alt="Futuristic glass and steel campus structure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDblGbgz0NDhDfP9ZBj8cGM4S3VWzj-5M2q3MhpzRkFAX1asmrWCkY8RBiyUFGlbLNgag6agGZfWkaPThkS7Ttdq0L_2iunk6CtOYPQsISW8hrN_AfDy41Mh-9JmBDozCXa-IchMxqKES3Js7PLj192IQYgWgoguWdlWwnQbLm49olddDL1aR1WKLF7lGLGXZQIJGyKeHbHiQBeruPzuPNYmXt3AI0YhXNQ6i8At_H7xD-IonuKuFy6NmGfC9YVQliHmMCKgDP4G6jz"/>
+<div class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent"></div>
+<div class="relative h-full p-12 flex flex-col justify-end">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="architecture">architecture</span>
+<h3 class="cinzel text-3xl text-white mb-4 uppercase tracking-widest">Campus Assets</h3>
+<p class="text-on-surface-variant">Developing sustainable, ultra-modern physical infrastructure that redefines the student experience.</p>
+</div>
+</div>
+<!-- EdTech -->
+<div class="col-span-12 md:col-span-4 group relative overflow-hidden bg-surface h-[500px]">
+<img alt="Digital interface glowing" class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-700" data-alt="Abstract glowing blue and gold data visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZtxXYCUEM_E4WYrSh4Wzy2GluGJbVCWdpR3vix-n74a35fzUls9GjkpbFEPtc8w6n3YZutIc7Lp8yP9jP5BC-xDiGVdQpmVn-GM9m6YkyOwToKG5VLjViQVl0Qai1Wwh5D5Zxh__1cNqdQ06Iyck7KrMdf-jC6DcdK-bRXTWZ7rv62BTUQJJJlxbc4nf2E1pjCXM23W9B9GCmQ4UQnE7a_7MA659WqKUOskA5lrIBJ9RPxLQ_l5nJWY7i9Twiv1kVeh7EF3kvN9jK"/>
+<div class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent"></div>
+<div class="relative h-full p-12 flex flex-col justify-end">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="terminal">terminal</span>
+<h3 class="cinzel text-3xl text-white mb-4 uppercase tracking-widest">EdTech Forge</h3>
+<p class="text-on-surface-variant">Proprietary learning management systems designed for offline-first resilience in developing markets.</p>
+</div>
+</div>
+<!-- Vocational -->
+<div class="col-span-12 md:col-span-8 group relative overflow-hidden bg-surface h-[500px]">
+<img alt="High precision engineering" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:scale-105 transition-transform duration-700" data-alt="Precision engineering lab with modern tools" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB77R079Hua0UeQD0Oxrk8CxlyJ_GHMp3650_md_c9lidCz-7Otyps2mcowzqP6idsIUeTiAAL-3qTLQ4r_agL_YjnJYdZcs6AWyENAJILJcMh9E3CGS8vQMHOA8--UXrjaRY0vPOEW7r23WeqxBVSaHCXCOVBIgurAa1bj7gIJ9OfjGBUl-gT6cxGNmRDKvoOoCJeXoELe9miE7aN9b1aja-r21AYArsd--BN3RROA1oo2s-AkUtPdsa_mN0SrmCwWUtIIkleS7H6M"/>
+<div class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent"></div>
+<div class="relative h-full p-12 flex flex-col justify-end">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="construction">construction</span>
+<h3 class="cinzel text-3xl text-white mb-4 uppercase tracking-widest">Vocational Training</h3>
+<p class="text-on-surface-variant max-w-md">Certification programs aligned with international standards in renewable energy, AI ethics, and logistics.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Institutional Quote Section -->
+<section class="py-32 relative overflow-hidden">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="container mx-auto px-12 relative z-10 text-center">
+<div class="max-w-4xl mx-auto">
+<span class="material-symbols-outlined text-primary text-6xl mb-8" data-icon="format_quote" data-weight="fill">format_quote</span>
+<blockquote class="cinzel text-3xl md:text-5xl text-white leading-tight font-light mb-12">
+                    "Education is not just a social good; it is the ultimate <span class="text-primary italic">Sovereign Asset</span>. In a world defined by intelligence, the greatest vault is the one that stores knowledge."
+                </blockquote>
+<div class="h-12 w-[1px] bg-primary mx-auto mb-6"></div>
+<cite class="not-italic cinzel tracking-[0.3em] text-primary text-sm uppercase">Institutional Directive 04-B</cite>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full border-t border-amber-900/20 bg-neutral-950">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 cinzel">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-[10px] uppercase tracking-widest leading-relaxed Raleway">
+                    SOVEREIGN ASSET MANAGEMENT.<br/>
+                    CURATING THE FUTURE OF INSTITUTIONAL CAPITAL.
+                </p>
+</div>
+<div>
+<h4 class="cinzel text-amber-500 text-sm tracking-widest uppercase mb-6">Explore</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm Raleway uppercase" href="#">Sectors</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm Raleway uppercase" href="#">Services</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm Raleway uppercase" href="#">Investments</a></li>
+</ul>
+</div>
+<div>
+<h4 class="cinzel text-amber-500 text-sm tracking-widest uppercase mb-6">Governance</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm Raleway uppercase" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm Raleway uppercase" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm Raleway uppercase" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h4 class="cinzel text-amber-500 text-sm tracking-widest uppercase mb-6">Portal</h4>
+<button class="border border-amber-900/40 px-6 py-2 text-[10px] text-amber-500 uppercase tracking-widest hover:bg-amber-500/10 transition-colors Raleway">
+                    Institutional Access
+                </button>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-white/5 text-center">
+<p class="text-neutral-600 text-[10px] tracking-widest cinzel">
+                © 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.
+            </p>
+</div>
+</footer>
+</body></html>

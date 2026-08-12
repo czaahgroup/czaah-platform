@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#201f1f",
+              "secondary-fixed-dim": "#dec57a",
+              "primary-fixed-dim": "#e6c364",
+              "on-tertiary-fixed": "#041451",
+              "surface-container-high": "#2a2a2a",
+              "surface-container-low": "#1c1b1b",
+              "on-surface-variant": "#d0c5b2",
+              "error-container": "#93000a",
+              "secondary": "#dec57a",
+              "inverse-on-surface": "#313030",
+              "tertiary-container": "#9ba8eb",
+              "on-secondary-container": "#cfb76e",
+              "on-error": "#690005",
+              "inverse-surface": "#e5e2e1",
+              "surface-bright": "#3a3939",
+              "on-surface": "#e5e2e1",
+              "primary": "#e6c364",
+              "surface": "#131313",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-variant": "#353534",
+              "error": "#ffb4ab",
+              "tertiary-fixed": "#dde1ff",
+              "on-primary-fixed": "#241a00",
+              "outline-variant": "#4d4637",
+              "on-background": "#e5e2e1",
+              "on-error-container": "#ffdad6",
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-highest": "#353534",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "on-primary": "#3d2e00",
+              "on-tertiary-fixed-variant": "#35437e",
+              "inverse-primary": "#755b00",
+              "background": "#131313",
+              "secondary-container": "#584707",
+              "secondary-fixed": "#fbe193",
+              "surface-tint": "#e6c364",
+              "on-secondary": "#3c2f00",
+              "on-tertiary-container": "#2e3b77",
+              "primary-container": "#c9a84c",
+              "outline": "#99907e",
+              "tertiary": "#b9c4ff",
+              "surface-dim": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "on-primary-fixed-variant": "#584400",
+              "on-tertiary": "#1e2b66",
+              "primary-fixed": "#ffe08f",
+              "on-primary-container": "#503d00"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"],
+              "serif-alt": ["Newsreader", "serif"],
+              "sans-alt": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 1.25rem;
+        }
+        .cinzel-light { font-family: 'Cinzel', serif; font-weight: 300; }
+        .bg-obsidian-glow {
+            background: radial-gradient(circle at center, #1c1b1b 0%, #050505 100%);
+        }
+        .gold-shimmer {
+            background: linear-gradient(135deg, #e6c364 0%, #c9a84c 50%, #e6c364 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-900/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent font-headline">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex items-center space-x-10">
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Investments</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label">Member Login</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2 text-sm tracking-widest uppercase font-bold border-radius-sm transition-all duration-300 active:scale-95">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative min-h-[819px] flex items-center overflow-hidden px-8 md:px-24">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background z-10"></div>
+<img alt="Corporate architectural detail" class="w-full h-full object-cover grayscale opacity-40 scale-105" data-alt="Modern geometric skyscraper facade in dark monochrome" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdjPhRwi7xV9YHfD18yyMTOPRNbHfWMKYkWXh_vKAHG5dEneoVyOgGykK20-3TaCrdWUZPXPMVbXjaoH2MkhoOxtX9MPOQbm0lCW5PrP1Q3Xh6B5EbSukvegHdf7guueO1Ph6n3_kcTF_KCKu5ndX2zQsjnfFm9IEQCOdOv6AOfur06cS-93A89dtb8nqLTmTVS3QqmLDRXZq8BRz-tV5NuiInlpgliC0PvCQtHra_VJRUZtjq75Q7v_yIsMsZeT94oH-O7hcLBtE8"/>
+</div>
+<div class="relative z-20 max-w-5xl">
+<div class="flex items-center space-x-4 mb-6">
+<div class="w-12 h-[1px] bg-primary"></div>
+<span class="text-primary tracking-[0.3em] uppercase text-xs font-bold font-label">About CZAAH</span>
+</div>
+<h1 class="text-6xl md:text-8xl font-headline font-black mb-8 leading-[0.9] tracking-tighter">
+                    About <span class="gold-shimmer">CZAAH.</span>
+</h1>
+<p class="text-xl md:text-2xl text-on-surface-variant font-serif-alt italic leading-relaxed max-w-3xl">
+                    Headquartered in the sovereign heart of Islamabad, CZAAH orchestrates a global symphony of asset management, bridging local opportunities with international institutional reach.
+                </p>
+</div>
+</section>
+<!-- Mission & Vision: Split Layout -->
+<section class="py-32 px-8 md:px-24 bg-surface-container-lowest">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-24 items-start">
+<div class="space-y-12">
+<h2 class="text-4xl font-headline text-primary border-b border-outline-variant/30 pb-6">Our Mission</h2>
+<p class="text-lg text-on-surface-variant leading-loose font-light">
+                        To architect exclusive financial corridors that empower sophisticated investors through precision-engineered SPVs and direct investment mandates. We transform complex capital requirements into seamless, high-yield opportunities for our global partners.
+                    </p>
+</div>
+<div class="space-y-12 md:mt-32">
+<h2 class="text-4xl font-headline text-primary border-b border-outline-variant/30 pb-6">Our Vision</h2>
+<p class="text-lg text-on-surface-variant leading-loose font-light">
+                        To be the premier digital-sovereign bridge for capital flows between emerging frontiers and established financial centers, redefining private equity through transparency, agility, and uncompromising institutional standards.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Structure Section: Detailed Cards -->
+<section class="py-32 px-8 md:px-24 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="mb-20">
+<h3 class="text-sm tracking-[0.4em] uppercase text-on-surface-variant mb-4">The Ecosystem</h3>
+<h2 class="text-5xl font-headline">Institutional Architecture</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-1">
+<!-- CZAAH Capital -->
+<div class="bg-surface-container-low p-12 transition-all duration-500 hover:bg-surface-container-high group border border-outline-variant/10">
+<div class="mb-10 text-primary">
+<span class="material-symbols-outlined !text-4xl">account_balance</span>
+</div>
+<h4 class="text-2xl font-headline mb-6 group-hover:text-primary transition-colors">CZAAH Capital</h4>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-8">
+                        The principal investment arm focusing on late-stage growth equity and strategic infrastructure projects across South Asia and the Middle East.
+                    </p>
+<div class="h-1 w-12 bg-outline-variant group-hover:w-full group-hover:bg-primary transition-all duration-700"></div>
+</div>
+<!-- International Operations -->
+<div class="bg-surface-container-low p-12 transition-all duration-500 hover:bg-surface-container-high group border border-outline-variant/10">
+<div class="mb-10 text-primary">
+<span class="material-symbols-outlined !text-4xl">public</span>
+</div>
+<h4 class="text-2xl font-headline mb-6 group-hover:text-primary transition-colors">International Operations</h4>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-8">
+                        Coordinating across London, Dubai, and Singapore to ensure cross-border compliance and seamless capital mobilization for our global clientele.
+                    </p>
+<div class="h-1 w-12 bg-outline-variant group-hover:w-full group-hover:bg-primary transition-all duration-700"></div>
+</div>
+<!-- Deal-Level SPVs -->
+<div class="bg-surface-container-low p-12 transition-all duration-500 hover:bg-surface-container-high group border border-outline-variant/10">
+<div class="mb-10 text-primary">
+<span class="material-symbols-outlined !text-4xl">layers</span>
+</div>
+<h4 class="text-2xl font-headline mb-6 group-hover:text-primary transition-colors">Deal-Level SPVs</h4>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-8">
+                        Bespoke investment vehicles tailored for specific high-conviction transactions, allowing for granular risk management and targeted exposure.
+                    </p>
+<div class="h-1 w-12 bg-outline-variant group-hover:w-full group-hover:bg-primary transition-all duration-700"></div>
+</div>
+</div>
+</section>
+<!-- Leadership Section: Founders Focus -->
+<section class="py-32 px-8 md:px-24 bg-surface">
+<div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+<div class="max-w-2xl">
+<h3 class="text-sm tracking-[0.4em] uppercase text-primary mb-4 font-bold">The Sovereign Council</h3>
+<h2 class="text-6xl font-headline">Leadership</h2>
+</div>
+<p class="text-on-surface-variant font-serif-alt text-xl italic max-w-md">
+                    Guided by visionaries with deep roots in global finance and frontier markets.
+                </p>
+</div>
+<!-- Founders Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-32">
+<!-- Founder 1 -->
+<div class="relative group cursor-pointer">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-highest">
+<img alt="Managing Director" class="w-full h-full object-cover grayscale transition-transform duration-700 group-hover:scale-110 opacity-80" data-alt="Professional portrait of a male executive in a dark suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjPuAeeJwdPLKCmJcUzWA_va4uNO-mmg2fPFh_bNxy1xNCCkeG1icqbhLo_dh5dTVIvJDTEO5s86qbSZf3xo-KeJ6zDKFLuGgus3KOTOmkxTXNgrk6o7-oIqLaGrotkUNeEl6cfo7WDVDbPhAFFeUoyTPvp8xAIyecVzwFYQQaUmMkiMUQRvGZBoVtIlsfBFCux0EQzIoxfQRlxLvJyw2tqsnYI9bh7_yWNwdwrSRxG5JgPcOpf82vWpLASjUgUtOdmZ30_cjT_El3"/>
+</div>
+<div class="mt-8">
+<h4 class="text-3xl font-headline mb-1">C. Zakariya Ali</h4>
+<p class="text-primary tracking-widest uppercase text-xs font-bold mb-4">Founder &amp; Managing Partner</p>
+<p class="text-on-surface-variant text-sm leading-relaxed max-w-sm">
+                            Architect of CZAAH's global strategy, former investment banker with 20+ years of expertise in structured finance and cross-border M&amp;A.
+                        </p>
+</div>
+</div>
+<!-- Founder 2 -->
+<div class="relative group cursor-pointer md:mt-24">
+<div class="aspect-[4/5] overflow-hidden bg-surface-container-highest">
+<img alt="Chief Operating Officer" class="w-full h-full object-cover grayscale transition-transform duration-700 group-hover:scale-110 opacity-80" data-alt="Professional portrait of a female executive in sophisticated business attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwIpsEcsHud5XcP24H2utFvD7d9HR5OEHLyf8_GAl4-0eKwJnb3BIvkYu2l_1hGiQyFZjh8EE93gnQJ6BGppc37XToaEZpvboaV2y0WjgbFt3nD8739148JNnivUXxvDqRYKcht-nmU8OidyatvJkkWQk5VEqo2ynsw81sn-1E3blq4ikq2BdrgJJbUy0clo5LziqbkXZUTqSBRZWkeNq7G358acv1NhoITBaOiqF1YkhmfzqjfdvcrWJCIVEhc3Q3NflmIgVBA47I"/>
+</div>
+<div class="mt-8">
+<h4 class="text-3xl font-headline mb-1">A. Al-Hamid</h4>
+<p class="text-primary tracking-widest uppercase text-xs font-bold mb-4">Co-Founder &amp; Chief Investment Officer</p>
+<p class="text-on-surface-variant text-sm leading-relaxed max-w-sm">
+                            Overseeing the global portfolio with a focus on sustainable infrastructure and emerging technology sectors.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Extended Team: Prestige List -->
+<div class="border-t border-outline-variant/30 pt-16 grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="space-y-2">
+<h5 class="text-lg font-headline">Hassan Raza</h5>
+<p class="text-on-surface-variant text-xs tracking-widest uppercase">Head of Compliance</p>
+</div>
+<div class="space-y-2">
+<h5 class="text-lg font-headline">Elena Markov</h5>
+<p class="text-on-surface-variant text-xs tracking-widest uppercase">Director, European Markets</p>
+</div>
+<div class="space-y-2">
+<h5 class="text-lg font-headline">Zayn Malik</h5>
+<p class="text-on-surface-variant text-xs tracking-widest uppercase">VP, Strategy &amp; Operations</p>
+</div>
+<div class="space-y-2">
+<h5 class="text-lg font-headline">Sarah J. Williams</h5>
+<p class="text-on-surface-variant text-xs tracking-widest uppercase">Chief Counsel</p>
+</div>
+<div class="space-y-2">
+<h5 class="text-lg font-headline">Omar Al-Sayed</h5>
+<p class="text-on-surface-variant text-xs tracking-widest uppercase">Senior Advisor, MENA</p>
+</div>
+<div class="space-y-2">
+<h5 class="text-lg font-headline">Li Wei</h5>
+<p class="text-on-surface-variant text-xs tracking-widest uppercase">Director, APAC Relations</p>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-40 px-8 text-center bg-surface-container-lowest relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+<div class="relative z-10 max-w-3xl mx-auto">
+<h2 class="text-4xl md:text-5xl font-headline mb-10 leading-tight">Partner with a Sovereign Entity Built for the Future.</h2>
+<div class="flex flex-col md:flex-row items-center justify-center gap-6">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-10 py-4 text-sm tracking-widest uppercase font-bold transition-all duration-300 hover:shadow-[0_0_20px_rgba(230,195,100,0.4)]">
+                        Inquire About Memberships
+                    </button>
+<button class="border border-primary/40 text-primary px-10 py-4 text-sm tracking-widest uppercase font-bold transition-all duration-300 hover:bg-primary hover:text-on-primary">
+                        View Portfolio
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-neutral-950 w-full border-t border-amber-900/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 font-headline uppercase tracking-widest">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-sm leading-relaxed mb-6 font-body">
+                    Elevating capital preservation through elite architectural precision and sovereign mandates.
+                </p>
+</div>
+<div>
+<h5 class="text-amber-500 text-xs tracking-[0.3em] uppercase mb-8 font-bold">Navigation</h5>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm transition-transform hover:translate-x-1 inline-block" href="#">Sectors</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm transition-transform hover:translate-x-1 inline-block" href="#">Services</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm transition-transform hover:translate-x-1 inline-block" href="#">Investments</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-amber-500 text-xs tracking-[0.3em] uppercase mb-8 font-bold">Legal</h5>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm transition-transform hover:translate-x-1 inline-block" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm transition-transform hover:translate-x-1 inline-block" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm transition-transform hover:translate-x-1 inline-block" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-amber-500 text-xs tracking-[0.3em] uppercase mb-8 font-bold">Contact</h5>
+<p class="text-neutral-500 text-sm mb-4">Islamabad HQ: Blue Area, Jinnah Avenue</p>
+<p class="text-neutral-500 text-sm">concierge@thegildedvault.com</p>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-white/5 text-center">
+<span class="text-[10px] uppercase tracking-widest text-neutral-600">© 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.</span>
+</div>
+</footer>
+</body></html>

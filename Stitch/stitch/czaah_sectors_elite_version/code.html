@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed-dim": "#b9c3ff",
+              "on-primary": "#3d2e00",
+              "on-tertiary-fixed-variant": "#35437e",
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-highest": "#353534",
+              "on-background": "#e5e2e1",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#dde1ff",
+              "on-primary-fixed": "#241a00",
+              "outline-variant": "#4d4637",
+              "on-tertiary": "#1e2b66",
+              "primary-fixed": "#ffe08f",
+              "on-primary-container": "#503d00",
+              "surface-dim": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "on-primary-fixed-variant": "#584400",
+              "on-tertiary-container": "#2e3b77",
+              "on-secondary": "#3c2f00",
+              "primary-container": "#c9a84c",
+              "outline": "#99907e",
+              "tertiary": "#b9c4ff",
+              "inverse-primary": "#755b00",
+              "background": "#131313",
+              "secondary-fixed": "#fbe193",
+              "secondary-container": "#584707",
+              "surface-tint": "#e6c364",
+              "on-surface-variant": "#d0c5b2",
+              "error-container": "#93000a",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-fixed": "#041451",
+              "surface-container-low": "#1c1b1b",
+              "secondary-fixed-dim": "#dec57a",
+              "primary-fixed-dim": "#e6c364",
+              "surface-container": "#201f1f",
+              "surface-variant": "#353534",
+              "error": "#ffb4ab",
+              "surface-bright": "#3a3939",
+              "primary": "#e6c364",
+              "on-surface": "#e5e2e1",
+              "surface": "#131313",
+              "surface-container-lowest": "#0e0e0e",
+              "on-secondary-container": "#cfb76e",
+              "on-error": "#690005",
+              "inverse-surface": "#e5e2e1",
+              "tertiary-container": "#9ba8eb",
+              "secondary": "#dec57a",
+              "inverse-on-surface": "#313030"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(230, 195, 100, 0.3);
+        }
+        .cinematic-overlay {
+            background: linear-gradient(to bottom, rgba(5, 5, 5, 0.4), rgba(19, 19, 19, 1));
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #e6c364 0%, #c9a84c 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-900/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent font-headline">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex items-center gap-12">
+<a class="text-amber-400 font-bold border-b border-amber-400 pb-1 text-sm tracking-widest uppercase font-label" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Investments</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-neutral-400 hover:text-amber-200 text-sm tracking-widest uppercase font-label transition-all">Member Login</button>
+<button class="gold-gradient text-on-primary px-6 py-2.5 text-xs font-bold tracking-widest uppercase transition-all hover:brightness-110 active:scale-95">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative h-[921px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Modern skyscraper architecture" class="w-full h-full object-cover grayscale opacity-60" data-alt="Monolithic dark glass skyscraper reaching into a moody sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDy0s0DnFnTH5N2dlEMs-tr_Mpz_5wkjkNgJxoYLBgWVDFlsxJ8PxGvxSVs7W3gngOtWgosfuTy39CaVtfisT8NPzZAKJBGsoJM1KrhAMxKsYjsV9_HoKxeYMcHNV56WJklNbJ52dUQh6tT2GcprYF-yjukKF4L4hxKFnLMpm_s3DL7ZKxKcyXNZh_ComqMvp0b_ftZHHCkAlr240aYY84Vqkm4LZoWN9xCJvSXkqf0y1FttStwn4PslkCQci67GvUjFbu_V4sUp95"/>
+<div class="absolute inset-0 cinematic-overlay"></div>
+</div>
+<div class="container mx-auto px-8 relative z-10 grid grid-cols-12 gap-8">
+<div class="col-span-12 lg:col-span-8">
+<span class="text-primary tracking-[0.4em] uppercase text-sm font-semibold mb-6 block">Institutional Portfolio</span>
+<h1 class="text-6xl md:text-8xl font-headline font-black text-on-surface leading-tight mb-8 tracking-tighter">
+                        Strategic <br/> <span class="text-primary text-glow">Sovereignty</span>
+</h1>
+<p class="text-xl md:text-2xl text-on-surface-variant max-w-2xl leading-relaxed font-light">
+                        We deploy capital across critical infrastructure and high-yield industrial sectors, backed by bilateral sovereign agreements and multi-billion dollar domestic mandates.
+                    </p>
+</div>
+</div>
+<div class="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
+<span class="material-symbols-outlined text-primary text-4xl">expand_more</span>
+</div>
+</section>
+<!-- Sectors Grid -->
+<section class="py-32 bg-surface">
+<div class="container mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1px bg-outline-variant/10">
+<!-- Sector 1: Minerals -->
+<div class="group relative bg-surface-container-low p-12 overflow-hidden transition-all duration-500 hover:bg-surface-container">
+<div class="relative z-10 h-full flex flex-col">
+<span class="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-12">Mandate 001</span>
+<span class="material-symbols-outlined text-primary text-5xl mb-8" data-icon="diamond" style="font-variation-settings: 'FILL' 0;">diamond</span>
+<h3 class="text-3xl font-headline text-on-surface mb-6">Strategic Minerals</h3>
+<p class="text-on-surface-variant leading-relaxed mb-12">Exclusive extraction rights for rare earth elements across designated sovereign zones. A $14.2B operation providing critical components for global high-tech industries.</p>
+<div class="mt-auto pt-8 border-t border-outline-variant/20 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] tracking-widest uppercase font-bold">Government Backed</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+<div class="absolute -right-20 -bottom-20 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[15rem]" data-icon="diamond">diamond</span>
+</div>
+</div>
+<!-- Sector 2: Real Estate -->
+<div class="group relative bg-surface-container-low p-12 overflow-hidden transition-all duration-500 hover:bg-surface-container">
+<div class="relative z-10 h-full flex flex-col">
+<span class="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-12">Mandate 002</span>
+<span class="material-symbols-outlined text-primary text-5xl mb-8" data-icon="apartment" style="font-variation-settings: 'FILL' 0;">apartment</span>
+<h3 class="text-3xl font-headline text-on-surface mb-6">Prime Real Estate</h3>
+<p class="text-on-surface-variant leading-relaxed mb-12">Acquisition of trophy assets and urban developments in high-growth financial hubs. Institutional-grade commercial portfolios with stable sovereign occupancy.</p>
+<div class="mt-auto pt-8 border-t border-outline-variant/20 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] tracking-widest uppercase font-bold">Asset Class A</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+<div class="absolute -right-20 -bottom-20 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[15rem]" data-icon="location_city">location_city</span>
+</div>
+</div>
+<!-- Sector 3: Technology -->
+<div class="group relative bg-surface-container-low p-12 overflow-hidden transition-all duration-500 hover:bg-surface-container">
+<div class="relative z-10 h-full flex flex-col">
+<span class="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-12">Mandate 003</span>
+<span class="material-symbols-outlined text-primary text-5xl mb-8" data-icon="memory" style="font-variation-settings: 'FILL' 0;">memory</span>
+<h3 class="text-3xl font-headline text-on-surface mb-6">Core Technology</h3>
+<p class="text-on-surface-variant leading-relaxed mb-12">Proprietary AI and decentralized finance systems engineered for sovereign data security. Leading the digital transformation of state-level asset management.</p>
+<div class="mt-auto pt-8 border-t border-outline-variant/20 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] tracking-widest uppercase font-bold">R&amp;D Proprietary</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+<div class="absolute -right-20 -bottom-20 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[15rem]" data-icon="lan">lan</span>
+</div>
+</div>
+<!-- Sector 4: Construction -->
+<div class="group relative bg-surface-container-low p-12 overflow-hidden transition-all duration-500 hover:bg-surface-container">
+<div class="relative z-10 h-full flex flex-col">
+<span class="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-12">Mandate 004</span>
+<span class="material-symbols-outlined text-primary text-5xl mb-8" data-icon="architecture" style="font-variation-settings: 'FILL' 0;">architecture</span>
+<h3 class="text-3xl font-headline text-on-surface mb-6">Civil Infrastructure</h3>
+<p class="text-on-surface-variant leading-relaxed mb-12">Large-scale civil engineering projects including trans-national rail, sustainable energy grids, and next-generation smart cities for emerging economies.</p>
+<div class="mt-auto pt-8 border-t border-outline-variant/20 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] tracking-widest uppercase font-bold">Public Private Partnership</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Sector 5: Textiles -->
+<div class="group relative bg-surface-container-low p-12 overflow-hidden transition-all duration-500 hover:bg-surface-container">
+<div class="relative z-10 h-full flex flex-col">
+<span class="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-12">Mandate 005</span>
+<span class="material-symbols-outlined text-primary text-5xl mb-8" data-icon="texture" style="font-variation-settings: 'FILL' 0;">texture</span>
+<h3 class="text-3xl font-headline text-on-surface mb-6">Advanced Textiles</h3>
+<p class="text-on-surface-variant leading-relaxed mb-12">High-performance material manufacturing for aerospace and medical sectors. Leveraging sustainable vertical supply chains across three continents.</p>
+<div class="mt-auto pt-8 border-t border-outline-variant/20 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] tracking-widest uppercase font-bold">Industrial Scale</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+</div>
+<!-- Sector 6: Defense -->
+<div class="group relative bg-surface-container-low p-12 overflow-hidden transition-all duration-500 hover:bg-surface-container">
+<div class="relative z-10 h-full flex flex-col">
+<span class="text-primary text-xs font-bold tracking-[0.3em] uppercase mb-12">Mandate 006</span>
+<span class="material-symbols-outlined text-primary text-5xl mb-8" data-icon="shield" style="font-variation-settings: 'FILL' 0;">shield</span>
+<h3 class="text-3xl font-headline text-on-surface mb-6">Security Services</h3>
+<p class="text-on-surface-variant leading-relaxed mb-12">Risk mitigation and secure logistics for diplomatic and corporate entities. Providing the stability necessary for frontier market investments to thrive.</p>
+<div class="mt-auto pt-8 border-t border-outline-variant/20 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="text-[10px] tracking-widest uppercase font-bold">Sovereign Protection</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-40 bg-surface-container-lowest relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+<div class="container mx-auto px-8 relative z-10">
+<div class="max-w-4xl mx-auto text-center">
+<h2 class="text-5xl md:text-6xl font-headline mb-12 leading-tight">Secure Your Place in the <span class="text-primary italic">Global Order</span></h2>
+<p class="text-xl text-on-surface-variant mb-16 font-light leading-relaxed">
+                        Access to these mandates is strictly limited to institutional partners and ultra-high-net-worth individuals. 
+                        Inquire privately for a strategic consultation regarding sovereign-backed allocations.
+                    </p>
+<div class="flex flex-col md:flex-row justify-center gap-8">
+<button class="gold-gradient text-on-primary px-12 py-5 text-sm font-bold tracking-widest uppercase hover:brightness-110 transition-all shadow-xl shadow-primary/10">
+                            Request Private Briefing
+                        </button>
+<button class="border border-primary/40 text-primary px-12 py-5 text-sm font-bold tracking-widest uppercase hover:bg-primary/10 transition-all">
+                            Review Compliance Standards
+                        </button>
+</div>
+</div>
+</div>
+<div class="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px]"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-neutral-950 w-full border-t border-amber-900/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 font-headline">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-sm leading-relaxed font-body">
+                    A private institutional asset manager dedicated to preserving and growing sovereign wealth through strategic multi-sector mandates.
+                </p>
+</div>
+<div>
+<h4 class="text-amber-500 text-xs font-bold tracking-widest uppercase mb-8 font-label">Navigation</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-sm" href="#">Sectors</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-sm" href="#">Services</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-sm" href="#">Investments</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-amber-500 text-xs font-bold tracking-widest uppercase mb-8 font-label">Legal</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-sm" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-sm" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-amber-500 text-xs font-bold tracking-widest uppercase mb-8 font-label">Global Presence</h4>
+<p class="text-neutral-500 text-sm leading-relaxed font-body">
+                    London • Dubai • Singapore • Zurich<br/>
+<span class="mt-4 block italic">Inquiries by invitation only.</span>
+</p>
+</div>
+</div>
+<div class="border-t border-white/5 py-8 text-center">
+<p class="text-[10px] uppercase tracking-widest text-neutral-600 font-label">
+                © 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.
+            </p>
+</div>
+</footer>
+</body></html>

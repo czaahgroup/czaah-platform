@@ -1,0 +1,120 @@
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 8.6s
+  Skipping validation of types
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/85) ...
+  Generating static pages using 15 workers (21/85) 
+  Generating static pages using 15 workers (42/85) 
+  Generating static pages using 15 workers (63/85) 
+✓ Generating static pages using 15 workers (85/85) in 786.1ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ƒ /admin
+├ ƒ /admin/chats
+├ ƒ /admin/content/investments
+├ ƒ /admin/content/products
+├ ƒ /admin/content/sectors
+├ ƒ /admin/content/services
+├ ƒ /admin/enquiries
+├ ƒ /admin/kyc
+├ ƒ /admin/settings
+├ ƒ /admin/users
+├ ƒ /api/admin/chats
+├ ƒ /api/admin/investments
+├ ƒ /api/admin/investments/[id]
+├ ƒ /api/admin/kyc
+├ ƒ /api/admin/kyc/approve
+├ ƒ /api/admin/kyc/document
+├ ƒ /api/admin/kyc/reject
+├ ƒ /api/admin/lookup
+├ ƒ /api/admin/overview
+├ ƒ /api/admin/products
+├ ƒ /api/admin/products/[id]
+├ ƒ /api/admin/sectors
+├ ƒ /api/admin/sectors/[id]
+├ ƒ /api/admin/services
+├ ƒ /api/admin/services/[id]
+├ ƒ /api/admin/settings
+├ ƒ /api/admin/users
+├ ƒ /api/admin/users/[id]
+├ ƒ /api/auth/callback
+├ ƒ /api/auth/register
+├ ƒ /api/auth/signout
+├ ƒ /api/chat
+├ ƒ /api/enquiries
+├ ƒ /api/enquiries/[id]
+├ ƒ /api/enquiries/[id]/assign
+├ ƒ /api/investments
+├ ƒ /api/investments/[id]
+├ ƒ /api/kyc/approve
+├ ƒ /api/kyc/reject
+├ ƒ /api/member/documents
+├ ƒ /api/notifications
+├ ƒ /api/public/sectors
+├ ƒ /api/public/sectors/[slug]
+├ ƒ /api/public/services
+├ ƒ /api/public/services/[slug]
+├ ƒ /api/sectors
+├ ○ /contact
+├ ○ /dashboard
+├ ○ /dashboard/bookmarks
+├ ○ /dashboard/documents
+├ ○ /dashboard/enquiries
+├ ƒ /dashboard/enquiries/[id]
+├ ○ /dashboard/enquiries/new
+├ ○ /dashboard/history
+├ ○ /dashboard/investments
+├ ƒ /dashboard/investments/[id]
+├ ○ /dashboard/settings
+├ ○ /faq
+├ ○ /insights
+├ ○ /investments
+├ ○ /login
+├ ○ /pending
+├ ○ /privacy
+├ ○ /process
+├ ○ /register
+├ ○ /sectors
+├ ƒ /sectors/[slug]
+├ ○ /sectors/agriculture
+├ ○ /sectors/aviation
+├ ○ /sectors/construction
+├ ○ /sectors/education
+├ ○ /sectors/engineering
+├ ○ /sectors/luxury-rentals
+├ ○ /sectors/manpower
+├ ○ /sectors/minerals
+├ ○ /sectors/pharmaceuticals
+├ ○ /sectors/realestate
+├ ○ /sectors/technology
+├ ○ /sectors/textiles
+├ ○ /sectors/tourism
+├ ○ /services
+├ ƒ /services/[slug]
+├ ○ /services/business-setup
+├ ○ /services/government
+├ ○ /services/import-export
+├ ○ /services/investment-advisory
+├ ○ /services/investment-migration
+├ ○ /services/investor-protection
+├ ○ /services/licensing
+├ ○ /services/partnership-development
+├ ○ /services/payment-solutions
+├ ○ /services/security
+├ ○ /team
+└ ○ /terms
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

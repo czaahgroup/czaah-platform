@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CZAAH Agriculture &amp; Farming - Elite Version</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#cfb76e",
+              "inverse-surface": "#e5e2e1",
+              "surface-variant": "#353534",
+              "outline": "#99907e",
+              "on-tertiary-fixed-variant": "#35437e",
+              "surface-container-high": "#2a2a2a",
+              "surface-dim": "#131313",
+              "secondary-fixed-dim": "#dec57a",
+              "surface-tint": "#e6c364",
+              "tertiary-fixed": "#dde1ff",
+              "on-primary-fixed": "#241a00",
+              "inverse-primary": "#755b00",
+              "on-secondary-fixed": "#231b00",
+              "surface-bright": "#3a3939",
+              "on-secondary-fixed-variant": "#564505",
+              "inverse-on-surface": "#313030",
+              "surface": "#131313",
+              "secondary": "#dec57a",
+              "surface-container-low": "#1c1b1b",
+              "secondary-container": "#584707",
+              "error": "#ffb4ab",
+              "surface-container-highest": "#353534",
+              "primary": "#e6c364",
+              "secondary-fixed": "#fbe193",
+              "outline-variant": "#4d4637",
+              "surface-container": "#201f1f",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "on-surface": "#e5e2e1",
+              "tertiary-container": "#9ba8eb",
+              "on-tertiary-fixed": "#041451",
+              "primary-container": "#c9a84c",
+              "on-primary-container": "#503d00",
+              "on-primary": "#3d2e00",
+              "primary-fixed-dim": "#e6c364",
+              "on-primary-fixed-variant": "#584400",
+              "on-background": "#e5e2e1",
+              "on-tertiary-container": "#2e3b77",
+              "error-container": "#93000a",
+              "background": "#131313",
+              "tertiary": "#b9c4ff",
+              "on-tertiary": "#1e2b66",
+              "surface-container-lowest": "#0e0e0e",
+              "primary-fixed": "#ffe08f",
+              "on-surface-variant": "#d0c5b2",
+              "on-error": "#690005",
+              "on-secondary": "#3c2f00",
+              "on-error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .cinematic-overlay {
+            background: linear-gradient(to bottom, rgba(5, 5, 5, 0.4), rgba(5, 5, 5, 0.9));
+        }
+        .gold-glow {
+            box-shadow: 0 0 40px -10px rgba(230, 195, 100, 0.2);
+        }
+        .asymmetric-border {
+            border-left: 1px solid rgba(230, 195, 100, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent font-headline">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex space-x-12 items-center">
+<a class="text-amber-400 font-bold border-b border-amber-400 pb-1 text-sm tracking-widest uppercase font-label" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Investments</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label">Member Login</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2 rounded-sm text-sm font-bold uppercase tracking-widest hover:scale-95 transition-all duration-300">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section: Cinematic Scarcity -->
+<section class="relative h-[921px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Cinematic landscape of fertile golden fields" class="w-full h-full object-cover" data-alt="Cinematic landscape of fertile golden fields at sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHiR1vY95Gp9SNJov1aBFQmPf6pup3WJrNML5rx93rAem6sZvP4pq1sL829xDyottGRjPSisq0_IGVXuYAZFubYD6Y_rjQ3NB_MjzDJvOZyy04DAPwkPHrnMJ4jiJTN3KKqmn1Z7GX3IgCIUP97peLtINn8w41QSMGHcBVjWE0gwUVHlXPclC1ChT_IcPDhlDRB2uDMUCl10nzKbAxiNx78Da17ndXEUoDfyxTVDg0zO3Twj_0SAWqZabO2Rfsg610BdgmAWaBVXnC"/>
+<div class="absolute inset-0 cinematic-overlay"></div>
+</div>
+<div class="container mx-auto px-12 relative z-10">
+<div class="max-w-4xl">
+<span class="inline-block text-primary font-label tracking-[0.3em] uppercase mb-6 text-sm opacity-80">Institutional Mandate: Agri-Sovereignty</span>
+<h1 class="font-headline text-6xl md:text-8xl lg:text-9xl mb-8 leading-tight tracking-tight">
+                        CZAAH <br/>
+<span class="text-primary italic">Agriculture</span>
+</h1>
+<div class="grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-7 asymmetric-border pl-8">
+<p class="text-on-surface-variant text-lg md:text-xl leading-relaxed font-light italic">
+                                Orchestrating the future of food security through elite asset management and technological integration across the global agrarian landscape.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- The Bento Mandate: Key Sectors -->
+<section class="py-32 px-8 bg-surface">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20">
+<div>
+<h2 class="font-headline text-4xl text-on-surface mb-4">Strategic Domains</h2>
+<div class="h-px w-24 bg-primary"></div>
+</div>
+<p class="text-on-surface-variant max-w-md text-right font-light mt-8 md:mt-0">
+                        Our portfolio represents the pinnacle of agricultural excellence, focusing on high-yield, sustainable, and essential commodities.
+                    </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Basmati Rice: The Crown Jewel -->
+<div class="md:col-span-8 group relative overflow-hidden h-[600px] bg-surface-container-low border border-outline-variant/20">
+<img alt="Premium Basmati Rice grains" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" data-alt="Golden grains of premium long grain basmati rice" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAws0bwJFhURtB6HL2pOqHce7WEewjQlvRu0_p34BvNqQUhmejjjkwMDYSO7wD7tmrECnxwYYtPQ5opeDw8Im-lDlhtnJzkCorwaNb-aYH1cbMknXuXaqJw47MhaByMzlsJoQwYNnMhtdtjIjc0ne42rSztRcgWqA3FohkJQvz12hNoAwBmzBIXPZhuGxL0OeUSqFEpZcY9ebTCWmCGKoKMAnOJQLmoot7M3BGOoXnkAF1ppJWZLPciX3qsPKj8BHbQNafYp4XYMWsj"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12 w-full">
+<span class="text-primary font-label uppercase tracking-widest text-xs mb-2 block">Premium Commodity</span>
+<h3 class="font-headline text-4xl mb-6">Basmati Rice</h3>
+<p class="text-on-surface-variant max-w-xl mb-8 leading-relaxed">
+                                Managing vast estates in the foothills of the Himalayas, we produce the world's most sought-after aromatic long-grain rice through heritage-focused cultivation.
+                            </p>
+<button class="border border-primary/40 px-8 py-3 text-xs font-bold uppercase tracking-widest hover:border-primary transition-all duration-300">Explore Production</button>
+</div>
+</div>
+<!-- Organic Produce: Modern Precision -->
+<div class="md:col-span-4 group relative overflow-hidden h-[600px] bg-surface-container-low border border-outline-variant/20">
+<img alt="Fresh organic greens in a greenhouse" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="High tech indoor organic vertical farming facility" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxg0Dzd-f5xl9CNE8Rp6K-AddEI8tM0c_5djZGIA35ZoyZjgRBnXHFO8F8qVNaOghTpHpJF0XViLwiL-zd6GQEa3cadb5BE1bLYa9hOVtBdaAgrNJNhrYHgcLMVpKTxtxb0aTWohNR_OpyOkGfETPAaqdjAOxCieI2uYyZiCUkhtut2YxdPMe8x_Hm5j3RPn0Vg5Y4FwtvM6NhuFCGTzN5OEMr3dBm99n9h4jMwHqvM2MxbSY1mMYA7bu_2RPvdoq_LkW8Bby_fq9l"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12">
+<span class="text-primary font-label uppercase tracking-widest text-xs mb-2 block">Sustainable Tech</span>
+<h3 class="font-headline text-3xl mb-6">Organic Produce</h3>
+<p class="text-on-surface-variant mb-8 text-sm leading-relaxed">
+                                Vertical farming and hydroponic systems ensuring year-round, chemical-free nutrition for elite markets.
+                            </p>
+<button class="border border-primary/40 px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:border-primary transition-all duration-300">View Infrastructure</button>
+</div>
+</div>
+<!-- Dairy: Sovereign Systems -->
+<div class="md:col-span-4 group relative overflow-hidden h-[500px] bg-surface-container-low border border-outline-variant/20">
+<img alt="Modern dairy facility at sunset" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="State of the art robotic dairy farming facility" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjb3iwNkWBpaWrS2-maS4VQEKtx35SJ7R4RRPEqqqXlba6eieoeah0nY1O5-RkosaV5-TZpvniYetElPhm-nvdU1nYSikq2ALlQTIiSh5lsqkWhV5ZedXsk8RXNcyhfZKjmmPocdA3gNrFyBI27m7tjIjThqbk-IUeC1Ye0pyOlbbS14CBgmS1YlMaKQd9p9X442Ukj-IKu8JrqTLoSTdcsN31cH8Kn_AtDE96NPyYiircfk8RpVamiwT108ev_oeWyCeTtGTj6WCL"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12">
+<h3 class="font-headline text-3xl mb-4 text-on-surface">Dairy Systems</h3>
+<p class="text-on-surface-variant mb-6 text-sm">Automated, welfare-first dairy production pipelines providing premium derivatives.</p>
+</div>
+</div>
+<!-- Tech Integration -->
+<div class="md:col-span-8 flex flex-col justify-center p-12 bg-surface-container-lowest border border-outline-variant/10 relative overflow-hidden h-[500px]">
+<div class="absolute top-0 right-0 p-20 opacity-10">
+<span class="material-symbols-outlined text-[12rem] text-primary">precision_manufacturing</span>
+</div>
+<div class="relative z-10">
+<h3 class="font-headline text-5xl mb-8 max-w-md leading-tight">Agri-Tech <span class="text-primary italic">Precision</span></h3>
+<div class="grid grid-cols-2 gap-12">
+<div>
+<h4 class="text-primary font-bold uppercase tracking-widest text-xs mb-4">Satellite Monitoring</h4>
+<p class="text-on-surface-variant text-sm">Real-time biometrics for soil health and crop yield forecasting across continents.</p>
+</div>
+<div>
+<h4 class="text-primary font-bold uppercase tracking-widest text-xs mb-4">Logistics Sovereignty</h4>
+<p class="text-on-surface-variant text-sm">Proprietary cold-chain infrastructure ensuring zero-waste delivery to global hubs.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Institutional Data Points -->
+<section class="py-24 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-12">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-16 border-t border-outline-variant/20 pt-16">
+<div class="flex flex-col">
+<span class="text-primary font-headline text-5xl mb-2">120K+</span>
+<span class="text-on-surface-variant font-label uppercase tracking-[0.2em] text-xs">Arable Hectares Managed</span>
+<div class="mt-8 h-[1px] w-full bg-outline-variant/20 relative">
+<div class="absolute top-0 left-0 h-[1px] w-3/4 bg-primary gold-glow"></div>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-primary font-headline text-5xl mb-2">24/7</span>
+<span class="text-on-surface-variant font-label uppercase tracking-[0.2em] text-xs">Automated Oversight</span>
+<div class="mt-8 h-[1px] w-full bg-outline-variant/20 relative">
+<div class="absolute top-0 left-0 h-[1px] w-full bg-primary gold-glow"></div>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-primary font-headline text-5xl mb-2">$4.2B</span>
+<span class="text-on-surface-variant font-label uppercase tracking-[0.2em] text-xs">Asset Valuation</span>
+<div class="mt-8 h-[1px] w-full bg-outline-variant/20 relative">
+<div class="absolute top-0 left-0 h-[1px] w-1/2 bg-primary gold-glow"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Call to Action: The Institutional Invitation -->
+<section class="py-40 relative overflow-hidden bg-neutral-950">
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px]"></div>
+</div>
+<div class="max-w-4xl mx-auto text-center px-8 relative z-10">
+<h2 class="font-headline text-5xl md:text-7xl mb-12 tracking-tight">Invest in the <br/><span class="italic text-primary">Fundamental Economy</span></h2>
+<p class="text-on-surface-variant text-lg mb-12 font-light max-w-2xl mx-auto">
+                    Agriculture is the ultimate hedge. Partner with CZAAH to secure positions in the world's most vital resource chains.
+                </p>
+<div class="flex flex-col md:flex-row gap-6 justify-center">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-12 py-5 font-bold uppercase tracking-widest text-sm hover:scale-105 transition-all">
+                        Request Prospectus
+                    </button>
+<button class="border border-outline-variant px-12 py-5 font-bold uppercase tracking-widest text-sm hover:border-primary transition-all">
+                        Consult with Sector Leads
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-neutral-950 w-full border-t border-amber-900/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 font-headline tracking-tighter">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-sm leading-relaxed">
+                    Sovereign asset management for the modern institutional era. Precision, pedigree, and prosperity.
+                </p>
+</div>
+<div class="col-span-1">
+<h4 class="text-amber-500 font-headline text-lg mb-6 tracking-widest">Sectors</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 inline-block text-sm" href="#">Agriculture</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 inline-block text-sm" href="#">Infrastructure</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 inline-block text-sm" href="#">Energy</a></li>
+</ul>
+</div>
+<div class="col-span-1">
+<h4 class="text-amber-500 font-headline text-lg mb-6 tracking-widest">Legal</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 inline-block text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 inline-block text-sm" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 inline-block text-sm" href="#">Compliance</a></li>
+</ul>
+</div>
+<div class="col-span-1">
+<h4 class="text-amber-500 font-headline text-lg mb-6 tracking-widest">Inquiries</h4>
+<p class="text-neutral-500 text-sm mb-4">Global Headquarters<br/>Geneva, Switzerland</p>
+<p class="text-amber-400 font-bold text-sm">office@gildedvault.com</p>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center bg-neutral-950">
+<p class="text-[10px] uppercase tracking-widest text-neutral-500">© 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.</p>
+<div class="flex space-x-6 mt-4 md:mt-0">
+<span class="material-symbols-outlined text-neutral-500 hover:text-amber-400 cursor-pointer transition-colors" style="font-variation-settings: 'opsz' 20;">public</span>
+<span class="material-symbols-outlined text-neutral-500 hover:text-amber-400 cursor-pointer transition-colors" style="font-variation-settings: 'opsz' 20;">account_balance</span>
+<span class="material-symbols-outlined text-neutral-500 hover:text-amber-400 cursor-pointer transition-colors" style="font-variation-settings: 'opsz' 20;">shield</span>
+</div>
+</div>
+</footer>
+</body></html>

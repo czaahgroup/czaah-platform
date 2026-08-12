@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@100;300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#fbe193",
+              "surface-tint": "#e6c364",
+              "surface": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "error-container": "#93000a",
+              "tertiary-fixed": "#dde1ff",
+              "surface-container": "#201f1f",
+              "primary-fixed-dim": "#e6c364",
+              "on-primary-fixed-variant": "#584400",
+              "inverse-primary": "#755b00",
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-lowest": "#0e0e0e",
+              "inverse-on-surface": "#313030",
+              "secondary-container": "#584707",
+              "on-tertiary-fixed-variant": "#35437e",
+              "on-tertiary-container": "#2e3b77",
+              "on-primary": "#3d2e00",
+              "primary": "#e6c364",
+              "surface-dim": "#131313",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#dec57a",
+              "on-surface": "#e5e2e1",
+              "on-secondary-container": "#cfb76e",
+              "on-surface-variant": "#d0c5b2",
+              "surface-bright": "#3a3939",
+              "surface-container-highest": "#353534",
+              "on-error": "#690005",
+              "surface-variant": "#353534",
+              "background": "#131313",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "secondary-fixed-dim": "#dec57a",
+              "outline": "#99907e",
+              "on-secondary": "#3c2f00",
+              "tertiary-container": "#9ba8eb",
+              "on-primary-container": "#503d00",
+              "primary-fixed": "#ffe08f",
+              "outline-variant": "#4d4637",
+              "on-error-container": "#ffdad6",
+              "tertiary": "#b9c4ff",
+              "on-tertiary-fixed": "#041451",
+              "on-tertiary": "#1e2b66",
+              "surface-container-high": "#2a2a2a",
+              "on-background": "#e5e2e1",
+              "surface-container-low": "#1c1b1b",
+              "primary-container": "#c9a84c",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#241a00"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .cinzel-bold { font-family: 'Cinzel', serif; font-weight: 700; }
+        .raleway-light { font-family: 'Raleway', sans-serif; font-weight: 300; }
+        .bg-obsidian-glow {
+            background: radial-gradient(circle at top right, rgba(230, 195, 100, 0.08), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(230, 195, 100, 0.05), transparent 40%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
+<!-- TopNavBar Implementation -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-12 py-6 bg-neutral-950/80 backdrop-blur-xl z-50 bg-gradient-to-b from-neutral-900/50 to-transparent">
+<div class="text-2xl font-serif tracking-[0.2em] text-[#E6C364]">CZAAH</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Sectors</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Services</a>
+<a class="text-[#E6C364] border-b border-[#E6C364]/40 pb-1 font-light tracking-widest" href="#">Insights</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Membership</a>
+</div>
+<div class="flex items-center space-x-8">
+<button class="material-symbols-outlined text-primary hover:text-[#C9A84C] transition-colors">lock</button>
+<button class="px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary text-xs font-bold tracking-widest uppercase rounded-sm hover:scale-95 transition-transform duration-300">Inquire</button>
+</div>
+</nav>
+<!-- SideNavBar Implementation (Desktop Only) -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full pt-24 bg-[#0E0E0E] w-64 border-r border-neutral-800/30 z-40 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.5)]">
+<div class="px-8 mb-12">
+<h3 class="text-lg font-bold text-[#E6C364] font-headline uppercase tracking-widest">Services</h3>
+<p class="text-[10px] text-on-surface-variant raleway-light tracking-widest mt-1">Institutional Excellence</p>
+</div>
+<nav class="flex flex-col space-y-2">
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined">handshake</span>
+<span class="text-sm tracking-tighter">Partnership</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="text-sm tracking-tighter">Government</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined">shield</span>
+<span class="text-sm tracking-tighter">Security</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-sm tracking-tighter">Payments</span>
+</a>
+<a class="flex items-center space-x-4 px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined">flight_takeoff</span>
+<span class="text-sm tracking-tighter">Migration</span>
+</a>
+</nav>
+</aside>
+<main class="lg:ml-64 pt-32 pb-24 px-8 md:px-16 min-h-screen bg-obsidian-glow">
+<!-- Editorial Hero Header -->
+<header class="mb-24 max-w-7xl mx-auto">
+<div class="grid grid-cols-12 gap-8 items-end">
+<div class="col-span-12 lg:col-span-7">
+<span class="text-primary text-xs font-bold tracking-[0.4em] uppercase mb-6 block">Intelligence Report</span>
+<h1 class="font-headline text-5xl md:text-7xl leading-tight text-on-surface mb-8 tracking-tight">The Sovereign <br/><span class="text-primary italic">Perspectives</span></h1>
+</div>
+<div class="col-span-12 lg:col-span-5 pb-2">
+<p class="text-on-surface-variant font-body text-lg leading-relaxed max-w-md ml-auto border-l border-outline-variant pl-8 italic">
+                        Strategic intelligence on Pakistan's high-stakes investment landscape, decoded for the global institutional elite.
+                    </p>
+</div>
+</div>
+</header>
+<!-- Featured Intelligence - Asymmetric Layout -->
+<section class="mb-32 max-w-7xl mx-auto">
+<div class="relative group cursor-pointer overflow-hidden rounded-sm bg-surface-container-low">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+<div class="h-[600px] relative overflow-hidden">
+<img alt="Pakistan Mining Landscape" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Vast cinematic copper mine in rugged mountains at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOI_WF4KpsB1mDe3RWsZY5wHbnsRbCGvP874y5YgsTIICxbDE4LzbHNlBhZ1TDChQRVGo1pzpq7ny3frIMCaeGMpylpDMISNpiVk5CukEXehwSqH6Y2DmBXTsXHZInZY2H81hC3TdIMfym3_p2Xkm0qOVoZo1ko28CvcizOOzp2C3_nUdGNcSU86erFLx6vu0vzWDRpF-BocbK8RTB39Z0JA91otWDCgCmsDU5x0jY2-IdaRlElB9Xnmn-6gyl7MjkAOUT7jx4xBQy"/>
+<div class="absolute inset-0 bg-surface/40 group-hover:bg-surface/20 transition-colors duration-500"></div>
+</div>
+<div class="p-12 md:p-20 flex flex-col justify-center bg-surface-container-lowest border-t md:border-t-0 md:border-l border-outline-variant/20">
+<div class="flex items-center space-x-4 mb-8">
+<span class="text-primary text-[10px] tracking-widest font-bold uppercase py-1 px-3 border border-primary/30">Extractives</span>
+<span class="text-on-surface-variant text-[10px] tracking-widest font-bold uppercase">Report 04-24</span>
+</div>
+<h2 class="font-headline text-4xl leading-snug mb-8 group-hover:text-primary transition-colors">The Copper Corridor: Balochistan’s Trillion-Dollar Awakening</h2>
+<p class="text-on-surface-variant font-body mb-12 leading-relaxed tracking-wide">
+                            Deep-dive into the legal and structural shifts surrounding Reko Diq. We analyze the sovereign guarantees providing a new floor for foreign mining consortiums.
+                        </p>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center space-x-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+<span class="text-primary font-headline text-xs">CS</span>
+</div>
+<div>
+<p class="text-xs font-bold tracking-widest uppercase text-on-surface">Chief Strategist</p>
+<p class="text-[10px] text-on-surface-variant uppercase">8 Min Read</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_right_alt</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Insights Grid - Bento Style -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-32">
+<!-- Insight Card 1 -->
+<div class="md:col-span-2 group cursor-pointer">
+<div class="bg-surface-container-low p-10 h-full flex flex-col border-b border-transparent hover:border-primary/40 transition-all duration-500">
+<span class="text-primary text-[10px] font-bold tracking-widest uppercase mb-6">Real Estate</span>
+<h3 class="font-headline text-3xl mb-6">Metropolitan Resilience: Karachi’s Vertical Shift</h3>
+<p class="text-on-surface-variant font-body mb-8 flex-grow">A quantitative analysis of high-yield commercial hubs and the regulatory easing of skyscraper development in the financial district.</p>
+<div class="pt-8 border-t border-outline-variant/30 flex justify-between items-center">
+<span class="text-[10px] tracking-widest text-on-surface-variant uppercase">April 12, 2024</span>
+<span class="material-symbols-outlined text-primary text-sm">open_in_new</span>
+</div>
+</div>
+</div>
+<!-- Insight Card 2 -->
+<div class="group cursor-pointer">
+<div class="bg-surface-container-highest p-10 h-full flex flex-col">
+<div class="mb-8 overflow-hidden rounded-sm h-48 bg-surface">
+<img alt="Economy Graph" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 opacity-60" data-alt="Abstract dark gold financial trading charts on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGoOoU9OxKM-vDv-ZeTAgOuLyGhOUThoqYwVe74P5Im7iNxILdxWwTp2pJm8WRTv4v1XVS90P771QcJgUgOmTJsJDWFQX3HfGjfZ7x_t_bjXxFeqfeLXeSSHR0utWQBRjVW-44HIu2s41LrS4DrnKc8qWJDTNtfoZWnvl9lzq4FHTLWFxyke-uVuBoRCnOFK_R6oGw3xBZnGid9nQWCeMy_WzSShg1HHLh67-bnfLckDypKPsmymLLAhQabkok4zw3Nw_R-fGFfodE"/>
+</div>
+<span class="text-primary text-[10px] font-bold tracking-widest uppercase mb-4">Economy</span>
+<h3 class="font-headline text-xl mb-4 leading-relaxed">Monetary Stability: The IMF Pivot</h3>
+<p class="text-sm text-on-surface-variant font-body mb-6">Analyzing the ripple effects of the latest tranche on bond yield projections.</p>
+<div class="mt-auto">
+<span class="text-[10px] tracking-widest text-on-surface-variant uppercase">Strategic Briefing</span>
+</div>
+</div>
+</div>
+<!-- Insight Card 3 -->
+<div class="group cursor-pointer">
+<div class="bg-[#0e0e0e] p-10 border border-outline-variant/20 h-full flex flex-col">
+<span class="text-primary text-[10px] font-bold tracking-widest uppercase mb-4">Energy</span>
+<h3 class="font-headline text-xl mb-4 leading-relaxed">Offshore Hydrocarbons: Indus Basin Potential</h3>
+<p class="text-sm text-on-surface-variant font-body mb-6">Why international majors are re-evaluating deep-water blocks following seismic data revisions.</p>
+<div class="mt-auto">
+<span class="text-[10px] tracking-widest text-on-surface-variant uppercase">Confidential Report</span>
+</div>
+</div>
+</div>
+<!-- Insight Card 4 - Large Image/Editorial -->
+<div class="md:col-span-2 relative group overflow-hidden h-[400px]">
+<img alt="Construction" class="w-full h-full object-cover brightness-50" data-alt="High-end architectural concrete and steel structures silhouette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC575gHS28LhX7YBIQw_ycUW8s4IEIzIItXdlY7yvNNTxQBZGkyXe4J6wfUnG88oH20RncbCDNkUlpPHaSTeux2hUTFA2RGs4-3GjiiqKMZf_qEq2Qq_iuKGGGnZVRhsy7W7nDvidzQiR4RFxJrZOX9CHXIzJ6FwCiXaY9LCXRy34agb6dcNIMRIrQ_kR2gJHem1NiJLrfFVilNnkGwWYNZADF49HsQXzuQn6A2u5MUfWKg71ug-hBbernsD-krTXw0c7N0r05S1PER"/>
+<div class="absolute inset-0 p-12 flex flex-col justify-end bg-gradient-to-t from-black to-transparent">
+<span class="text-primary text-[10px] font-bold tracking-widest uppercase mb-4">Infrastructure</span>
+<h3 class="font-headline text-3xl mb-4 max-w-lg">Sovereign Logistics: The Special Economic Zones</h3>
+<p class="text-on-surface font-light max-w-md opacity-80">Unlocking tax exemptions and strategic trade advantages through institutional partnership.</p>
+</div>
+</div>
+</section>
+<!-- Newsletter / Subscription - The Gilded Vault Style -->
+<section class="max-w-4xl mx-auto py-24 px-12 bg-surface-container-low border border-primary/20 relative overflow-hidden text-center">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary mb-6 text-4xl" style="font-variation-settings: 'FILL' 1;">mail</span>
+<h2 class="font-headline text-3xl mb-4 tracking-tight">The Executive Briefing</h2>
+<p class="text-on-surface-variant font-body mb-10 max-w-md mx-auto leading-relaxed">
+                    Exclusive weekly intelligence delivered directly to your secure inbox. No marketing. Only strategy.
+                </p>
+<div class="flex flex-col md:flex-row gap-4 max-w-md mx-auto">
+<input class="bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 text-sm py-3 px-0 w-full font-body placeholder:text-neutral-600 outline-none transition-all" placeholder="Institutional Email" type="email"/>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold px-10 py-3 text-xs uppercase tracking-widest hover:scale-105 transition-all">Join</button>
+</div>
+<p class="text-[9px] text-neutral-600 mt-8 uppercase tracking-[0.2em]">Restricted to Qualified Institutional Investors Only</p>
+</div>
+</section>
+</main>
+<!-- Footer Implementation -->
+<footer class="w-full px-12 flex flex-col items-center space-y-8 bg-[#050505] py-20 border-t border-neutral-900">
+<div class="font-serif text-[#E6C364] tracking-widest text-2xl">CZAAH</div>
+<div class="flex flex-wrap justify-center gap-x-12 gap-y-4">
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity text-xs tracking-[0.15em] uppercase" href="#">Privacy Policy</a>
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity text-xs tracking-[0.15em] uppercase" href="#">Terms of Engagement</a>
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity text-xs tracking-[0.15em] uppercase" href="#">Global Compliance</a>
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity text-xs tracking-[0.15em] uppercase" href="#">Contact</a>
+</div>
+<div class="pt-8 border-t border-neutral-900 w-full text-center">
+<p class="text-neutral-600 text-[10px] tracking-[0.2em] uppercase">© 2024 CZAAH Sovereign Group. All Rights Reserved.</p>
+</div>
+</footer>
+</body></html>

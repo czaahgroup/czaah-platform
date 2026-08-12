@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Gilded Vault | Member Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&amp;family=Raleway:wght@300;400;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,700;1,6..72,400&amp;family=Manrope:wght@300;400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container": "#201f1f",
+                        "secondary-fixed-dim": "#dec57a",
+                        "primary-fixed-dim": "#e6c364",
+                        "on-tertiary-fixed": "#041451",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface-variant": "#d0c5b2",
+                        "error-container": "#93000a",
+                        "secondary": "#dec57a",
+                        "inverse-on-surface": "#313030",
+                        "tertiary-container": "#9ba8eb",
+                        "on-secondary-container": "#cfb76e",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-bright": "#3a3939",
+                        "on-surface": "#e5e2e1",
+                        "primary": "#e6c364",
+                        "surface": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-variant": "#353534",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#dde1ff",
+                        "on-primary-fixed": "#241a00",
+                        "outline-variant": "#4d4637",
+                        "on-background": "#e5e2e1",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#564505",
+                        "surface-container-highest": "#353534",
+                        "tertiary-fixed-dim": "#b9c3ff",
+                        "on-primary": "#3d2e00",
+                        "on-tertiary-fixed-variant": "#35437e",
+                        "inverse-primary": "#755b00",
+                        "background": "#131313",
+                        "secondary-container": "#584707",
+                        "secondary-fixed": "#fbe193",
+                        "surface-tint": "#e6c364",
+                        "on-secondary": "#3c2f00",
+                        "on-tertiary-container": "#2e3b77",
+                        "primary-container": "#c9a84c",
+                        "outline": "#99907e",
+                        "tertiary": "#b9c4ff",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed": "#231b00",
+                        "on-primary-fixed-variant": "#584400",
+                        "on-tertiary": "#1e2b66",
+                        "primary-fixed": "#ffe08f",
+                        "on-primary-container": "#503d00"
+                    },
+                    fontFamily: {
+                        "headline": ["Cinzel", "serif"],
+                        "body": ["Raleway", "sans-serif"],
+                        "label": ["Raleway", "sans-serif"],
+                        "display": ["Cinzel", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-nav {
+            background: rgba(19, 19, 19, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .cinematic-glow {
+            background: radial-gradient(circle at center, rgba(230, 195, 100, 0.08) 0%, transparent 70%);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #e6c364 0%, #c9a84c 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+            font-family: 'Raleway', sans-serif;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-neutral-900/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center w-full px-8 py-4 max-w-full shadow-2xl shadow-black/50">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent font-headline">THE GILDED VAULT</span>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Investments</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label">Member Login</button>
+<button class="gold-gradient text-on-primary px-6 py-2 text-sm font-bold tracking-widest uppercase transition-all duration-300 active:scale-95">Schedule Consultation</button>
+</div>
+</header>
+<div class="flex min-h-screen pt-20">
+<!-- Sidebar Navigation -->
+<aside class="w-64 fixed h-full bg-surface-container-lowest border-r border-outline-variant/20 hidden md:block">
+<div class="p-8 space-y-12">
+<div class="space-y-4">
+<p class="text-[10px] uppercase tracking-[0.2em] text-outline">Principal Access</p>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-amber-400 font-bold border-b border-amber-400 pb-1 bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-xs uppercase tracking-widest font-label">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-amber-200 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-amber-200 transition-colors" data-icon="account_balance">account_balance</span>
+<span class="text-xs uppercase tracking-widest font-label">Portfolios</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-amber-200 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-amber-200 transition-colors" data-icon="shield">shield</span>
+<span class="text-xs uppercase tracking-widest font-label">Security</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-amber-200 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-amber-200 transition-colors" data-icon="description">description</span>
+<span class="text-xs uppercase tracking-widest font-label">Documents</span>
+</a>
+</nav>
+</div>
+<div class="space-y-4">
+<p class="text-[10px] uppercase tracking-[0.2em] text-outline">Support</p>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-amber-200 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-amber-200 transition-colors" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-xs uppercase tracking-widest font-label">Concierge</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-amber-200 transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-amber-200 transition-colors" data-icon="settings">settings</span>
+<span class="text-xs uppercase tracking-widest font-label">Preferences</span>
+</a>
+</nav>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-8 lg:p-12 relative">
+<div class="cinematic-glow fixed inset-0 pointer-events-none"></div>
+<!-- Welcome Header -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-16 relative">
+<div class="space-y-2">
+<h1 class="text-4xl md:text-5xl font-headline tracking-tighter text-on-surface">Welcome back, <span class="text-primary italic">Alexander</span></h1>
+<p class="text-on-surface-variant font-body tracking-wide opacity-80">Your private portfolio oversight for Q3 2024.</p>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-high px-4 py-2 border border-outline-variant/30">
+<div class="w-3 h-3 bg-primary rounded-full animate-pulse"></div>
+<span class="text-xs font-bold uppercase tracking-[0.3em] text-primary">SUPER ADMIN TIER</span>
+</div>
+</header>
+<!-- Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+<!-- Metric Card 1 -->
+<div class="bg-surface-container-low p-8 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl" data-icon="pending_actions">pending_actions</span>
+</div>
+<p class="text-[10px] uppercase tracking-widest text-outline mb-4">Active Enquiries</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-headline text-primary">12</h3>
+<div class="h-8 w-24 flex items-end gap-1">
+<div class="w-2 bg-primary/20 h-[40%]"></div>
+<div class="w-2 bg-primary/20 h-[60%]"></div>
+<div class="w-2 bg-primary/40 h-[50%]"></div>
+<div class="w-2 bg-primary/60 h-[80%]"></div>
+<div class="w-2 bg-primary h-[90%]"></div>
+</div>
+</div>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface-container-low p-8 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl" data-icon="task_alt">task_alt</span>
+</div>
+<p class="text-[10px] uppercase tracking-widest text-outline mb-4">Resolved</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-headline text-on-surface">148</h3>
+<div class="h-8 w-24 flex items-end gap-1">
+<div class="w-2 bg-on-surface/10 h-[70%]"></div>
+<div class="w-2 bg-on-surface/10 h-[80%]"></div>
+<div class="w-2 bg-on-surface/20 h-[75%]"></div>
+<div class="w-2 bg-on-surface/30 h-[85%]"></div>
+<div class="w-2 bg-on-surface/40 h-[95%]"></div>
+</div>
+</div>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-surface-container-low p-8 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl" data-icon="verified_user">verified_user</span>
+</div>
+<p class="text-[10px] uppercase tracking-widest text-outline mb-4">KYC Status</p>
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold uppercase tracking-widest text-secondary">Verified</span>
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+</div>
+<p class="mt-4 text-[10px] text-on-surface-variant font-label tracking-wide">Next review: Dec 2024</p>
+</div>
+<!-- Metric Card 4 -->
+<div class="bg-surface-container-low p-8 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl" data-icon="analytics">analytics</span>
+</div>
+<p class="text-[10px] uppercase tracking-widest text-outline mb-4">Total Enquiries</p>
+<div class="flex items-end justify-between">
+<h3 class="text-3xl font-headline text-on-surface">160</h3>
+<div class="h-8 w-24 flex items-end gap-1">
+<div class="w-2 bg-on-surface/10 h-[30%]"></div>
+<div class="w-2 bg-on-surface/10 h-[40%]"></div>
+<div class="w-2 bg-on-surface/20 h-[60%]"></div>
+<div class="w-2 bg-on-surface/30 h-[70%]"></div>
+<div class="w-2 bg-on-surface/40 h-[100%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Dashboard Body: Asymmetric Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Quick Actions & Main Content -->
+<div class="lg:col-span-8 space-y-12">
+<!-- Quick Actions -->
+<div class="space-y-6">
+<h2 class="text-xs uppercase tracking-[0.4em] text-outline font-bold">Quick Directives</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<button class="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant/10 hover:border-primary/40 transition-all duration-500 group">
+<span class="material-symbols-outlined text-primary mb-4 text-3xl transition-transform group-hover:-translate-y-1" data-icon="add_box">add_box</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface">New Enquiry</span>
+</button>
+<button class="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant/10 hover:border-primary/40 transition-all duration-500 group">
+<span class="material-symbols-outlined text-primary mb-4 text-3xl transition-transform group-hover:-translate-y-1" data-icon="explore">explore</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface">Browse Sectors</span>
+</button>
+<button class="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant/10 hover:border-primary/40 transition-all duration-500 group">
+<span class="material-symbols-outlined text-primary mb-4 text-3xl transition-transform group-hover:-translate-y-1" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface">Fund Assets</span>
+</button>
+<button class="flex flex-col items-center justify-center p-8 bg-surface-container-lowest border border-outline-variant/10 hover:border-primary/40 transition-all duration-500 group">
+<span class="material-symbols-outlined text-primary mb-4 text-3xl transition-transform group-hover:-translate-y-1" data-icon="support_agent">support_agent</span>
+<span class="text-[10px] uppercase tracking-widest text-on-surface">Call Advisor</span>
+</button>
+</div>
+</div>
+<!-- Market Insights (Editorial Pattern) -->
+<div class="bg-surface-container-low p-1 relative">
+<div class="bg-surface-container-lowest p-10 space-y-8">
+<div class="flex justify-between items-center">
+<span class="text-[10px] uppercase tracking-[0.3em] text-primary font-bold">Confidential Insight</span>
+<span class="text-[10px] text-outline">READ TIME: 4 MIN</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div class="space-y-4">
+<h3 class="text-3xl font-headline leading-tight italic text-on-surface">The Emerging Shift in Sovereign Gold Reserves</h3>
+<p class="text-on-surface-variant font-body leading-relaxed text-sm">Central banks are pivoting toward hard asset accumulation at record speeds. We evaluate the implications for private sovereign vaults through the end of the fiscal year.</p>
+<a class="inline-block text-[10px] uppercase tracking-widest text-primary border-b border-primary/30 pb-1 hover:border-primary transition-all" href="#">Review Whitepaper</a>
+</div>
+<div class="relative aspect-video bg-neutral-900 overflow-hidden">
+<img alt="Gold bars in a secure dark environment" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 hover:scale-105 transition-all duration-700" data-alt="Close up of stacked gold bullions in dark vault" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAscaKNwddtgGkBfjscJhWN9-BPwuMaDFDm373ebZaVpdm4Z1-C9OERzVPXRATbTNKlA35hXFLnZlquC0KjI0uSJJF7-idz4sMuOYiwMU-bTwfc0DK2xSR2b4_FGyFU1acY4MQDduceA_3P5tAwvHPZBtZnOHb_wzPUadGyrzfAlljp51h4uLVPfT_JanKrzTKc4KpCy-8J8nTEjPmQ1HmZhGRhcOpwqCQjG0Dp4nBSlByiU7dFs1qj4MP_o6yR39HYXx3VtslhDOyA"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Sidebar -->
+<div class="lg:col-span-4 space-y-8">
+<h2 class="text-xs uppercase tracking-[0.4em] text-outline font-bold">Activity Ledger</h2>
+<div class="space-y-0 border-l border-outline-variant/20">
+<!-- Activity Item 1 -->
+<div class="relative pl-8 pb-8 group">
+<div class="absolute left-[-5px] top-0 w-2.5 h-2.5 bg-primary border border-surface rounded-full z-10"></div>
+<div class="space-y-1">
+<p class="text-[10px] text-outline uppercase tracking-widest">Today, 09:42 AM</p>
+<p class="text-sm font-semibold text-on-surface">Enquiry Created: <span class="text-primary italic">#GV-8821</span></p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Request for private appraisal of offshore digital assets initiated.</p>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="relative pl-8 pb-8 group">
+<div class="absolute left-[-5px] top-0 w-2.5 h-2.5 bg-outline-variant border border-surface rounded-full z-10 group-hover:bg-primary transition-colors"></div>
+<div class="space-y-1">
+<p class="text-[10px] text-outline uppercase tracking-widest">Yesterday, 04:15 PM</p>
+<p class="text-sm font-semibold text-on-surface">Status Updated: <span class="text-secondary italic">KYC Audit</span></p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Global compliance verification completed for account secondary.</p>
+</div>
+</div>
+<!-- Activity Item 3 -->
+<div class="relative pl-8 pb-8 group">
+<div class="absolute left-[-5px] top-0 w-2.5 h-2.5 bg-outline-variant border border-surface rounded-full z-10 group-hover:bg-primary transition-colors"></div>
+<div class="space-y-1">
+<p class="text-[10px] text-outline uppercase tracking-widest">24 Oct, 2024</p>
+<p class="text-sm font-semibold text-on-surface">Document Vault Access</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Security key used to access Quarterly Investment Prospectus.</p>
+</div>
+</div>
+<!-- Activity Item 4 -->
+<div class="relative pl-8 group">
+<div class="absolute left-[-5px] top-0 w-2.5 h-2.5 bg-outline-variant border border-surface rounded-full z-10 group-hover:bg-primary transition-colors"></div>
+<div class="space-y-1">
+<p class="text-[10px] text-outline uppercase tracking-widest">22 Oct, 2024</p>
+<p class="text-sm font-semibold text-on-surface">Portal Login: London, UK</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Authorized entry recorded via secondary biometric validation.</p>
+</div>
+</div>
+</div>
+<div class="pt-8">
+<button class="w-full py-4 border border-outline-variant/30 text-[10px] uppercase tracking-[0.3em] hover:bg-white/5 transition-all text-on-surface-variant">View Full Audit Trail</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-neutral-950 w-full border-t border-amber-900/20 mt-20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div>
+<div class="text-xl font-bold text-amber-500 mb-6 font-headline tracking-tighter uppercase">THE GILDED VAULT</div>
+<p class="text-[10px] text-neutral-500 leading-relaxed uppercase tracking-widest italic">Institutional Grade Sovereignty</p>
+</div>
+<div>
+<p class="text-amber-500 text-xs font-bold tracking-[0.2em] mb-6 uppercase">Platform</p>
+<nav class="flex flex-col gap-4">
+<a class="text-neutral-500 hover:text-neutral-200 text-[13px] transition-all hover:translate-x-1 font-label" href="#">Sectors</a>
+<a class="text-neutral-500 hover:text-neutral-200 text-[13px] transition-all hover:translate-x-1 font-label" href="#">Services</a>
+<a class="text-neutral-500 hover:text-neutral-200 text-[13px] transition-all hover:translate-x-1 font-label" href="#">Investments</a>
+</nav>
+</div>
+<div>
+<p class="text-amber-500 text-xs font-bold tracking-[0.2em] mb-6 uppercase">Governance</p>
+<nav class="flex flex-col gap-4">
+<a class="text-neutral-500 hover:text-neutral-200 text-[13px] transition-all hover:translate-x-1 font-label" href="#">Privacy Policy</a>
+<a class="text-neutral-500 hover:text-neutral-200 text-[13px] transition-all hover:translate-x-1 font-label" href="#">Terms of Service</a>
+<a class="text-neutral-500 hover:text-neutral-200 text-[13px] transition-all hover:translate-x-1 font-label" href="#">Compliance</a>
+</nav>
+</div>
+<div>
+<p class="text-amber-500 text-xs font-bold tracking-[0.2em] mb-6 uppercase">Global HQ</p>
+<p class="text-neutral-500 text-[13px] font-label">Level 82, The Shard<br/>London, UK SE1 9SG</p>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-white/5 text-center">
+<p class="text-[10px] uppercase tracking-widest text-neutral-600">© 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.</p>
+</div>
+</footer>
+</body></html>

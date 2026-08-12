@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Investor Protection | The Gilded Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;500;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#e5e2e1",
+                        "primary-container": "#c9a84c",
+                        "on-primary-container": "#503d00",
+                        "on-primary": "#3d2e00",
+                        "primary-fixed-dim": "#e6c364",
+                        "on-background": "#e5e2e1",
+                        "background": "#131313",
+                        "on-surface-variant": "#d0c5b2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-variant": "#353534",
+                        "surface-dim": "#131313",
+                        "surface": "#131313",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#e6c364",
+                        "outline-variant": "#4d4637",
+                        "surface-container": "#201f1f"
+                    },
+                    fontFamily: {
+                        "headline": ["Cinzel", "serif"],
+                        "body": ["Raleway", "sans-serif"],
+                        "serif-body": ["Newsreader", "serif"],
+                        "label": ["Raleway", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+        .glass-header {
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .premium-gradient {
+            background: linear-gradient(135deg, #e6c364 0%, #c9a84c 100%);
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(230, 195, 100, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-8 py-4 bg-[#050505]/80 backdrop-blur-xl z-50 border-b border-[#4D4637]/20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-widest text-[#E6C364] font-['Cinzel'] uppercase">The Gilded Vault</span>
+<div class="hidden md:flex gap-6 font-['Cinzel'] tracking-[0.1em] uppercase text-xs">
+<a class="text-[#D0C5B2] hover:text-[#E6C364] transition-colors" href="#">Sectors</a>
+<a class="text-[#E6C364] border-b border-[#E6C364] pb-1" href="#">Services</a>
+<a class="text-[#D0C5B2] hover:text-[#E6C364] transition-colors" href="#">Portfolio</a>
+<a class="text-[#D0C5B2] hover:text-[#E6C364] transition-colors" href="#">Vault</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-[#E6C364] cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-[#E6C364] cursor-pointer" data-icon="account_balance_wallet">account_balance_wallet</span>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Sovereign Member Profile Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFM589Dk3cP3Vq7x8xEXSYfB2xcwQl7HsDUpPQr6hY25JQACK0rDUdZJFdj5rmiGVwIoeWXnKfhYgHag-5yeBL_NSGG0-_ZRBKu_j5qa7S8h9twpp2xDLL0EsMUuwMN6NEChjJW6bMjb1P0WXLoa1Wz19NUOeUyeXY7T-P5j2ypQp-Zwom-Zb__MAonO1lLH2ATavPYeOE6KsZKWQVtOt78GkqN6jMhu6pNjC39rV9NhLDEjCw4Y3T18_HhFahxdRithhiDrvavmQj"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar (Hidden on main detail page as per UX mandate for focus) -->
+<main class="pt-24 pb-20">
+<!-- Hero Section: Authoritative Dossier Feel -->
+<section class="relative min-h-[716px] flex items-center px-8 md:px-24 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent z-10"></div>
+<img class="w-full h-full object-cover opacity-40" data-alt="Ultra-modern dark skyscraper architecture with golden lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdWRmSO4US_B9qHQW6OPFqttGRj1SQ-v2iPtQaPy-y2qclwseE0sC6DTNI_cT81idtVVSmZxQwY8M5CdY2zPElDdsy9KCBCy3FB_ivt1d_oeCf7msD29wUiAh7Y1CZFsnF4RMKoHDUIfe-5x--fiC6t--vzDYABn6Ria5c-CCQhE0M9Yh911scADMhqMEpknmw3sBXnQ5TsfdcDDODsFmXA22DcYyFFgRpU7Mvny5_I1-EtPeeRE0LbUluR102oMTKEWoW7q0-o26Q"/>
+</div>
+<div class="relative z-20 max-w-4xl">
+<div class="inline-flex items-center gap-3 mb-6 px-4 py-1 border border-primary/30 bg-primary/5">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="verified_user">verified_user</span>
+<span class="font-headline text-[10px] tracking-[0.3em] uppercase text-primary">Institutional Protocol v.4.0</span>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl font-bold text-primary mb-6 leading-tight tracking-tight text-glow">
+                    Investor Protection
+                </h1>
+<p class="font-serif-body text-2xl md:text-3xl text-on-surface-variant italic leading-relaxed max-w-2xl mb-12">
+                    Surgical Precision in Risk Management. Defining the frontier of institutional security through algorithmic rigor and sovereign legal frameworks.
+                </p>
+<div class="flex gap-8">
+<button class="premium-gradient px-8 py-4 text-on-primary font-bold uppercase tracking-widest text-xs border-radius-sm shadow-lg hover:brightness-110 transition-all">
+                        Request Protocol Access
+                    </button>
+<button class="px-8 py-4 border border-primary/40 text-primary font-bold uppercase tracking-widest text-xs hover:border-primary transition-all">
+                        Security Whitepaper
+                    </button>
+</div>
+</div>
+</section>
+<!-- Protection Framework: Bento Grid / Dossier Style -->
+<section class="px-8 md:px-24 py-24 bg-surface">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+<div class="max-w-xl">
+<h2 class="font-headline text-3xl text-primary uppercase tracking-widest mb-4">Protection Framework</h2>
+<p class="text-on-surface-variant font-serif-body text-lg italic">A multi-layered defense architecture engineered to ensure capital preservation and absolute transparency across global jurisdictions.</p>
+</div>
+<div class="text-right">
+<span class="text-5xl font-headline text-surface-container-highest">06</span>
+<p class="text-[10px] uppercase tracking-[0.2em] text-outline">Active Security Layers</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Layer 1: Pre-Investment Screening -->
+<div class="md:col-span-8 group relative bg-surface-container-low p-10 border-l border-primary/20 hover:border-primary transition-all duration-500">
+<div class="flex justify-between items-start mb-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="policy">policy</span>
+<span class="font-headline text-outline text-sm">L-01</span>
+</div>
+<h3 class="font-headline text-2xl mb-4 group-hover:text-primary transition-colors">Pre-Investment Screening</h3>
+<p class="font-serif-body text-on-surface-variant text-lg leading-relaxed mb-6">
+                        Exhaustive multi-vector due diligence utilizing proprietary AI models to vet assets against historical volatility, regulatory compliance, and ESG benchmarks before a single unit of capital is deployed.
+                    </p>
+<ul class="grid grid-cols-2 gap-4 text-xs font-label uppercase tracking-widest text-outline">
+<li class="flex items-center gap-2"><div class="w-1 h-1 bg-primary"></div> Vector Analysis</li>
+<li class="flex items-center gap-2"><div class="w-1 h-1 bg-primary"></div> KYB Protocol</li>
+<li class="flex items-center gap-2"><div class="w-1 h-1 bg-primary"></div> Liquidity Stress</li>
+<li class="flex items-center gap-2"><div class="w-1 h-1 bg-primary"></div> Risk Modeling</li>
+</ul>
+</div>
+<!-- Layer 2: Legal Architecture -->
+<div class="md:col-span-4 bg-surface-container-lowest p-10 border-t border-primary/10">
+<div class="flex justify-between items-start mb-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="gavel">gavel</span>
+<span class="font-headline text-outline text-sm">L-02</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Legal Architecture</h3>
+<p class="font-serif-body text-on-surface-variant text-base italic leading-relaxed">
+                        Bespoke SPV structures and multi-jurisdictional legal shielding to insulate member assets from systemic counterparty risks.
+                    </p>
+</div>
+<!-- Layer 3: Asset Verification -->
+<div class="md:col-span-4 bg-surface-container-lowest p-10 border-b border-primary/10">
+<div class="flex justify-between items-start mb-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="visibility">visibility</span>
+<span class="font-headline text-outline text-sm">L-03</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Asset Verification</h3>
+<p class="font-serif-body text-on-surface-variant text-base italic leading-relaxed">
+                        Real-time on-chain and physical auditing procedures. Every asset is marked, tracked, and verified daily by independent custodians.
+                    </p>
+</div>
+<!-- Layer 4: Financial Governance -->
+<div class="md:col-span-8 group relative bg-surface-container-low p-10 border-r border-primary/20 hover:border-primary transition-all duration-500">
+<div class="flex justify-between items-start mb-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="account_balance">account_balance</span>
+<span class="font-headline text-outline text-sm">L-04</span>
+</div>
+<h3 class="font-headline text-2xl mb-4 group-hover:text-primary transition-colors">Financial Governance</h3>
+<p class="font-serif-body text-on-surface-variant text-lg leading-relaxed mb-6">
+                        Stringent multi-signature approval workflows and automated capital control limits. No transaction occurs without three-tier institutional validation and sovereign-grade biometric confirmation.
+                    </p>
+<div class="w-full bg-outline-variant/30 h-[1px] mb-6">
+<div class="bg-primary h-full w-3/4 shadow-[0_0_8px_#e6c364]"></div>
+</div>
+<div class="flex justify-between text-[10px] uppercase tracking-widest text-primary">
+<span>Governance Threshold: Secured</span>
+<span>Tier 3 Protocol Active</span>
+</div>
+</div>
+<!-- Layer 5: Compliance Radar -->
+<div class="md:col-span-6 bg-surface-container-high p-10">
+<div class="flex justify-between items-start mb-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="radar">radar</span>
+<span class="font-headline text-outline text-sm">L-05</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Regulatory Compliance</h3>
+<p class="font-serif-body text-on-surface-variant text-base italic leading-relaxed">
+                        Continuous monitoring of global regulatory shifts to ensure all holdings remain compliant with evolving sovereign mandates and disclosure requirements.
+                    </p>
+</div>
+<!-- Layer 6: Crisis Management -->
+<div class="md:col-span-6 bg-surface-container-high p-10">
+<div class="flex justify-between items-start mb-12">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="emergency">emergency</span>
+<span class="font-headline text-outline text-sm">L-06</span>
+</div>
+<h3 class="font-headline text-2xl mb-4">Crisis Mitigation</h3>
+<p class="font-serif-body text-on-surface-variant text-base italic leading-relaxed">
+                        Dynamic hedging strategies and automated 'circuit breakers' designed to liquidate or reallocate capital within milliseconds of market anomaly detection.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Asymmetric Detail Section -->
+<section class="py-32 px-8 md:px-24">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
+<div class="md:col-span-5 order-2 md:order-1">
+<div class="relative aspect-[4/5] w-full border border-outline-variant/30 p-4">
+<img class="w-full h-full object-cover grayscale opacity-60 hover:grayscale-0 transition-all duration-700" data-alt="High-tech server room with golden diagnostic lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfX04bvnkfleZceVXCDZc9gX9TwAS7rypIbXp5uMR6Si93VVJI9GM9YGtpDxas7Y6qNLQeIQ06F_bsqaUo8PgxCSGxVYVTVbLXXQsHVVldyrpm_rFolxvb54rTKEcO4URtDG8sKvU6fjT1AMbOy_em8nYm7H3dHGy5tZtxeHyHgZ4x0ANipI0hEYSMyZwAhzxPqkcUnWGgLM6gezj3dCKuGNbNgR4mD-vqFrT1cKLHv52n3LGnQv6vxtWCfUienaetsUBFEnKKYnWQ"/>
+<div class="absolute -bottom-8 -right-8 bg-surface p-8 border border-primary/20 shadow-2xl max-w-xs">
+<span class="material-symbols-outlined text-primary mb-4" data-icon="lock">lock</span>
+<p class="font-serif-body text-sm italic text-on-surface-variant">"The ultimate luxury in investment is the peace of mind that comes from knowing the perimeter is impenetrable."</p>
+<p class="font-headline text-[10px] tracking-widest text-primary mt-4 uppercase">— Chief Security Architect</p>
+</div>
+</div>
+</div>
+<div class="md:col-span-7 order-1 md:order-2">
+<span class="text-[10px] font-headline tracking-[0.4em] text-primary uppercase mb-6 block">Sovereign Discipline</span>
+<h2 class="font-headline text-4xl md:text-5xl mb-8 leading-tight">The Discipline of Capital Preservation</h2>
+<div class="space-y-8 font-serif-body text-xl text-on-surface-variant/80 leading-relaxed">
+<p>At The Gilded Vault, we view protection not as a feature, but as the fundamental substrate upon which all growth is built. Our approach eschews common market exuberance in favor of a cold, calculated analysis of risk.</p>
+<p>Every asset under our management undergoes a "Sovereign Audit"—a proprietary 400-point check that spans physical existence, legal clarity, and geopolitical vulnerability. This is the institutional discipline that separates the elite from the ephemeral.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full flex flex-col items-center py-12 px-8 gap-6 bg-[#050505] border-t border-[#4D4637]/10">
+<div class="flex flex-wrap justify-center gap-8 mb-4">
+<a class="font-['Raleway'] text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 hover:text-[#E6C364] transition-colors" href="#">Terms of Sovereignty</a>
+<a class="font-['Raleway'] text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 hover:text-[#E6C364] transition-colors" href="#">Privacy Protocol</a>
+<a class="font-['Raleway'] text-[10px] uppercase tracking-[0.2em] text-[#E6C364] transition-colors" href="#">Investor Protection</a>
+<a class="font-['Raleway'] text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 hover:text-[#E6C364] transition-colors" href="#">Institutional Disclosure</a>
+</div>
+<p class="font-['Raleway'] text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 text-center">
+            © 2024 The Gilded Vault. All Rights Reserved. Sovereign Member Confidentiality Applies.
+        </p>
+</footer>
+</body></html>

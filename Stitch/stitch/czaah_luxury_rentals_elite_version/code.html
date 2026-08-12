@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Luxury Rentals | THE GILDED VAULT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed-dim": "#dec57a",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-tint": "#e6c364",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#e6c364",
+                        "on-secondary-fixed-variant": "#564505",
+                        "on-surface": "#e5e2e1",
+                        "on-background": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#35437e",
+                        "surface-variant": "#353534",
+                        "surface-bright": "#3a3939",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "on-tertiary": "#1e2b66",
+                        "primary-fixed-dim": "#e6c364",
+                        "on-tertiary-fixed": "#041451",
+                        "surface": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#313030",
+                        "secondary-container": "#584707",
+                        "tertiary": "#b9c4ff",
+                        "error": "#ffb4ab",
+                        "tertiary-container": "#9ba8eb",
+                        "surface-dim": "#131313",
+                        "primary-container": "#c9a84c",
+                        "secondary": "#dec57a",
+                        "outline-variant": "#4d4637",
+                        "on-secondary-container": "#cfb76e",
+                        "on-primary-fixed": "#241a00",
+                        "surface-container-highest": "#353534",
+                        "on-secondary": "#3c2f00",
+                        "tertiary-fixed-dim": "#b9c3ff",
+                        "on-primary": "#3d2e00",
+                        "on-tertiary-container": "#2e3b77",
+                        "primary-fixed": "#ffe08f",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-primary": "#755b00",
+                        "on-primary-container": "#503d00",
+                        "tertiary-fixed": "#dde1ff",
+                        "outline": "#99907e",
+                        "on-secondary-fixed": "#231b00",
+                        "background": "#131313",
+                        "on-surface-variant": "#d0c5b2",
+                        "on-primary-fixed-variant": "#584400",
+                        "secondary-fixed": "#fbe193",
+                        "on-error": "#690005"
+                    },
+                    fontFamily: {
+                        "headline": ["Cinzel", "serif"],
+                        "body": ["Raleway", "sans-serif"],
+                        "label": ["Raleway", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .cinzel { font-family: 'Cinzel', serif; }
+        .raleway { font-family: 'Raleway', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-obsidian { background-color: #050505; }
+        .text-glow { text-shadow: 0 0 15px rgba(230, 195, 100, 0.3); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent cinzel">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase raleway" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase raleway" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase raleway" href="#">Investments</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase raleway">Member Login</button>
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary px-6 py-2 rounded-sm text-sm font-bold tracking-widest uppercase hover:scale-105 transition-transform duration-300">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="relative h-screen w-full flex items-center overflow-hidden">
+<div class="absolute inset-0 bg-neutral-950">
+<img class="w-full h-full object-cover opacity-40 grayscale-[0.5]" data-alt="Cinematic low angle shot of a black luxury executive sedan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmjE051u6RhTg151VGFoHcA87Tq2F1Y8Ujxwylu7yadB9VLI0lbamGnaGTLpQYqRXWhHTYvuZn3YytcqDklD68lNIReyA04Tp2X4Azxldvsg2PcwYY9_F2OJWfvBPoZhHJAu3sRdkCUdCPE94xlRmG38VxhB1-dfT5bSdgAoT3HW8SWho_8x8iS2YrB6e9W9-nsZXTwVnMCXFUySZ3zar38_sgQu7tzMei6LQ22NvS8E5iuJrTLH6XU6-IrQT9neC6TWnfOCFBrJ8s"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent"></div>
+</div>
+<div class="relative z-10 px-12 md:px-24 w-full grid grid-cols-12">
+<div class="col-span-12 md:col-span-7">
+<span class="text-primary tracking-[0.4em] uppercase text-sm mb-6 block raleway font-semibold">Bespoke Mobility Solutions</span>
+<h1 class="text-5xl md:text-8xl cinzel font-black tracking-tight leading-none mb-8 text-glow">
+                    Sovereign <br/> <span class="text-on-surface-variant">Fleet Services</span>
+</h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-xl mb-10 raleway font-light leading-relaxed">
+                    Unrivaled ground transportation for the global elite. From armoured transport to executive chauffeur excellence, we define the standard of secure mobility.
+                </p>
+<div class="flex gap-4">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-sm cinzel font-bold tracking-widest uppercase text-sm hover:brightness-110 transition-all">Secure Passage</button>
+<button class="border border-outline-variant/40 px-10 py-4 rounded-sm cinzel font-bold tracking-widest uppercase text-sm hover:border-primary/60 transition-all">The Fleet</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Services Bento Grid -->
+<section class="py-32 px-12 md:px-24 bg-surface">
+<div class="mb-20 flex flex-col md:flex-row justify-between items-end gap-8">
+<h2 class="text-4xl md:text-6xl cinzel font-bold">Strategic <br/> Mobility</h2>
+<div class="w-full md:w-1/3 h-[1px] bg-outline-variant/30 mb-4 hidden md:block"></div>
+<p class="text-on-surface-variant max-w-sm raleway uppercase tracking-widest text-xs leading-loose">
+                Managed assets for institutional security and executive excellence in dynamic environments.
+            </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[800px]">
+<!-- Chauffeur Service -->
+<div class="md:col-span-8 relative overflow-hidden group bg-surface-container-low">
+<img class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" data-alt="Professional chauffeur in black suit opening luxury car door" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZQ0-EW6FfzyEJPIm3saYXfW_OZLNaWnRyNey6oEsT7K0RCck0AMIp2kRDLZtOPwN-QNqYgAu6_IAiMkPhS3gjCzOIJBRrVdl3i1gULyieZ-gNMARKDZou6bL--wY83exGBl9Rka466ctJHUVs5gnvtAjUMjC-CKZHEFPTKwzbXexNAQkUqVZ45UzX3lwl_BKLPXhticX-YQvI9UMsICgTAO7fReGrVXcPeWsUG-QocmZs78a6hZYdDunuj77qlqStUAj2E9rWRZ2w"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12">
+<h3 class="text-3xl cinzel mb-4">Elite Chauffeur Service</h3>
+<p class="text-on-surface-variant max-w-md raleway font-light">
+                        Vetted professionals with advanced tactical driving certification and protocol mastery.
+                    </p>
+</div>
+</div>
+<!-- Armoured Transport -->
+<div class="md:col-span-4 relative overflow-hidden group bg-surface-container-low">
+<img class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" data-alt="Matte black armoured SUV parked in urban environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL8dlQgBZW9LDftT5BA66HFk9_7n4A-yzFDK5jfNsGn1KObJfGzZI0aUSYewo189K51d-vzCxHLfsBCXhTl0Xe56HN502a0dB_ULrOuoKC_cTF384n1W1c7Ix_nwyiUiV-U_5WTzMkxj73xCsCIe6UEgoEXgwa1e4gKJDRBj62AvGgrqASnPzclOmruFXb3izUlNw2AhJX8SI64SXbuvXy-wZzNjmAJuyFTfq00EgZz9TQBbdahw_CnD3cRL1ZvqMDkq0HnezGIRcy"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12">
+<h3 class="text-3xl cinzel mb-4">Armoured Transport</h3>
+<p class="text-on-surface-variant raleway font-light">
+                        Level B6/B7 ballistic protection for high-risk transits.
+                    </p>
+</div>
+</div>
+<!-- Corporate Fleet -->
+<div class="md:col-span-4 relative overflow-hidden group bg-surface-container-low">
+<div class="absolute inset-0 bg-surface-container-high/40 p-12 flex flex-col justify-end">
+<div class="mb-6">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="groups">groups</span>
+</div>
+<h3 class="text-3xl cinzel mb-4">Corporate Fleet</h3>
+<p class="text-on-surface-variant raleway font-light">
+                        Scalable asset management for visiting delegations and institutional partners.
+                    </p>
+</div>
+</div>
+<!-- Global Coverage -->
+<div class="md:col-span-8 relative overflow-hidden group bg-surface-container-low">
+<img class="absolute inset-0 w-full h-full object-cover opacity-30" data-alt="Abstract night view of a global metropolis with light trails" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3s93ZaCpX6i2UJSGIdWqiqN-RguXBzUSQ4UfXlooolGA_5mOHdqTd0DujhVWLlNrE4IzlxLuchkbZkIbICzPalPxAumVQd_6ez2hN88ScN0J1Gg06R4939PaSj2JTAqeqis1Jk07IFPbXU4ByHPaFD19MgEJBBV71Fb00zFzGk3WYHa8DjHe1XQf2PBMmYHxFx9_TQBjViO60_cgKSbVuKGhCU5FNlJI_IJO28i-AGsFRvXDWAGNPe_57MChUZ2dOO_vIJfryyudo"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="text-center px-12">
+<h3 class="text-5xl cinzel mb-6">Global Reach</h3>
+<p class="text-on-surface-variant max-w-xl raleway font-light mx-auto uppercase tracking-widest text-sm">
+                            Seamless transit across 40+ strategic global jurisdictions with localized tactical support.
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Detailed Features -->
+<section class="py-32 px-12 md:px-24 bg-surface-container-lowest">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
+<div>
+<h2 class="text-4xl md:text-5xl cinzel font-bold mb-12">The Security Protocol</h2>
+<div class="space-y-12">
+<div class="flex gap-8 group">
+<div class="flex-shrink-0 w-16 h-16 border border-primary/20 flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<h4 class="text-xl cinzel mb-2">Vetted Operators</h4>
+<p class="text-on-surface-variant raleway font-light">All personnel undergo rigorous background checks and continuous security clearance monitoring.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<div class="flex-shrink-0 w-16 h-16 border border-primary/20 flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="architecture">architecture</span>
+</div>
+<div>
+<h4 class="text-xl cinzel mb-2">Advanced Ballistics</h4>
+<p class="text-on-surface-variant raleway font-light">Vehicles equipped with reinforced chassis, run-flat systems, and multi-layer ballistic glass.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<div class="flex-shrink-0 w-16 h-16 border border-primary/20 flex items-center justify-center group-hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<div>
+<h4 class="text-xl cinzel mb-2">Real-time Monitoring</h4>
+<p class="text-on-surface-variant raleway font-light">24/7 command center tracking for every asset and personnel member in the field.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="relative">
+<div class="aspect-[4/5] bg-surface-container-low overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Interior of a luxury executive vehicle showing high end leather seats" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhec8EMXLacmz0UIws0_MuIfgzSpqNj1e1LYdcmd0lWIoB2qmPmSGxsnXqOee_MttiGA3VoqAiee_Cxkut9X6GXfmmDICHJ_IjOFanOufuY45JYvysjL_NoKjTsb1VDn-XyXXhgMzydQgdIX1NgZsvU3rmeFKvlOju2056rgxQRzWr7pM8pyQguqNqJTflen6Zn4wSUBG9a7UJKJTdMk9d1QaNtKqutOvkZRvlNNP42QpRY3pdweKZNiVr4ZWNba8dFKQR7CkubyMU"/>
+</div>
+<div class="absolute -bottom-12 -left-12 p-8 bg-neutral-950 border border-primary/10 max-w-xs shadow-2xl">
+<p class="cinzel text-lg italic text-primary">"Security is the silent foundation of true luxury."</p>
+<p class="raleway uppercase tracking-widest text-[10px] mt-4 text-on-surface-variant">Chief of Operations, Gilded Vault</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Call to Action -->
+<section class="py-40 px-12 md:px-24 text-center">
+<h2 class="text-5xl md:text-7xl cinzel font-black mb-12">Initiate Transfer</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto raleway text-xl font-light mb-16">
+            Access our private inventory and coordinate your secure transport requirements with our concierge team.
+        </p>
+<button class="bg-gradient-to-tr from-amber-400 to-amber-700 text-on-primary px-16 py-6 cinzel font-bold tracking-[0.2em] uppercase text-sm hover:shadow-[0_0_30px_rgba(230,195,100,0.3)] transition-all">
+            Inquire Privately
+        </button>
+</section>
+<!-- Footer -->
+<footer class="w-full border-t border-amber-900/20 bg-neutral-950">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 cinzel">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-[10px] uppercase tracking-widest raleway leading-relaxed">
+                    © 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.
+                </p>
+</div>
+<div>
+<h5 class="cinzel text-amber-500 mb-6 uppercase tracking-widest text-sm font-bold">Sectors</h5>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block raleway text-sm" href="#">Textiles</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block raleway text-sm" href="#">Construction</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block raleway text-sm" href="#">Aviation</a></li>
+</ul>
+</div>
+<div>
+<h5 class="cinzel text-amber-500 mb-6 uppercase tracking-widest text-sm font-bold">Support</h5>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block raleway text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block raleway text-sm" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block raleway text-sm" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="cinzel text-amber-500 mb-6 uppercase tracking-widest text-sm font-bold">Contact</h5>
+<p class="text-neutral-500 raleway text-sm mb-4">Direct Institutional Access</p>
+<p class="text-amber-400 raleway text-sm font-bold tracking-widest">+1 (800) SOVEREIGN</p>
+</div>
+</div>
+</footer>
+</body></html>

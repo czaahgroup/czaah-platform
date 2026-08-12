@@ -1,0 +1,999 @@
+'use client'
+
+import { useEffect, useState, useRef, useCallback } from 'react'
+import type { CallState, CallType, Participant } from '@/lib/hooks/useCall'
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+}
+
+function PhoneIcon({ size = 24, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+    </svg>
+  )
+}
+
+function PhoneEndIcon({ size = 24, color = '#fff' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.68 13.31a16 16 0 003.41 2.6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7 2 2 0 011.72 2v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.42 19.42 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  )
+}
+
+function VideoIcon({ size = 24, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="23 7 16 12 23 17 23 7" fill={color} />
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" fill="none" />
+    </svg>
+  )
+}
+
+function VideoOffIcon({ size = 24, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="23 7 16 12 23 17 23 7" />
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+      <line x1="2" y1="2" x2="22" y2="22" strokeWidth={2} />
+    </svg>
+  )
+}
+
+function MicIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+    </svg>
+  )
+}
+
+function MicOffIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+      <line x1="3" y1="3" x2="21" y2="21" strokeWidth={2} strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function AddIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  )
+}
+
+// Video element component that handles srcObject via ref
+function VideoElement({
+  stream,
+  muted = false,
+  style,
+  className,
+}: {
+  stream: MediaStream | null
+  muted?: boolean
+  style?: React.CSSProperties
+  className?: string
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream
+    }
+  }, [stream])
+
+  return (
+    <video
+      ref={videoRef}
+      autoPlay
+      playsInline
+      muted={muted}
+      style={style}
+      className={className}
+    />
+  )
+}
+
+export interface CallUIProps {
+  callState: CallState
+  callType: CallType | null
+  callDuration: number
+  isMuted: boolean
+  isVideoOff: boolean
+  participants: Participant[]
+  localStream: MediaStream | null
+  callerName: string | null
+  callerType: CallType | null
+  onAccept: () => void
+  onDecline: () => void
+  onEndCall: () => void
+  onToggleMute: () => void
+  onToggleVideo: () => void
+  onAddParticipant?: () => void
+  onRejoin?: () => void
+  canRejoin?: boolean
+}
+
+const STYLES = `
+  @keyframes callPulse {
+    0% { transform: scale(0.5); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+  @keyframes callRing {
+    0% { transform: rotate(-10deg); }
+    100% { transform: rotate(10deg); }
+  }
+  @keyframes callFadeOut {
+    0%, 60% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+`
+
+export function CallUI({
+  callState,
+  callType,
+  callDuration,
+  isMuted,
+  isVideoOff,
+  participants,
+  localStream,
+  callerName,
+  callerType,
+  onAccept,
+  onDecline,
+  onEndCall,
+  onToggleMute,
+  onToggleVideo,
+  onAddParticipant,
+  onRejoin,
+  canRejoin,
+}: CallUIProps) {
+  const [endedVisible, setEndedVisible] = useState(false)
+  const [endedDuration, setEndedDuration] = useState(0)
+  const [endedType, setEndedType] = useState<CallType | null>(null)
+
+  useEffect(() => {
+    if (callState === 'ended') {
+      setEndedDuration(callDuration)
+      setEndedType(callType)
+      setEndedVisible(true)
+      const timer = setTimeout(() => setEndedVisible(false), 2000)
+      return () => clearTimeout(timer)
+    } else {
+      setEndedVisible(false)
+    }
+  }, [callState, callDuration, callType])
+
+  if (callState === 'idle' && !endedVisible) return null
+
+  // Disconnected — show rejoin option
+  if (callState === 'disconnected') {
+    return (
+      <>
+        <style>{STYLES}</style>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 50,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: 'rgba(239,68,68,0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '20px',
+          }}>
+            <PhoneEndIcon size={28} color="#ef4444" />
+          </div>
+          <p style={{
+            fontFamily: "'Cinzel', serif",
+            fontSize: '18px',
+            color: '#fff',
+            marginBottom: '8px',
+          }}>Call Disconnected</p>
+          <p style={{
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: '13px',
+            color: 'rgba(255,255,255,0.4)',
+            marginBottom: '24px',
+          }}>You were disconnected from the call</p>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            {canRejoin && onRejoin && (
+              <button
+                onClick={onRejoin}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 28px',
+                  borderRadius: '24px',
+                  background: 'linear-gradient(135deg, #8a6f2e, #c9a84c)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: "'Raleway', sans-serif",
+                  fontWeight: 600,
+                  fontSize: '14px',
+                  color: '#000',
+                }}
+              >
+                <PhoneIcon size={18} color="#000" />
+                Rejoin Call
+              </button>
+            )}
+            <button
+              onClick={onEndCall}
+              style={{
+                padding: '12px 24px',
+                borderRadius: '24px',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                cursor: 'pointer',
+                fontFamily: "'Raleway', sans-serif",
+                fontSize: '13px',
+                color: 'rgba(255,255,255,0.5)',
+              }}
+            >
+              Leave
+            </button>
+          </div>
+          <p style={{
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: '11px',
+            color: 'rgba(255,255,255,0.25)',
+            marginTop: '16px',
+          }}>Auto-dismissing in 30 seconds</p>
+        </div>
+      </>
+    )
+  }
+
+  // Ended flash
+  if (callState === 'ended' || (callState === 'idle' && endedVisible)) {
+    if (!endedVisible) return null
+    const typeLabel = endedType === 'video' ? 'Video call' : 'Call'
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '8px 16px',
+          animation: 'callFadeOut 2s ease-out forwards',
+        }}
+      >
+        <style>{STYLES}</style>
+        <span
+          style={{
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: '12px',
+            color: 'rgba(255,255,255,0.5)',
+            background: 'rgba(255,255,255,0.05)',
+            padding: '4px 12px',
+            borderRadius: '12px',
+          }}
+        >
+          {typeLabel} ended {endedDuration > 0 ? `\u2014 ${formatDuration(endedDuration)}` : ''}
+        </span>
+      </div>
+    )
+  }
+
+  // Calling overlay
+  if (callState === 'calling') {
+    const isVideo = callType === 'video'
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '24px',
+          zIndex: 50,
+        }}
+      >
+        <style>{STYLES}</style>
+
+        {/* Local video preview during video calling */}
+        {isVideo && localStream && (
+          <div style={{ position: 'absolute', bottom: '120px', right: '20px', zIndex: 51 }}>
+            <VideoElement
+              stream={localStream}
+              muted
+              style={{
+                width: '120px',
+                borderRadius: '8px',
+                border: '2px solid rgba(201,168,76,0.3)',
+                objectFit: 'cover',
+              }}
+            />
+          </div>
+        )}
+
+        {/* Pulsing rings */}
+        <div style={{ position: 'relative', width: '120px', height: '120px' }}>
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '50%',
+              border: '2px solid rgba(201,168,76,0.3)',
+              animation: 'callPulse 2s ease-out infinite',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '50%',
+              border: '2px solid rgba(201,168,76,0.2)',
+              animation: 'callPulse 2s ease-out infinite 0.5s',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '50%',
+              border: '2px solid rgba(201,168,76,0.1)',
+              animation: 'callPulse 2s ease-out infinite 1s',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: 'rgba(201,168,76,0.15)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {isVideo ? (
+              <VideoIcon size={28} color="#C9A84C" />
+            ) : (
+              <PhoneIcon size={28} color="#C9A84C" />
+            )}
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <p
+            style={{
+              fontFamily: "'Cinzel', serif",
+              fontSize: '16px',
+              color: '#fff',
+              letterSpacing: '1px',
+              margin: '0 0 4px 0',
+            }}
+          >
+            Calling...
+          </p>
+          <p
+            style={{
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: '12px',
+              color: 'rgba(255,255,255,0.4)',
+              margin: 0,
+            }}
+          >
+            Waiting for answer
+          </p>
+        </div>
+
+        <button
+          onClick={onEndCall}
+          style={{
+            background: '#ef4444',
+            border: 'none',
+            borderRadius: '50%',
+            width: '56px',
+            height: '56px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+          title="Cancel call"
+        >
+          <PhoneEndIcon size={24} color="#fff" />
+        </button>
+      </div>
+    )
+  }
+
+  // Ringing overlay (incoming call)
+  if (callState === 'ringing') {
+    const isVideo = callerType === 'video'
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '24px',
+          zIndex: 50,
+        }}
+      >
+        <style>{STYLES}</style>
+        <div
+          style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: 'rgba(201,168,76,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            animation: 'callRing 0.5s ease-in-out infinite alternate',
+          }}
+        >
+          {isVideo ? (
+            <VideoIcon size={36} color="#C9A84C" />
+          ) : (
+            <PhoneIcon size={36} color="#C9A84C" />
+          )}
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <p
+            style={{
+              fontFamily: "'Cinzel', serif",
+              fontSize: '16px',
+              color: '#fff',
+              letterSpacing: '1px',
+              margin: '0 0 4px 0',
+            }}
+          >
+            Incoming {isVideo ? 'video' : 'voice'} call
+          </p>
+          <p
+            style={{
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: '14px',
+              color: '#C9A84C',
+              margin: 0,
+              fontWeight: 600,
+            }}
+          >
+            {callerName}
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '24px' }}>
+          <button
+            onClick={onDecline}
+            style={{
+              background: '#ef4444',
+              border: 'none',
+              borderRadius: '50%',
+              width: '56px',
+              height: '56px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+            title="Decline"
+          >
+            <PhoneEndIcon size={24} color="#fff" />
+          </button>
+
+          <button
+            onClick={onAccept}
+            style={{
+              background: '#22c55e',
+              border: 'none',
+              borderRadius: '50%',
+              width: '56px',
+              height: '56px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+            title="Accept"
+          >
+            {isVideo ? (
+              <VideoIcon size={24} color="#fff" />
+            ) : (
+              <PhoneIcon size={24} color="#fff" />
+            )}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Connected -- voice call (compact bar)
+  if (callState === 'connected' && callType === 'voice') {
+    const participantNames = participants.map((p) => p.userName).join(', ')
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '8px 16px',
+          background: '#080808',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}
+      >
+        <span
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: '#22c55e',
+            boxShadow: '0 0 6px rgba(34,197,94,0.5)',
+            flexShrink: 0,
+          }}
+        />
+
+        <span
+          style={{
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#fff',
+            flex: 1,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {participantNames || callerName || 'Call'}
+        </span>
+
+        {participants.length >= 2 && (
+          <span
+            style={{
+              background: 'rgba(201,168,76,0.2)',
+              color: '#C9A84C',
+              fontSize: '10px',
+              fontWeight: 700,
+              padding: '1px 6px',
+              borderRadius: '10px',
+              fontFamily: "'Raleway', sans-serif",
+              flexShrink: 0,
+            }}
+          >
+            {participants.length + 1}
+          </span>
+        )}
+
+        <span
+          style={{
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: '13px',
+            color: '#fff',
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '0.5px',
+            flexShrink: 0,
+          }}
+        >
+          {formatDuration(callDuration)}
+        </span>
+
+        <button
+          onClick={onToggleMute}
+          style={{
+            background: 'none',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '6px',
+            padding: '4px 8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: isMuted ? '#ef4444' : '#C9A84C',
+            transition: 'all 0.15s ease',
+            flexShrink: 0,
+          }}
+          title={isMuted ? 'Unmute' : 'Mute'}
+        >
+          {isMuted ? (
+            <MicOffIcon size={18} color="#ef4444" />
+          ) : (
+            <MicIcon size={18} color="#C9A84C" />
+          )}
+        </button>
+
+        {onAddParticipant && (
+          <button
+            onClick={onAddParticipant}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(201,168,76,0.3)',
+              borderRadius: '6px',
+              padding: '4px 8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.15s ease',
+              flexShrink: 0,
+            }}
+            title="Add participant"
+          >
+            <AddIcon size={16} color="#C9A84C" />
+          </button>
+        )}
+
+        <button
+          onClick={onEndCall}
+          style={{
+            background: '#ef4444',
+            border: 'none',
+            borderRadius: '6px',
+            padding: '4px 10px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            flexShrink: 0,
+          }}
+          title="End call"
+        >
+          <PhoneEndIcon size={14} color="#fff" />
+          <span
+            style={{
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: '11px',
+              color: '#fff',
+              fontWeight: 600,
+            }}
+          >
+            End
+          </span>
+        </button>
+      </div>
+    )
+  }
+
+  // Connected -- video call (full overlay)
+  if (callState === 'connected' && callType === 'video') {
+    const count = participants.length
+    const gridStyle = getVideoGridStyle(count)
+
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: '#000',
+          zIndex: 50,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Duration timer */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            left: '12px',
+            zIndex: 52,
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)',
+            padding: '4px 10px',
+            borderRadius: '12px',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: '14px',
+              color: '#fff',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {formatDuration(callDuration)}
+          </span>
+        </div>
+
+        {/* Video grid */}
+        <div
+          style={{
+            flex: 1,
+            display: 'grid',
+            ...gridStyle,
+            gap: '0px',
+          }}
+        >
+          {participants.map((participant) => (
+            <div
+              key={participant.userId}
+              style={{
+                position: 'relative',
+                background: '#111',
+                overflow: 'hidden',
+              }}
+            >
+              {participant.stream && !participant.isVideoOff ? (
+                <VideoElement
+                  stream={participant.stream}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#111',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '50%',
+                      background: 'rgba(201,168,76,0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'Cinzel', serif",
+                        fontSize: '24px',
+                        color: '#C9A84C',
+                      }}
+                    >
+                      {participant.userName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Name overlay */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: '8px 12px',
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'Raleway', sans-serif",
+                    fontSize: '12px',
+                    color: '#fff',
+                    fontWeight: 500,
+                  }}
+                >
+                  {participant.userName}
+                </span>
+                {participant.isMuted && (
+                  <MicOffIcon size={12} color="#ef4444" />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Local video PIP */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '80px',
+            right: '16px',
+            zIndex: 52,
+          }}
+        >
+          {localStream && !isVideoOff ? (
+            <VideoElement
+              stream={localStream}
+              muted
+              style={{
+                width: '120px',
+                borderRadius: '8px',
+                border: '2px solid rgba(201,168,76,0.3)',
+                objectFit: 'cover',
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: '120px',
+                height: '90px',
+                borderRadius: '8px',
+                border: '2px solid rgba(201,168,76,0.3)',
+                background: '#111',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <VideoOffIcon size={20} color="rgba(255,255,255,0.3)" />
+            </div>
+          )}
+        </div>
+
+        {/* Control bar */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 52,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: 'rgba(0,0,0,0.8)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '24px',
+            padding: '8px 16px',
+          }}
+        >
+          {/* Mute toggle */}
+          <button
+            onClick={onToggleMute}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              border: 'none',
+              background: isMuted ? '#ef4444' : 'rgba(201,168,76,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            title={isMuted ? 'Unmute' : 'Mute'}
+          >
+            {isMuted ? (
+              <MicOffIcon size={20} color="#fff" />
+            ) : (
+              <MicIcon size={20} color="#C9A84C" />
+            )}
+          </button>
+
+          {/* Video toggle */}
+          <button
+            onClick={onToggleVideo}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              border: 'none',
+              background: isVideoOff ? '#ef4444' : 'rgba(201,168,76,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            title={isVideoOff ? 'Turn on camera' : 'Turn off camera'}
+          >
+            {isVideoOff ? (
+              <VideoOffIcon size={20} color="#fff" />
+            ) : (
+              <VideoIcon size={20} color="#C9A84C" />
+            )}
+          </button>
+
+          {/* Add participant */}
+          {onAddParticipant && (
+            <button
+              onClick={onAddParticipant}
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                border: '1px solid rgba(201,168,76,0.3)',
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              title="Add participant"
+            >
+              <AddIcon size={20} color="#C9A84C" />
+            </button>
+          )}
+
+          {/* End call */}
+          <button
+            onClick={onEndCall}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              border: 'none',
+              background: '#ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            title="End call"
+          >
+            <PhoneEndIcon size={20} color="#fff" />
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return null
+}
+
+function getVideoGridStyle(participantCount: number): React.CSSProperties {
+  switch (participantCount) {
+    case 0:
+      return {}
+    case 1:
+      return {
+        gridTemplateColumns: '1fr',
+        gridTemplateRows: '1fr',
+      }
+    case 2:
+      return {
+        gridTemplateColumns: '1fr 1fr',
+        gridTemplateRows: '1fr',
+      }
+    case 3:
+    case 4:
+      return {
+        gridTemplateColumns: '1fr 1fr',
+        gridTemplateRows: '1fr 1fr',
+      }
+    case 5:
+    default:
+      return {
+        gridTemplateColumns: '1fr 1fr 1fr',
+        gridTemplateRows: '1fr 1fr',
+      }
+  }
+}

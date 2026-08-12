@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@100;300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#fbe193",
+              "surface-tint": "#e6c364",
+              "surface": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "error-container": "#93000a",
+              "tertiary-fixed": "#dde1ff",
+              "surface-container": "#201f1f",
+              "primary-fixed-dim": "#e6c364",
+              "on-primary-fixed-variant": "#584400",
+              "inverse-primary": "#755b00",
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-lowest": "#0e0e0e",
+              "inverse-on-surface": "#313030",
+              "secondary-container": "#584707",
+              "on-tertiary-fixed-variant": "#35437e",
+              "on-tertiary-container": "#2e3b77",
+              "on-primary": "#3d2e00",
+              "primary": "#e6c364",
+              "surface-dim": "#131313",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#dec57a",
+              "on-surface": "#e5e2e1",
+              "on-secondary-container": "#cfb76e",
+              "on-surface-variant": "#d0c5b2",
+              "surface-bright": "#3a3939",
+              "surface-container-highest": "#353534",
+              "on-error": "#690005",
+              "surface-variant": "#353534",
+              "background": "#131313",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "secondary-fixed-dim": "#dec57a",
+              "outline": "#99907e",
+              "on-secondary": "#3c2f00",
+              "tertiary-container": "#9ba8eb",
+              "on-primary-container": "#503d00",
+              "primary-fixed": "#ffe08f",
+              "outline-variant": "#4d4637",
+              "on-error-container": "#ffdad6",
+              "tertiary": "#b9c4ff",
+              "on-tertiary-fixed": "#041451",
+              "on-tertiary": "#1e2b66",
+              "surface-container-high": "#2a2a2a",
+              "on-background": "#e5e2e1",
+              "surface-container-low": "#1c1b1b",
+              "primary-container": "#c9a84c",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#241a00"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(230, 195, 100, 0.05) 0%, rgba(5, 5, 5, 0) 50%);
+        }
+        .gold-glow {
+            box-shadow: 0 0 40px -10px rgba(230, 195, 100, 0.15);
+        }
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 selection:text-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-12 py-6 bg-neutral-950/80 backdrop-blur-xl z-50">
+<div class="text-2xl font-serif tracking-[0.2em] text-[#E6C364]">CZAAH</div>
+<div class="hidden md:flex space-x-12">
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Sectors</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Services</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Insights</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Membership</a>
+</div>
+<div class="flex items-center space-x-6">
+<span class="material-symbols-outlined text-[#E6C364] cursor-pointer">lock</span>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-2 text-sm font-bold tracking-widest hover:scale-95 transition-all duration-300">INQUIRE</button>
+</div>
+</nav>
+<!-- SideNavBar (Active: Security) -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full pt-24 bg-[#0E0E0E] h-screen w-64 border-r border-neutral-800/30 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.5)] z-40">
+<div class="px-8 mb-12">
+<h2 class="text-lg font-bold text-[#E6C364] font-headline">Services</h2>
+<p class="text-xs text-neutral-500 tracking-tighter">Institutional Excellence</p>
+</div>
+<nav class="flex flex-col space-y-1">
+<a class="group flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined mr-4 text-sm">handshake</span>
+<span class="text-sm font-medium tracking-tighter">Partnership</span>
+</a>
+<a class="group flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined mr-4 text-sm">account_balance</span>
+<span class="text-sm font-medium tracking-tighter">Government</span>
+</a>
+<a class="group flex items-center px-8 py-4 text-[#E6C364] bg-neutral-900/50 border-r-2 border-[#E6C364] translate-x-1 transition-all" href="#">
+<span class="material-symbols-outlined mr-4 text-sm">shield</span>
+<span class="text-sm font-medium tracking-tighter">Security</span>
+</a>
+<a class="group flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined mr-4 text-sm">payments</span>
+<span class="text-sm font-medium tracking-tighter">Payments</span>
+</a>
+<a class="group flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined mr-4 text-sm">flight_takeoff</span>
+<span class="text-sm font-medium tracking-tighter">Migration</span>
+</a>
+</nav>
+</aside>
+<main class="lg:ml-64 pt-32 min-h-screen">
+<!-- Hero Section -->
+<section class="px-12 mb-32 editorial-grid">
+<div class="col-span-12 lg:col-span-8">
+<h3 class="text-primary text-sm tracking-[0.4em] uppercase mb-6 font-bold">Division of Sovereign Assets</h3>
+<h1 class="font-headline text-5xl lg:text-7xl leading-tight text-on-surface mb-8 tracking-tight">
+                    INTELLIGENCE-LED <br/>
+<span class="text-on-surface-variant font-light italic">Asset Protection</span>
+</h1>
+<p class="text-lg text-on-surface-variant max-w-2xl leading-relaxed font-light mb-12">
+                    CZAAH provides invisible yet impenetrable security architectures for high-stakes environments. From remote extraction sites to executive boardrooms, our oversight ensures the continuity of global enterprise.
+                </p>
+<div class="flex space-x-8">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-10 py-4 font-bold tracking-[0.2em] text-xs transition-transform active:scale-95">REQUEST OVERVIEW</button>
+<button class="border border-primary/40 text-primary px-10 py-4 font-bold tracking-[0.2em] text-xs hover:border-primary transition-colors">OPERATIONAL FOOTPRINT</button>
+</div>
+</div>
+<div class="hidden lg:block col-span-4 relative">
+<div class="absolute inset-0 bg-primary/5 rounded-full blur-[120px]"></div>
+<img class="w-full h-[500px] object-cover grayscale opacity-60 hover:grayscale-0 transition-all duration-700" data-alt="High-tech security operations center with multiple screens" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgvytKjHCG3g46g5GeMdYUY0kAeRu1EtlAjjiOtrJoijvJtdXzjFODvZP6OwytS2mUPkF2IKPfU7ucSISU9DRehN6l4XTRvPQXRxSxazu-D5WDNlSwl8ct3EFmled37YdHapf3G7m9zPdscA9DFbaMMyF11EdlsrSVFRS19mv_k3WWMC1Db0WNIxerKhPrTc_E0uxGRO4d2TM2Ibks1ANN8Gb5s1gfyPe96cQuk-_5H6yn4Psuc0IAtR_j9FqfZyK-ZGJc8-ZYV5R1"/>
+</div>
+</section>
+<!-- Bento Grid Services -->
+<section class="px-12 py-24 bg-surface-container-lowest">
+<div class="mb-16">
+<h2 class="font-headline text-3xl text-[#E6C364] mb-2">Core Competencies</h2>
+<div class="w-24 h-px bg-primary/30"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Mining & Construction -->
+<div class="md:col-span-2 relative group overflow-hidden bg-surface-container-low p-12 flex flex-col justify-end min-h-[500px]">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-30 group-hover:scale-105 transition-transform duration-1000" data-alt="Remote industrial mining site at dusk with security lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT0K3FUA7P5jG0cuM74hmW1TKfdUyMuvh6Ffu7I9G4hCxwmAaTm1Itpd-YEgGPlmwCphG25e4PvO19MXVwnkTUwmjfXBBKgYBtdx7EpN5yoeogPZAsWg88mH-zXx8UcVXaxnECoJCV_1OVVLdYhB03x_x9Ilqu0HRG9I159IrZyHpK5d74nL1XV_VanIYbLIQbR1DuK5Er6oU_Fj6KKM6BXleYiKfkkPUS04UGzIv1HbEjcEYWCyYgy_Nsh_KTepY0F6gzj86-7ziY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+</div>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">construction</span>
+<h3 class="font-headline text-3xl mb-4 text-on-surface">Industrial Sovereignty</h3>
+<p class="text-on-surface-variant max-w-lg mb-8">Specialized site protection for large-scale mining operations and critical infrastructure development in high-risk territories.</p>
+<div class="flex items-center text-primary text-xs tracking-widest font-bold group-hover:gap-4 transition-all">
+                            EXPLORE OPERATIONS <span class="material-symbols-outlined">arrow_right_alt</span>
+</div>
+</div>
+</div>
+<!-- Executive Protection -->
+<div class="relative group bg-surface-container p-12 flex flex-col min-h-[500px]">
+<div class="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1521791136064-7986c2923216?auto=format&amp;fit=crop&amp;q=80&amp;w=800')] bg-cover"></div>
+<div class="relative z-10 h-full flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary text-4xl mb-6" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+<h3 class="font-headline text-2xl mb-4">Executive &amp; Principal Oversight</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">Discreet, tier-one protection for individuals of significant global impact. Seamless integration with lifestyle and mobility.</p>
+</div>
+<ul class="space-y-4 text-xs tracking-widest text-on-surface-variant">
+<li class="flex items-center gap-2"><div class="w-1 h-1 bg-primary"></div> DYNAMIC ESCORT RADAR</li>
+<li class="flex items-center gap-2"><div class="w-1 h-1 bg-primary"></div> ADVANCE RECONNAISSANCE</li>
+<li class="flex items-center gap-2"><div class="w-1 h-1 bg-primary"></div> SECURE LOGISTICS</li>
+</ul>
+</div>
+</div>
+<!-- Corporate Risk -->
+<div class="bg-surface-container-high p-12 flex flex-col justify-center border-t border-primary/10">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">query_stats</span>
+<h3 class="font-headline text-2xl mb-4">Risk Management</h3>
+<p class="text-on-surface-variant text-sm mb-6 leading-relaxed">International operations require granular threat assessments. Our analysts provide real-time intelligence for volatile markets.</p>
+<button class="text-primary border-b border-primary/20 pb-2 self-start text-xs tracking-widest font-bold hover:border-primary transition-all">DATA PRIVACY POLICY</button>
+</div>
+<!-- Specialized Personnel -->
+<div class="md:col-span-2 relative group overflow-hidden bg-surface-container-low p-12 flex items-center min-h-[300px]">
+<div class="w-1/2 pr-8 relative z-10">
+<h3 class="font-headline text-3xl mb-4">The Human Element</h3>
+<p class="text-on-surface-variant text-sm">Our personnel are recruited exclusively from elite government and military units, ensuring a standard of discipline and ethical oversight that defines the CZAAH legacy.</p>
+</div>
+<div class="w-1/2 absolute right-0 h-full">
+<img class="w-full h-full object-cover grayscale brightness-50 group-hover:brightness-100 transition-all duration-700" data-alt="Portrait of a professional security specialist in formal attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsCaPfbkUmXiLNISI4sfHge1qaPV1Q_EXYDTiWNt0IqIVbKe2-pLdLXVy1NLTpVMYZ5_QgBhmolUsyuGvsCvf_zlFfkmSGq_iQtCKo-dXnH8nl986TtSV-E9SAgYb006Sy0m1oClGJeIAqvbmraw9v_h4yIgKPwJb9GJ1iIv_6bQQpfyECiNAbIFLqNcLg114vELT93KQvKKFMEWiHkHsAZ9Lsd5Psg4CjT_eGHe_DrDCoDn2Gn46M4oj1hYgJ8eaSFgS9A7oRruUu"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Global Oversight Map CTA -->
+<section class="px-12 py-32 editorial-grid items-center bg-surface">
+<div class="col-span-12 lg:col-span-5 order-2 lg:order-1">
+<div class="relative">
+<img class="w-full opacity-40" data-alt="Dark stylized world map showing global security networks" data-location="Global Operational Map" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkMERStwRURqpCePoFynIFAVZ_lHqVNog8kjuY6ExzXzrxQZzbxEr1WBbdj1mFguX28BwWLQCKHxNajsZpyNR6DanIxl1QmBsaFtqcwpiONFdmM_8luNGRc8bkL8dXg4LfTVTR_K96BXLhj1S769j7cI7JVUmQJPOZyn_zAXh-uLNDoSYRmIY5oT5Mi2EdS3FXdKOeS18zCO8vbxz8d2bK9C71UkCpTi0AqxoO8RvaO_9GzMHB3qObsdexEHHXW8ezVuy8JlcWa8yt"/>
+<div class="absolute top-1/4 left-1/3 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+<div class="absolute bottom-1/2 right-1/4 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+<div class="absolute top-2/3 right-1/2 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-6 lg:col-start-7 order-1 lg:order-2 mb-16 lg:mb-0">
+<h2 class="font-headline text-4xl lg:text-5xl mb-8 tracking-tighter">TRANSNATIONAL <br/>READINESS</h2>
+<div class="space-y-12">
+<div class="flex gap-6">
+<div class="text-primary font-headline text-3xl">01</div>
+<div>
+<h4 class="font-bold tracking-widest text-xs uppercase mb-2">Crisis Response</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">24/7 global extraction and emergency intervention capabilities for distressed assets.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<div class="text-primary font-headline text-3xl">02</div>
+<div>
+<h4 class="font-bold tracking-widest text-xs uppercase mb-2">Tactical Intelligence</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Direct satellite feeds and ground-level reporting provided exclusively to members.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<div class="text-primary font-headline text-3xl">03</div>
+<div>
+<h4 class="font-bold tracking-widest text-xs uppercase mb-2">Regulatory Buffer</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Ensuring operations remain within global compliance frameworks while maintaining maximum security.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Institutional Trust -->
+<section class="px-12 py-24 border-t border-neutral-900 bg-surface-container-lowest">
+<div class="flex flex-col md:flex-row justify-between items-center gap-12 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700">
+<div class="text-xl font-headline tracking-[0.5em]">ISO 27001</div>
+<div class="text-xl font-headline tracking-[0.5em]">GDPR ELITE</div>
+<div class="text-xl font-headline tracking-[0.5em]">ASIS INTL</div>
+<div class="text-xl font-headline tracking-[0.5em]">ICoC SIGNATORY</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full px-12 flex flex-col items-center space-y-8 bg-[#050505] full-width py-20 border-t border-neutral-900">
+<div class="font-serif text-[#E6C364] tracking-widest text-3xl font-headline">CZAAH</div>
+<div class="flex flex-wrap justify-center gap-12">
+<a class="text-neutral-600 Raleway text-xs tracking-[0.15em] uppercase hover:text-[#E6C364] transition-opacity" href="#">Privacy Policy</a>
+<a class="text-neutral-600 Raleway text-xs tracking-[0.15em] uppercase hover:text-[#E6C364] transition-opacity" href="#">Terms of Engagement</a>
+<a class="text-neutral-600 Raleway text-xs tracking-[0.15em] uppercase hover:text-[#E6C364] transition-opacity" href="#">Global Compliance</a>
+<a class="text-neutral-600 Raleway text-xs tracking-[0.15em] uppercase hover:text-[#E6C364] transition-opacity" href="#">Contact</a>
+</div>
+<p class="text-neutral-600 text-[10px] tracking-[0.2em] uppercase mt-12">© 2024 CZAAH Sovereign Group. All Rights Reserved.</p>
+</footer>
+</body></html>

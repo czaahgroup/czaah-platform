@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CZAAH Member Login - Elite Version</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,700;1,6..72,400&amp;family=Manrope:wght@300;400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-container": "#cfb76e",
+              "inverse-surface": "#e5e2e1",
+              "surface-variant": "#353534",
+              "outline": "#99907e",
+              "on-tertiary-fixed-variant": "#35437e",
+              "surface-container-high": "#2a2a2a",
+              "surface-dim": "#131313",
+              "secondary-fixed-dim": "#dec57a",
+              "surface-tint": "#e6c364",
+              "tertiary-fixed": "#dde1ff",
+              "on-primary-fixed": "#241a00",
+              "inverse-primary": "#755b00",
+              "on-secondary-fixed": "#231b00",
+              "surface-bright": "#3a3939",
+              "on-secondary-fixed-variant": "#564505",
+              "inverse-on-surface": "#313030",
+              "surface": "#131313",
+              "secondary": "#dec57a",
+              "surface-container-low": "#1c1b1b",
+              "secondary-container": "#584707",
+              "error": "#ffb4ab",
+              "surface-container-highest": "#353534",
+              "primary": "#e6c364",
+              "secondary-fixed": "#fbe193",
+              "outline-variant": "#4d4637",
+              "surface-container": "#201f1f",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "on-surface": "#e5e2e1",
+              "tertiary-container": "#9ba8eb",
+              "on-tertiary-fixed": "#041451",
+              "primary-container": "#c9a84c",
+              "on-primary-container": "#503d00",
+              "on-primary": "#3d2e00",
+              "primary-fixed-dim": "#e6c364",
+              "on-primary-fixed-variant": "#584400",
+              "on-background": "#e5e2e1",
+              "on-tertiary-container": "#2e3b77",
+              "error-container": "#93000a",
+              "background": "#131313",
+              "tertiary": "#b9c4ff",
+              "on-tertiary": "#1e2b66",
+              "surface-container-lowest": "#0e0e0e",
+              "primary-fixed": "#ffe08f",
+              "on-surface-variant": "#d0c5b2",
+              "on-error": "#690005",
+              "on-secondary": "#3c2f00",
+              "on-error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .cinzel { font-family: 'Cinzel', serif; }
+        .raleway { font-family: 'Raleway', sans-serif; }
+        .vault-bg-pattern {
+            background-image: radial-gradient(circle at 2px 2px, rgba(230, 195, 100, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        .gold-brushed-border {
+            border: 1px solid transparent;
+            background: linear-gradient(#131313, #131313) padding-box,
+                        linear-gradient(135deg, #e6c364 0%, #584400 50%, #e6c364 100%) border-box;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen flex flex-col">
+<main class="flex-grow flex items-center justify-center relative overflow-hidden py-20 px-6">
+<!-- Background Architectural Lines -->
+<div class="absolute inset-0 vault-bg-pattern pointer-events-none"></div>
+<div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+<svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="100" id="grid" patternunits="userSpaceOnUse" width="100">
+<path d="M 100 0 L 0 0 0 100" fill="none" stroke="#e6c364" stroke-width="0.5"></path>
+</pattern>
+</defs>
+<rect fill="url(#grid)" height="100%" width="100%"></rect>
+</svg>
+</div>
+<!-- Ambient Glow -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+<!-- Login Container -->
+<div class="relative z-10 w-full max-w-[480px]">
+<!-- Header Section -->
+<div class="text-center mb-12">
+<h2 class="cinzel text-primary text-xs tracking-[0.4em] uppercase mb-4">Sovereign Asset Management</h2>
+<h1 class="cinzel text-4xl md:text-5xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent">
+                    THE GILDED VAULT
+                </h1>
+<div class="mt-6 h-[1px] w-24 bg-gradient-to-r from-transparent via-primary/50 to-transparent mx-auto"></div>
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest gold-brushed-border p-10 md:p-14 shadow-2xl shadow-black/80">
+<div class="mb-10 text-center">
+<h3 class="cinzel text-xl text-on-surface tracking-widest uppercase">Member Login</h3>
+<p class="raleway text-on-surface-variant text-sm mt-2 font-light">Access your digital sovereign treasury</p>
+</div>
+<form class="space-y-8">
+<!-- Email Field -->
+<div class="relative group">
+<label class="raleway text-[10px] uppercase tracking-[0.2em] text-outline mb-2 block transition-colors group-focus-within:text-primary" for="email">Entity Identifier</label>
+<div class="flex items-center border-b border-outline-variant group-focus-within:border-primary transition-all duration-500 pb-2">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary text-xl mr-3">fingerprint</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-surface-variant raleway text-base" id="email" name="email" placeholder="name@institution.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="relative group">
+<div class="flex justify-between items-end mb-2">
+<label class="raleway text-[10px] uppercase tracking-[0.2em] text-outline transition-colors group-focus-within:text-primary" for="password">Security Cipher</label>
+<a class="raleway text-[10px] uppercase tracking-[0.1em] text-on-surface-variant hover:text-primary transition-colors" href="#">Recover Access</a>
+</div>
+<div class="flex items-center border-b border-outline-variant group-focus-within:border-primary transition-all duration-500 pb-2">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary text-xl mr-3">lock_open</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface placeholder:text-surface-variant raleway text-base" id="password" name="password" placeholder="••••••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- MFA Notice -->
+<div class="flex items-start space-x-3 bg-surface-container/50 p-4 rounded-sm border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">verified_user</span>
+<p class="text-[11px] leading-relaxed text-on-surface-variant raleway uppercase tracking-wider">
+                            Multi-factor authentication (MFA) will be requested upon successful identity verification.
+                        </p>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary py-4 cinzel font-bold text-sm tracking-[0.2em] uppercase transition-all duration-300 hover:brightness-110 active:scale-[0.98] shadow-lg shadow-primary/10" type="submit">
+                        Enter The Vault
+                    </button>
+</form>
+<!-- Footer Links -->
+<div class="mt-12 pt-8 border-t border-outline-variant/20 flex flex-col items-center space-y-4">
+<p class="raleway text-[10px] text-outline uppercase tracking-widest">Inquiry for Institutional Access?</p>
+<a class="raleway text-xs text-primary border border-primary/40 px-6 py-2 hover:bg-primary/5 transition-all duration-300" href="#">
+                        Request Credentials
+                    </a>
+</div>
+</div>
+<!-- Compliance Disclaimer -->
+<div class="mt-12 px-4">
+<p class="text-[9px] text-center text-outline uppercase tracking-[0.15em] leading-loose opacity-60">
+                    This system is restricted to authorized personnel. All connections are encrypted via sovereign protocols. By proceeding, you agree to the Gilded Vault's compliance and data sovereignty terms.
+                </p>
+</div>
+</div>
+</main>
+<!-- Institutional Footer -->
+<footer class="bg-neutral-950 border-t border-amber-900/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 cinzel">THE GILDED VAULT</div>
+<p class="raleway text-[0.875rem] text-neutral-500 leading-relaxed">
+                    Pioneering sovereign asset management for the digital age. Precision, privacy, and prestige in every transaction.
+                </p>
+</div>
+<div class="flex flex-col space-y-4">
+<h4 class="cinzel text-amber-500 text-sm tracking-widest uppercase">Navigation</h4>
+<nav class="flex flex-col space-y-2">
+<a class="raleway text-[0.875rem] text-neutral-500 hover:text-neutral-200 hover:translate-x-1 transition-transform duration-300" href="#">Sectors</a>
+<a class="raleway text-[0.875rem] text-neutral-500 hover:text-neutral-200 hover:translate-x-1 transition-transform duration-300" href="#">Services</a>
+<a class="raleway text-[0.875rem] text-neutral-500 hover:text-neutral-200 hover:translate-x-1 transition-transform duration-300" href="#">Investments</a>
+</nav>
+</div>
+<div class="flex flex-col space-y-4">
+<h4 class="cinzel text-amber-500 text-sm tracking-widest uppercase">Legal</h4>
+<nav class="flex flex-col space-y-2">
+<a class="raleway text-[0.875rem] text-neutral-500 hover:text-neutral-200 hover:translate-x-1 transition-transform duration-300" href="#">Privacy Policy</a>
+<a class="raleway text-[0.875rem] text-neutral-500 hover:text-neutral-200 hover:translate-x-1 transition-transform duration-300" href="#">Terms of Service</a>
+<a class="raleway text-[0.875rem] text-neutral-500 hover:text-neutral-200 hover:translate-x-1 transition-transform duration-300" href="#">Compliance</a>
+</nav>
+</div>
+<div class="flex flex-col space-y-4">
+<h4 class="cinzel text-amber-500 text-sm tracking-widest uppercase">Identity</h4>
+<div class="flex items-center space-x-2 text-neutral-500 raleway text-[0.875rem]">
+<span class="material-symbols-outlined text-primary text-sm">location_on</span>
+<span>Geneva • London • Singapore</span>
+</div>
+<div class="flex items-center space-x-2 text-neutral-500 raleway text-[0.875rem]">
+<span class="material-symbols-outlined text-primary text-sm">encrypted</span>
+<span>End-to-End Sovereignty</span>
+</div>
+</div>
+</div>
+<div class="px-12 py-6 border-t border-white/5 text-center">
+<span class="text-[10px] uppercase tracking-widest text-neutral-500 raleway">© 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.</span>
+</div>
+</footer>
+</body></html>

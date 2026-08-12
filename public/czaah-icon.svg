@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg class="markhor-mark" viewBox="-5 -12 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="navHornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8a6f2e"></stop>
+            <stop offset="40%" stop-color="#c9a84c"></stop>
+            <stop offset="60%" stop-color="#e8c97a"></stop>
+            <stop offset="100%" stop-color="#8a6f2e"></stop>
+          </linearGradient>
+          <linearGradient id="navBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#c9a84c"></stop>
+            <stop offset="100%" stop-color="#8a6f2e"></stop>
+          </linearGradient>
+        </defs>
+        <path d="M 38 38 C 34 30, 24 22, 20 12 C 17 4, 22 -2, 28 2 C 34 6, 36 16, 32 24 C 28 32, 22 34, 18 28 C 15 22, 18 14, 24 12" stroke="url(#navHornGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"></path>
+        <path d="M 35 36 C 30 28, 22 20, 22 12 C 22 7, 26 4, 29 6" stroke="url(#navHornGrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"></path>
+        <path d="M 52 36 C 56 28, 66 20, 70 10 C 73 2, 68 -4, 62 0 C 56 4, 54 14, 58 22 C 62 30, 68 32, 72 26 C 75 20, 72 12, 66 10" stroke="url(#navHornGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"></path>
+        <path d="M 55 34 C 60 26, 68 18, 68 10 C 68 5, 64 2, 61 4" stroke="url(#navHornGrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"></path>
+        <path d="M 34 38 C 32 42, 32 48, 36 52 L 38 58 C 40 64, 50 64, 52 58 L 54 52 C 58 48, 58 42, 56 38 C 54 34, 50 32, 45 32 C 40 32, 36 34, 34 38 Z" fill="url(#navBodyGrad)" opacity="0.9"></path>
+        <circle cx="41" cy="44" r="1.5" fill="#e8c97a" opacity="0.9"></circle>
+        <circle cx="49" cy="44" r="1.5" fill="#e8c97a" opacity="0.9"></circle>
+      </svg>

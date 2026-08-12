@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Investment Advisory | THE GILDED VAULT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-highest": "#353534",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "on-primary": "#3d2e00",
+              "on-tertiary-fixed-variant": "#35437e",
+              "tertiary-fixed": "#dde1ff",
+              "on-primary-fixed": "#241a00",
+              "outline-variant": "#4d4637",
+              "on-background": "#e5e2e1",
+              "on-error-container": "#ffdad6",
+              "surface-dim": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "on-primary-fixed-variant": "#584400",
+              "on-tertiary": "#1e2b66",
+              "primary-fixed": "#ffe08f",
+              "on-primary-container": "#503d00",
+              "inverse-primary": "#755b00",
+              "background": "#131313",
+              "secondary-fixed": "#fbe193",
+              "secondary-container": "#584707",
+              "surface-tint": "#e6c364",
+              "on-tertiary-container": "#2e3b77",
+              "on-secondary": "#3c2f00",
+              "primary-container": "#c9a84c",
+              "outline": "#99907e",
+              "tertiary": "#b9c4ff",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-fixed": "#041451",
+              "surface-container-low": "#1c1b1b",
+              "on-surface-variant": "#d0c5b2",
+              "error-container": "#93000a",
+              "surface-container": "#201f1f",
+              "secondary-fixed-dim": "#dec57a",
+              "primary-fixed-dim": "#e6c364",
+              "surface-bright": "#3a3939",
+              "primary": "#e6c364",
+              "on-surface": "#e5e2e1",
+              "surface": "#131313",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-variant": "#353534",
+              "error": "#ffb4ab",
+              "tertiary-container": "#9ba8eb",
+              "secondary": "#dec57a",
+              "inverse-on-surface": "#313030",
+              "on-secondary-container": "#cfb76e",
+              "on-error": "#690005",
+              "inverse-surface": "#e5e2e1"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(230, 195, 100, 0.3);
+        }
+        .asymmetric-offset {
+            transform: translateX(5%);
+        }
+        .cinzel { font-family: 'Cinzel', serif; }
+        .raleway { font-family: 'Raleway', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-900/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent cinzel">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase raleway" href="#">Sectors</a>
+<a class="text-amber-400 font-bold border-b border-amber-400 pb-1 text-sm tracking-widest uppercase raleway" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase raleway" href="#">Investments</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-neutral-400 hover:text-amber-200 text-sm tracking-widest uppercase raleway transition-all active:scale-95">Member Login</button>
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary px-6 py-2 rounded-sm text-sm font-bold tracking-widest uppercase raleway hover:brightness-110 transition-all active:scale-95">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section: Cinematic Asymmetry -->
+<section class="relative h-[870px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-40 grayscale" data-alt="Cinematic high-angle view of a data-driven golden city financial district" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyHTMdk0zd030ZjBsMb35-d8oUeioZF0AylAvtprvTzuD0PDtctcwab_CVMk52bWVHd5My0D_tkI5R0IK4U-TEahfKZGpFmenovPVESnNmeVr-vSEEX0FDAoalcL1lbuZFcvArAxI_KmgYiEZG656jps7VYb0qiiRdPg240mJCj8nqfucGG766l2-1uFZKIABfcahJA-YZN_Sqism0qXJNC6nh6pu5-edz2TWVeTzOkDBffEWUvuC0kdCEE12hpAXMiPYQcHpYrjsn"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
+</div>
+<div class="relative z-10 w-full max-w-7xl mx-auto px-12 grid grid-cols-12 gap-8">
+<div class="col-span-12 md:col-span-8 flex flex-col items-start gap-8">
+<span class="text-primary tracking-[0.4em] uppercase text-sm font-bold raleway">Sovereign Investment Advisory</span>
+<h1 class="text-6xl md:text-8xl leading-tight cinzel font-black tracking-tighter text-glow">
+                        ARCHITECTS <br/> OF CAPITAL
+                    </h1>
+<p class="text-on-surface-variant max-w-xl text-lg leading-relaxed raleway">
+                        Precision-engineered investment strategies for the digital elite. We transform raw market volatility into structured sovereign wealth through advanced modelling and clandestine market intelligence.
+                    </p>
+<div class="flex gap-6 mt-4">
+<button class="bg-primary text-on-primary px-8 py-4 rounded-sm font-bold uppercase tracking-widest text-xs raleway hover:brightness-110 transition-all">Explore Matrix</button>
+<button class="border border-primary/40 text-primary px-8 py-4 rounded-sm font-bold uppercase tracking-widest text-xs raleway hover:border-primary transition-all">Institutional Access</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Service Pillars: Tonal Transitions -->
+<section class="bg-surface-container-lowest py-32 px-12">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
+<!-- Feasibility Studies -->
+<div class="flex flex-col gap-6 group">
+<div class="w-12 h-12 flex items-center justify-center border border-primary/20 group-hover:border-primary/60 transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="analytics" data-weight="thin">analytics</span>
+</div>
+<h3 class="cinzel text-2xl font-bold text-on-surface">Feasibility Studies</h3>
+<p class="raleway text-on-surface-variant leading-relaxed">Rigorous stress-testing of venture viability using proprietary datasets that span global micro-economies and geopolitical shifts.</p>
+</div>
+<!-- Market Analysis -->
+<div class="flex flex-col gap-6 group">
+<div class="w-12 h-12 flex items-center justify-center border border-primary/20 group-hover:border-primary/60 transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="query_stats" data-weight="thin">query_stats</span>
+</div>
+<h3 class="cinzel text-2xl font-bold text-on-surface">Market Analysis</h3>
+<p class="raleway text-on-surface-variant leading-relaxed">Beyond surface trends. We utilize high-frequency data and sentiment algorithms to identify alpha before it reaches the public domain.</p>
+</div>
+<!-- Financial Modelling -->
+<div class="flex flex-col gap-6 group">
+<div class="w-12 h-12 flex items-center justify-center border border-primary/20 group-hover:border-primary/60 transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="account_balance" data-weight="thin">account_balance</span>
+</div>
+<h3 class="cinzel text-2xl font-bold text-on-surface">Financial Modelling</h3>
+<p class="raleway text-on-surface-variant leading-relaxed">Dynamic, multi-scenario simulations designed for hyper-growth and preservation of intergenerational sovereign assets.</p>
+</div>
+</div>
+</section>
+<!-- Sector Opportunity Matrix: Bento Grid -->
+<section class="bg-surface py-32 px-12 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+<div class="max-w-2xl">
+<h2 class="cinzel text-4xl md:text-5xl font-bold mb-6">Sector Opportunity Matrix</h2>
+<p class="raleway text-on-surface-variant text-lg">Our proprietary mapping system categorizes global assets by liquidity, sovereign risk, and long-term yield potential.</p>
+</div>
+<div class="text-right">
+<span class="text-primary text-sm tracking-widest uppercase raleway block mb-2">Updated: Q4 2024</span>
+<div class="h-1 w-32 bg-outline-variant relative">
+<div class="absolute h-full w-[72%] bg-gradient-to-r from-primary to-primary-container shadow-[0_0_8px_rgba(230,195,100,0.6)]"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[250px]">
+<!-- Large Feature -->
+<div class="md:col-span-2 md:row-span-2 bg-surface-container-low p-10 flex flex-col justify-between border border-white/5 relative group cursor-pointer">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div>
+<span class="text-primary text-xs uppercase tracking-widest raleway mb-4 block">Strategic Focus</span>
+<h4 class="cinzel text-3xl font-bold mb-4">Post-Scarcity Technologies</h4>
+<p class="raleway text-on-surface-variant text-sm leading-relaxed max-w-xs">Capital allocation into autonomous resource extraction and fusion energy infrastructure.</p>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-4xl cinzel font-black opacity-10">01</span>
+<span class="material-symbols-outlined text-primary" data-icon="north_east">north_east</span>
+</div>
+</div>
+<!-- Medium Feature -->
+<div class="md:col-span-2 bg-surface-container-high p-8 flex flex-col justify-center border border-white/5 hover:bg-surface-container-highest transition-colors cursor-pointer">
+<h4 class="cinzel text-xl font-bold mb-2">Rare Earth Arbitrage</h4>
+<div class="flex gap-4 items-center">
+<div class="flex-1 h-[2px] bg-outline-variant">
+<div class="h-full w-[85%] bg-primary"></div>
+</div>
+<span class="text-xs raleway font-bold text-primary">Yield: 14.2%</span>
+</div>
+</div>
+<!-- Small Item 1 -->
+<div class="bg-surface-container-low p-8 border border-white/5 hover:border-primary/40 transition-all flex flex-col justify-between cursor-pointer">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="diamond">diamond</span>
+<h5 class="cinzel font-bold text-sm uppercase tracking-wider">Luxury Heritage</h5>
+</div>
+<!-- Small Item 2 -->
+<div class="bg-surface-container-low p-8 border border-white/5 hover:border-primary/40 transition-all flex flex-col justify-between cursor-pointer">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="shield_person">shield_person</span>
+<h5 class="cinzel font-bold text-sm uppercase tracking-wider">Sovereign Debt</h5>
+</div>
+</div>
+</div>
+</section>
+<!-- Institutional Expertise CTA -->
+<section class="py-40 relative">
+<div class="max-w-5xl mx-auto text-center px-12">
+<h2 class="cinzel text-4xl md:text-6xl font-black mb-12 leading-tight">THE STANDARD OF <br/> <span class="text-primary italic">FINANCIAL SOVEREIGNTY</span></h2>
+<p class="raleway text-on-surface-variant text-xl mb-12 max-w-2xl mx-auto">Access our closed-door briefings and institutional-grade financial modeling services.</p>
+<div class="inline-flex flex-col items-center gap-4">
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary px-16 py-5 rounded-sm text-sm font-bold tracking-[0.3em] uppercase raleway shadow-2xl hover:scale-105 transition-all">
+                        Request Credentials
+                    </button>
+<span class="text-[10px] uppercase tracking-[0.5em] text-outline raleway">Exclusively for Accredited Entities</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-neutral-950 w-full border-t border-amber-900/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 cinzel">THE GILDED VAULT</div>
+<p class="raleway text-neutral-500 text-sm leading-relaxed">Sovereign asset management for the digital era. Preserving legacy through mathematical certainty.</p>
+</div>
+<div>
+<h5 class="cinzel text-amber-500 text-sm font-bold uppercase tracking-widest mb-6">Navigation</h5>
+<ul class="flex flex-col gap-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm raleway transition-transform hover:translate-x-1 inline-block" href="#">Sectors</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm raleway transition-transform hover:translate-x-1 inline-block" href="#">Services</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm raleway transition-transform hover:translate-x-1 inline-block" href="#">Investments</a></li>
+</ul>
+</div>
+<div>
+<h5 class="cinzel text-amber-500 text-sm font-bold uppercase tracking-widest mb-6">Legal</h5>
+<ul class="flex flex-col gap-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm raleway transition-transform hover:translate-x-1 inline-block" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm raleway transition-transform hover:translate-x-1 inline-block" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 text-sm raleway transition-transform hover:translate-x-1 inline-block" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="cinzel text-amber-500 text-sm font-bold uppercase tracking-widest mb-6">Contact</h5>
+<p class="raleway text-neutral-500 text-sm mb-4">Mayfair, London<br/>Zurich, CH</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-neutral-500 cursor-pointer hover:text-primary transition-colors" data-icon="mail">mail</span>
+<span class="material-symbols-outlined text-neutral-500 cursor-pointer hover:text-primary transition-colors" data-icon="lock">lock</span>
+</div>
+</div>
+</div>
+<div class="border-t border-white/5 py-8 text-center">
+<p class="text-[10px] uppercase tracking-widest text-neutral-600 raleway">
+                © 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.
+            </p>
+</div>
+</footer>
+</body></html>

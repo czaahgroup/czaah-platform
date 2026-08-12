@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed-dim": "#dec57a",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-tint": "#e6c364",
+                        "surface-container-low": "#1c1b1b",
+                        "primary": "#e6c364",
+                        "on-secondary-fixed-variant": "#564505",
+                        "on-surface": "#e5e2e1",
+                        "on-background": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#35437e",
+                        "surface-variant": "#353534",
+                        "surface-bright": "#3a3939",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container": "#201f1f",
+                        "on-tertiary": "#1e2b66",
+                        "primary-fixed-dim": "#e6c364",
+                        "on-tertiary-fixed": "#041451",
+                        "surface": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#313030",
+                        "secondary-container": "#584707",
+                        "tertiary": "#b9c4ff",
+                        "error": "#ffb4ab",
+                        "tertiary-container": "#9ba8eb",
+                        "surface-dim": "#131313",
+                        "primary-container": "#c9a84c",
+                        "secondary": "#dec57a",
+                        "outline-variant": "#4d4637",
+                        "on-secondary-container": "#cfb76e",
+                        "on-primary-fixed": "#241a00",
+                        "surface-container-highest": "#353534",
+                        "on-secondary": "#3c2f00",
+                        "tertiary-fixed-dim": "#b9c3ff",
+                        "on-primary": "#3d2e00",
+                        "on-tertiary-container": "#2e3b77",
+                        "primary-fixed": "#ffe08f",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-primary": "#755b00",
+                        "on-primary-container": "#503d00",
+                        "tertiary-fixed": "#dde1ff",
+                        "outline": "#99907e",
+                        "on-secondary-fixed": "#231b00",
+                        "background": "#131313",
+                        "on-surface-variant": "#d0c5b2",
+                        "on-primary-fixed-variant": "#584400",
+                        "secondary-fixed": "#fbe193",
+                        "on-error": "#690005"
+                    },
+                    fontFamily: {
+                        "headline": ["Cinzel", "serif"],
+                        "body": ["Raleway", "sans-serif"],
+                        "label": ["Raleway", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(230, 195, 100, 0.3);
+        }
+        .cinzel-font { font-family: 'Cinzel', serif; }
+        .raleway-font { font-family: 'Raleway', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface raleway-font selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent cinzel-font">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-amber-400 font-bold border-b border-amber-400 pb-1 text-sm tracking-widest uppercase cinzel-font" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase cinzel-font" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase cinzel-font" href="#">Investments</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-neutral-400 hover:text-amber-200 text-sm tracking-widest uppercase cinzel-font transition-all">Member Login</button>
+<button class="bg-gradient-to-tr from-primary to-primary-container px-6 py-2 text-on-primary font-bold text-sm tracking-widest uppercase rounded-sm hover:scale-105 active:scale-95 transition-all duration-300">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section: Cinematic Scarcity -->
+<section class="relative h-[921px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Cinematic macro shot of high-end golden silk threads" class="w-full h-full object-cover filter brightness-[0.25] grayscale" data-alt="Cinematic macro shot of high-end golden silk threads" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD741cSf7Dy7lqn3bNOnQnVZrc5YKKz2uQBONm1BchtrTnhZbxvn2LqKXK-PntHLEh_fjmW9hVt76_l2yTAcCUbEZmoUOHGEGT4pe5_B1ZuUqNaiI6GV76rSljhbEa_GY5kmnP-5a_5WDAY_YgKXZgIjR7sMI934vdF1HVveCXJmObDcb91JXkdoOT9v7hbKF3kI4twT1vjO_EcBXhUOeSlqyhmtOV3oNwDUx4jr0TNM78KXfeTf2XsNaz_WE_gLzEQqidHW_9XJvKN"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-transparent to-surface opacity-80"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+</div>
+<div class="relative z-10 w-full px-12 md:px-24">
+<div class="max-w-4xl space-y-6">
+<span class="text-primary tracking-[0.4em] uppercase text-sm font-semibold cinzel-font">Sovereign Asset Class</span>
+<h1 class="text-6xl md:text-8xl cinzel-font font-black leading-tight tracking-tighter text-glow">
+                        TEXTILES <br/>
+<span class="text-primary-fixed">&amp; TRADE</span>
+</h1>
+<p class="max-w-xl text-lg text-on-surface-variant leading-relaxed">
+                        Accessing the heart of global procurement. Pakistan’s textile heritage reimagined through the lens of institutional precision and sovereign trade advantages.
+                    </p>
+</div>
+</div>
+<div class="absolute bottom-12 right-12 hidden md:block">
+<div class="flex flex-col items-end border-r-2 border-primary pr-6 py-2">
+<span class="text-primary text-3xl font-bold cinzel-font">#04</span>
+<span class="text-xs tracking-widest uppercase text-neutral-500">Global Exporter Rank</span>
+</div>
+</div>
+</section>
+<!-- Asymmetric Value Proposition -->
+<section class="py-32 px-12 md:px-24 bg-surface">
+<div class="grid grid-cols-12 gap-12">
+<div class="col-span-12 md:col-span-5 space-y-8">
+<h2 class="text-4xl cinzel-font leading-none text-primary">Pakistan's Global <br/>Command</h2>
+<p class="text-on-surface-variant leading-loose">
+                        Leveraging Pakistan’s strategic position as a textile powerhouse, THE GILDED VAULT provides exclusive access to vertical manufacturing ecosystems. From raw fiber sourcing to final garment logistics, we navigate the complexities of international trade with unparalleled authority.
+                    </p>
+<div class="p-8 bg-surface-container-low border-l-4 border-primary/40">
+<h4 class="text-primary font-bold cinzel-font uppercase tracking-widest mb-4">The GSP+ Advantage</h4>
+<p class="text-sm text-on-surface-variant italic">
+                            Zero-duty access to European markets, providing an immediate 12% competitive edge over regional competitors. A sovereign trade instrument secured for institutional partners.
+                        </p>
+</div>
+</div>
+<div class="col-span-12 md:col-span-7 grid grid-cols-2 gap-4">
+<div class="bg-surface-container h-[400px] mt-12 overflow-hidden">
+<img alt="Interior of a modern high-end textile factory" class="w-full h-full object-cover grayscale hover:scale-110 transition-transform duration-700 opacity-60" data-alt="Interior of a modern high-end textile factory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXp4l6eZZ3zXca7kYba8pWFUo8qWmPMPg6dswV0xnJc-UEcxNHlgbcGjKYUfrZj53LWmT1GRXJAXDeo3acijTG3de4H9bni5Uu7aAnjjhhLzEySRSXKKPRrI3OSqNjvZre-UdOW9s13NmhGAtD4cgtWYJTVryzj3RvdrRwTT9q-rEg_LXNWWKUHeZCoxn80phEnVrsIHFYwRx-sAWFi-i73L8PFNxh2nFw_yEGMzn9yAMf2ssD_Mbb192tsL9YQsekiBvDBzJ8r3-X"/>
+</div>
+<div class="bg-surface-container h-[400px] overflow-hidden">
+<img alt="Luxury fabric swatches in deep obsidian and gold" class="w-full h-full object-cover grayscale hover:scale-110 transition-transform duration-700 opacity-60" data-alt="Luxury fabric swatches in deep obsidian and gold" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAqW-Oi6twHnF-sJm65F3Z2jwJPFVpeiH-lIzc9xXA5-2J1qOVpBT2-Iz-GT-Fllr09SF9eSBqKAh551N41Y3E8-7lUYfEH5o3BIF2Gk2P3GnRf6oTPsSvwGL59RaNKWznnbascGogv0fffgUmsWZwgvBlcXV3OB2R1YOD_1pvuNIQ7-JfJXfQv3m1IOt7AXTT_aSadU5LdGI2TI50yN2C1geLEsL_PgLL4ybOheo5A42XPAOG6bK_WRtSFjPYFxUdqFTEmVSi0Yky"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid: Services & Compliance -->
+<section class="py-24 px-12 md:px-24 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto space-y-12">
+<div class="text-center space-y-4">
+<h3 class="text-3xl cinzel-font text-on-surface">Institutional Sourcing Ecosystem</h3>
+<div class="w-24 h-px bg-primary mx-auto"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
+<!-- Procurement -->
+<div class="md:col-span-2 md:row-span-1 bg-surface p-10 flex flex-col justify-between border-t border-white/5 group hover:bg-surface-container-high transition-all duration-500">
+<div>
+<span class="material-symbols-outlined text-primary text-4xl mb-6">inventory_2</span>
+<h4 class="text-xl cinzel-font mb-4">Global Procurement</h4>
+<p class="text-sm text-on-surface-variant">Centralized sourcing of raw cotton, synthetic fibers, and high-performance yarns through vetted tier-1 suppliers.</p>
+</div>
+<div class="flex items-center text-primary text-xs tracking-widest uppercase font-bold mt-8">
+                            Explore Logistics <span class="material-symbols-outlined ml-2 text-sm">arrow_forward</span>
+</div>
+</div>
+<!-- Quality Assurance -->
+<div class="md:col-span-1 md:row-span-2 bg-primary p-10 flex flex-col justify-between group">
+<div class="text-on-primary">
+<span class="material-symbols-outlined text-4xl mb-6" style="font-variation-settings: 'FILL' 1;">verified</span>
+<h4 class="text-xl cinzel-font mb-4">Quality Assurance</h4>
+<p class="text-sm font-semibold opacity-90">Microscopic precision. Every yard undergoes rigorous institutional-grade stress testing and color-fastness audits.</p>
+</div>
+<div class="h-1 w-full bg-on-primary/20 relative mt-auto">
+<div class="absolute top-0 left-0 h-full w-[98%] bg-on-primary shadow-[0_0_10px_rgba(255,255,255,0.5)]"></div>
+</div>
+</div>
+<!-- Compliance -->
+<div class="md:col-span-1 md:row-span-1 bg-surface-container p-10 border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">gavel</span>
+<h4 class="text-lg cinzel-font mb-2">Compliance</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Oeko-Tex Standard 100 &amp; WRAP certified facilities ensuring ethical excellence.</p>
+</div>
+<!-- Market Data -->
+<div class="md:col-span-2 md:row-span-1 bg-surface p-10 flex items-center justify-between border-b border-white/5">
+<div class="space-y-2">
+<h4 class="text-xl cinzel-font">Trade Volume</h4>
+<p class="text-sm text-on-surface-variant">Annual institutional turnover across three continents.</p>
+</div>
+<div class="text-right">
+<div class="text-5xl font-black text-primary cinzel-font tracking-tighter">$2.4B</div>
+<div class="text-[10px] tracking-widest text-primary/60 uppercase">Fiscal 2023 Performance</div>
+</div>
+</div>
+<!-- Logistics -->
+<div class="md:col-span-1 md:row-span-1 bg-surface-container-high p-10">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">sailing</span>
+<h4 class="text-lg cinzel-font mb-2">Freight</h4>
+<p class="text-xs text-on-surface-variant">Door-to-door sovereign logistics chain.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-32 bg-surface text-center">
+<div class="max-w-2xl mx-auto px-6 space-y-10">
+<h2 class="text-4xl cinzel-font text-glow">Secure Your Supply Chain</h2>
+<p class="text-on-surface-variant">Request a comprehensive sector report or a private manufacturing tour within our high-tier network.</p>
+<div class="flex flex-col md:flex-row justify-center items-center gap-6">
+<button class="w-full md:w-auto px-10 py-4 bg-gradient-to-tr from-primary to-primary-container text-on-primary font-bold cinzel-font uppercase tracking-widest rounded-sm">
+                        Download Prospectus
+                    </button>
+<button class="w-full md:w-auto px-10 py-4 border border-primary/40 text-primary hover:border-primary transition-all font-bold cinzel-font uppercase tracking-widest rounded-sm">
+                        Contact Sector Head
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full border-t border-amber-900/20 bg-neutral-950">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 cinzel-font">THE GILDED VAULT</div>
+<p class="text-xs uppercase tracking-widest text-neutral-500 leading-loose">
+                    Defining the architecture of sovereign wealth and institutional trade. Private. Precise. Powerful.
+                </p>
+</div>
+<div class="flex flex-col space-y-4">
+<h5 class="text-amber-500 font-bold cinzel-font text-sm uppercase tracking-widest mb-2">Ecosystem</h5>
+<a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 duration-300 text-sm" href="#">Sectors</a>
+<a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 duration-300 text-sm" href="#">Services</a>
+<a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 duration-300 text-sm" href="#">Investments</a>
+</div>
+<div class="flex flex-col space-y-4">
+<h5 class="text-amber-500 font-bold cinzel-font text-sm uppercase tracking-widest mb-2">Legal</h5>
+<a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 duration-300 text-sm" href="#">Privacy Policy</a>
+<a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 duration-300 text-sm" href="#">Terms of Service</a>
+<a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 duration-300 text-sm" href="#">Compliance</a>
+</div>
+<div class="flex flex-col space-y-6">
+<h5 class="text-amber-500 font-bold cinzel-font text-sm uppercase tracking-widest mb-2">Intelligence</h5>
+<div class="border-b border-amber-900/40 pb-2">
+<input class="bg-transparent border-none text-xs focus:ring-0 w-full p-0 text-amber-200 placeholder:text-neutral-700" placeholder="Sovereign Email" type="email"/>
+</div>
+<button class="text-[10px] tracking-[0.3em] uppercase text-primary text-left font-bold hover:text-amber-200 transition-colors">Subscribe to Briefings</button>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-white/5 text-center">
+<p class="text-[10px] uppercase tracking-[0.4em] text-neutral-600">
+                © 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.
+            </p>
+</div>
+</footer>
+</body></html>

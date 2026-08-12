@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#3d2e00",
+              "surface-container-highest": "#353534",
+              "on-background": "#e5e2e1",
+              "outline-variant": "#4d4637",
+              "primary-fixed": "#ffe08f",
+              "on-primary-container": "#503d00",
+              "surface-dim": "#131313",
+              "primary-container": "#c9a84c",
+              "outline": "#99907e",
+              "background": "#131313",
+              "surface-container-low": "#1c1b1b",
+              "primary-fixed-dim": "#e6c364",
+              "surface-container": "#201f1f",
+              "primary": "#e6c364",
+              "on-surface": "#e5e2e1",
+              "surface": "#131313",
+              "surface-container-lowest": "#0e0e0e",
+              "on-surface-variant": "#d0c5b2",
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #050505;
+            background-image: radial-gradient(circle at 50% -20%, #1c1b1b 0%, #050505 80%);
+        }
+        .cinematic-overlay {
+            background: linear-gradient(180deg, rgba(5,5,5,0) 0%, rgba(5,5,5,0.8) 100%);
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-900/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50 flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent font-headline">
+            THE GILDED VAULT
+        </div>
+<div class="hidden md:flex gap-12 items-center">
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase" href="#">Investments</a>
+</div>
+<div class="flex gap-6 items-center">
+<button class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase">Member Login</button>
+<button class="bg-gradient-to-tr from-primary to-primary-container px-6 py-2 rounded-sm text-on-primary font-bold text-sm tracking-widest uppercase hover:scale-95 transition-all duration-300">Schedule Consultation</button>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-6 lg:px-24 max-w-7xl mx-auto min-h-screen">
+<!-- Header Section -->
+<header class="mb-16 md:grid md:grid-cols-12 gap-8 items-end">
+<div class="md:col-span-8">
+<span class="text-primary font-headline tracking-[0.3em] uppercase text-sm mb-4 block">Institutional Onboarding</span>
+<h1 class="text-5xl md:text-7xl font-headline font-bold text-on-surface tracking-tight leading-none mb-6">
+                    Membership <br/>Application
+                </h1>
+<p class="text-on-surface-variant text-lg max-w-xl leading-relaxed">
+                    Initiate your entry into the world's most secure sovereign asset management ecosystem. Every detail provided is treated with the highest tier of diplomatic confidentiality.
+                </p>
+</div>
+<div class="md:col-span-4 flex md:justify-end gap-2 mt-8 md:mt-0">
+<div class="h-[1px] w-12 bg-primary self-center"></div>
+<span class="font-headline text-primary text-xl">01 / 03</span>
+</div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+<!-- Main Application Flow -->
+<div class="lg:col-span-8 space-y-12">
+<!-- Step Indicator -->
+<div class="flex items-center gap-8 mb-12">
+<div class="flex flex-col gap-2">
+<span class="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">Step 01</span>
+<span class="font-headline text-sm text-on-surface">Account Details</span>
+<div class="h-0.5 w-full bg-primary shadow-[0_0_8px_rgba(230,195,100,0.5)]"></div>
+</div>
+<div class="flex flex-col gap-2 opacity-30">
+<span class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Step 02</span>
+<span class="font-headline text-sm text-on-surface-variant">Company Info</span>
+<div class="h-0.5 w-full bg-outline-variant"></div>
+</div>
+<div class="flex flex-col gap-2 opacity-30">
+<span class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Step 03</span>
+<span class="font-headline text-sm text-on-surface-variant">Identity Verification</span>
+<div class="h-0.5 w-full bg-outline-variant"></div>
+</div>
+</div>
+<!-- Form Section -->
+<section class="space-y-12">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<div class="relative group">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Legal First Name</label>
+<input class="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface py-3 transition-all placeholder:text-neutral-700 font-headline tracking-widest" placeholder="EX: ALEXANDER" type="text"/>
+</div>
+<div class="relative group">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Legal Last Name</label>
+<input class="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface py-3 transition-all placeholder:text-neutral-700 font-headline tracking-widest" placeholder="EX: ROTHSCHILD" type="text"/>
+</div>
+</div>
+<div class="relative group">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Secure Email Address</label>
+<input class="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface py-3 transition-all placeholder:text-neutral-700" placeholder="vault.access@private.com" type="email"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<div class="relative group">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Residential Jurisdiction</label>
+<select class="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface py-3 transition-all appearance-none cursor-pointer">
+<option class="bg-surface-container">Switzerland (CH)</option>
+<option class="bg-surface-container">Singapore (SG)</option>
+<option class="bg-surface-container">United Arab Emirates (AE)</option>
+<option class="bg-surface-container">Cayman Islands (KY)</option>
+</select>
+</div>
+<div class="relative group">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 group-focus-within:text-primary transition-colors">Intended Allocation (USD)</label>
+<input class="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-outline-variant focus:border-primary focus:ring-0 text-on-surface py-3 transition-all placeholder:text-neutral-700" placeholder="$10,000,000+" type="text"/>
+</div>
+</div>
+<!-- Identity Verification Portal Preview -->
+<div class="mt-16 p-1 bg-gradient-to-br from-outline-variant/30 to-transparent">
+<div class="bg-surface-container-lowest p-8 border border-outline-variant/20">
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+<h3 class="font-headline text-xl tracking-wide">Document Upload Portal</h3>
+</div>
+<div class="border-2 border-dashed border-outline-variant/30 py-12 flex flex-col items-center justify-center gap-4 bg-surface/40 hover:bg-surface-container-low transition-colors group cursor-pointer">
+<span class="material-symbols-outlined text-4xl text-outline group-hover:text-primary transition-colors">cloud_upload</span>
+<p class="text-sm text-on-surface-variant tracking-widest uppercase">Drag &amp; Drop Sovereign Documents</p>
+<p class="text-[10px] text-outline tracking-widest uppercase">Passport, Proof of Wealth, or Entity Resolution (PDF, JPG, PNG)</p>
+</div>
+</div>
+</div>
+<div class="pt-10 flex justify-between items-center">
+<button class="text-on-surface-variant hover:text-primary text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">arrow_back</span> Save as Draft
+                        </button>
+<button class="bg-gradient-to-tr from-primary to-primary-container px-12 py-4 rounded-sm text-on-primary font-bold text-sm tracking-[0.2em] uppercase hover:scale-[0.98] transition-all duration-300 flex items-center gap-3">
+                            Proceed to Company Information <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</section>
+</div>
+<!-- Sidebar -->
+<aside class="lg:col-span-4 space-y-8">
+<div class="bg-surface-container-low p-8 border border-outline-variant/10 shadow-2xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5">
+<span class="material-symbols-outlined text-9xl">lock</span>
+</div>
+<h4 class="font-headline text-primary text-lg mb-6 border-b border-primary/20 pb-4">Security &amp; Compliance</h4>
+<div class="space-y-6">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-xl">shield_person</span>
+<div>
+<h5 class="text-xs font-bold uppercase tracking-widest text-on-surface mb-1">Sovereign Encryption</h5>
+<p class="text-xs text-on-surface-variant leading-relaxed">Your data is fragmented and stored across multiple off-shore cold-storage nodes within the 'Gilded Vault' architecture.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-xl">gavel</span>
+<div>
+<h5 class="text-xs font-bold uppercase tracking-widest text-on-surface mb-1">KYC / AML Protocol</h5>
+<p class="text-xs text-on-surface-variant leading-relaxed">Mandatory compliance with international Tier-1 financial regulations to ensure the integrity of the sovereign collective.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-xl">visibility_off</span>
+<div>
+<h5 class="text-xs font-bold uppercase tracking-widest text-on-surface mb-1">Zero-Knowledge Proof</h5>
+<p class="text-xs text-on-surface-variant leading-relaxed">Verification is performed using ZK-protocols, ensuring no human representative sees your sensitive underlying documents.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-8 border border-outline-variant/10">
+<h4 class="font-headline text-on-surface text-sm tracking-widest uppercase mb-4">Support &amp; Concierge</h4>
+<p class="text-xs text-on-surface-variant mb-6 leading-relaxed">Need assistance with your application? Our private intake desk is available 24/7 via encrypted channels.</p>
+<a class="text-primary text-xs uppercase tracking-widest font-bold flex items-center gap-2 hover:gap-4 transition-all" href="#">
+                        Connect with Concierge <span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+</div>
+<!-- Atmospheric Visual -->
+<div class="relative h-64 w-full group overflow-hidden grayscale hover:grayscale-0 transition-all duration-700">
+<img alt="Encrypted server room" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" data-alt="Dark futuristic server room with gold glowing light indicators" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNwJm5WgL5EhX21AhfVkVtEgmMUW-KyCKAaBA9QT4rVbJVLcw8gfJq-ngkWC8AmJjWkFtifYVL9KO9RgTwyEFa2dA0juLetSK_UK08p6apIQWLwglYDyY2VjbOlwgfuxlxvocy9tuelCl0IoVd74ZAk1VkdOUeU8VFF_RIKIvycJOGLPBFexeStzOvvFzyfJj5D38KaDsprwzNQO6m0tTBTxcJzAKYPFG8BQwHr5mK3UzCvbkXk5qBN26VbOMINjWlD4cjVonEJT2C"/>
+<div class="absolute inset-0 cinematic-overlay"></div>
+<div class="absolute bottom-4 left-4">
+<span class="text-[10px] text-primary uppercase tracking-[0.3em] font-bold">Node: Zurich-01</span>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-neutral-950 border-t border-amber-900/20 w-full mt-20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 font-headline">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-[10px] uppercase tracking-widest leading-relaxed">
+                    Sovereign Asset Management. <br/>Architecting legacy through <br/>discretion and precision.
+                </p>
+</div>
+<div>
+<h5 class="text-amber-500 font-headline text-sm mb-6 uppercase tracking-widest">Navigation</h5>
+<ul class="space-y-3">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-[0.875rem]" href="#">Sectors</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-[0.875rem]" href="#">Services</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-[0.875rem]" href="#">Investments</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-amber-500 font-headline text-sm mb-6 uppercase tracking-widest">Governance</h5>
+<ul class="space-y-3">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-[0.875rem]" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-[0.875rem]" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform hover:translate-x-1 inline-block text-[0.875rem]" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-amber-500 font-headline text-sm mb-6 uppercase tracking-widest">Global Desk</h5>
+<p class="text-neutral-500 text-[10px] uppercase tracking-widest mb-4">Geneva | Singapore | Dubai | London</p>
+<div class="h-px bg-amber-900/20 w-full mb-4"></div>
+<p class="text-neutral-400 text-xs font-headline tracking-widest">APPLY@GILDEDVAULT.COM</p>
+</div>
+</div>
+<div class="bg-black py-8 border-t border-white/5">
+<div class="max-w-7xl mx-auto px-12 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="text-[10px] uppercase tracking-widest text-neutral-600">© 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<span class="text-[10px] uppercase tracking-widest text-neutral-700">ISO 27001 CERTIFIED</span>
+<span class="text-[10px] uppercase tracking-widest text-neutral-700">SWIFT ARCHITECTURE</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

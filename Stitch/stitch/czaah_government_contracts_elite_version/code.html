@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Government Contracts | CZAAH Sovereign Group</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@100;300;400;500;700&amp;family=Newsreader:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#fbe193",
+              "surface-tint": "#e6c364",
+              "surface": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "error-container": "#93000a",
+              "tertiary-fixed": "#dde1ff",
+              "surface-container": "#201f1f",
+              "primary-fixed-dim": "#e6c364",
+              "on-primary-fixed-variant": "#584400",
+              "inverse-primary": "#755b00",
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-lowest": "#0e0e0e",
+              "inverse-on-surface": "#313030",
+              "secondary-container": "#584707",
+              "on-tertiary-fixed-variant": "#35437e",
+              "on-tertiary-container": "#2e3b77",
+              "on-primary": "#3d2e00",
+              "primary": "#e6c364",
+              "surface-dim": "#131313",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#dec57a",
+              "on-surface": "#e5e2e1",
+              "on-secondary-container": "#cfb76e",
+              "on-surface-variant": "#d0c5b2",
+              "surface-bright": "#3a3939",
+              "surface-container-highest": "#353534",
+              "on-error": "#690005",
+              "surface-variant": "#353534",
+              "background": "#131313",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "secondary-fixed-dim": "#dec57a",
+              "outline": "#99907e",
+              "on-secondary": "#3c2f00",
+              "tertiary-container": "#9ba8eb",
+              "on-primary-container": "#503d00",
+              "primary-fixed": "#ffe08f",
+              "outline-variant": "#4d4637",
+              "on-error-container": "#ffdad6",
+              "tertiary": "#b9c4ff",
+              "on-tertiary-fixed": "#041451",
+              "on-tertiary": "#1e2b66",
+              "surface-container-high": "#2a2a2a",
+              "on-background": "#e5e2e1",
+              "surface-container-low": "#1c1b1b",
+              "primary-container": "#c9a84c",
+              "error": "#ffb4ab",
+              "on-primary-fixed": "#241a00"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .cinzel-text { font-family: 'Cinzel', serif; }
+        .raleway-text { font-family: 'Raleway', sans-serif; }
+        .glass-panel {
+            background: rgba(28, 27, 27, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .tonal-glow {
+            background: radial-gradient(circle at center, rgba(230, 195, 100, 0.08) 0%, transparent 70%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface raleway-text selection:bg-primary-container selection:text-on-primary">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full flex justify-between items-center px-12 py-6 bg-neutral-950/80 backdrop-blur-xl z-50 bg-gradient-to-b from-neutral-900/50 to-transparent">
+<div class="text-2xl font-serif tracking-[0.2em] text-[#E6C364] cinzel-text">CZAAH</div>
+<nav class="hidden md:flex items-center space-x-12">
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Sectors</a>
+<a class="text-[#E6C364] border-b border-[#E6C364]/40 pb-1 tracking-widest" href="#">Services</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Insights</a>
+<a class="text-neutral-400 font-light tracking-widest hover:text-[#C9A84C] transition-colors duration-500" href="#">Membership</a>
+</nav>
+<div class="flex items-center space-x-8">
+<button class="material-symbols-outlined text-[#E6C364]">lock</button>
+<button class="px-8 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold tracking-widest text-xs uppercase transition-transform active:scale-95 duration-300">Inquire</button>
+</div>
+</header>
+<!-- SideNavBar (Desktop Shell) -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full pt-24 bg-[#0E0E0E] w-64 border-r border-neutral-800/30 shadow-[40px_0_60px_-15px_rgba(0,0,0,0.5)] z-40">
+<div class="px-8 mb-12">
+<h3 class="text-lg font-bold text-[#E6C364] tracking-tighter raleway-text uppercase">Services</h3>
+<p class="text-[10px] text-neutral-500 tracking-[0.2em] uppercase mt-1">Institutional Excellence</p>
+</div>
+<nav class="flex-1">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all group" href="#">
+<span class="material-symbols-outlined mr-4">handshake</span>
+<span class="text-sm font-medium tracking-tight">Partnership</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-8 py-4 text-[#E6C364] bg-neutral-900/50 border-r-2 border-[#E6C364] translate-x-1" href="#">
+<span class="material-symbols-outlined mr-4">account_balance</span>
+<span class="text-sm font-medium tracking-tight">Government</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined mr-4">shield</span>
+<span class="text-sm font-medium tracking-tight">Security</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined mr-4">payments</span>
+<span class="text-sm font-medium tracking-tight">Payments</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-8 py-4 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/20 transition-all" href="#">
+<span class="material-symbols-outlined mr-4">flight_takeoff</span>
+<span class="text-sm font-medium tracking-tight">Migration</span>
+</a>
+</li>
+</ul>
+</nav>
+</aside>
+<main class="lg:pl-64 pt-24 min-h-screen">
+<!-- Hero Section: Strategic Briefing -->
+<section class="relative w-full h-[819px] flex items-end px-12 pb-24 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-neutral-950/60 z-10"></div>
+<img class="w-full h-full object-cover" data-alt="Abstract golden flowing light textures on black background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX4-PdbuIjyaDUpTo3-2so1koSRgmpl2A6kVcsgTIyF9AZGGsNF-FDrF1k5GwIR4bT97UcbvgSqkyKBDugIDZzwGUsrMxRgE1IWHlBQl0np8qRmqLoz2cnsEUQ7wGoRGhxJMwNl23_rIMegVABABi_nRQxk-0BIAKdc1nKXoeY5icZZbSDqdXo-eK59NzKA_FOBW6iCCHeMzexaFOxWO-gseoNwC1QQ_e2EVngySrooU1qMHIQU0GAuBOp7qRabWAmIhvxNj8jbGvZ"/>
+</div>
+<div class="relative z-20 w-full max-w-6xl">
+<div class="inline-block px-4 py-1 border border-primary/30 text-primary text-[10px] tracking-[0.4em] uppercase mb-6 bg-primary/5">Confidential Briefing</div>
+<h1 class="text-6xl md:text-8xl font-black cinzel-text text-on-surface tracking-tighter leading-none mb-8">
+                    Sovereign <br/> <span class="text-primary">Procurement</span>
+</h1>
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<p class="text-xl md:text-2xl font-light text-on-surface-variant max-w-xl leading-relaxed">
+                        Navigating Pakistan's PKR 2 Trillion+ public procurement market requires institutional precision and elite regulatory navigation.
+                    </p>
+<div class="grid grid-cols-2 gap-8 border-l border-outline-variant/30 pl-12">
+<div>
+<span class="block text-3xl font-bold text-primary tracking-tighter">PKR 2T+</span>
+<span class="text-[10px] uppercase tracking-widest text-neutral-500">Market Volume</span>
+</div>
+<div>
+<span class="block text-3xl font-bold text-primary tracking-tighter">8.2%</span>
+<span class="text-[10px] uppercase tracking-widest text-neutral-500">CAGR Growth</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid: Operational Sectors -->
+<section class="px-12 py-32 bg-surface">
+<div class="mb-20">
+<h2 class="text-4xl cinzel-text font-bold mb-4 tracking-tight">Sector <span class="text-primary italic">Intelligence</span></h2>
+<div class="w-24 h-px bg-primary/40"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[700px]">
+<!-- Infrastructure Card -->
+<div class="md:col-span-8 group relative overflow-hidden bg-surface-container-lowest border-l border-primary/20 p-12 flex flex-col justify-end transition-all hover:bg-surface-container-low">
+<div class="absolute top-0 right-0 p-12 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-9xl">apartment</span>
+</div>
+<div class="relative z-10">
+<span class="text-primary text-xs tracking-widest uppercase mb-4 block">Strategic Focus 01</span>
+<h3 class="text-4xl cinzel-text font-bold mb-6">Critical Infrastructure</h3>
+<p class="text-on-surface-variant max-w-md mb-8">Comprehensive tender advisory for National Highway Authority and Railway developments. We bridge the gap between global engineering and local regulatory frameworks.</p>
+<ul class="space-y-3 mb-12">
+<li class="flex items-center text-sm text-neutral-400">
+<span class="w-1.5 h-1.5 bg-primary mr-3"></span> CPEC Phase II Integration
+                            </li>
+<li class="flex items-center text-sm text-neutral-400">
+<span class="w-1.5 h-1.5 bg-primary mr-3"></span> Port Expansion Frameworks
+                            </li>
+</ul>
+<button class="text-primary text-[10px] font-bold tracking-[0.2em] uppercase flex items-center group/btn">
+                            Explore Assets <span class="material-symbols-outlined ml-2 transition-transform group-hover/btn:translate-x-2">arrow_right_alt</span>
+</button>
+</div>
+</div>
+<!-- Energy Card -->
+<div class="md:col-span-4 bg-surface-container-low border-r border-primary/10 p-10 flex flex-col justify-between hover:translate-y-[-4px] transition-transform">
+<div>
+<span class="material-symbols-outlined text-primary text-3xl mb-8">bolt</span>
+<h3 class="text-2xl cinzel-text font-bold mb-4">Energy &amp; Power</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Securing participation in renewable transition projects and traditional grid modernization tenders across all provinces.</p>
+</div>
+<div class="mt-8 border-t border-outline-variant/20 pt-8">
+<div class="flex justify-between items-end mb-2">
+<span class="text-[10px] text-neutral-500 uppercase tracking-widest">Active Tenders</span>
+<span class="text-primary font-bold">14</span>
+</div>
+<div class="w-full h-[1px] bg-outline-variant/30 relative">
+<div class="absolute top-0 left-0 w-[65%] h-full bg-primary shadow-[0_0_8px_rgba(230,195,100,0.6)]"></div>
+</div>
+</div>
+</div>
+<!-- IT/Digital Card -->
+<div class="md:col-span-4 bg-surface-container-high p-10 flex flex-col justify-between">
+<div>
+<span class="material-symbols-outlined text-primary text-3xl mb-8">terminal</span>
+<h3 class="text-2xl cinzel-text font-bold mb-4">Digital Sovereignty</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Advising on high-value E-Government initiatives, data centers, and secure cloud infrastructure for public sectors.</p>
+</div>
+<button class="border border-primary/40 px-6 py-3 text-[10px] font-bold tracking-widest uppercase hover:bg-primary/10 transition-colors">
+                        View Briefing
+                    </button>
+</div>
+<!-- Regulatory Expertise -->
+<div class="md:col-span-8 bg-surface p-12 border border-outline-variant/20 flex flex-col md:flex-row items-center gap-12 tonal-glow">
+<div class="flex-1">
+<h3 class="text-3xl cinzel-text font-bold mb-6">Regulatory Navigation</h3>
+<p class="text-on-surface-variant mb-6 leading-relaxed italic">"Our expertise in PPRA rules and sovereign compliance ensures your bids are not just compliant, but prioritized."</p>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container-lowest border-l border-primary/40">
+<h4 class="text-primary font-bold text-xs uppercase tracking-widest mb-1">Audit Protocol</h4>
+<p class="text-[10px] text-neutral-500 uppercase">Pre-submission screening</p>
+</div>
+<div class="p-4 bg-surface-container-lowest border-l border-primary/40">
+<h4 class="text-primary font-bold text-xs uppercase tracking-widest mb-1">Local Liaison</h4>
+<p class="text-[10px] text-neutral-500 uppercase">Provincial Alignment</p>
+</div>
+</div>
+</div>
+<div class="w-full md:w-64 aspect-square bg-surface-container-lowest border border-outline-variant/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-50 contrast-125" data-alt="Close up of high-end stationery and a fountain pen on dark desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNr2-1hXS5zRVpiBgTbiCfM9tsXKYYkkKxAaQmFqmuRVVWnCgLmDrQuCpPtL5WmEyZ5hbzjp_R7p--MMwDuHLT72WAHn0TqnHCM4yvziGxI9OVww_XSxGre5a2jqyn21_94rgCjK98BPlGgiEZA3hR8p--UWlFfE5wzwDvue-qXXEFcbpCyGQ-eObw3Pte3RZLmjwGRJNWuxaL1-UVJqp9eGclvf7b9hwBLauZy3nWxJA9j8JWGSnSXadDKsYt5AHBqh-KLByiafQC"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Executive Dashboard Interface Mockup -->
+<section class="px-12 py-32 bg-surface-container-lowest">
+<div class="max-w-6xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div class="max-w-xl">
+<h2 class="text-4xl cinzel-text font-bold mb-6 leading-tight">The Procurement <span class="text-primary">Command Centre</span></h2>
+<p class="text-on-surface-variant">Real-time tracking of high-stakes opportunities across Pakistan's federal and provincial pipelines. This is institutional access redefined.</p>
+</div>
+<div class="flex gap-4">
+<div class="px-6 py-4 bg-surface border border-outline-variant/20">
+<span class="block text-[10px] text-neutral-500 uppercase mb-1">Last Update</span>
+<span class="text-sm font-mono tracking-tighter text-on-surface">12 NOV 2024 - 14:02 GST</span>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="text-left text-[10px] text-neutral-500 uppercase tracking-[0.2em] border-b border-outline-variant/30">
+<th class="pb-6 px-4 font-light">Reference ID</th>
+<th class="pb-6 px-4 font-light">Opportunity Scope</th>
+<th class="pb-6 px-4 font-light">Entity</th>
+<th class="pb-6 px-4 font-light">Status</th>
+<th class="pb-6 px-4 font-light text-right">Estimated Value</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-colors group">
+<td class="py-6 px-4 font-mono text-primary group-hover:pl-6 transition-all">PAK-FED-8821</td>
+<td class="py-6 px-4 text-on-surface">Smart City Infrastructure - Phase 1 (ICT)</td>
+<td class="py-6 px-4 text-neutral-400">CDA Islamabad</td>
+<td class="py-6 px-4">
+<span class="flex items-center text-[10px] uppercase tracking-widest text-emerald-400">
+<span class="w-1 h-1 rounded-full bg-emerald-400 mr-2 shadow-[0_0_5px_rgba(52,211,153,0.8)]"></span> Open
+                                    </span>
+</td>
+<td class="py-6 px-4 text-right font-bold tracking-tighter">PKR 450.0M</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-colors group">
+<td class="py-6 px-4 font-mono text-primary group-hover:pl-6 transition-all">PAK-PUN-0092</td>
+<td class="py-6 px-4 text-on-surface">Agri-Tech Solar Deployment Grid</td>
+<td class="py-6 px-4 text-neutral-400">PBIT Lahore</td>
+<td class="py-6 px-4">
+<span class="flex items-center text-[10px] uppercase tracking-widest text-primary">
+<span class="w-1 h-1 rounded-full bg-primary mr-2"></span> Shortlisted
+                                    </span>
+</td>
+<td class="py-6 px-4 text-right font-bold tracking-tighter">PKR 1.2B</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-white/5 transition-colors group">
+<td class="py-6 px-4 font-mono text-primary group-hover:pl-6 transition-all">PAK-SND-4432</td>
+<td class="py-6 px-4 text-on-surface">Special Economic Zone Fiber Backbone</td>
+<td class="py-6 px-4 text-neutral-400">SEZMC Karachi</td>
+<td class="py-6 px-4">
+<span class="flex items-center text-[10px] uppercase tracking-widest text-neutral-500">
+<span class="w-1 h-1 rounded-full bg-neutral-500 mr-2"></span> Evaluation
+                                    </span>
+</td>
+<td class="py-6 px-4 text-right font-bold tracking-tighter">PKR 890.0M</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-12 flex justify-center">
+<button class="px-12 py-4 bg-surface border border-primary/20 hover:border-primary transition-colors text-primary text-[10px] font-bold tracking-[0.3em] uppercase">
+                        Request Full Dashboard Access
+                    </button>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-40 px-12 relative overflow-hidden">
+<div class="absolute inset-0 tonal-glow opacity-50"></div>
+<div class="relative z-10 max-w-4xl mx-auto text-center">
+<h2 class="text-5xl md:text-7xl cinzel-text font-bold mb-10 tracking-tighter">Secure Your <span class="italic text-primary">Sovereign Position</span></h2>
+<p class="text-xl text-on-surface-variant mb-16 max-w-2xl mx-auto leading-relaxed">
+                    CZAAH provides the regulatory shield and strategic conduit necessary for high-stakes government procurement excellence.
+                </p>
+<div class="flex flex-col md:flex-row gap-8 justify-center items-center">
+<a class="px-12 py-5 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold tracking-[0.2em] uppercase text-xs" href="#">Partner With Us</a>
+<a class="px-12 py-5 border border-primary/40 text-primary font-bold tracking-[0.2em] uppercase text-xs hover:bg-primary/5 transition-all" href="#">Download Sector Whitepaper</a>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full px-12 flex flex-col items-center space-y-8 bg-[#050505] py-20 border-t border-neutral-900">
+<div class="font-serif text-[#E6C364] tracking-widest text-2xl cinzel-text">CZAAH</div>
+<nav class="flex flex-wrap justify-center gap-x-12 gap-y-6">
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity raleway-text text-xs tracking-[0.15em] uppercase" href="#">Privacy Policy</a>
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity raleway-text text-xs tracking-[0.15em] uppercase" href="#">Terms of Engagement</a>
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity raleway-text text-xs tracking-[0.15em] uppercase" href="#">Global Compliance</a>
+<a class="text-neutral-600 hover:text-[#E6C364] transition-opacity raleway-text text-xs tracking-[0.15em] uppercase" href="#">Contact</a>
+</nav>
+<p class="text-neutral-600 raleway-text text-[10px] tracking-[0.2em] uppercase mt-8 opacity-60">
+                © 2024 CZAAH Sovereign Group. All Rights Reserved.
+            </p>
+</footer>
+</main>
+<!-- Mobile BottomNavBar (Hidden on desktop) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container border-t border-outline-variant/20 px-6 py-4 flex justify-around items-center z-50">
+<a class="flex flex-col items-center text-primary" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="text-[8px] uppercase tracking-widest mt-1">Gov</span>
+</a>
+<a class="flex flex-col items-center text-neutral-500" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[8px] uppercase tracking-widest mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center text-neutral-500" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[8px] uppercase tracking-widest mt-1">Insights</span>
+</a>
+<a class="flex flex-col items-center text-neutral-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[8px] uppercase tracking-widest mt-1">Account</span>
+</a>
+</nav>
+</body></html>

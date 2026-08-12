@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aviation Sector | THE GILDED VAULT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed-dim": "#dec57a",
+              "surface-container-high": "#2a2a2a",
+              "surface-tint": "#e6c364",
+              "surface-container-low": "#1c1b1b",
+              "primary": "#e6c364",
+              "on-secondary-fixed-variant": "#564505",
+              "on-surface": "#e5e2e1",
+              "on-background": "#e5e2e1",
+              "error-container": "#93000a",
+              "on-tertiary-fixed-variant": "#35437e",
+              "surface-variant": "#353534",
+              "surface-bright": "#3a3939",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-container": "#201f1f",
+              "on-tertiary": "#1e2b66",
+              "primary-fixed-dim": "#e6c364",
+              "on-tertiary-fixed": "#041451",
+              "surface": "#131313",
+              "on-error-container": "#ffdad6",
+              "inverse-on-surface": "#313030",
+              "secondary-container": "#584707",
+              "tertiary": "#b9c4ff",
+              "error": "#ffb4ab",
+              "tertiary-container": "#9ba8eb",
+              "surface-dim": "#131313",
+              "primary-container": "#c9a84c",
+              "secondary": "#dec57a",
+              "outline-variant": "#4d4637",
+              "on-secondary-container": "#cfb76e",
+              "on-primary-fixed": "#241a00",
+              "surface-container-highest": "#353534",
+              "on-secondary": "#3c2f00",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "on-primary": "#3d2e00",
+              "on-tertiary-container": "#2e3b77",
+              "primary-fixed": "#ffe08f",
+              "inverse-surface": "#e5e2e1",
+              "inverse-primary": "#755b00",
+              "on-primary-container": "#503d00",
+              "tertiary-fixed": "#dde1ff",
+              "outline": "#99907e",
+              "on-secondary-fixed": "#231b00",
+              "background": "#131313",
+              "on-surface-variant": "#d0c5b2",
+              "on-primary-fixed-variant": "#584400",
+              "secondary-fixed": "#fbe193",
+              "on-error": "#690005"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+            font-family: 'Raleway', sans-serif;
+        }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 glass-nav border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent font-cinzel">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex space-x-12 items-center">
+<a class="text-amber-400 font-bold border-b border-amber-400 pb-1 text-sm tracking-widest uppercase font-cinzel" href="#">Sectors</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-cinzel" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-cinzel" href="#">Investments</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-cinzel">Member Login</button>
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary px-6 py-2 rounded-sm font-bold text-sm tracking-widest uppercase hover:opacity-90 transition-all active:scale-95 duration-150 font-cinzel">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative h-[921px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-60 grayscale-[0.2]" data-alt="Cinematic shot of a luxury private jet on a dark runway at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq4ZAHEJZbp-zrKWcTmyl_kz3d9rwLebgSvIcz8Bni_5ZlKBoIhnAQiE7bQ-epXZ0zA-1qQNGTv7Ek6hMW-QWfMVou_3CSURZN2zV1USWHDiWsy4T38YDXydqMk5HpKsWDV3lMt9z9S2_qcJ_0mErM6Mo70ru_AAKqPoe6zssRX4tYUf7Q6abPQ326CqAMPa0KrUNOIS8i5YMqgdHQv1Itc9Vlgkw-WDemaZ7HHluzuI0FOMZSlJNOPybnOW1R2z21TZ-Pck-dkdKi"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-lowest via-surface-container-lowest/60 to-transparent"></div>
+</div>
+<div class="container mx-auto px-12 relative z-10 grid grid-cols-12">
+<div class="col-span-12 md:col-span-8 lg:col-span-7">
+<span class="text-primary tracking-[0.4em] uppercase text-sm mb-6 block font-cinzel">Sovereign Mobility</span>
+<h1 class="text-6xl md:text-8xl font-black font-cinzel leading-tight tracking-tighter mb-8 text-on-surface">
+                        Aviation <br/>
+<span class="text-primary italic">Excellence</span>
+</h1>
+<p class="text-lg md:text-xl text-on-surface-variant max-w-xl leading-relaxed font-body mb-10">
+                        Strategic aerial logistics for the global elite. From clandestine executive transport to rapid response medical evacuation, CZAAH Aviation ensures the world is never out of reach.
+                    </p>
+<div class="flex space-x-6">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-sm font-bold tracking-widest uppercase font-cinzel hover:bg-primary-container transition-all">
+                            Access Portal
+                        </button>
+<button class="border border-outline-variant text-on-surface px-10 py-4 rounded-sm font-bold tracking-widest uppercase font-cinzel hover:bg-white/5 transition-all">
+                            Fleet Specs
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Asymmetric Value Prop -->
+<section class="py-32 bg-surface">
+<div class="container mx-auto px-12 grid grid-cols-12 gap-12 items-center">
+<div class="col-span-12 lg:col-span-5 order-2 lg:order-1">
+<div class="relative group">
+<div class="absolute -inset-4 bg-primary/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<img class="relative w-full aspect-[4/5] object-cover grayscale-[0.3] rounded-sm" data-alt="Close up of high-end wood and leather interior of a private jet cabin" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOtvPjRRQCWclqg2o2y6tq8rs0zaowoJxsIIVdwwomRVb2hQtp9FCsruQyKXAu1hIsrGozs9m6a_xSHMJaMTFZteHJnTHgG9J95unLmDHx63prlroN_P_vVRAzD37BDpPNlVmcxYEAXwXQeXVymIaxwlZB2smuA1I1AOWvHxwy1X9W6TCcb8k9OjOu-9KMZBAxgLi8DJg_8GY6C1vpXwjmTeOFiF4cThrZ9LBHToA7jyTx6DP4Mci-yVTBIl4ImriAuAa_Gg9ZKZsZ"/>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-6 lg:col-start-7 order-1 lg:order-2">
+<h2 class="text-4xl md:text-5xl font-cinzel mb-12 leading-tight">Beyond the Standard <br/>Flight Path</h2>
+<div class="space-y-12">
+<div class="flex gap-8 group">
+<span class="text-primary text-4xl font-cinzel opacity-30 group-hover:opacity-100 transition-opacity">01</span>
+<div>
+<h3 class="text-xl font-cinzel text-primary mb-3">Absolute Discretion</h3>
+<p class="text-on-surface-variant font-body leading-relaxed">Private terminals and non-commercial flight plans ensure your itinerary remains an institutional secret.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<span class="text-primary text-4xl font-cinzel opacity-30 group-hover:opacity-100 transition-opacity">02</span>
+<div>
+<h3 class="text-xl font-cinzel text-primary mb-3">Remote Site Access</h3>
+<p class="text-on-surface-variant font-body leading-relaxed">Our rotor-wing and STOL capabilities provide direct access to secluded assets, resource sites, and private estates.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<span class="text-primary text-4xl font-cinzel opacity-30 group-hover:opacity-100 transition-opacity">03</span>
+<div>
+<h3 class="text-xl font-cinzel text-primary mb-3">Institutional Precision</h3>
+<p class="text-on-surface-variant font-body leading-relaxed">Aviation protocols maintained to sovereign standards, with continuous monitoring by our 24/7 flight operations center.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid Services -->
+<section class="py-32 bg-surface-container-lowest">
+<div class="container mx-auto px-12">
+<div class="mb-20 text-center">
+<h2 class="text-5xl font-cinzel mb-4">Strategic Operations</h2>
+<div class="w-24 h-px bg-primary mx-auto"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Private Charter -->
+<div class="md:col-span-2 bg-surface-container-low p-12 relative overflow-hidden flex flex-col justify-end min-h-[500px] group">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition-transform duration-700" data-alt="Modern private jet flying above a sea of clouds" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2BZmC9zgCpYRf9Cmp8ZjN6KmjFa8Kk_CDVu4Vsu7LFu4R_-wfGWOUUv7W2skbTZpLVGJRLjA-wqGWfhDgVDoZSM2eZc-XeTKPo-7cECKiDnFGn2HN5XUqnN8n6xZw8dQ53ZgBiLDk8-MyMMIjR3swuhdZPobfJauSXqMdi2DWM3ovjUBDvUF9Vt_8DxCNLuDz64sPdsPqeMX9mILPCsEGOtApIuEjG0FUuqCrGpVPX8wgIriPaF9R3YZJrt-NDaC-qPkEE2OJLHEK"/>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="flight_takeoff">flight_takeoff</span>
+<h3 class="text-3xl font-cinzel mb-4">Private Charter</h3>
+<p class="text-on-surface-variant font-body max-w-md">Bespoke itineraries for global transitions. Our long-range fleet is ready within four hours of activation.</p>
+</div>
+</div>
+<!-- Executive Transport -->
+<div class="bg-surface-container p-12 relative overflow-hidden flex flex-col justify-end group">
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="groups">groups</span>
+<h3 class="text-2xl font-cinzel mb-4">Executive Transport</h3>
+<p class="text-on-surface-variant font-body text-sm">Efficient regional movement for leadership teams, optimized for productivity in high-fidelity cabins.</p>
+</div>
+</div>
+<!-- Site Access -->
+<div class="bg-surface-container p-12 relative overflow-hidden flex flex-col justify-end group">
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="explore">explore</span>
+<h3 class="text-2xl font-cinzel mb-4">Site Access</h3>
+<p class="text-on-surface-variant font-body text-sm">Specialized extraction and delivery to off-grid exploration sites and industrial complexes.</p>
+</div>
+</div>
+<!-- Medical Evac -->
+<div class="md:col-span-2 bg-surface-container-low p-12 relative overflow-hidden flex flex-col justify-end min-h-[400px] group">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition-transform duration-700" data-alt="Interior of a medical helicopter with advanced equipment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZnk3ZZDS55Tkgn4w2sD84jCZa0IT3Agd_yNf82B9Yt77cupWPxB4tArYghjvNvc8aoNcUan_hw9Wje4eRC5l-K99Fczuk28R61cwHSsfyxla3XBhs0GYN1SORP1ZtO_L_qZVOQuqED13RqprV-hlpCWoMyt8n5oYMAtKyYGq_kuymag2Y3ws9yl18rJbx6_oFMlLiPfNoCrFhGbTaHuIaLnyiTiy6FcmYYHT_WZMk5DrcxipkHp_ZUpSiAsTqAqKxdBEGbj_qKxfY"/>
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="emergency">emergency</span>
+<h3 class="text-3xl font-cinzel mb-4">Medical Evacuation</h3>
+<p class="text-on-surface-variant font-body max-w-md">Global rapid-response aeromedical service. Level-1 trauma capabilities integrated directly into our airframes.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Dynamic Statistics -->
+<section class="py-24 bg-surface-container-lowest border-y border-outline-variant/10">
+<div class="container mx-auto px-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+<div>
+<div class="text-4xl font-cinzel text-primary mb-2">124</div>
+<div class="text-xs tracking-[0.3em] uppercase text-on-surface-variant">Access Points</div>
+</div>
+<div>
+<div class="text-4xl font-cinzel text-primary mb-2">15,000+</div>
+<div class="text-xs tracking-[0.3em] uppercase text-on-surface-variant">Annual Hours</div>
+</div>
+<div>
+<div class="text-4xl font-cinzel text-primary mb-2">0.5s</div>
+<div class="text-xs tracking-[0.3em] uppercase text-on-surface-variant">Response Latency</div>
+</div>
+<div>
+<div class="text-4xl font-cinzel text-primary mb-2">98%</div>
+<div class="text-xs tracking-[0.3em] uppercase text-on-surface-variant">Retention Rate</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-40 relative">
+<div class="container mx-auto px-12 text-center relative z-10">
+<h2 class="text-5xl md:text-7xl font-cinzel mb-12 tracking-tight">Command Your <br/><span class="text-primary italic">Trajectory</span></h2>
+<div class="max-w-2xl mx-auto mb-12">
+<p class="text-on-surface-variant font-body leading-relaxed text-lg">CZAAH Aviation is not merely a service; it is an institutional asset. Connect with our flight coordination desk to secure your position.</p>
+</div>
+<button class="bg-gradient-to-tr from-primary to-primary-container text-on-primary px-16 py-6 rounded-sm font-bold text-lg tracking-[0.2em] uppercase font-cinzel shadow-2xl shadow-primary/20 hover:scale-105 transition-transform">
+                    Inquire Privately
+                </button>
+</div>
+<!-- Background Halo -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-amber-900/20 bg-neutral-950">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 font-cinzel">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-sm font-body leading-relaxed">Sovereign Asset Management for the global institutional investor. Excellence through discretion.</p>
+</div>
+<div>
+<h4 class="text-amber-500 font-cinzel text-sm tracking-widest uppercase mb-6">Explore</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 block font-body text-sm" href="#">Sectors</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 block font-body text-sm" href="#">Services</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 block font-body text-sm" href="#">Investments</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-amber-500 font-cinzel text-sm tracking-widest uppercase mb-6">Legal</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 block font-body text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 block font-body text-sm" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-transform duration-300 hover:translate-x-1 block font-body text-sm" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-amber-500 font-cinzel text-sm tracking-widest uppercase mb-6">Connect</h4>
+<div class="flex space-x-4 mb-6">
+<span class="material-symbols-outlined text-amber-500/50 cursor-pointer hover:text-amber-500" data-icon="language">language</span>
+<span class="material-symbols-outlined text-amber-500/50 cursor-pointer hover:text-amber-500" data-icon="mail">mail</span>
+</div>
+<div class="text-[10px] uppercase tracking-widest text-neutral-500 font-cinzel">
+                    © 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.
+                </div>
+</div>
+</div>
+</footer>
+</body></html>

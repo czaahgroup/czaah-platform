@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#564505",
+              "surface-container-highest": "#353534",
+              "tertiary-fixed-dim": "#b9c3ff",
+              "on-primary": "#3d2e00",
+              "on-tertiary-fixed-variant": "#35437e",
+              "tertiary-fixed": "#dde1ff",
+              "on-primary-fixed": "#241a00",
+              "outline-variant": "#4d4637",
+              "on-background": "#e5e2e1",
+              "on-error-container": "#ffdad6",
+              "surface-dim": "#131313",
+              "on-secondary-fixed": "#231b00",
+              "on-primary-fixed-variant": "#584400",
+              "on-tertiary": "#1e2b66",
+              "primary-fixed": "#ffe08f",
+              "on-primary-container": "#503d00",
+              "inverse-primary": "#755b00",
+              "background": "#131313",
+              "secondary-fixed": "#fbe193",
+              "secondary-container": "#584707",
+              "surface-tint": "#e6c364",
+              "on-tertiary-container": "#2e3b77",
+              "on-secondary": "#3c2f00",
+              "primary-container": "#c9a84c",
+              "outline": "#99907e",
+              "tertiary": "#b9c4ff",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-fixed": "#041451",
+              "surface-container-low": "#1c1b1b",
+              "on-surface-variant": "#d0c5b2",
+              "error-container": "#93000a",
+              "surface-container": "#201f1f",
+              "secondary-fixed-dim": "#dec57a",
+              "primary-fixed-dim": "#e6c364",
+              "surface-bright": "#3a3939",
+              "primary": "#e6c364",
+              "on-surface": "#e5e2e1",
+              "surface": "#131313",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-variant": "#353534",
+              "error": "#ffb4ab",
+              "tertiary-container": "#9ba8eb",
+              "secondary": "#dec57a",
+              "inverse-on-surface": "#313030",
+              "on-secondary-container": "#cfb76e",
+              "on-error": "#690005",
+              "inverse-surface": "#e5e2e1"
+            },
+            fontFamily: {
+              "headline": ["Cinzel", "serif"],
+              "body": ["Raleway", "sans-serif"],
+              "label": ["Raleway", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-nav {
+        background: rgba(19, 19, 19, 0.8);
+        backdrop-filter: blur(20px);
+      }
+      .gold-gradient-text {
+        background: linear-gradient(135deg, #e6c364 0%, #c9a84c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .obsidian-glow {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-900/80 backdrop-blur-xl border-b border-white/5 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+<div class="text-2xl font-bold tracking-tighter bg-gradient-to-tr from-amber-200 via-amber-500 to-amber-700 bg-clip-text text-transparent font-headline">
+                THE GILDED VAULT
+            </div>
+<div class="hidden md:flex space-x-12 items-center">
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Sectors</a>
+<a class="text-amber-400 font-bold border-b border-amber-400 pb-1 text-sm tracking-widest uppercase font-label" href="#">Services</a>
+<a class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label" href="#">Investments</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-neutral-400 hover:text-amber-200 transition-colors text-sm tracking-widest uppercase font-label">Member Login</button>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-sm font-bold text-sm tracking-widest uppercase transition-all hover:brightness-110 active:scale-95">
+                    Schedule Consultation
+                </button>
+</div>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section: Elite Institutional Aesthetic -->
+<section class="relative min-h-[716px] flex items-center overflow-hidden px-8 md:px-20">
+<div class="absolute inset-0 z-0">
+<img alt="Corporate architecture" class="w-full h-full object-cover opacity-30 grayscale" data-alt="Modern high-rise glass architecture in deep monochrome" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5dqDSSF0b5SvlSj5XQe6vJVoPWgpoIJT_hJzHNyezmXv7ov6_OzfphwCK05k1BxSFo5mWZlg_REKjx7ZgrU6XSONJ760xCVIQCiJLQoRzj1UG-2h62s1I8btoCj1KykNsopp5-tVd1kXXw9wJEb4YJpdyV5QRiuR7BNQYGfPZX9W_eOaTIcVOR5ds8vqU4FUmXJFiorsUD8APC7Dnu4Rw5cEXGBaejF3RK19XZfDPfJxhmyN8a5E9xPsp3CRxAGDePtl6urAD-Ini"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-4xl">
+<span class="inline-block py-1 px-3 mb-6 border border-primary/40 text-primary text-[10px] uppercase tracking-[0.3em] font-label">
+                    Strategic Market Entry
+                </span>
+<h1 class="font-headline text-5xl md:text-7xl leading-tight mb-8 tracking-tight">
+                    Corporate <br/>
+<span class="gold-gradient-text">Structuring &amp; Genesis</span>
+</h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-2xl leading-relaxed font-light mb-10">
+                    Precision-engineered business frameworks for the international visionary. We navigate SECP complexities and regulatory landscapes to anchor your sovereign capital.
+                </p>
+<div class="flex gap-6">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-10 py-4 rounded-sm font-bold text-sm tracking-widest uppercase">
+                        Initialize Protocol
+                    </button>
+<button class="border border-primary/40 text-primary px-10 py-4 rounded-sm font-bold text-sm tracking-widest uppercase hover:bg-primary/5 transition-colors">
+                        View Dossier
+                    </button>
+</div>
+</div>
+</section>
+<!-- Entity Selection Interface: The Sovereign Choice -->
+<section class="py-32 px-8 md:px-20 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto">
+<div class="mb-20 text-center">
+<h2 class="font-headline text-4xl mb-4">Entity Selection Matrix</h2>
+<div class="w-24 h-px bg-primary mx-auto"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- PLC -->
+<div class="group relative p-10 bg-surface border border-outline-variant/20 hover:border-primary/40 transition-all duration-500">
+<div class="mb-12">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" style="font-variation-settings: 'FILL' 0;">account_balance</span>
+<h3 class="font-headline text-2xl mb-4">Private Limited (PLC)</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">The standard for scalable operations. Offers maximum flexibility for multi-shareholder structures and equity rounds.</p>
+</div>
+<ul class="space-y-4 mb-12">
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> 2+ Shareholders Required
+                            </li>
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> Unlimited Capital Growth
+                            </li>
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> Foreign Direct Investment
+                            </li>
+</ul>
+<div class="pt-8 border-t border-outline-variant/10 text-primary font-bold text-[10px] tracking-widest uppercase group-hover:translate-x-2 transition-transform cursor-pointer">
+                            Establish Structure →
+                        </div>
+</div>
+<!-- SMC -->
+<div class="group relative p-10 bg-surface-container-low border border-primary/20 scale-105 z-10 obsidian-glow">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[9px] font-bold px-4 py-1 tracking-[0.2em] uppercase">
+                            Most Requested
+                        </div>
+<div class="mb-12">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" style="font-variation-settings: 'FILL' 1;">person_pin</span>
+<h3 class="font-headline text-2xl mb-4">Single Member (SMC)</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">Designed for the sole investor seeking total control with limited liability protection. Ideal for consultants and holding firms.</p>
+</div>
+<ul class="space-y-4 mb-12">
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> 100% Individual Ownership
+                            </li>
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> Simplified Compliance
+                            </li>
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> Corporate Bank Readiness
+                            </li>
+</ul>
+<div class="pt-8 border-t border-outline-variant/10 text-primary font-bold text-[10px] tracking-widest uppercase group-hover:translate-x-2 transition-transform cursor-pointer">
+                            Establish Structure →
+                        </div>
+</div>
+<!-- Branch -->
+<div class="group relative p-10 bg-surface border border-outline-variant/20 hover:border-primary/40 transition-all duration-500">
+<div class="mb-12">
+<span class="material-symbols-outlined text-primary text-4xl mb-6" style="font-variation-settings: 'FILL' 0;">domain_verification</span>
+<h3 class="font-headline text-2xl mb-4">Branch Office</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">For global conglomerates expanding operations without local incorporation. Seamless alignment with parent entity.</p>
+</div>
+<ul class="space-y-4 mb-12">
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> BOI/SEC Certification
+                            </li>
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> Foreign Parent Liability
+                            </li>
+<li class="flex items-center text-[11px] uppercase tracking-widest text-on-surface/80">
+<span class="material-symbols-outlined text-primary text-sm mr-3">check_circle</span> Repatriation Approval
+                            </li>
+</ul>
+<div class="pt-8 border-t border-outline-variant/10 text-primary font-bold text-[10px] tracking-widest uppercase group-hover:translate-x-2 transition-transform cursor-pointer">
+                            Establish Structure →
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- The Execution Roadmap -->
+<section class="py-32 px-8 md:px-20 bg-surface relative overflow-hidden">
+<div class="absolute right-0 top-0 w-1/3 h-full bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-20">
+<div class="md:w-1/3">
+<h2 class="font-headline text-4xl mb-8 leading-tight">The Path to <br/><span class="text-primary">Operational Sovereignty</span></h2>
+<p class="text-on-surface-variant font-light leading-relaxed mb-8">
+                        Our three-phase integration protocol ensures legal precision while maintaining the momentum of your entry strategy.
+                    </p>
+<div class="p-8 border-l-2 border-primary bg-surface-container-low">
+<div class="text-[10px] uppercase tracking-[0.3em] text-primary mb-2">Average Timeline</div>
+<div class="text-3xl font-headline">14 Business Days</div>
+</div>
+</div>
+<div class="md:w-2/3 space-y-12">
+<div class="flex gap-8 group">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center border border-primary/40 font-headline text-primary text-xl group-hover:bg-primary group-hover:text-on-primary transition-colors">01</div>
+<div>
+<h4 class="font-headline text-xl mb-3 uppercase tracking-wider">SECP Digital Registration</h4>
+<p class="text-on-surface-variant font-light text-sm leading-relaxed">Name reservation and digital drafting of Articles of Association. Real-time submission via the elite portal for immediate regulatory visibility.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center border border-primary/40 font-headline text-primary text-xl group-hover:bg-primary group-hover:text-on-primary transition-colors">02</div>
+<div>
+<h4 class="font-headline text-xl mb-3 uppercase tracking-wider">Corporate Tax &amp; Structuring</h4>
+<p class="text-on-surface-variant font-light text-sm leading-relaxed">NTN issuance and fiscal framing. We align your corporate structure with international double-taxation treaties and local compliance mandates.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center border border-primary/40 font-headline text-primary text-xl group-hover:bg-primary group-hover:text-on-primary transition-colors">03</div>
+<div>
+<h4 class="font-headline text-xl mb-3 uppercase tracking-wider">Capital Anchorage (Banking)</h4>
+<p class="text-on-surface-variant font-light text-sm leading-relaxed">Direct facilitation with tier-1 institutional banks. Setup of foreign currency accounts and corporate credit lines tailored for global investors.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Visual Anchor: Trust & Authority -->
+<section class="py-20 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-8 grid grid-cols-2 md:grid-cols-4 gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant mb-2">verified_user</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-label">SECP Licensed</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant mb-2">gavel</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-label">Legal Precision</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant mb-2">public</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-label">Global Access</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant mb-2">encrypted</span>
+<span class="text-[10px] uppercase tracking-[0.2em] font-label">Tier-1 Security</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-neutral-950 w-full border-t border-amber-900/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 max-w-7xl mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="text-xl font-bold text-amber-500 mb-6 font-headline">THE GILDED VAULT</div>
+<p class="text-neutral-500 text-sm font-body leading-relaxed">
+                    The pinnacle of sovereign asset management and corporate legal architecture.
+                </p>
+</div>
+<div>
+<h4 class="text-amber-500 font-headline text-sm uppercase tracking-widest mb-6">Navigation</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm" href="#">Sectors</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm" href="#">Services</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm" href="#">Investments</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-amber-500 font-headline text-sm uppercase tracking-widest mb-6">Institutional</h4>
+<ul class="space-y-4">
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm" href="#">Terms of Service</a></li>
+<li><a class="text-neutral-500 hover:text-neutral-200 transition-all hover:translate-x-1 inline-block text-sm" href="#">Compliance</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-amber-500 font-headline text-sm uppercase tracking-widest mb-6">Headquarters</h4>
+<p class="text-neutral-500 text-[10px] uppercase tracking-widest leading-loose">
+                    FINANCIAL DISTRICT, ZONE I<br/>
+                    ISLAMABAD, PK 44000<br/>
+                    +92 (51) 884-VAULT
+                </p>
+</div>
+</div>
+<div class="border-t border-white/5 py-8 text-center">
+<p class="text-[10px] uppercase tracking-widest text-neutral-600 font-body">
+                © 2024 THE GILDED VAULT. SOVEREIGN ASSET MANAGEMENT. ALL RIGHTS RESERVED.
+            </p>
+</div>
+</footer>
+</body></html>

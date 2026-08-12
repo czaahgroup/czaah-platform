@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sleep:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:czaah.com)",
+      "Bash(ls:*)",
+      "Bash(npx next:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

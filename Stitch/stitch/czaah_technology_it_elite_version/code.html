@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Technology &amp; IT | The Gilded Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&amp;family=Raleway:wght@300;400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "tertiary-fixed-dim": "#b9c3ff",
+                "on-surface": "#e5e2e1",
+                "tertiary-container": "#9ba8eb",
+                "on-tertiary-fixed": "#041451",
+                "primary-container": "#c9a84c",
+                "on-primary-container": "#503d00",
+                "on-primary": "#3d2e00",
+                "primary-fixed-dim": "#e6c364",
+                "on-primary-fixed-variant": "#584400",
+                "on-background": "#e5e2e1",
+                "on-tertiary-container": "#2e3b77",
+                "error-container": "#93000a",
+                "background": "#131313",
+                "tertiary": "#b9c4ff",
+                "on-tertiary": "#1e2b66",
+                "primary-fixed": "#ffe08f",
+                "on-surface-variant": "#d0c5b2",
+                "on-error": "#690005",
+                "surface-container-lowest": "#0e0e0e",
+                "on-secondary": "#3c2f00",
+                "on-error-container": "#ffdad6",
+                "on-secondary-container": "#cfb76e",
+                "surface-variant": "#353534",
+                "inverse-surface": "#e5e2e1",
+                "surface-container-high": "#2a2a2a",
+                "outline": "#99907e",
+                "on-tertiary-fixed-variant": "#35437e",
+                "secondary-fixed-dim": "#dec57a",
+                "surface-dim": "#131313",
+                "surface-tint": "#e6c364",
+                "tertiary-fixed": "#dde1ff",
+                "on-primary-fixed": "#241a00",
+                "inverse-primary": "#755b00",
+                "on-secondary-fixed": "#231b00",
+                "surface-bright": "#3a3939",
+                "on-secondary-fixed-variant": "#564505",
+                "inverse-on-surface": "#313030",
+                "surface": "#131313",
+                "surface-container-low": "#1c1b1b",
+                "secondary": "#dec57a",
+                "secondary-container": "#584707",
+                "error": "#ffb4ab",
+                "surface-container-highest": "#353534",
+                "primary": "#e6c364",
+                "outline-variant": "#4d4637",
+                "secondary-fixed": "#fbe193",
+                "surface-container": "#201f1f"
+              },
+              fontFamily: {
+                "headline": ["Cinzel", "serif"],
+                "body": ["Raleway", "sans-serif"],
+                "label": ["Raleway", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(230, 195, 100, 0.4);
+        }
+        .bg-obsidian-gradient {
+            background: radial-gradient(circle at top right, rgba(230, 195, 100, 0.05), transparent 60%),
+                        linear-gradient(to bottom, #050505, #131313);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full flex justify-between items-center px-8 py-4 bg-[#050505]/80 backdrop-blur-xl z-50 border-b border-[#4D4637]/20 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+<div class="text-xl font-headline font-bold tracking-widest text-[#E6C364]">The Gilded Vault</div>
+<div class="hidden md:flex gap-10 items-center">
+<a class="font-headline text-sm tracking-[0.1em] uppercase text-[#E6C364] border-b border-[#E6C364] pb-1" href="#">Sectors</a>
+<a class="font-headline text-sm tracking-[0.1em] uppercase text-[#D0C5B2] hover:text-[#E6C364] transition-colors" href="#">Services</a>
+<a class="font-headline text-sm tracking-[0.1em] uppercase text-[#D0C5B2] hover:text-[#E6C364] transition-colors" href="#">Portfolio</a>
+<a class="font-headline text-sm tracking-[0.1em] uppercase text-[#D0C5B2] hover:text-[#E6C364] transition-colors" href="#">Vault</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-[#D0C5B2] hover:text-[#E6C364] transition-all">notifications</button>
+<button class="material-symbols-outlined text-[#D0C5B2] hover:text-[#E6C364] transition-all">account_balance_wallet</button>
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Sovereign Member Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGeNC8sd6WXwWlPE3cAeWQwPQDiWn94WHgpPTW_3Wid8Ce5Sks1pcAkwHwX1vT9BLeBPZaBT9d2DRDpMDnNNWXX9ZOW-Sztd-IL-oddVrQE7OjU2DUZAVQ0PgvXHlf5NqDIUNFLKRC62n80SfSFv9MKJu3pXQadj110UsYuWLjVOfJ3g3H2DdV8JGA-YFdGSVsNR8sP0kLIOr-m0qMLnFq3rseSjcJ9f90yYG54iAaFkNPV5jXRwX8hixLH2-8aspApNKMvxhrGLqj"/>
+</div>
+</div>
+</nav>
+<!-- Side Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#0E0E0E] border-r border-[#4D4637]/20 flex flex-col py-6 hidden lg:flex z-40">
+<div class="px-8 mt-20 mb-12">
+<h2 class="text-lg font-headline text-[#E6C364] tracking-widest">Sovereign Control</h2>
+<p class="text-xs font-label uppercase tracking-[0.2em] text-on-surface-variant opacity-60">Institutional Access</p>
+</div>
+<div class="flex-1 flex flex-col">
+<a class="flex items-center gap-4 text-[#D0C5B2] px-8 py-4 hover:bg-[#1C1B1B] transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label tracking-wide text-sm">Admin Dashboard</span>
+</a>
+<a class="flex items-center gap-4 text-[#D0C5B2] px-8 py-4 hover:bg-[#1C1B1B] transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label tracking-wide text-sm">Members</span>
+</a>
+<a class="flex items-center gap-4 bg-gradient-to-r from-[#E6C364]/10 to-transparent text-[#E6C364] border-l-2 border-[#E6C364] px-8 py-4" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+<span class="font-label tracking-wide text-sm">Sectors</span>
+</a>
+<a class="flex items-center gap-4 text-[#D0C5B2] px-8 py-4 hover:bg-[#1C1B1B] transition-all" href="#">
+<span class="material-symbols-outlined">account_balance</span>
+<span class="font-label tracking-wide text-sm">Investments</span>
+</a>
+<a class="flex items-center gap-4 text-[#D0C5B2] px-8 py-4 hover:bg-[#1C1B1B] transition-all" href="#">
+<span class="material-symbols-outlined">swap_horiz</span>
+<span class="font-label tracking-wide text-sm">Trade Desk</span>
+</a>
+</div>
+<div class="mt-auto px-8 py-6 flex flex-col gap-4">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary font-label font-bold uppercase tracking-widest text-xs py-3 px-4 shadow-xl">
+                New Investment
+            </button>
+<div class="flex gap-4 mt-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">settings</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">contact_support</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-20">
+<!-- Hero Section: Digital Frontier -->
+<section class="relative h-[819px] w-full overflow-hidden flex items-center">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="High-tech modern server vault with gold illumination" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI6U42psgtP1JZuU-gkVGYcKkHKRMZ7BSn99_J7ZpPIQ7QVoc1VSt-4ULwdUmJxIexPKjKQy1_1mvb3eh8x_LW8wZ85n_pjJbn0SCI5afrA4_4qncAjUdvVWcPSKiGy2jX5gjG9U6QAx0fjjsIH2oZEF9vsgKbNny-IcYT_HMoqY1YbDRfrE6L5a_dhLMZR-5F2Bf88OeSDxIze39IoM5WArs6Gn8QxwilfkrJGlsoMs-0Ebb4W3FaACEbcUiaur-mD5FNcoat9l7e"/>
+<div class="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/70 to-transparent"></div>
+</div>
+<div class="relative z-10 container mx-auto px-12 grid grid-cols-12">
+<div class="col-span-12 lg:col-span-7">
+<span class="inline-block px-3 py-1 border border-primary/40 text-primary font-label text-[10px] uppercase tracking-[0.3em] mb-6">Sector Deep-Dive</span>
+<h1 class="text-6xl md:text-8xl font-headline font-black text-on-surface leading-[1.1] mb-8">
+<span class="text-glow">Technology</span><br/>
+<span class="text-primary">&amp; IT</span>
+</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed font-light max-w-xl mb-12">
+                        Architecting the digital infrastructure of the sovereign future. From institutional blockchain protocols to elite engineering hubs, we define the next generation of technological hegemony.
+                    </p>
+<div class="flex gap-8 items-center">
+<button class="px-8 py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary font-label font-bold uppercase tracking-[0.2em] text-xs transition-transform active:scale-95">
+                            Acquisition Protocol
+                        </button>
+<button class="px-8 py-4 border border-primary/40 text-primary font-label font-bold uppercase tracking-[0.2em] text-xs hover:border-primary transition-colors">
+                            View Roadmap
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Grid: Institutional Data -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-0 border-t border-outline-variant/10 bg-surface-container-lowest">
+<div class="p-10 border-r border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-4">Total Assets Under Management</p>
+<h3 class="text-4xl font-headline text-primary">$4.2B</h3>
+<div class="w-full bg-outline-variant/20 h-[1px] mt-4 relative">
+<div class="absolute top-0 left-0 h-full bg-primary w-3/4 shadow-[0_0_8px_#E6C364]"></div>
+</div>
+</div>
+<div class="p-10 border-r border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-4">Annual Export Velocity</p>
+<h3 class="text-4xl font-headline text-on-surface">+18.4%</h3>
+<div class="w-full bg-outline-variant/20 h-[1px] mt-4 relative">
+<div class="absolute top-0 left-0 h-full bg-primary w-1/2 shadow-[0_0_8px_#E6C364]"></div>
+</div>
+</div>
+<div class="p-10 border-r border-outline-variant/10">
+<p class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-4">Active Elite Engineers</p>
+<h3 class="text-4xl font-headline text-on-surface">12,400</h3>
+<div class="w-full bg-outline-variant/20 h-[1px] mt-4 relative">
+<div class="absolute top-0 left-0 h-full bg-primary w-2/3 shadow-[0_0_8px_#E6C364]"></div>
+</div>
+</div>
+<div class="p-10">
+<p class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-4">Sovereign Partnerships</p>
+<h3 class="text-4xl font-headline text-on-surface">14</h3>
+<div class="w-full bg-outline-variant/20 h-[1px] mt-4 relative">
+<div class="absolute top-0 left-0 h-full bg-primary w-1/3 shadow-[0_0_8px_#E6C364]"></div>
+</div>
+</div>
+</section>
+<!-- Bento Grid: The Strategic Core -->
+<section class="py-24 px-8 md:px-20 bg-obsidian-gradient">
+<div class="flex justify-between items-end mb-16">
+<div>
+<h2 class="text-4xl font-headline text-on-surface tracking-wide mb-4">The Strategic Pillars</h2>
+<p class="text-on-surface-variant max-w-lg">Advanced positioning within the critical nodes of the digital global economy.</p>
+</div>
+<div class="text-right hidden md:block">
+<span class="text-[10px] font-label text-primary uppercase tracking-[0.5em]">Classified // Level 4 Access</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<!-- E-Governance Partnerships -->
+<div class="col-span-12 md:col-span-8 group relative overflow-hidden bg-surface-container-low border-none h-[500px]">
+<img class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="Abstract global network digital visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGAm5ZNHnIwxIbf1yHUD31SRZ17zb9xvcfTXf-W-fDUtC3k3FoiOp6xUfbH1fSHYEN-GLGsRo2ua3JQ7qJMLDFIrUVNttSHbGC3KrCHvLzqqh0ZuI4DQet-27SSJLxyf7AjFIXg_zvqquX2azC5EE6AkvgNNozuS8DvWA_ewtHYk7huy5PXTuaYjfjXUTKvUk7Mxe0b79Ww-qn0pCvhnTsvY0DTX6y30H0rOmlOHMwEdwgBI40v8YKatWvvxR83IhU3CJgkrOugF5g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent"></div>
+<div class="relative h-full p-12 flex flex-col justify-end">
+<span class="material-symbols-outlined text-primary mb-6 text-4xl">security</span>
+<h3 class="text-3xl font-headline text-on-surface mb-4">E-Governance Partnerships</h3>
+<p class="text-on-surface-variant max-w-md mb-8">Securing national data protocols and administrative architecture for sovereign states. Our frameworks manage over 40 million civic entries annually.</p>
+<div class="flex gap-4">
+<span class="px-3 py-1 bg-surface-variant/50 text-[10px] text-primary uppercase tracking-widest border border-outline-variant/30">Protocol Alpha</span>
+<span class="px-3 py-1 bg-surface-variant/50 text-[10px] text-primary uppercase tracking-widest border border-outline-variant/30">Civic Ledger</span>
+</div>
+</div>
+</div>
+<!-- IT Export Scaling -->
+<div class="col-span-12 md:col-span-4 bg-surface-container border-none p-12 flex flex-col justify-between hover:bg-surface-container-high transition-colors">
+<div>
+<span class="material-symbols-outlined text-primary mb-6 text-4xl">trending_up</span>
+<h3 class="text-2xl font-headline text-on-surface mb-4">IT Export Scaling</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">
+                            Bridging the talent-capital gap. Our proprietary scaling engine accelerates medium-sized firms into global contenders, focusing on the MENA and EU corridors.
+                        </p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-xs font-label">
+<span class="text-on-surface-variant">Growth Index</span>
+<span class="text-primary">+240%</span>
+</div>
+<div class="w-full bg-outline-variant/20 h-1">
+<div class="h-full bg-primary w-[85%] shadow-[0_0_10px_#E6C364]"></div>
+</div>
+<button class="w-full py-4 border border-outline-variant/40 text-[10px] text-on-surface uppercase tracking-[0.2em] hover:border-primary transition-all">Explore Pipeline</button>
+</div>
+</div>
+<!-- Elite Engineering Talent -->
+<div class="col-span-12 md:col-span-4 bg-surface-container border-none p-12 flex flex-col justify-between hover:bg-surface-container-high transition-colors">
+<div>
+<span class="material-symbols-outlined text-primary mb-6 text-4xl">psychology</span>
+<h3 class="text-2xl font-headline text-on-surface mb-4">Elite Engineering</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">
+                            The top 0.1% of technical talent in Islamabad and Lahore, hand-selected through the Sovereign Vetting Program.
+                        </p>
+</div>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-xs text-on-surface-variant">
+<span class="w-1 h-1 bg-primary rounded-full"></span> Tier-1 Security Clearance
+                        </li>
+<li class="flex items-center gap-3 text-xs text-on-surface-variant">
+<span class="w-1 h-1 bg-primary rounded-full"></span> Specialized in Zero-Trust Systems
+                        </li>
+<li class="flex items-center gap-3 text-xs text-on-surface-variant">
+<span class="w-1 h-1 bg-primary rounded-full"></span> 24/7 Red-Team Readiness
+                        </li>
+</ul>
+</div>
+<!-- Modern Server Vault / Data Visualisation -->
+<div class="col-span-12 md:col-span-8 group relative overflow-hidden bg-surface-container-low border-none h-[400px]">
+<img class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" data-alt="Futuristic server room with cold blue and gold accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARHAfn6rWOTRNqA8azoce2xBJzDCJsAWoh0NHfGUwtFHtZn7Dbp3-gad0aFvIIL_Lhi9XvGjsmayJFDwXZTy7kbRsEL6aIcYjrqYmUJTJmY6G_dUCCwWm0bNXbXi0kOgeTX43XxEUal6m1MblkHZSRFsbMlkWHjj4RhFPWJQ89twVxQ-h8akNhfDFdHNxNWEkZQJnJBZgAA4Zj_-9uEFrwN1kbUV8Ko5Cj0mujk9x_pAI-TBI3ASycGVWtaBc8oA2kkLFOz-Wr1nhA"/>
+<div class="absolute inset-0 bg-gradient-to-r from-[#0e0e0e] to-transparent"></div>
+<div class="relative h-full p-12 flex flex-col justify-center">
+<h3 class="text-3xl font-headline text-on-surface mb-4 max-w-sm">The Sovereign Cloud Initiative</h3>
+<p class="text-on-surface-variant max-w-xs mb-8">Hosting the critical assets of our elite members in hardened, geographically-isolated data bunkers.</p>
+<a class="text-primary text-[10px] uppercase font-bold tracking-[0.4em] flex items-center gap-3 hover:translate-x-2 transition-transform" href="#">
+                            Enter the Vault <span class="material-symbols-outlined !text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter / CTA -->
+<section class="py-24 border-t border-outline-variant/10 bg-[#050505]">
+<div class="container mx-auto px-12 text-center">
+<h2 class="text-5xl font-headline text-on-surface mb-8">Join the Vanguard</h2>
+<p class="text-on-surface-variant max-w-xl mx-auto mb-12 text-lg">
+                    Secure your position in the next phase of the Digital Frontier. Exclusive updates for sovereign members only.
+                </p>
+<div class="max-w-md mx-auto relative group">
+<input class="w-full bg-transparent border-none border-b border-outline-variant py-4 px-0 focus:ring-0 text-on-surface font-label text-sm placeholder:text-on-surface-variant/40 tracking-widest transition-all focus:border-primary" placeholder="ENTER ACCESS CODE OR EMAIL" type="email"/>
+<button class="absolute right-0 top-1/2 -translate-y-1/2 text-primary">
+<span class="material-symbols-outlined text-4xl">arrow_right_alt</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full flex flex-col items-center py-12 px-8 gap-6 bg-[#050505] border-t border-[#4D4637]/10">
+<div class="flex flex-wrap justify-center gap-10">
+<a class="font-label text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 hover:text-[#E6C364] transition-colors" href="#">Terms of Sovereignty</a>
+<a class="font-label text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 hover:text-[#E6C364] transition-colors" href="#">Privacy Protocol</a>
+<a class="font-label text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 hover:text-[#E6C364] transition-colors" href="#">Investor Protection</a>
+<a class="font-label text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 hover:text-[#E6C364] transition-colors" href="#">Institutional Disclosure</a>
+</div>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-[#D0C5B2]/50 text-center">
+                © 2024 The Gilded Vault. All Rights Reserved. Sovereign Member Confidentiality Applies.
+            </p>
+</footer>
+</main>
+<!-- Mobile Navigation Bottom Bar -->
+<nav class="fixed bottom-0 w-full md:hidden bg-[#050505]/95 backdrop-blur-md border-t border-[#4D4637]/20 flex justify-around items-center py-4 z-50">
+<div class="flex flex-col items-center text-[#E6C364]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Sectors</span>
+</div>
+<div class="flex flex-col items-center text-[#D0C5B2]">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Explore</span>
+</div>
+<div class="flex flex-col items-center text-[#D0C5B2]">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Vault</span>
+</div>
+<div class="flex flex-col items-center text-[#D0C5B2]">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[8px] uppercase tracking-tighter mt-1">Profile</span>
+</div>
+</nav>
+</body></html>
