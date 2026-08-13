@@ -625,7 +625,7 @@ export default function RealEstatePage() {
         <section className="py-32 px-5 md:px-24 bg-surface fade-in">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-4">Featured <span className="text-primary">properties.</span></h2>
-            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-2">Hand-selected investment opportunities across Pakistan's highest-growth real estate corridors. Each listing is pre-vetted, title-verified, and investment-ready.</p>
+            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-2">Hand-selected investment opportunities across our international real estate markets. Each listing is pre-vetted, title-verified, and investment-ready.</p>
 
             <div className="search-panel">
               <div className="search-bar-row">
@@ -862,7 +862,7 @@ export default function RealEstatePage() {
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">analytics</span>
                 <h3 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Investment Advisory</h3>
-                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Market analysis, opportunity identification, and investment structuring for institutional and private investors evaluating Pakistan's real estate market.</p>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Market analysis, opportunity identification, and investment structuring for institutional and private investors evaluating real estate across Pakistan, the UK, UAE, and Europe.</p>
               </div>
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">domain</span>
@@ -877,7 +877,7 @@ export default function RealEstatePage() {
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">verified</span>
                 <h3 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Due Diligence & Title Verification</h3>
-                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Comprehensive property due diligence, title verification, legal review, and risk assessment. We eliminate the opacity that deters international investors from Pakistani real estate.</p>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Comprehensive property due diligence, title verification, legal review, and risk assessment across every market we operate in — eliminating the opacity that deters international investors.</p>
               </div>
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">apartment</span>
@@ -887,7 +887,7 @@ export default function RealEstatePage() {
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">account_balance</span>
                 <h3 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Structured Investment Vehicles</h3>
-                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Deal-by-deal or pooled investment structures with clean legal frameworks, regular reporting, and defined exit mechanisms — the institutional approach to Pakistan real estate.</p>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Deal-by-deal or pooled investment structures with clean legal frameworks, regular reporting, and defined exit mechanisms — the institutional approach to international real estate.</p>
               </div>
             </div>
           </div>
@@ -981,21 +981,21 @@ export default function RealEstatePage() {
         <section className="py-32 px-5 md:px-24 bg-surface-container-lowest fade-in">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-4">Why <span className="text-primary">CZAAH.</span></h2>
-            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-12">What makes us different from every other real estate firm in Pakistan.</p>
+            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-12">What makes us different from every other real estate firm operating across our markets.</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 stagger">
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all flex gap-6">
                 <span className="material-symbols-outlined text-primary text-3xl flex-shrink-0 mt-1">location_on</span>
                 <div>
                   <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-2">On-the-Ground Expertise</h4>
-                  <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Headquartered in Islamabad with presence across Pakistan's key property markets. We conduct physical due diligence, verify titles in person, and maintain direct relationships with developers and authorities.</p>
+                  <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">London-based with on-the-ground presence across Pakistan's key property markets, plus partnerships across the UK, UAE, and Europe. We conduct physical due diligence, verify titles in person, and maintain direct relationships with developers and authorities.</p>
                 </div>
               </div>
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all flex gap-6">
                 <span className="material-symbols-outlined text-primary text-3xl flex-shrink-0 mt-1">fact_check</span>
                 <div>
                   <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-2">End-to-End Due Diligence</h4>
-                  <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Title verification, legal review, market valuation, and risk assessment — we remove the opacity and uncertainty that has historically deterred international investment in Pakistani real estate.</p>
+                  <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Title verification, legal review, market valuation, and risk assessment — we remove the opacity and uncertainty that has historically deterred international investment across emerging and established real estate markets alike.</p>
                 </div>
               </div>
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all flex gap-6">
@@ -1021,8 +1021,8 @@ export default function RealEstatePage() {
         {/* CTA */}
         <section className="py-32 px-5 md:px-24 bg-surface fade-in">
           <div className="max-w-[1600px] mx-auto text-center">
-            <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-6">Position your capital in <span className="text-primary">Pakistan's growth corridors.</span></h2>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mx-auto mb-10">CPEC corridors, commercial hubs, and structured diaspora access &mdash; through a single institutional counterparty.</p>
+            <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-6">Position your capital in <span className="text-primary">international growth corridors.</span></h2>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mx-auto mb-10">Pakistan's CPEC corridors, UK and UAE commercial hubs, and European residency-linked property &mdash; through a single institutional counterparty.</p>
             <a href="/contact?interest=Real%20Estate#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Discuss Opportunities &rarr;</a>
           </div>
         </section>
