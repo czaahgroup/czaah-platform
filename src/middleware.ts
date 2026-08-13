@@ -36,7 +36,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/auth/') ||
     pathname.startsWith('/sectors') ||
     pathname.startsWith('/services') ||
-    pathname.startsWith('/api/public/')
+    pathname.startsWith('/api/public/') ||
+    pathname === '/api/contact'
 
   if (isPublicRoute) return supabaseResponse
 
