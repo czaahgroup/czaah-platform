@@ -12,7 +12,6 @@ const founders = [
 ]
 
 const seniorExecs = [
-  { initials: 'SA', name: 'Ch Shahzad Akhtar', title: 'Chief Executive Officer', scope: "Over 25 years of experience in marketing, business development, sports consultancy, and media management. Founder of Kashmir Premier League, Sindh Premier League, Global Celebrity League, Global Affairs Magazine, and Ring of Pakistan. CEO of Pakistan's Overseas Real Estate Forum and Cutting Edge Group. Member of the 100 CEOs Club of Pakistan, with established relations with the United Nations." },
   { initials: 'SK', name: 'Saqib Karamat', title: 'Executive Director', scope: 'Visionary entrepreneur and strategic leader with extensive experience in technology, investment, real estate, and global education sectors. Strong footprint across Europe, China, Hong Kong, and Korea. Built, scaled, and managed multi-sector ventures focused on innovation and cross-border collaboration. Portfolio includes AI-driven innovations, healthcare transformation, and educational mobility programmes empowering youth worldwide. CEO, Europe of Oryx Capital. CEO, Marks Group. COO, Shenzhen Xingyi Intelligent Technology Co., Ltd. COO, Olive Healthcare Europe. CEO, Inturnationally Limited.' },
 ]
 
