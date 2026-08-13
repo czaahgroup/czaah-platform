@@ -634,11 +634,13 @@ export default function RealEstatePage() {
               <div className="search-filters">
                 <select className="filter-select" id="filterLocation">
                   <option value="">All Locations</option>
+                  <option value="london">London</option>
                   <option value="islamabad">Islamabad</option>
                   <option value="lahore">Lahore</option>
                   <option value="karachi">Karachi</option>
                   <option value="gwadar">Gwadar</option>
                   <option value="cpec sez">CPEC SEZ</option>
+                  <option value="dubai">Dubai</option>
                 </select>
                 <select className="filter-select" id="filterType">
                   <option value="">All Types</option>
@@ -661,10 +663,100 @@ export default function RealEstatePage() {
                 </select>
                 <button className="clear-filters" id="clearFilters">Clear All</button>
               </div>
-              <div className="search-results-count" id="resultsCount"><span>6</span> properties found</div>
+              <div className="search-results-count" id="resultsCount"><span>9</span> properties found</div>
             </div>
 
             <div className="properties-grid" id="propertiesGrid">
+
+              <div className="property-card" data-location="london" data-type="commercial" data-status="available" data-price="2900000" data-keywords="canary wharf grade-a office floor london city">
+                <div className="property-img-wrapper">
+                  <img className="property-img" src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600&h=400&fit=crop" alt="Canary Wharf Office" />
+                  <span className="property-status status-available">Available</span>
+                </div>
+                <div className="property-body">
+                  <div className="property-tags">
+                    <span className="property-type">Commercial</span>
+                    <span className="property-location">London</span>
+                  </div>
+                  <h3>Canary Wharf &mdash; Grade-A Office Floor</h3>
+                  <p>Full floor Grade-A office space in London's premier financial district. River views, 24/7 access, and proximity to Crossrail &mdash; fitted to institutional leasing standards.</p>
+                  <div className="property-stats">
+                    <div className="property-stat">
+                      <span className="property-stat-value">9,500 ft&sup2;</span>
+                      <span className="property-stat-label">Area</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">5.8%</span>
+                      <span className="property-stat-label">Yield</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">$2.9M</span>
+                      <span className="property-stat-label">Price</span>
+                    </div>
+                  </div>
+                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
+                </div>
+              </div>
+
+              <div className="property-card" data-location="london" data-type="mixed-use" data-status="limited" data-price="1950000" data-keywords="mayfair boutique retail unit london west end">
+                <div className="property-img-wrapper">
+                  <img className="property-img" src="https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&h=400&fit=crop" alt="Mayfair Retail Unit" />
+                  <span className="property-status status-limited">Limited Units</span>
+                </div>
+                <div className="property-body">
+                  <div className="property-tags">
+                    <span className="property-type">Mixed-Use</span>
+                    <span className="property-location">London</span>
+                  </div>
+                  <h3>Mayfair &mdash; Boutique Retail &amp; Office</h3>
+                  <p>Prime mixed-use unit in the heart of Mayfair, steps from Bond Street. Ground-floor retail with office space above &mdash; freehold, with strong footfall and heritage frontage.</p>
+                  <div className="property-stats">
+                    <div className="property-stat">
+                      <span className="property-stat-value">4,100 ft&sup2;</span>
+                      <span className="property-stat-label">Area</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">4.9%</span>
+                      <span className="property-stat-label">Yield</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">$1.95M</span>
+                      <span className="property-stat-label">Price</span>
+                    </div>
+                  </div>
+                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
+                </div>
+              </div>
+
+              <div className="property-card" data-location="dubai" data-type="commercial" data-status="available" data-price="950000" data-keywords="business bay freehold office suite dubai uae">
+                <div className="property-img-wrapper">
+                  <img className="property-img" src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&h=400&fit=crop" alt="Dubai Business Bay Office" />
+                  <span className="property-status status-available">Available</span>
+                </div>
+                <div className="property-body">
+                  <div className="property-tags">
+                    <span className="property-type">Commercial</span>
+                    <span className="property-location">Dubai</span>
+                  </div>
+                  <h3>Business Bay &mdash; Freehold Office Suite</h3>
+                  <p>Freehold office suite in Dubai's Business Bay, overlooking the canal. Tax-free returns, fully fitted, and positioned within one of the UAE's fastest-growing commercial districts.</p>
+                  <div className="property-stats">
+                    <div className="property-stat">
+                      <span className="property-stat-value">2,800 ft&sup2;</span>
+                      <span className="property-stat-label">Area</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">8.1%</span>
+                      <span className="property-stat-label">Yield</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">$950K</span>
+                      <span className="property-stat-label">Price</span>
+                    </div>
+                  </div>
+                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
+                </div>
+              </div>
 
               <div className="property-card" data-location="islamabad" data-type="commercial" data-status="available" data-price="1800000" data-keywords="blue area office tower full floor grade-a margalla hills">
                 <div className="property-img-wrapper">
