@@ -15,8 +15,8 @@ const sectorCards = [
   { name: 'Real Estate', icon: 'location_city', description: 'International real estate across the UK, UAE, and Pakistan — London commercial property, Dubai freehold investments, and Pakistan\'s CPEC growth corridors, with structured, transparent investment vehicles.', tag: 'UK · UAE · Pakistan', slug: 'realestate' },
   { name: 'Construction & Development', icon: 'architecture', description: 'Civil infrastructure, commercial buildings, and Special Economic Zone development across Pakistan, the UK, and the Gulf — including CPEC corridor projects, delivered through trusted construction partners.', tag: 'Infrastructure', slug: 'construction' },
   { name: 'Human Resources', icon: 'groups', description: 'Access Pakistan\'s 70M+ workforce — deployment across the Gulf, UK, Europe, and the Balkans, plus domestic staffing, executive search, trade testing, and HR advisory services.', tag: 'Gulf · UK · EU', slug: 'manpower' },
-  { name: 'Technology & IT', icon: 'memory', description: 'Enter Pakistan\'s $3.2B+ IT sector — government digital transformation partnerships and access to 500,000+ skilled technology professionals.', tag: '$3.2B+ Sector', slug: 'technology' },
   { name: 'Textiles & Trade', icon: 'storefront', description: 'Source from the world\'s 4th largest textile exporter — certified, compliant, and competitively priced. Denim, knitwear, home textiles, and sportswear.', tag: '4th Global Exporter', slug: 'textiles' },
+  { name: 'Technology & IT', icon: 'memory', description: 'Enter Pakistan\'s $3.2B+ IT sector — government digital transformation partnerships and access to 500,000+ skilled technology professionals.', tag: '$3.2B+ Sector', slug: 'technology' },
   { name: 'Agriculture', icon: 'grass', description: 'Pakistan\'s agricultural sector accounts for 23% of GDP. Large-scale farming, organic food production, and food processing — vast fertile land and growing export demand.', tag: '23% of GDP', slug: 'agriculture' },
   { name: 'Pharmaceuticals', icon: 'medication', description: 'A $4B+ market growing at 12% annually. Medicine production, medical supply chains, and healthcare manufacturing with access to 230M+ domestic consumers.', tag: '$4B+ Market', slug: 'pharmaceuticals' },
   { name: 'Engineering & Energy', icon: 'bolt', description: 'HVAC systems, elevators, escalators, power generation, civil works, solar panels, and industrial air conditioning solutions across Pakistan.', tag: '8 Disciplines', slug: 'engineering' },
@@ -253,7 +253,7 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/*  STRATEGIC SECTORS (5 featured cards)                         */}
+      {/*  STRATEGIC SECTORS (4 featured cards)                         */}
       {/* ══════════════════════════════════════════════════════════════ */}
       <section className="py-20 md:py-32 bg-surface px-5 md:px-24">
         <div className="max-w-[1600px] mx-auto">
@@ -268,8 +268,8 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-1">
-            {sectorCards.slice(0, 5).map((sector, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1">
+            {sectorCards.slice(0, 4).map((sector, i) => (
               <Link
                 key={sector.slug}
                 href={`/sectors/${sector.slug}`}
