@@ -129,7 +129,7 @@ export default function SecurityPage() {
               Security <span className="text-primary">Services.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              Corporate and project protection for international operations across Pakistan &mdash; site security, executive protection, risk assessment, and monitoring through vetted, experienced security partners.
+              Corporate, asset, and project protection across our operating markets &mdash; site security, executive protection, risk assessment, and monitoring through vetted, experienced security partners, with deep province-by-province expertise in Pakistan.
             </p>
             <Link href="/contact?interest=Security%20Services#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Discuss Requirements &rarr;
@@ -224,7 +224,7 @@ export default function SecurityPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Our <span className="text-primary">services.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Comprehensive security solutions for corporate, industrial, and international clients operating in Pakistan.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Comprehensive security solutions for corporate, industrial, and international clients &mdash; deepest expertise in Pakistan, with coverage across our other operating markets.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { icon: 'security', title: 'Site Security', desc: '24/7 security personnel for mining operations, construction sites, industrial facilities, and energy projects across Pakistan.' },
@@ -289,7 +289,7 @@ export default function SecurityPage() {
         <section className="py-32 px-5 md:px-24 text-center">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">Protect your <span className="text-primary">operations.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Site security, executive protection, and risk assessment &mdash; deployed through vetted, experienced security partners.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Site security, executive protection, and risk assessment &mdash; deployed through vetted, experienced security partners across our operating markets.</p>
             <Link href="/contact?interest=Security%20Services#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Discuss Requirements &rarr;
             </Link>

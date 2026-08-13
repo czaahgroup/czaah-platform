@@ -130,7 +130,7 @@ export default function LicensingPage() {
               Licensing &amp;<br /><span className="text-primary">Compliance.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              Navigating Pakistan&apos;s regulatory landscape requires deep institutional knowledge. CZAAH manages FBR registration, Board of Investment approvals, industry-specific licensing, provincial permits, and environmental clearances — so you can operate with full confidence.
+              Navigating regulatory landscapes across the UK, Pakistan, and international markets requires deep institutional knowledge. In Pakistan, CZAAH manages FBR registration, Board of Investment approvals, industry-specific licensing, provincial permits, and environmental clearances — so you can operate with full confidence, wherever you're doing business.
             </p>
             <Link href="/contact?interest=Licensing%20%26%20Compliance#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Navigate Regulations &rarr;
@@ -145,7 +145,7 @@ export default function LicensingPage() {
               Sector Compliance <span className="text-primary">Navigator.</span>
             </h2>
             <p className="raleway-text text-on-surface-variant max-w-2xl mb-10">
-              Select your industry sector to see the full regulatory roadmap — every license, permit, and registration required to operate in Pakistan.
+              Select your industry sector to see the full regulatory roadmap — every license, permit, and registration required to operate in Pakistan, one of our core regulatory markets.
             </p>
 
             <div className="flex flex-wrap gap-3 mb-10">
@@ -200,15 +200,15 @@ export default function LicensingPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Our <span className="text-primary">services.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Comprehensive licensing and compliance management across Pakistan&apos;s federal and provincial regulatory framework.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Comprehensive licensing and compliance management &mdash; deep regulatory expertise in Pakistan, plus market-entry compliance support across the UK and our other operating markets.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { icon: 'diamond', title: 'FBR Registration', desc: 'National Tax Number (NTN) acquisition, sales tax registration, income tax compliance setup, and ongoing FBR filing management. We ensure your tax obligations are met from day one.' },
-                { icon: 'account_balance', title: 'Board of Investment', desc: 'Foreign investment approval facilitation, profit repatriation permissions, investment incentive scheme applications, and BOI liaison for international investors entering Pakistan.' },
-                { icon: 'license', title: 'Industry Licensing', desc: 'Sector-specific permits and licenses for mining, pharmaceuticals, telecommunications, food production, manufacturing, and other regulated industries across Pakistan.' },
-                { icon: 'location_on', title: 'Provincial Permits', desc: 'Development authority approvals, environmental impact assessments, No Objection Certificates (NOCs), and provincial regulatory clearances across Punjab, Sindh, KPK, and Balochistan.' },
-                { icon: 'local_shipping', title: 'Import/Export Licensing', desc: 'WeBOC registration, customs licensing, trade permits, and import/export documentation. We prepare your business for compliant cross-border trade operations.' },
-                { icon: 'verified', title: 'Ongoing Regulatory Compliance', desc: 'Tax filings, audit coordination, regulatory reporting, and compliance monitoring. Proactive management ensures your business stays ahead of evolving regulatory requirements.' },
+                { icon: 'diamond', title: 'FBR Registration (Pakistan)', desc: 'National Tax Number (NTN) acquisition, sales tax registration, income tax compliance setup, and ongoing FBR filing management. We ensure your Pakistan tax obligations are met from day one.' },
+                { icon: 'account_balance', title: 'Board of Investment (Pakistan)', desc: 'Foreign investment approval facilitation, profit repatriation permissions, investment incentive scheme applications, and BOI liaison for international investors entering Pakistan.' },
+                { icon: 'license', title: 'Industry Licensing', desc: 'Sector-specific permits and licenses for mining, pharmaceuticals, telecommunications, food production, manufacturing, and other regulated industries — primarily across Pakistan.' },
+                { icon: 'location_on', title: 'Provincial Permits (Pakistan)', desc: 'Development authority approvals, environmental impact assessments, No Objection Certificates (NOCs), and provincial regulatory clearances across Punjab, Sindh, KPK, and Balochistan.' },
+                { icon: 'local_shipping', title: 'Import/Export Licensing', desc: 'WeBOC registration, customs licensing, trade permits, and import/export documentation for compliant cross-border trade operations to and from Pakistan.' },
+                { icon: 'verified', title: 'Ongoing Regulatory Compliance', desc: 'Tax filings, audit coordination, regulatory reporting, and compliance monitoring across every jurisdiction we operate in. Proactive management ensures your business stays ahead of evolving requirements.' },
               ].map((card, i) => (
                 <div key={i} className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all duration-300">
                   <span className="material-symbols-outlined text-primary text-3xl mb-4 block">{card.icon}</span>
@@ -230,8 +230,8 @@ export default function LicensingPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
                 { number: '50+', label: 'Regulatory bodies navigated' },
-                { number: 'FBR', label: 'Registered tax agents' },
-                { number: 'BOI', label: 'Investment facilitation' },
+                { number: 'UK · PK · UAE', label: 'Markets covered' },
+                { number: 'BOI', label: 'Pakistan investment facilitation' },
                 { number: 'Multi', label: 'Provincial coverage' },
               ].map((stat, i) => (
                 <div key={i}>
@@ -250,7 +250,7 @@ export default function LicensingPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Why <span className="text-primary">CZAAH.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">We turn Pakistan&apos;s regulatory complexity into a streamlined process for our clients.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">We turn regulatory complexity &mdash; in Pakistan and across our other markets &mdash; into a streamlined process for our clients.</p>
             <div className="space-y-4">
               {[
                 { icon: 'gavel', title: 'Regulatory Expertise', desc: "Deep understanding of Pakistan's multi-layered regulatory framework — federal, provincial, and sector-specific. Our team has navigated licensing processes across every major industry and jurisdiction in the country." },
@@ -276,8 +276,8 @@ export default function LicensingPage() {
         {/* CTA */}
         <section className="py-32 px-5 md:px-24 text-center">
           <div className="max-w-[1600px] mx-auto">
-            <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">Navigate Pakistan&apos;s regulatory <span className="text-primary">landscape.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">FBR, BOI, provincial permits, and industry licensing &mdash; managed by a team that operates inside these institutions.</p>
+            <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">Navigate regulatory <span className="text-primary">landscapes.</span></h2>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">FBR, BOI, provincial permits, and industry licensing in Pakistan &mdash; plus market-entry compliance in the UK and beyond &mdash; managed by a team that operates inside these institutions.</p>
             <Link href="/contact?interest=Licensing%20%26%20Compliance#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Discuss Compliance &rarr;
             </Link>

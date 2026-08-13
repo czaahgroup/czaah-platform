@@ -77,7 +77,7 @@ export default function InvestmentAdvisoryPage() {
               Investment<br /><span className="text-primary">Advisory.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              Data-driven investment advisory for international capital entering Pakistan — feasibility studies, market analysis, financial modelling, opportunity identification, and strategic guidance across all sectors.
+              Data-driven investment advisory across the UK, Pakistan, and international markets — feasibility studies, market analysis, financial modelling, opportunity identification, and strategic guidance across all sectors.
             </p>
             <Link href="/contact?interest=Investment%20Advisory#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Get Advisory &rarr;
@@ -91,7 +91,7 @@ export default function InvestmentAdvisoryPage() {
         <section className="py-32 px-5 md:px-24 bg-surface-container-lowest">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Sector opportunity <span className="text-primary">matrix.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-10">CZAAH&apos;s proprietary assessment of Pakistan&apos;s investment landscape — evaluating market depth, growth trajectory, competitive dynamics, and regulatory environment across nine priority sectors.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-10">CZAAH&apos;s proprietary assessment of Pakistan&apos;s investment landscape, one of our core advisory markets — evaluating market depth, growth trajectory, competitive dynamics, and regulatory environment across nine priority sectors.</p>
 
             <div className="flex flex-wrap gap-3 mb-10">
               {sectorsList.map((s, i) => (
@@ -168,10 +168,10 @@ export default function InvestmentAdvisoryPage() {
               {[
                 { icon: 'query_stats', title: 'Feasibility Studies', desc: 'Comprehensive market and financial feasibility for proposed investments. We assess viability, project costs, revenue potential, and regulatory requirements before you commit capital.' },
                 { icon: 'monitoring', title: 'Market Analysis', desc: 'Sector research, competitor mapping, demand forecasting, regulatory landscape. Our analysts provide the granular, on-the-ground intelligence that international databases cannot capture.' },
-                { icon: 'calculate', title: 'Financial Modelling', desc: 'Revenue projections, IRR analysis, sensitivity testing, capital structuring. Rigorous financial models built with local cost data and realistic assumptions for the Pakistani market.' },
-                { icon: 'lightbulb', title: 'Opportunity Identification', desc: 'Proactive deal sourcing across minerals, real estate, technology, textiles, pharmaceuticals, and agriculture. We surface opportunities that match your investment thesis and risk appetite.' },
+                { icon: 'calculate', title: 'Financial Modelling', desc: 'Revenue projections, IRR analysis, sensitivity testing, capital structuring. Rigorous financial models built with local cost data and realistic assumptions for each market we cover.' },
+                { icon: 'lightbulb', title: 'Opportunity Identification', desc: 'Proactive deal sourcing across minerals, real estate, technology, textiles, pharmaceuticals, and agriculture in Pakistan, plus opportunities across our UK and international markets. We surface opportunities that match your investment thesis and risk appetite.' },
                 { icon: 'warning', title: 'Risk Assessment', desc: "Political, regulatory, currency, and operational risk evaluation with mitigation strategies. We quantify risks that other advisors treat as unknowns — because we operate inside the system." },
-                { icon: 'strategy', title: 'Strategic Advisory', desc: "Board-level guidance on Pakistan market entry, expansion, and portfolio strategy. Whether you're making your first investment or scaling an existing position, we provide the strategic clarity you need." },
+                { icon: 'strategy', title: 'Strategic Advisory', desc: "Board-level guidance on market entry, expansion, and portfolio strategy across the UK, Pakistan, and international markets. Whether you're making your first investment or scaling an existing position, we provide the strategic clarity you need." },
               ].map((card, i) => (
                 <div key={i} className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all duration-300">
                   <span className="material-symbols-outlined text-primary text-3xl mb-4 block">{card.icon}</span>
@@ -190,7 +190,7 @@ export default function InvestmentAdvisoryPage() {
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-12">Advisory capability <span className="text-primary">at a glance.</span></h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[{ number: '9', label: 'Sectors covered' }, { number: '$300B+', label: 'Addressable market' }, { number: '13+', label: 'Sectors covered' }, { number: 'Institutional', label: 'Advisory grade' }].map((stat, i) => (
+              {[{ number: '9', label: 'Pakistan sectors covered' }, { number: '$300B+', label: 'Addressable market' }, { number: 'UK · PK · UAE', label: 'Markets covered' }, { number: 'Institutional', label: 'Advisory grade' }].map((stat, i) => (
                 <div key={i}><div className="cinzel-text text-3xl md:text-4xl text-primary mb-2">{stat.number}</div><div className="raleway-text text-xs uppercase tracking-[0.1em] text-on-surface-variant">{stat.label}</div></div>
               ))}
             </div>
@@ -203,11 +203,11 @@ export default function InvestmentAdvisoryPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Why <span className="text-primary">CZAAH.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Our advisory is built on real operational experience across Pakistan&apos;s key sectors — not theoretical analysis from a distance.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Our advisory is built on real operational experience across our key markets — not theoretical analysis from a distance.</p>
             <div className="space-y-4">
               {[
                 { icon: 'hub', title: 'Cross-Sector Expertise', desc: 'Advisory coverage spanning minerals, real estate, technology, textiles, pharmaceuticals, agriculture, aviation, government, and security. We understand how sectors interconnect and where the real opportunities lie.' },
-                { icon: 'pin_drop', title: 'On-the-Ground Intelligence', desc: 'Our teams operate from Islamabad with international reach, providing real-time market intelligence that international advisory firms simply cannot access. We know the players, the regulations, and the unwritten rules.' },
+                { icon: 'pin_drop', title: 'On-the-Ground Intelligence', desc: 'Our teams operate from London and Islamabad with international reach, providing real-time market intelligence that generic advisory firms simply cannot access. We know the players, the regulations, and the unwritten rules.' },
                 { icon: 'school', title: 'Institutional Methodology', desc: 'Our advisory process follows institutional standards — structured frameworks, auditable models, and documented assumptions. The quality of work you expect from a global advisory firm, with the depth of a local operator.' },
                 { icon: 'diversity_3', title: 'Network Advantage', desc: 'Advisory backed by relationships across government, industry, and finance. When we assess an opportunity, we can validate assumptions directly with the stakeholders who matter — not rely on secondary sources.' },
               ].map((card, i) => (
@@ -229,7 +229,7 @@ export default function InvestmentAdvisoryPage() {
         <section className="py-32 px-5 md:px-24 text-center">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">Informed decisions in <span className="text-primary">complex markets.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Feasibility, financial modelling, and strategic guidance &mdash; grounded in real operational experience across Pakistan.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Feasibility, financial modelling, and strategic guidance &mdash; grounded in real operational experience across the UK, Pakistan, and our international markets.</p>
             <Link href="/contact?interest=Investment%20Advisory#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Request an Assessment &rarr;
             </Link>

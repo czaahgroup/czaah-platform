@@ -75,11 +75,12 @@ const categories: Category[] = [
   },
   {
     name: 'International', icon: 'public',
-    description: "Active engagement with foreign diplomatic missions, trade promotion bodies, and multilateral organisations operating in Pakistan.",
+    description: "Active engagement with UK institutions, foreign diplomatic missions, trade promotion bodies, and multilateral organisations across our operating markets.",
     connections: [
+      { name: 'UK DIT', type: '\u2691', description: 'UK Department for Business & Trade, bilateral commerce, export support', depth: 4 },
+      { name: 'Companies House', type: '\u2691', description: 'UK company registry, incorporation, statutory compliance', depth: 4 },
       { name: 'Chinese Embassy', type: '\u2691', description: 'Commercial section, CPEC coordination, trade promotion', depth: 5 },
       { name: 'UAE Trade Offices', type: '\u2691', description: 'UAE-Pakistan trade facilitation, investment promotion', depth: 4 },
-      { name: 'UK DIT', type: '\u2691', description: 'UK Department for International Trade, bilateral commerce', depth: 3 },
       { name: 'USAID', type: '\u2691', description: 'Development programmes, governance, economic growth', depth: 3 },
       { name: 'World Bank Pakistan', type: '\u2691', description: 'Development projects, policy reform, technical assistance', depth: 4 },
       { name: 'CPEC Authority', type: '\u2691', description: 'China-Pakistan Economic Corridor coordination body', depth: 5 }
@@ -124,7 +125,7 @@ export default function PartnershipDevelopmentPage() {
               Partnership<br /><span className="text-primary">Development.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              CZAAH&apos;s deepest value is our network. We connect international investors with Pakistan&apos;s most relevant government departments, industry leaders, legal experts, financial institutions, and operational partners &mdash; curated introductions that accelerate your success.
+              CZAAH&apos;s deepest value is our network. We connect investors with the most relevant government departments, industry leaders, legal experts, financial institutions, and operational partners across the UK, Pakistan, and our international markets &mdash; curated introductions that accelerate your success.
             </p>
             <Link href="/contact?interest=Partnership%20Development#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Build Partnerships &rarr;
@@ -138,7 +139,7 @@ export default function PartnershipDevelopmentPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Our network <span className="text-primary">constellation.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-10">Explore CZAAH&apos;s institutional relationships across Pakistan&apos;s government, industry, and financial landscape.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-10">Explore CZAAH&apos;s institutional relationships across the UK, Pakistan, and international government, industry, and financial landscape.</p>
 
             {/* Category Selector */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
@@ -192,15 +193,15 @@ export default function PartnershipDevelopmentPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Our <span className="text-primary">services.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Curated introductions and partnership structuring &mdash; connecting you with the right people at the right level across Pakistan&apos;s institutions.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Curated introductions and partnership structuring &mdash; connecting you with the right people at the right level across our institutions in the UK, Pakistan, and beyond.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { icon: 'account_balance', title: 'Government Liaison', desc: "Direct introductions to relevant federal and provincial departments, ministries, and regulatory bodies. We navigate Pakistan's government apparatus so you don't have to — opening doors that matter." },
-                { icon: 'handshake', title: 'Industry Partnerships', desc: 'Connections with established Pakistani companies, manufacturers, and service providers. We match your operational needs with vetted, capable partners who have the track record to deliver.' },
-                { icon: 'gavel', title: 'Legal & Accounting', desc: 'Access to vetted law firms, chartered accountants, and tax advisors with international experience. We connect you with professionals who understand both Pakistani law and international investor expectations.' },
-                { icon: 'payments', title: 'Financial Institutions', desc: "Banking relationships, development finance institutions, private equity introductions. We facilitate access to Pakistan's financial ecosystem — from commercial banks to DFIs to private capital." },
+                { icon: 'account_balance', title: 'Government Liaison', desc: "Direct introductions to relevant government departments, ministries, and regulatory bodies across our operating markets. We navigate the bureaucracy so you don't have to — opening doors that matter." },
+                { icon: 'handshake', title: 'Industry Partnerships', desc: 'Connections with established companies, manufacturers, and service providers. We match your operational needs with vetted, capable partners who have the track record to deliver.' },
+                { icon: 'gavel', title: 'Legal & Accounting', desc: 'Access to vetted law firms, chartered accountants, and tax advisors with international experience. We connect you with professionals who understand both local law and international investor expectations.' },
+                { icon: 'payments', title: 'Financial Institutions', desc: "Banking relationships, development finance institutions, private equity introductions. We facilitate access to the financial ecosystem in every market we operate — from commercial banks to DFIs to private capital." },
                 { icon: 'engineering', title: 'Developer & Contractor Networks', desc: 'Construction companies, real estate developers, and infrastructure contractors. When your investment requires physical execution, we connect you with contractors who deliver on time and on budget.' },
-                { icon: 'group_add', title: 'Joint Venture Structuring', desc: 'Partner identification, JV negotiation support, partnership agreement frameworks. We help you find the right local partner and structure the relationship to protect your interests while enabling mutual success.' },
+                { icon: 'group_add', title: 'Joint Venture Structuring', desc: 'Partner identification, JV negotiation support, partnership agreement frameworks. We help you find the right partner and structure the relationship to protect your interests while enabling mutual success.' },
               ].map((card, i) => (
                 <div key={i} className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all duration-300">
                   <span className="material-symbols-outlined text-primary text-3xl mb-4 block">{card.icon}</span>
@@ -219,7 +220,7 @@ export default function PartnershipDevelopmentPage() {
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-12">Partnership network <span className="text-primary">at a glance.</span></h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[{ number: 'Cross-party', label: 'Political coverage' }, { number: 'Federal+Provincial', label: 'Government access' }, { number: 'Vetted', label: 'Partner network' }, { number: 'Decades', label: 'Relationship depth' }].map((stat, i) => (
+              {[{ number: 'UK · Pakistan · UAE', label: 'Markets covered' }, { number: 'Cross-party', label: 'Pakistan political coverage' }, { number: 'Vetted', label: 'Partner network' }, { number: 'Decades', label: 'Relationship depth' }].map((stat, i) => (
                 <div key={i}><div className="cinzel-text text-2xl md:text-3xl text-primary mb-2">{stat.number}</div><div className="raleway-text text-xs uppercase tracking-[0.1em] text-on-surface-variant">{stat.label}</div></div>
               ))}
             </div>
@@ -232,10 +233,10 @@ export default function PartnershipDevelopmentPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Why <span className="text-primary">CZAAH.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">In Pakistan, relationships determine outcomes. Ours are the ones that move deals forward.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Across every market we operate in, relationships determine outcomes. Ours are the ones that move deals forward.</p>
             <div className="space-y-4">
               {[
-                { icon: 'diamond', title: 'Relationship Depth', desc: "Our network is built on years of direct engagement with Pakistan's government officials, industry leaders, and institutional stakeholders. These are not cold introductions — they are warm, trusted connections with established credibility." },
+                { icon: 'diamond', title: 'Relationship Depth', desc: "Our network is built on years of direct engagement with government officials, industry leaders, and institutional stakeholders across the UK, Pakistan, and our international markets. These are not cold introductions — they are warm, trusted connections with established credibility." },
                 { icon: 'diversity_3', title: 'Cross-Party Access', desc: "Pakistan's political landscape shifts between administrations. CZAAH maintains relationships across all major political parties, ensuring your partnerships and projects have continuity regardless of who governs." },
                 { icon: 'person_search', title: 'Curated Introductions', desc: "We don't provide contact lists — we provide curated, purposeful introductions to the specific individuals who can advance your objectives. Every connection is selected for relevance, capability, and reliability." },
                 { icon: 'handshake', title: 'Long-Term Partnership Approach', desc: "We invest in relationships that endure. CZAAH doesn't facilitate one-off introductions — we build partnership ecosystems that support your investment through every phase, from entry to expansion to exit." },
@@ -258,7 +259,7 @@ export default function PartnershipDevelopmentPage() {
         <section className="py-32 px-5 md:px-24 text-center">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">The relationships that <span className="text-primary">matter.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Government departments, industry leaders, legal experts, and institutional partners &mdash; curated introductions that accelerate outcomes.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Government departments, industry leaders, legal experts, and institutional partners across the UK, Pakistan, and beyond &mdash; curated introductions that accelerate outcomes.</p>
             <Link href="/contact?interest=Partnership%20Development#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Discuss Your Objectives &rarr;
             </Link>

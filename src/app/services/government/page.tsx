@@ -59,7 +59,7 @@ export default function GovernmentPage() {
               Government<br /><span className="text-primary">Contracts.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              Pakistan&apos;s annual public procurement exceeds PKR 2 trillion across infrastructure, energy, IT, and defence. Navigating this market requires deep institutional knowledge, regulatory expertise, and established relationships. That&apos;s what we provide.
+              Pakistan&apos;s annual public procurement exceeds PKR 2 trillion across infrastructure, energy, IT, and defence — one of the core public-sector markets we operate in, alongside opportunities across the UK and our other markets. Navigating this space requires deep institutional knowledge, regulatory expertise, and established relationships. That&apos;s what we provide.
             </p>
             <Link href="/contact?interest=Government%20Contracts#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Explore Opportunities &rarr;
@@ -127,7 +127,7 @@ export default function GovernmentPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Our <span className="text-primary">services.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Comprehensive support for international and domestic firms competing in Pakistan&apos;s public procurement market.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Comprehensive support for international and domestic firms competing in Pakistan&apos;s public procurement market, and navigating public-sector opportunities across our other markets.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { icon: 'search', title: 'Tender Intelligence', desc: 'Real-time monitoring of federal and provincial tender announcements across NHA, WAPDA, NADRA, FBR, and provincial works departments. Early identification of opportunities that match your capabilities.' },
@@ -237,8 +237,8 @@ export default function GovernmentPage() {
         {/* CTA */}
         <section className="py-32 px-5 md:px-24 text-center">
           <div className="max-w-[1600px] mx-auto">
-            <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">Compete in Pakistan&apos;s <span className="text-primary">public sector.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Tender identification, bid preparation, regulatory compliance, and government relationships &mdash; the infrastructure to win.</p>
+            <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">Compete in the <span className="text-primary">public sector.</span></h2>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Tender identification, bid preparation, regulatory compliance, and government relationships in Pakistan and beyond &mdash; the infrastructure to win.</p>
             <Link href="/contact?interest=Government%20Contracts#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Discuss a Tender &rarr;
             </Link>
