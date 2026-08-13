@@ -53,11 +53,11 @@ const verticals = [
 ] as const
 
 const statsData = [
-  { flag: 'https://flagcdn.com/w80/pk.png', alt: 'Pakistan', name: 'Pakistan', label: 'Headquarters & on-the-ground operations across Pakistan' },
-  { flag: 'https://flagcdn.com/w80/gb.png', alt: 'United Kingdom', name: 'United Kingdom', label: 'European investor relations & capital partnerships' },
+  { flag: 'https://flagcdn.com/w80/gb.png', alt: 'United Kingdom', name: 'United Kingdom', label: 'Group headquarters — London-based international operations' },
+  { flag: 'https://flagcdn.com/w80/pk.png', alt: 'Pakistan', name: 'Pakistan', label: 'On-the-ground operations across Pakistan via CZAAH Capital & Ventures' },
+  { flag: 'https://flagcdn.com/w80/ae.png', alt: 'United Arab Emirates', name: 'UAE', label: 'Dubai free zone entity, Gulf capital partnerships & commodities trading' },
   { flag: 'https://flagcdn.com/w80/be.png', alt: 'Belgium', name: 'Brussels', label: 'EU regulatory hub & European institutional partnerships' },
   { flag: 'https://flagcdn.com/w80/hk.png', alt: 'Hong Kong', name: 'Hong Kong', label: 'Asia-Pacific capital markets & cross-border trade' },
-  { flag: 'https://flagcdn.com/w80/sa.png', alt: 'Saudi Arabia', name: 'Middle East', label: 'Gulf capital partnerships & commodities trading network' },
   { flag: 'https://flagcdn.com/w80/cn.png', alt: 'China', name: 'Asia', label: 'CPEC partnerships & cross-border trade facilitation' },
 ] as const
 
@@ -374,7 +374,7 @@ export default function HomePage() {
             <span className="text-primary tracking-[0.4em] uppercase text-xs font-semibold raleway-text block mb-4">Global Reach</span>
             <h2 className="text-4xl md:text-6xl cinzel-text text-on-surface">Global presence, local depth.</h2>
             <p className="text-on-surface-variant raleway-text leading-relaxed max-w-xl mx-auto mt-6">
-              Headquartered in Islamabad, with investor relationships spanning six regions and international-standard transaction structures.
+              Headquartered in London, with operations and investor relationships spanning six regions and international-standard transaction structures.
             </p>
           </div>
 
@@ -577,7 +577,7 @@ export default function HomePage() {
         <div className="relative text-center max-w-2xl mx-auto">
           <h2 className="text-4xl md:text-5xl cinzel-text text-on-surface mb-6">Begin the <span className="text-primary">conversation.</span></h2>
           <p className="text-on-surface-variant raleway-text text-lg leading-relaxed mb-12 italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-            Structured access to Pakistan&apos;s most compelling sectors — with a single, institutional-grade counterparty.
+            Structured access to the UK, Pakistan, and our most compelling international sectors — with a single, institutional-grade counterparty.
           </p>
           <Link href="/contact" className="liquid-gold-bg text-on-primary px-12 py-5 font-bold tracking-[0.2em] uppercase text-sm transition-transform hover:-translate-y-1 raleway-text inline-block">
             Request a Consultation
