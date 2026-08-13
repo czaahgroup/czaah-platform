@@ -33,6 +33,7 @@ const serviceCards = [
   { icon: 'shield', model: 'Risk & Protection', title: 'Investor Protection', description: 'Legal contracts, project verification, investment due diligence, insurance facilitation, and transparent financial reporting at every stage.', slug: 'investor-protection' },
   { icon: 'insights', model: 'Strategy & Analysis', title: 'Investment Advisory', description: 'Feasibility studies, market opportunity mapping, financial modelling, and strategic guidance for verified investment opportunities across all sectors.', slug: 'investment-advisory' },
   { icon: 'handshake', model: 'Local Expertise', title: 'Partnership Development', description: 'Connection with government departments, legal experts, developers, financial institutions, and industrial partners for safe, transparent investment.', slug: 'partnership-development' },
+  { icon: 'flight_takeoff', model: 'Residency & Citizenship', title: 'Investment Migration', description: 'Residency and citizenship by investment programmes, visa facilitation, and immigration advisory for investors, executives, and their families across leading global jurisdictions.', slug: 'investment-migration' },
 ] as const
 
 const verticals = [
@@ -233,7 +234,7 @@ export default function HomePage() {
             <div className="w-12 h-[2px] bg-primary mb-6" />
             <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Capital · Ventures · Infrastructure</div>
             <h1 className="cinzel-text text-3xl sm:text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">
-              Pakistan&apos;s <span className="text-primary">Investment</span><br />
+              International <span className="text-primary">Investment</span><br />
               Facilitation Group.
             </h1>
             <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">
