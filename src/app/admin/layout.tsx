@@ -107,6 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <SectionHeader label="Members" />
         <NavLink href="/admin/kyc" label="KYC Review" icon="verified_user" />
         <NavLink href="/admin/workforce" label="Workforce" icon="engineering" />
+        <NavLink href="/admin/employers" label="Employers" icon="apartment" />
         {isSuperAdmin && <NavLink href="/admin/users" label="Users" icon="group" />}
 
         <SectionHeader label="Enquiries" />

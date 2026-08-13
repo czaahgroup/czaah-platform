@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Navbar } from '@/components/layouts/Navbar';
 import { Footer } from '@/components/layouts/Footer';
 import { WorkforceRegistrationModal } from '@/components/WorkforceRegistrationModal';
+import { EmployerRegistrationModal } from '@/components/EmployerRegistrationModal';
 
 const talentPools = [
   { title: 'Civil Engineers', badge: 'high', badgeText: 'High Availability', teamSize: '5–50', timeline: '30–45 days', cert: 'Certified by PEC', industry: 'Construction,Mining', role: 'Engineers & Technical', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan' },
@@ -34,6 +35,7 @@ export default function ManpowerPage() {
   const [filters, setFilters] = useState<{ industry: Set<string>; role: Set<string>; dest: Set<string> }>({ industry: new Set(), role: new Set(), dest: new Set() });
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const [showRegistration, setShowRegistration] = useState(false);
+  const [showEmployerRegistration, setShowEmployerRegistration] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -102,6 +104,12 @@ export default function ManpowerPage() {
                 className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm"
               >
                 Register as a Worker &rarr;
+              </button>
+              <button
+                onClick={() => setShowEmployerRegistration(true)}
+                className="border border-primary/40 text-primary hover:bg-primary/10 px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm transition-colors"
+              >
+                Register as an Employer &rarr;
               </button>
             </div>
           </section>
@@ -340,6 +348,12 @@ export default function ManpowerPage() {
               >
                 Register as a Worker &rarr;
               </button>
+              <button
+                onClick={() => setShowEmployerRegistration(true)}
+                className="border border-primary/40 text-primary hover:bg-primary/10 px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm transition-colors"
+              >
+                Register as an Employer &rarr;
+              </button>
             </div>
           </div>
         </section>
@@ -347,6 +361,7 @@ export default function ManpowerPage() {
       </div>
 
       <WorkforceRegistrationModal open={showRegistration} onClose={() => setShowRegistration(false)} />
+      <EmployerRegistrationModal open={showEmployerRegistration} onClose={() => setShowEmployerRegistration(false)} />
 
       <Footer />
     </>
