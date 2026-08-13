@@ -221,7 +221,6 @@ export default function HomePage() {
             playsInline
             webkit-playsinline=""
             preload="auto"
-            poster="/Images/Main-Hero.jpg"
             className="w-full h-full object-cover object-bottom"
           >
             <source src="/Images/Hero-Video.mp4" type="video/mp4" />

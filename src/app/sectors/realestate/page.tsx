@@ -817,7 +817,7 @@ export default function RealEstatePage() {
 
               <div className="property-card" data-location="riyadh" data-type="commercial" data-status="available" data-price="1650000" data-keywords="king abdullah financial district office riyadh saudi vision 2030">
                 <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1541200256116-5d8f6b1a2c26?w=600&h=400&fit=crop" alt="Riyadh Financial District Office" />
+                  <img className="property-img" src="/Images/Riyadh-KAFD.jpg" alt="King Abdullah Financial District, Riyadh" />
                   <span className="property-status status-available">Available</span>
                 </div>
                 <div className="property-body">
