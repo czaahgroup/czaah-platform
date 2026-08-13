@@ -12,7 +12,7 @@ import { Footer } from '@/components/layouts/Footer'
 
 const sectorCards = [
   { name: 'Minerals & Mining', icon: 'diamond', description: 'Access Pakistan\'s $1T+ in untapped mineral reserves — copper, gold, rare earths, coal, and gemstones across Balochistan, KPK, and Gilgit-Baltistan.', tag: '$1T+ Reserves', slug: 'minerals' },
-  { name: 'Real Estate', icon: 'location_city', description: 'Invest in Pakistan\'s highest-growth corridors — CPEC zones, commercial hubs, and industrial real estate with structured, transparent investment vehicles.', tag: 'CPEC Corridor', slug: 'realestate' },
+  { name: 'Real Estate', icon: 'location_city', description: 'International real estate across the UK, UAE, and Pakistan — London commercial property, Dubai freehold investments, and Pakistan\'s CPEC growth corridors, with structured, transparent investment vehicles.', tag: 'UK · UAE · Pakistan', slug: 'realestate' },
   { name: 'Construction & Development', icon: 'architecture', description: 'Civil infrastructure, commercial buildings, CPEC corridor projects, and Special Economic Zone development with trusted construction partners.', tag: 'Infrastructure', slug: 'construction' },
   { name: 'Human Resources', icon: 'groups', description: 'Access Pakistan\'s 70M+ workforce — overseas manpower deployment, domestic staffing, executive search, trade testing, and HR advisory services.', tag: '70M+ Workforce', slug: 'manpower' },
   { name: 'Technology & IT', icon: 'memory', description: 'Enter Pakistan\'s $3.2B+ IT sector — government digital transformation partnerships and access to 500,000+ skilled technology professionals.', tag: '$3.2B+ Sector', slug: 'technology' },
@@ -38,7 +38,7 @@ const serviceCards = [
 
 const verticals = [
   { num: '01', name: 'Minerals & Mining', model: 'Advisory · Access · Deal Structuring', description: 'Navigate Pakistan\'s complex mining regulatory landscape. We facilitate exploration licensing, joint ventures, and connect producers with international buyers.', slug: 'minerals', coreFocus: true },
-  { num: '02', name: 'Real Estate', model: 'CPEC · Commercial · Industrial', description: 'Invest in Pakistan\'s highest-growth corridors — CPEC Special Economic Zones, commercial hubs, and industrial properties with structured, transparent vehicles.', slug: 'realestate', coreFocus: true },
+  { num: '02', name: 'Real Estate', model: 'UK · UAE · Pakistan', description: 'International real estate across London commercial property, Dubai freehold investments, and Pakistan\'s CPEC Special Economic Zones — structured, transparent investment vehicles.', slug: 'realestate', coreFocus: true },
   { num: '03', name: 'Technology & IT', model: 'Market Entry · Talent · Digital', description: 'Enter Pakistan\'s booming tech sector — government IT partnerships for enterprise vendors, and access to 500,000+ skilled professionals for global firms.', slug: 'technology', coreFocus: false },
   { num: '04', name: 'Textiles & Trade', model: 'Sourcing · Compliance · Export', description: 'Source certified Pakistani textiles for EU, US, and Gulf markets. Full compliance handling — OEKO-TEX, GOTS, Better Cotton — with GSP+ zero-duty EU access.', slug: 'textiles', coreFocus: false },
   { num: '05', name: 'Agriculture', model: 'Farming · Organic · Processing', description: 'Pakistan\'s agricultural sector is 23% of GDP with massive modernisation potential. Large-scale farming, organic food production, and cold chain infrastructure.', slug: 'agriculture', coreFocus: false },
