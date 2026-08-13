@@ -31,17 +31,17 @@ const SECTORS = [
 ] as const
 
 const SERVICES = [
-  { name: 'Business Setup', href: '/services/business-setup', icon: '\u25C6', desc: 'SECP registration, entity formation' },
-  { name: 'Licensing & Compliance', href: '/services/licensing', icon: '\u25A0', desc: 'FBR, BOI, regulatory approvals' },
-  { name: 'Import & Export', href: '/services/import-export', icon: '\u21C4', desc: 'Trade docs, customs, logistics' },
-  { name: 'Investor Protection', href: '/services/investor-protection', icon: '\u2605', desc: 'Due diligence, contracts, reporting' },
-  { name: 'Investment Advisory', href: '/services/investment-advisory', icon: '$', desc: 'Feasibility, strategy, analysis' },
-  { name: 'Partnership Development', href: '/services/partnership-development', icon: '+', desc: 'Local partners, government liaison' },
+  { name: 'Business Setup', href: '/services/business-setup', icon: '\u25C6', desc: 'UK & international company formation' },
+  { name: 'Licensing & Compliance', href: '/services/licensing', icon: '\u25A0', desc: 'Regulatory & market-entry support' },
+  { name: 'Import & Export', href: '/services/import-export', icon: '\u21C4', desc: 'International trade & logistics' },
+  { name: 'Investor Protection', href: '/services/investor-protection', icon: '\u2605', desc: 'Due diligence, risk & compliance' },
+  { name: 'Investment Advisory', href: '/services/investment-advisory', icon: '$', desc: 'Global opportunities & strategy' },
+  { name: 'Partnership Development', href: '/services/partnership-development', icon: '+', desc: 'International strategic partnerships' },
   { name: 'divider' as const, href: '', icon: '', desc: '' },
-  { name: 'Government Contracts', href: '/services/government', icon: '\u25A0', desc: 'NHA, WAPDA, NADRA, defence' },
-  { name: 'Security Services', href: '/services/security', icon: '\u2605', desc: 'Corporate & project protection' },
-  { name: 'Payment Solutions', href: '/services/payment-solutions', icon: '\u25C6', desc: 'Cross-border payments, multi-currency' },
-  { name: 'Investment Migration', href: '/services/investment-migration', icon: '\u2708', desc: 'Residency & citizenship by investment' },
+  { name: 'Government Contracts', href: '/services/government', icon: '\u25A0', desc: 'Public-sector opportunities & procurement' },
+  { name: 'Security Services', href: '/services/security', icon: '\u2605', desc: 'Corporate, asset & project protection' },
+  { name: 'Payment Solutions', href: '/services/payment-solutions', icon: '\u25C6', desc: 'Cross-border & multi-currency solutions' },
+  { name: 'Investment Migration', href: '/services/investment-migration', icon: '\u2708', desc: 'Global residency & investment programmes' },
 ] as const
 
 const ABOUT_LINKS = [
