@@ -516,8 +516,18 @@ export default function RealEstatePage() {
               </div>
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">apartment</span>
-                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">UAE &amp; Dubai</h4>
-                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Freehold property in Dubai and across the UAE — tax-free returns, high rental yields, and a fast-growing market with some of the world's most investor-friendly ownership frameworks.</p>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Dubai</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Freehold property in Dubai's designated investment zones — tax-free returns, high rental yields, and one of the world's most investor-friendly ownership frameworks.</p>
+              </div>
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">mosque</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Saudi Arabia</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Residential and commercial property across Riyadh and the Kingdom's Vision 2030 giga-projects — expanding foreign ownership reforms opening a market long closed to international investors.</p>
+              </div>
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">domain</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Qatar</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Freehold property in Doha's designated investment zones — strong rental demand, tax-free returns, and residency-linked ownership for qualifying investments.</p>
               </div>
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">euro</span>
@@ -654,6 +664,8 @@ export default function RealEstatePage() {
                   <option value="gwadar">Gwadar</option>
                   <option value="cpec sez">CPEC SEZ</option>
                   <option value="dubai">Dubai</option>
+                  <option value="riyadh">Riyadh</option>
+                  <option value="doha">Doha</option>
                 </select>
                 <select className="filter-select" id="filterType">
                   <option value="">All Types</option>
@@ -678,7 +690,7 @@ export default function RealEstatePage() {
                 </select>
                 <button className="clear-filters" id="clearFilters">Clear All</button>
               </div>
-              <div className="search-results-count" id="resultsCount"><span>10</span> properties found</div>
+              <div className="search-results-count" id="resultsCount"><span>12</span> properties found</div>
             </div>
 
             <div className="properties-grid" id="propertiesGrid">
@@ -796,6 +808,66 @@ export default function RealEstatePage() {
                     </div>
                     <div className="property-stat">
                       <span className="property-stat-value">$950K</span>
+                      <span className="property-stat-label">Price</span>
+                    </div>
+                  </div>
+                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
+                </div>
+              </div>
+
+              <div className="property-card" data-location="riyadh" data-type="commercial" data-status="available" data-price="1650000" data-keywords="king abdullah financial district office riyadh saudi vision 2030">
+                <div className="property-img-wrapper">
+                  <img className="property-img" src="https://images.unsplash.com/photo-1541200256116-5d8f6b1a2c26?w=600&h=400&fit=crop" alt="Riyadh Financial District Office" />
+                  <span className="property-status status-available">Available</span>
+                </div>
+                <div className="property-body">
+                  <div className="property-tags">
+                    <span className="property-type">Commercial</span>
+                    <span className="property-location">Riyadh</span>
+                  </div>
+                  <h3>King Abdullah Financial District &mdash; Office Suite</h3>
+                  <p>Grade-A office space in Riyadh's flagship financial district, part of the Vision 2030 development pipeline. Foreign ownership permitted under recent reforms, with strong institutional-grade tenancy demand.</p>
+                  <div className="property-stats">
+                    <div className="property-stat">
+                      <span className="property-stat-value">3,400 ft&sup2;</span>
+                      <span className="property-stat-label">Area</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">6.5%</span>
+                      <span className="property-stat-label">Yield</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">$1.65M</span>
+                      <span className="property-stat-label">Price</span>
+                    </div>
+                  </div>
+                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
+                </div>
+              </div>
+
+              <div className="property-card" data-location="doha" data-type="mixed-use" data-status="for-sale" data-price="1100000" data-keywords="pearl qatar freehold residential doha world cup legacy">
+                <div className="property-img-wrapper">
+                  <img className="property-img" src="https://images.unsplash.com/photo-1512632578888-169bbbc64f33?w=600&h=400&fit=crop" alt="The Pearl Qatar Residence" />
+                  <span className="property-status status-for-sale">For Sale</span>
+                </div>
+                <div className="property-body">
+                  <div className="property-tags">
+                    <span className="property-type">Mixed-Use</span>
+                    <span className="property-location">Doha</span>
+                  </div>
+                  <h3>The Pearl &mdash; Freehold Waterfront Residence</h3>
+                  <p>Freehold apartment on Doha's Pearl Island, one of Qatar's few designated foreign-ownership zones. Residency-linked for qualifying investment, with strong rental demand from the expatriate community.</p>
+                  <div className="property-stats">
+                    <div className="property-stat">
+                      <span className="property-stat-value">1,850 ft&sup2;</span>
+                      <span className="property-stat-label">Area</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">6.8%</span>
+                      <span className="property-stat-label">Yield</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">$1.1M</span>
                       <span className="property-stat-label">Price</span>
                     </div>
                   </div>
