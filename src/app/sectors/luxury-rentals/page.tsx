@@ -57,10 +57,17 @@ export default function LuxuryRentalsPage() {
               <span className="material-symbols-outlined text-base">arrow_back</span> Back to Overview
             </a>
             <div className="w-12 h-[2px] bg-primary mb-6" />
-            <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Executive Ground Transport</div>
-            <h1 className="cinzel-text text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">Luxury Car<br /><span className="text-primary">Rental Fleets.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Premium and armoured vehicle fleets for executives, delegations, and high-profile clients across Pakistan, the Gulf, and the United Kingdom &mdash; from daily executive transport to long-term corporate fleet programmes.</p>
-            <a href="/contact?interest=Luxury%20Car%20Rentals#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Reserve a Vehicle &rarr;</a>
+            <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Luxury Mobility &amp; Chauffeur Services</div>
+            <h1 className="cinzel-text text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">Travel Your<br /><span className="text-primary">Way.</span></h1>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-4">Premium mobility solutions for executives, investors, VIP clients and international visitors across <strong className="text-on-surface font-semibold">London, the UK and selected international destinations</strong>.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-4">Choose from a <strong className="text-on-surface font-semibold">private chauffeur-driven experience</strong> or a carefully selected range of <strong className="text-on-surface font-semibold">self-drive luxury and prestige vehicles</strong>, available for short-term and extended hire.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-6">From airport transfers and business meetings to corporate travel, special occasions and personal journeys, CZAAH provides discreet and professionally coordinated luxury transportation.</p>
+            <div className="flex flex-wrap gap-2 mb-10 max-w-2xl">
+              {['Private Chauffeurs', 'Luxury Self-Drive Hire', 'Executive Cars', 'Prestige & Supercars', 'Airport Transfers', 'Corporate Travel', 'VIP Transport', 'Security & Armoured Vehicles'].map((tag) => (
+                <span key={tag} className="raleway-text text-xs px-3 py-1.5 border border-primary/30 text-primary/90">{tag}</span>
+              ))}
+            </div>
+            <a href="/contact?interest=Luxury%20Mobility%20%26%20Chauffeur%20Services#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Arrange Your Journey &rarr;</a>
           </section>
         </div>
 
@@ -315,7 +322,7 @@ export default function LuxuryRentalsPage() {
           <div className="max-w-[1600px] mx-auto text-center">
             <h2 className="cinzel-text text-4xl text-on-surface mb-4">Ground transport, <span className="text-primary">elevated.</span></h2>
             <p className="raleway-text text-on-surface-variant text-base mb-10 max-w-2xl mx-auto">Premium vehicles, professional chauffeurs, and security logistics &mdash; across Pakistan, the Gulf, and the UK.</p>
-            <a href="/contact?interest=Luxury%20Car%20Rentals#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Reserve a Vehicle &rarr;</a>
+            <a href="/contact?interest=Luxury%20Mobility%20%26%20Chauffeur%20Services#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Arrange Your Journey &rarr;</a>
           </div>
         </section>
 
