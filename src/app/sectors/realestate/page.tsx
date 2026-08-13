@@ -344,6 +344,18 @@ export default function RealEstatePage() {
       border: 1px solid rgba(59, 130, 246, 0.3);
     }
 
+    .status-for-sale {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-off-plan {
+      background: rgba(168, 85, 247, 0.15);
+      color: #a855f7;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
     .property-img-wrapper {
       position: relative;
     }
@@ -624,6 +636,7 @@ export default function RealEstatePage() {
         {/*  FEATURED PROPERTIES  */}
         <section className="py-32 px-5 md:px-24 bg-surface fade-in">
           <div className="max-w-[1600px] mx-auto">
+            <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Your Expert Property Finder in London</div>
             <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-4">Featured <span className="text-primary">properties.</span></h2>
             <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-2">Hand-selected investment opportunities across our international real estate markets. Each listing is pre-vetted, title-verified, and investment-ready.</p>
 
@@ -651,6 +664,8 @@ export default function RealEstatePage() {
                 </select>
                 <select className="filter-select" id="filterStatus">
                   <option value="">All Status</option>
+                  <option value="for-sale">For Sale</option>
+                  <option value="off-plan">Off Plan</option>
                   <option value="available">Available</option>
                   <option value="limited">Limited Units</option>
                   <option value="coming">Coming Soon</option>
@@ -663,15 +678,15 @@ export default function RealEstatePage() {
                 </select>
                 <button className="clear-filters" id="clearFilters">Clear All</button>
               </div>
-              <div className="search-results-count" id="resultsCount"><span>9</span> properties found</div>
+              <div className="search-results-count" id="resultsCount"><span>10</span> properties found</div>
             </div>
 
             <div className="properties-grid" id="propertiesGrid">
 
-              <div className="property-card" data-location="london" data-type="commercial" data-status="available" data-price="2900000" data-keywords="canary wharf grade-a office floor london city">
+              <div className="property-card" data-location="london" data-type="commercial" data-status="for-sale" data-price="2900000" data-keywords="canary wharf grade-a office floor london city for sale">
                 <div className="property-img-wrapper">
                   <img className="property-img" src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600&h=400&fit=crop" alt="Canary Wharf Office" />
-                  <span className="property-status status-available">Available</span>
+                  <span className="property-status status-for-sale">For Sale</span>
                 </div>
                 <div className="property-body">
                   <div className="property-tags">
@@ -691,6 +706,36 @@ export default function RealEstatePage() {
                     </div>
                     <div className="property-stat">
                       <span className="property-stat-value">$2.9M</span>
+                      <span className="property-stat-label">Price</span>
+                    </div>
+                  </div>
+                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
+                </div>
+              </div>
+
+              <div className="property-card" data-location="london" data-type="mixed-use" data-status="off-plan" data-price="1350000" data-keywords="nine elms riverside residences off plan pre-construction london new development">
+                <div className="property-img-wrapper">
+                  <img className="property-img" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop" alt="Nine Elms Development" />
+                  <span className="property-status status-off-plan">Off Plan</span>
+                </div>
+                <div className="property-body">
+                  <div className="property-tags">
+                    <span className="property-type">Mixed-Use</span>
+                    <span className="property-location">London</span>
+                  </div>
+                  <h3>Nine Elms &mdash; Riverside Residences</h3>
+                  <p>Off-plan residential-led mixed-use development on the South Bank, near the new US Embassy and Battersea Power Station. Early-stage pricing with staged payment plan ahead of completion.</p>
+                  <div className="property-stats">
+                    <div className="property-stat">
+                      <span className="property-stat-value">1,100 ft&sup2;</span>
+                      <span className="property-stat-label">Area</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">5.2%</span>
+                      <span className="property-stat-label">Yield</span>
+                    </div>
+                    <div className="property-stat">
+                      <span className="property-stat-value">$1.35M</span>
                       <span className="property-stat-label">Price</span>
                     </div>
                   </div>
