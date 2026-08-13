@@ -484,10 +484,37 @@ export default function RealEstatePage() {
             <div className="w-12 h-[2px] bg-primary mb-6" />
             <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Investment Advisory & Facilitation</div>
             <h1 className="cinzel-text text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">Real<br /><span className="text-primary">Estate.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Pakistan's real estate market is valued at over $300 billion — and CPEC is creating entirely new growth corridors. CZAAH provides structured, transparent access for international and diaspora investors seeking Pakistan's highest-growth property opportunities.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">CZAAH facilitates real estate investment across international markets — Pakistan, the United Kingdom, the UAE, and Europe. In Pakistan alone, the market is valued at over $300 billion, with CPEC creating entirely new growth corridors. We provide structured, transparent access for international and diaspora investors seeking the highest-growth property opportunities worldwide.</p>
             <a href="/contact?interest=Real%20Estate#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Investment Enquiries &rarr;</a>
           </section>
         </div>
+
+        <div className="w-full h-px bg-outline-variant/20" />
+
+        {/*  INTERNATIONAL MARKETS  */}
+        <section className="py-32 px-5 md:px-24 bg-surface fade-in">
+          <div className="max-w-[1600px] mx-auto">
+            <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-4">International <span className="text-primary">markets.</span></h2>
+            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-12">Beyond Pakistan, CZAAH facilitates property investment across leading global real estate markets — structured access, local partnerships, and end-to-end transaction support.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger">
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">location_city</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">United Kingdom</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Residential and commercial property across London and major UK cities — a stable, transparent market with strong legal protections, popular with diaspora and institutional investors alike.</p>
+              </div>
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">apartment</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">UAE &amp; Dubai</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Freehold property in Dubai and across the UAE — tax-free returns, high rental yields, and a fast-growing market with some of the world's most investor-friendly ownership frameworks.</p>
+              </div>
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">euro</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Europe</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Residency-linked property investment across Portugal, Greece, Spain, and Cyprus — structured through CZAAH's investment migration advisory for investors seeking EU market access alongside real estate returns.</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <div className="w-full h-px bg-outline-variant/20" />
 
