@@ -15,7 +15,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 const SECTORS = [
   { name: 'Mines & Minerals', href: '/sectors/minerals', icon: '\u25C6', desc: 'Copper, gold, rare earths, coal' },
-  { name: 'Real Estate', href: '/sectors/realestate', icon: '\u2302', desc: 'CPEC corridors, commercial, industrial' },
+  { name: 'Real Estate', href: '/sectors/realestate', icon: '\u2302', desc: 'UK, UAE, Saudi, Qatar & Pakistan' },
   { name: 'Technology & IT', href: '/sectors/technology', icon: '\u2699', desc: 'Software, digital services, gov IT' },
   { name: 'Textiles & Trade', href: '/sectors/textiles', icon: '\u2756', desc: 'Garments, fabric, home textiles' },
   { name: 'Agriculture', href: '/sectors/agriculture', icon: '\u2618', desc: 'Farming, organic food, processing' },
