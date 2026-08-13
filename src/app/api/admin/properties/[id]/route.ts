@@ -62,7 +62,51 @@ export async function PATCH(
     const body = await request.json()
     const { action, notes } = body
 
-    if (!action || !['approve', 'reject'].includes(action)) {
+    // General field edit (no approve/reject action) — e.g. editing a CZAAH-direct listing
+    if (!action) {
+      const {
+        title, propertyType, listingType, price, currency, location, city, country,
+        areaSqft, bedrooms, bathrooms, description, features, images, yieldPercentage,
+      } = body
+
+      const featuresArray = features
+        ? (typeof features === 'string' ? features.split(',').map((f: string) => f.trim()).filter(Boolean) : features)
+        : undefined
+      const imagesArray = images
+        ? (typeof images === 'string' ? images.split(',').map((i: string) => i.trim()).filter(Boolean) : images)
+        : undefined
+
+      const editUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() }
+      if (title !== undefined) editUpdates.title = title
+      if (propertyType !== undefined) editUpdates.property_type = propertyType
+      if (listingType !== undefined) editUpdates.listing_type = listingType
+      if (price !== undefined) editUpdates.price = price
+      if (currency !== undefined) editUpdates.currency = currency
+      if (location !== undefined) editUpdates.location = location
+      if (city !== undefined) editUpdates.city = city
+      if (country !== undefined) editUpdates.country = country
+      if (areaSqft !== undefined) editUpdates.area_sqft = areaSqft
+      if (bedrooms !== undefined) editUpdates.bedrooms = bedrooms
+      if (bathrooms !== undefined) editUpdates.bathrooms = bathrooms
+      if (description !== undefined) editUpdates.description = description
+      if (featuresArray !== undefined) editUpdates.features = featuresArray
+      if (imagesArray !== undefined) editUpdates.images = imagesArray
+      if (yieldPercentage !== undefined) editUpdates.yield_percentage = yieldPercentage
+
+      const { data: edited, error: editError } = await supabase
+        .from('property_listings')
+        .update(editUpdates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (editError) {
+        return NextResponse.json({ error: editError.message }, { status: 500 })
+      }
+      return NextResponse.json({ data: edited })
+    }
+
+    if (!['approve', 'reject'].includes(action)) {
       return NextResponse.json({ error: 'Invalid action. Must be approve or reject.' }, { status: 400 })
     }
 
@@ -153,6 +197,46 @@ export async function PATCH(
     return NextResponse.json({ data: updated })
   } catch (err) {
     console.error('PATCH /api/admin/properties/[id] error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const userClient = createAuthClient(request)
+    const { data: { user }, error: authError } = await userClient.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const supabase = createAdminClient()
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || (profile.role !== 'super_admin' && profile.role !== 'admin')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { error: deleteError } = await supabase
+      .from('property_listings')
+      .delete()
+      .eq('id', id)
+
+    if (deleteError) {
+      return NextResponse.json({ error: deleteError.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    console.error('DELETE /api/admin/properties/[id] error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

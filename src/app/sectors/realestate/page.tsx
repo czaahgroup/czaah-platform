@@ -16,43 +16,66 @@ interface LiveProperty {
   currency: string;
   location: string;
   city: string;
+  country: string | null;
   area_sqft: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
   description: string | null;
   features: string[];
   images: string[];
+  yield_percentage: number | null;
 }
+
+const STATUS_META: Record<string, { label: string; className: string }> = {
+  sale: { label: 'For Sale', className: 'status-for-sale' },
+  rent: { label: 'For Rent', className: 'status-for-rent' },
+  lease: { label: 'For Rent', className: 'status-for-rent' },
+  off_plan: { label: 'Off Plan', className: 'status-off-plan' },
+};
 
 export default function RealEstatePage() {
   const router = useRouter();
   const supabase = createClient();
-  const [liveProperties, setLiveProperties] = useState<LiveProperty[]>([]);
-  const [liveLoading, setLiveLoading] = useState(true);
+  const [properties, setProperties] = useState<LiveProperty[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filterCity, setFilterCity] = useState('');
   const [filterType, setFilterType] = useState('');
+  const [filterListingType, setFilterListingType] = useState('');
   const [filterMinPrice, setFilterMinPrice] = useState('');
   const [filterMaxPrice, setFilterMaxPrice] = useState('');
 
   useEffect(() => {
-    async function fetchLive() {
+    const timeout = setTimeout(async () => {
+      setLoading(true);
       try {
         const params = new URLSearchParams();
+        if (searchQuery) params.set('search', searchQuery);
         if (filterCity) params.set('city', filterCity);
         if (filterType) params.set('type', filterType);
+        if (filterListingType) params.set('listing_type', filterListingType);
         if (filterMinPrice) params.set('min_price', filterMinPrice);
         if (filterMaxPrice) params.set('max_price', filterMaxPrice);
         const res = await fetch(`/api/public/properties?${params.toString()}`);
         const json = await res.json();
-        if (res.ok) setLiveProperties(json.data || []);
+        if (res.ok) setProperties(json.data || []);
       } catch (err) {
-        console.error('Failed to load live properties:', err);
+        console.error('Failed to load properties:', err);
       } finally {
-        setLiveLoading(false);
+        setLoading(false);
       }
-    }
-    fetchLive();
-  }, [filterCity, filterType, filterMinPrice, filterMaxPrice]);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [searchQuery, filterCity, filterType, filterListingType, filterMinPrice, filterMaxPrice]);
+
+  function clearFilters() {
+    setSearchQuery('');
+    setFilterCity('');
+    setFilterType('');
+    setFilterListingType('');
+    setFilterMinPrice('');
+    setFilterMaxPrice('');
+  }
 
   async function handleEnquire(propertyId: string) {
     const { data: { session } } = await supabase.auth.getSession();
@@ -85,104 +108,6 @@ export default function RealEstatePage() {
     document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .fade-in-scale, .stagger').forEach(el => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-        document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .fade-in-scale, .stagger').forEach(el => observer.observe(el));
-
-        // Property search & filter
-        const searchInput = document.getElementById('propertySearch');
-        const filterLocation = document.getElementById('filterLocation');
-        const filterType = document.getElementById('filterType');
-        const filterStatus = document.getElementById('filterStatus');
-        const filterPrice = document.getElementById('filterPrice');
-        const clearBtn = document.getElementById('clearFilters');
-        const resultsCount = document.getElementById('resultsCount');
-        const grid = document.getElementById('propertiesGrid');
-        const cards = grid.querySelectorAll('.property-card');
-
-        function filterProperties() {
-          const query = searchInput.value.toLowerCase().trim();
-          const loc = filterLocation.value.toLowerCase();
-          const type = filterType.value.toLowerCase();
-          const status = filterStatus.value.toLowerCase();
-          const priceRange = filterPrice.value;
-
-          let visible = 0;
-
-          cards.forEach(card => {
-            const cardLoc = card.dataset.location;
-            const cardType = card.dataset.type;
-            const cardStatus = card.dataset.status;
-            const cardPrice = parseInt(card.dataset.price);
-            const cardKeywords = card.dataset.keywords;
-            const cardText = card.textContent.toLowerCase();
-
-            let show = true;
-
-            // Text search
-            if (query && !cardText.includes(query) && !cardKeywords.includes(query)) {
-              show = false;
-            }
-
-            // Location filter
-            if (loc && cardLoc !== loc) {
-              show = false;
-            }
-
-            // Type filter
-            if (type && cardType !== type) {
-              show = false;
-            }
-
-            // Status filter
-            if (status && cardStatus !== status) {
-              show = false;
-            }
-
-            // Price filter
-            if (priceRange) {
-              const [min, max] = priceRange.split('-').map(Number);
-              if (cardPrice < min || cardPrice > max) {
-                show = false;
-              }
-            }
-
-            card.classList.toggle('hidden', !show);
-            if (show) visible++;
-          });
-
-          resultsCount.innerHTML = '<span>' + visible + '</span> propert' + (visible === 1 ? 'y' : 'ies') + ' found';
-
-          // Show no results message
-          const existing = grid.querySelector('.no-results');
-          if (existing) existing.remove();
-
-          if (visible === 0) {
-            const msg = document.createElement('div');
-            msg.className = 'no-results';
-            msg.innerHTML = '<h3>No properties match your criteria</h3><p>Try adjusting your filters or search terms.</p>';
-            grid.appendChild(msg);
-          }
-        }
-
-        searchInput.addEventListener('input', filterProperties);
-        filterLocation.addEventListener('change', filterProperties);
-        filterType.addEventListener('change', filterProperties);
-        filterStatus.addEventListener('change', filterProperties);
-        filterPrice.addEventListener('change', filterProperties);
-
-        clearBtn.addEventListener('click', () => {
-          searchInput.value = '';
-          filterLocation.value = '';
-          filterType.value = '';
-          filterStatus.value = '';
-          filterPrice.value = '';
-          filterProperties();
-        });
   }, []);
 
   return (
@@ -354,6 +279,12 @@ export default function RealEstatePage() {
       background: rgba(168, 85, 247, 0.15);
       color: #a855f7;
       border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .status-for-rent {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
     }
 
     .property-img-wrapper {
@@ -540,109 +471,6 @@ export default function RealEstatePage() {
 
         <div className="w-full h-px bg-outline-variant/20" />
 
-        {/*  AVAILABLE PROPERTIES (Live from partners)  */}
-        {(!liveLoading && liveProperties.length > 0) && (
-          <>
-            <section className="py-32 px-5 md:px-24 bg-surface fade-in">
-              <div className="max-w-[1600px] mx-auto">
-                <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-4">Available <span className="text-primary">properties.</span></h2>
-                <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-6">Browse approved property listings from our verified real estate partners. Enquire directly to start a conversation.</p>
-
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '24px', marginBottom: '24px' }}>
-                  <select className="filter-select" value={filterCity} onChange={(e) => setFilterCity(e.target.value)}>
-                    <option value="">All Cities</option>
-                    <option value="Islamabad">Islamabad</option>
-                    <option value="Lahore">Lahore</option>
-                    <option value="Karachi">Karachi</option>
-                    <option value="Gwadar">Gwadar</option>
-                    <option value="Peshawar">Peshawar</option>
-                  </select>
-                  <select className="filter-select" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-                    <option value="">All Types</option>
-                    <option value="residential">Residential</option>
-                    <option value="commercial">Commercial</option>
-                    <option value="industrial">Industrial</option>
-                    <option value="land">Land</option>
-                    <option value="mixed_use">Mixed Use</option>
-                  </select>
-                  <input
-                    type="number"
-                    placeholder="Min Price"
-                    value={filterMinPrice}
-                    onChange={(e) => setFilterMinPrice(e.target.value)}
-                    className="filter-select"
-                    style={{ width: '130px' }}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max Price"
-                    value={filterMaxPrice}
-                    onChange={(e) => setFilterMaxPrice(e.target.value)}
-                    className="filter-select"
-                    style={{ width: '130px' }}
-                  />
-                </div>
-
-                <div className="properties-grid">
-                  {liveProperties.map((prop) => (
-                    <div key={prop.id} className="property-card">
-                      <div className="property-img-wrapper">
-                        {prop.images && prop.images.length > 0 ? (
-                          <img className="property-img" src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/platform-files/${prop.images[0]}`} alt={prop.title} />
-                        ) : (
-                          <div className="property-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.15)', fontSize: '32px' }}>&#8962;</div>
-                        )}
-                        <span className="property-status status-available" style={{ textTransform: 'capitalize' }}>{prop.listing_type}</span>
-                      </div>
-                      <div className="property-body">
-                        <div className="property-tags">
-                          <span className="property-type">{prop.property_type.replace('_', ' ')}</span>
-                          <span className="property-location">{prop.city}</span>
-                        </div>
-                        <h3>{prop.title}</h3>
-                        {prop.description && <p>{prop.description.length > 140 ? prop.description.slice(0, 140) + '...' : prop.description}</p>}
-                        <div className="property-stats">
-                          {prop.area_sqft && (
-                            <div className="property-stat">
-                              <span className="property-stat-value">{prop.area_sqft.toLocaleString()} ft&sup2;</span>
-                              <span className="property-stat-label">Area</span>
-                            </div>
-                          )}
-                          {prop.bedrooms != null && (
-                            <div className="property-stat">
-                              <span className="property-stat-value">{prop.bedrooms}</span>
-                              <span className="property-stat-label">Beds</span>
-                            </div>
-                          )}
-                          {prop.bathrooms != null && (
-                            <div className="property-stat">
-                              <span className="property-stat-value">{prop.bathrooms}</span>
-                              <span className="property-stat-label">Baths</span>
-                            </div>
-                          )}
-                          <div className="property-stat">
-                            <span className="property-stat-value">{prop.price ? `${prop.currency} ${prop.price.toLocaleString()}` : 'On Request'}</span>
-                            <span className="property-stat-label">Price</span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleEnquire(prop.id)}
-                          className="property-cta"
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
-                        >
-                          Enquire Now &rarr;
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            <div className="w-full h-px bg-outline-variant/20" />
-          </>
-        )}
-
         {/*  FEATURED PROPERTIES  */}
         <section className="py-32 px-5 md:px-24 bg-surface fade-in">
           <div className="max-w-[1600px] mx-auto">
@@ -652,408 +480,135 @@ export default function RealEstatePage() {
 
             <div className="search-panel">
               <div className="search-bar-row">
-                <input type="text" className="search-bar" id="propertySearch" placeholder="Search by name, location, or keyword..." />
+                <input
+                  type="text"
+                  className="search-bar"
+                  placeholder="Search by name, location, or keyword..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
               <div className="search-filters">
-                <select className="filter-select" id="filterLocation">
+                <select className="filter-select" value={filterCity} onChange={(e) => setFilterCity(e.target.value)}>
                   <option value="">All Locations</option>
-                  <option value="london">London</option>
-                  <option value="islamabad">Islamabad</option>
-                  <option value="lahore">Lahore</option>
-                  <option value="karachi">Karachi</option>
-                  <option value="gwadar">Gwadar</option>
-                  <option value="cpec sez">CPEC SEZ</option>
-                  <option value="dubai">Dubai</option>
-                  <option value="riyadh">Riyadh</option>
-                  <option value="doha">Doha</option>
+                  <option value="London">London</option>
+                  <option value="Islamabad">Islamabad</option>
+                  <option value="Lahore">Lahore</option>
+                  <option value="Karachi">Karachi</option>
+                  <option value="Gwadar">Gwadar</option>
+                  <option value="Dubai">Dubai</option>
+                  <option value="Riyadh">Riyadh</option>
+                  <option value="Doha">Doha</option>
                 </select>
-                <select className="filter-select" id="filterType">
+                <select className="filter-select" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
                   <option value="">All Types</option>
+                  <option value="residential">Residential</option>
                   <option value="commercial">Commercial</option>
                   <option value="industrial">Industrial</option>
-                  <option value="mixed-use">Mixed-Use</option>
-                  <option value="commercial plot">Commercial Plot</option>
+                  <option value="land">Land</option>
+                  <option value="mixed_use">Mixed Use</option>
                 </select>
-                <select className="filter-select" id="filterStatus">
+                <select className="filter-select" value={filterListingType} onChange={(e) => setFilterListingType(e.target.value)}>
                   <option value="">All Status</option>
-                  <option value="for-sale">For Sale</option>
-                  <option value="off-plan">Off Plan</option>
-                  <option value="available">Available</option>
-                  <option value="limited">Limited Units</option>
-                  <option value="coming">Coming Soon</option>
+                  <option value="sale">For Sale</option>
+                  <option value="rent">For Rent</option>
+                  <option value="off_plan">Off Plan</option>
                 </select>
-                <select className="filter-select" id="filterPrice">
-                  <option value="">Any Price</option>
-                  <option value="0-1000000">Under $1M</option>
-                  <option value="1000000-2000000">$1M &ndash; $2M</option>
-                  <option value="2000000-99999999">$2M+</option>
-                </select>
-                <button className="clear-filters" id="clearFilters">Clear All</button>
+                <input
+                  type="number"
+                  placeholder="Min Price"
+                  value={filterMinPrice}
+                  onChange={(e) => setFilterMinPrice(e.target.value)}
+                  className="filter-select"
+                  style={{ width: '130px' }}
+                />
+                <input
+                  type="number"
+                  placeholder="Max Price"
+                  value={filterMaxPrice}
+                  onChange={(e) => setFilterMaxPrice(e.target.value)}
+                  className="filter-select"
+                  style={{ width: '130px' }}
+                />
+                <button className="clear-filters" onClick={clearFilters}>Clear All</button>
               </div>
-              <div className="search-results-count" id="resultsCount"><span>12</span> properties found</div>
+              <div className="search-results-count">
+                <span>{properties.length}</span> propert{properties.length === 1 ? 'y' : 'ies'} found
+              </div>
             </div>
 
-            <div className="properties-grid" id="propertiesGrid">
+            <div className="properties-grid">
+              {loading ? (
+                <div className="no-results"><h3>Loading properties&hellip;</h3></div>
+              ) : properties.length === 0 ? (
+                <div className="no-results"><h3>No properties match your criteria</h3><p>Try adjusting your filters or search terms.</p></div>
+              ) : properties.map((prop) => {
+                const statusMeta = STATUS_META[prop.listing_type] || { label: prop.listing_type, className: 'status-available' };
+                const image = prop.images && prop.images.length > 0 ? prop.images[0] : null;
+                const imageSrc = image
+                  ? (image.startsWith('http') || image.startsWith('/'))
+                    ? image
+                    : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/platform-files/${image}`
+                  : null;
+                return (
+                  <div key={prop.id} className="property-card">
+                    <div className="property-img-wrapper">
+                      {imageSrc ? (
+                        <img className="property-img" src={imageSrc} alt={prop.title} />
+                      ) : (
+                        <div className="property-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.15)', fontSize: '32px' }}>&#8962;</div>
+                      )}
+                      <span className={`property-status ${statusMeta.className}`}>{statusMeta.label}</span>
+                    </div>
+                    <div className="property-body">
+                      <div className="property-tags">
+                        <span className="property-type">{prop.property_type.replace('_', ' ')}</span>
+                        <span className="property-location">{prop.city}</span>
+                      </div>
+                      <h3>{prop.title}</h3>
+                      {prop.description && <p>{prop.description.length > 140 ? prop.description.slice(0, 140) + '...' : prop.description}</p>}
+                      <div className="property-stats">
+                        {prop.area_sqft && (
+                          <div className="property-stat">
+                            <span className="property-stat-value">{prop.area_sqft.toLocaleString()} ft&sup2;</span>
+                            <span className="property-stat-label">Area</span>
+                          </div>
+                        )}
+                        {prop.bedrooms != null && (
+                          <div className="property-stat">
+                            <span className="property-stat-value">{prop.bedrooms}</span>
+                            <span className="property-stat-label">Beds</span>
+                          </div>
+                        )}
+                        {prop.bathrooms != null && (
+                          <div className="property-stat">
+                            <span className="property-stat-value">{prop.bathrooms}</span>
+                            <span className="property-stat-label">Baths</span>
+                          </div>
+                        )}
+                        {prop.yield_percentage != null && (
+                          <div className="property-stat">
+                            <span className="property-stat-value">{prop.yield_percentage}%</span>
+                            <span className="property-stat-label">Yield</span>
+                          </div>
+                        )}
+                        <div className="property-stat">
+                          <span className="property-stat-value">{prop.price ? `${prop.currency} ${prop.price.toLocaleString()}` : 'On Request'}</span>
+                          <span className="property-stat-label">Price</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleEnquire(prop.id)}
+                        className="property-cta"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+                      >
+                        Enquire Now &rarr;
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
 
-              <div className="property-card" data-location="london" data-type="commercial" data-status="for-sale" data-price="2900000" data-keywords="canary wharf grade-a office floor london city for sale">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=600&h=400&fit=crop" alt="Canary Wharf Office" />
-                  <span className="property-status status-for-sale">For Sale</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Commercial</span>
-                    <span className="property-location">London</span>
-                  </div>
-                  <h3>Canary Wharf &mdash; Grade-A Office Floor</h3>
-                  <p>Full floor Grade-A office space in London's premier financial district. River views, 24/7 access, and proximity to Crossrail &mdash; fitted to institutional leasing standards.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">9,500 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">5.8%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$2.9M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="london" data-type="mixed-use" data-status="off-plan" data-price="1350000" data-keywords="nine elms riverside residences off plan pre-construction london new development">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop" alt="Nine Elms Development" />
-                  <span className="property-status status-off-plan">Off Plan</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Mixed-Use</span>
-                    <span className="property-location">London</span>
-                  </div>
-                  <h3>Nine Elms &mdash; Riverside Residences</h3>
-                  <p>Off-plan residential-led mixed-use development on the South Bank, near the new US Embassy and Battersea Power Station. Early-stage pricing with staged payment plan ahead of completion.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">1,100 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">5.2%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$1.35M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="london" data-type="mixed-use" data-status="limited" data-price="1950000" data-keywords="mayfair boutique retail unit london west end">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&h=400&fit=crop" alt="Mayfair Retail Unit" />
-                  <span className="property-status status-limited">Limited Units</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Mixed-Use</span>
-                    <span className="property-location">London</span>
-                  </div>
-                  <h3>Mayfair &mdash; Boutique Retail &amp; Office</h3>
-                  <p>Prime mixed-use unit in the heart of Mayfair, steps from Bond Street. Ground-floor retail with office space above &mdash; freehold, with strong footfall and heritage frontage.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">4,100 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">4.9%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$1.95M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="dubai" data-type="commercial" data-status="available" data-price="950000" data-keywords="business bay freehold office suite dubai uae">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&h=400&fit=crop" alt="Dubai Business Bay Office" />
-                  <span className="property-status status-available">Available</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Commercial</span>
-                    <span className="property-location">Dubai</span>
-                  </div>
-                  <h3>Business Bay &mdash; Freehold Office Suite</h3>
-                  <p>Freehold office suite in Dubai's Business Bay, overlooking the canal. Tax-free returns, fully fitted, and positioned within one of the UAE's fastest-growing commercial districts.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">2,800 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">8.1%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$950K</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="riyadh" data-type="commercial" data-status="available" data-price="1650000" data-keywords="king abdullah financial district office riyadh saudi vision 2030">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="/Images/Riyadh-KAFD.jpg" alt="King Abdullah Financial District, Riyadh" />
-                  <span className="property-status status-available">Available</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Commercial</span>
-                    <span className="property-location">Riyadh</span>
-                  </div>
-                  <h3>King Abdullah Financial District &mdash; Office Suite</h3>
-                  <p>Grade-A office space in Riyadh's flagship financial district, part of the Vision 2030 development pipeline. Foreign ownership permitted under recent reforms, with strong institutional-grade tenancy demand.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">3,400 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">6.5%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$1.65M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="doha" data-type="mixed-use" data-status="for-sale" data-price="1100000" data-keywords="pearl qatar freehold residential doha world cup legacy">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1512632578888-169bbbc64f33?w=600&h=400&fit=crop" alt="The Pearl Qatar Residence" />
-                  <span className="property-status status-for-sale">For Sale</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Mixed-Use</span>
-                    <span className="property-location">Doha</span>
-                  </div>
-                  <h3>The Pearl &mdash; Freehold Waterfront Residence</h3>
-                  <p>Freehold apartment on Doha's Pearl Island, one of Qatar's few designated foreign-ownership zones. Residency-linked for qualifying investment, with strong rental demand from the expatriate community.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">1,850 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">6.8%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$1.1M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="islamabad" data-type="commercial" data-status="available" data-price="1800000" data-keywords="blue area office tower full floor grade-a margalla hills">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop" alt="Commercial Tower" />
-                  <span className="property-status status-available">Available</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Commercial</span>
-                    <span className="property-location">Islamabad</span>
-                  </div>
-                  <h3>Blue Area Office Tower &mdash; Full Floor</h3>
-                  <p>Premium Grade-A office space in Islamabad's prime Blue Area district. 12,000 sq ft full floor with panoramic Margalla Hills views, fitted to international standards.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">12,000 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">7.2%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$1.8M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="lahore" data-type="industrial" data-status="available" data-price="2400000" data-keywords="sundar industrial estate warehouse complex logistics motorway">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=600&h=400&fit=crop" alt="Industrial Warehouse" />
-                  <span className="property-status status-available">Available</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Industrial</span>
-                    <span className="property-location">Lahore</span>
-                  </div>
-                  <h3>Sundar Industrial Estate &mdash; Warehouse Complex</h3>
-                  <p>Modern logistics and warehousing facility on the Lahore&ndash;Karachi motorway corridor. 40,000 sq ft with loading docks, 24/7 security, and CPEC freight connectivity.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">40,000 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">8.5%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$2.4M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="karachi" data-type="mixed-use" data-status="limited" data-price="1200000" data-keywords="clifton commercial centre retail office mixed-use">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop" alt="Mixed-Use Development" />
-                  <span className="property-status status-limited">Limited Units</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Mixed-Use</span>
-                    <span className="property-location">Karachi</span>
-                  </div>
-                  <h3>Clifton Commercial Centre &mdash; Retail &amp; Office</h3>
-                  <p>Prime mixed-use development in Karachi's Clifton district. Ground-floor retail with upper office floors, high footfall location near major residential communities.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">8,500 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">6.8%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$1.2M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="gwadar" data-type="commercial plot" data-status="coming" data-price="850000" data-keywords="gwadar free zone commercial plot port cpec tax-free">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=600&h=400&fit=crop" alt="Gwadar Port Area" />
-                  <span className="property-status status-coming">Coming Soon</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Commercial Plot</span>
-                    <span className="property-location">Gwadar</span>
-                  </div>
-                  <h3>Gwadar Free Zone &mdash; Commercial Plot</h3>
-                  <p>Strategic commercial plot within Gwadar Free Zone Phase II. Tax-exempt zone with direct port access, positioned for the next wave of CPEC-driven development.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">2 Acres</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">Tax-Free</span>
-                      <span className="property-stat-label">Zone</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$850K</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Register Interest &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="cpec sez" data-type="industrial" data-status="available" data-price="1600000" data-keywords="rashakai sez manufacturing unit kpk tax holiday motorway">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?w=600&h=400&fit=crop" alt="SEZ Industrial" />
-                  <span className="property-status status-available">Available</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Industrial</span>
-                    <span className="property-location">CPEC SEZ</span>
-                  </div>
-                  <h3>Rashakai SEZ &mdash; Manufacturing Unit</h3>
-                  <p>Ready-to-operate manufacturing unit in the Rashakai Special Economic Zone, KPK. Incentivised tax structure, Chinese JV-ready infrastructure, and direct M-1 motorway access.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">25,000 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">10-yr</span>
-                      <span className="property-stat-label">Tax Holiday</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$1.6M</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
-
-              <div className="property-card" data-location="islamabad" data-type="commercial" data-status="limited" data-price="620000" data-keywords="f-7 markaz premium office suites diplomatic zone parking">
-                <div className="property-img-wrapper">
-                  <img className="property-img" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop" alt="Corporate Office" />
-                  <span className="property-status status-limited">Limited Units</span>
-                </div>
-                <div className="property-body">
-                  <div className="property-tags">
-                    <span className="property-type">Commercial</span>
-                    <span className="property-location">Islamabad</span>
-                  </div>
-                  <h3>F-7 Markaz &mdash; Premium Office Suites</h3>
-                  <p>Boutique office suites in Islamabad's F-7 Markaz, ideal for corporate HQs and embassy-area presence. Fully fitted, 24/7 access, underground parking, diplomatic zone proximity.</p>
-                  <div className="property-stats">
-                    <div className="property-stat">
-                      <span className="property-stat-value">3,200 ft&sup2;</span>
-                      <span className="property-stat-label">Area</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">7.5%</span>
-                      <span className="property-stat-label">Yield</span>
-                    </div>
-                    <div className="property-stat">
-                      <span className="property-stat-value">$620K</span>
-                      <span className="property-stat-label">Price</span>
-                    </div>
-                  </div>
-                  <a href="/contact#contact-form" className="property-cta">Request Details &rarr;</a>
-                </div>
-              </div>
 
             </div>
           </div>

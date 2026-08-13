@@ -13,10 +13,11 @@ export async function GET(request: NextRequest) {
     const listingType = searchParams.get('listing_type')
     const minPrice = searchParams.get('min_price')
     const maxPrice = searchParams.get('max_price')
+    const search = searchParams.get('search')
 
     let query = supabase
       .from('property_listings')
-      .select('id, title, property_type, listing_type, price, currency, location, city, area_sqft, bedrooms, bathrooms, description, features, images, created_at')
+      .select('id, title, property_type, listing_type, price, currency, location, city, country, area_sqft, bedrooms, bathrooms, description, features, images, yield_percentage, created_at')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
 
@@ -25,6 +26,7 @@ export async function GET(request: NextRequest) {
     if (listingType) query = query.eq('listing_type', listingType)
     if (minPrice) query = query.gte('price', Number(minPrice))
     if (maxPrice) query = query.lte('price', Number(maxPrice))
+    if (search) query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%`)
 
     const { data: properties, error } = await query
 
