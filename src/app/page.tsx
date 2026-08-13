@@ -232,13 +232,13 @@ export default function HomePage() {
         <div className="relative z-10 px-5 md:px-24 w-full max-w-[1600px] mx-auto">
           <div>
             <div className="w-12 h-[2px] bg-primary mb-6" />
-            <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Capital · Ventures · Infrastructure</div>
+            <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Based in London. Connected Globally.</div>
             <h1 className="cinzel-text text-3xl sm:text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">
               International <span className="text-primary">Investment</span><br />
               Facilitation Group.
             </h1>
             <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">
-              Anchored in <span className="text-on-surface font-semibold">Mining &amp; Minerals</span>, <span className="text-on-surface font-semibold">Real Estate</span>, and industrial <span className="text-on-surface font-semibold">Construction</span> — with structured access across thirteen sectors through our institutional infrastructure.
+              CZAAH Group is a <span className="text-on-surface font-semibold">London-based</span> International Investment Facilitation Group connecting investors, businesses and strategic partners with opportunities across the <span className="text-on-surface font-semibold">United Kingdom</span>, <span className="text-on-surface font-semibold">Pakistan</span> and international markets.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6">
@@ -261,7 +261,7 @@ export default function HomePage() {
           <div className="flex flex-col lg:flex-row justify-between items-end mb-20 gap-8">
             <div className="max-w-xl">
               <h2 className="text-4xl md:text-5xl cinzel-text mb-6 text-on-surface">Strategic Sectors</h2>
-              <p className="text-on-surface-variant raleway-text leading-relaxed">We identify and secure high-yield opportunities within Pakistan&apos;s most resilient industries, providing a bridge for global capital to meet institutional-grade assets.</p>
+              <p className="text-on-surface-variant raleway-text leading-relaxed">With London at the centre of our international operations, we facilitate opportunities across International Real Estate, Construction &amp; Development, International Manpower, Mines &amp; Minerals, and other strategic sectors.</p>
             </div>
             <Link href="/sectors" className="text-primary flex items-center gap-2 hover:gap-4 transition-all group">
               <span className="text-sm tracking-widest uppercase font-bold raleway-text">View All Sectors</span>
