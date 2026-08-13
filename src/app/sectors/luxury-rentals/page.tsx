@@ -59,7 +59,7 @@ export default function LuxuryRentalsPage() {
             <div className="w-12 h-[2px] bg-primary mb-6" />
             <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Executive Ground Transport</div>
             <h1 className="cinzel-text text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">Luxury Car<br /><span className="text-primary">Rental Fleets.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Premium and armoured vehicle fleets for executives, delegations, and high-profile clients across Pakistan and the Gulf &mdash; from daily executive transport to long-term corporate fleet programmes.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Premium and armoured vehicle fleets for executives, delegations, and high-profile clients across Pakistan, the Gulf, and the United Kingdom &mdash; from daily executive transport to long-term corporate fleet programmes.</p>
             <a href="/contact?interest=Luxury%20Car%20Rentals#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Reserve a Vehicle &rarr;</a>
           </section>
         </div>
@@ -175,6 +175,7 @@ export default function LuxuryRentalsPage() {
                       <option value="Peshawar">Peshawar</option>
                       <option value="Inter-City">Inter-City</option>
                       <option value="Gulf (Dubai/Abu Dhabi)">Gulf (Dubai/Abu Dhabi)</option>
+                      <option value="London / UK">London / UK</option>
                     </select>
                   </div>
                   <div className="lx-form-group">
@@ -220,7 +221,7 @@ export default function LuxuryRentalsPage() {
             <div>
               <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Executive Fleet</div>
               <h3 className="cinzel-text text-3xl text-on-surface mb-6">Arrive like you <span className="text-primary">mean business.</span></h3>
-              <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Our executive fleet includes the latest models from Mercedes-Benz, BMW, Audi, Land Rover, and Toyota Land Cruiser — maintained to international standards and available with professional chauffeurs across Islamabad, Lahore, Karachi, and Gulf cities.</p>
+              <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Our executive fleet includes the latest models from Mercedes-Benz, BMW, Audi, Land Rover, and Toyota Land Cruiser — maintained to international standards and available with professional chauffeurs across Islamabad, Lahore, Karachi, London, and Gulf cities.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Whether it&apos;s airport transfers, multi-day business trips, or full corporate fleet contracts, every vehicle is presented immaculately with real-time tracking, backup vehicle guarantee, and 24/7 dispatch capability.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed">For visiting executives, investor delegations, and diplomatic parties, our fleet ensures your ground transport matches the professionalism of your operations.</p>
             </div>
@@ -244,7 +245,7 @@ export default function LuxuryRentalsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
               {[
                 { icon: 'star', title: 'Executive Chauffeur', desc: 'Professional chauffeur-driven luxury vehicles for daily executive transport, airport transfers, and business travel. Vetted drivers with security clearance, city knowledge, and discretion as standard.' },
-                { icon: 'business', title: 'Corporate Fleet Contracts', desc: 'Long-term vehicle leasing and fleet management for corporations operating in Pakistan. Dedicated vehicles, assigned drivers, maintenance, insurance, and fleet administration handled end-to-end.' },
+                { icon: 'business', title: 'Corporate Fleet Contracts', desc: 'Long-term vehicle leasing and fleet management for corporations operating in Pakistan, the Gulf, and the UK. Dedicated vehicles, assigned drivers, maintenance, insurance, and fleet administration handled end-to-end.' },
                 { icon: 'shield', title: 'Armoured Transport', desc: 'B6/B6+ armoured SUVs and sedans with trained protection drivers. Route planning, convoy operations, and integration with close protection teams for high-risk environments.' },
                 { icon: 'flight', title: 'VIP Delegation Fleets', desc: 'Multi-vehicle coordination for visiting delegations, investor tours, and corporate events. Matching vehicles, uniformed drivers, and real-time fleet tracking across multiple cities simultaneously.' },
                 { icon: 'directions_car', title: 'Self-Drive Luxury', desc: 'Self-drive rental of premium vehicles for clients who prefer independence. Late-model luxury SUVs and sedans with comprehensive insurance, roadside assistance, and GPS navigation.' },
@@ -294,7 +295,7 @@ export default function LuxuryRentalsPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center stagger">
               {[
                 { number: '24/7', label: 'Dispatch availability' },
-                { number: '3', label: 'Cities covered' },
+                { number: '3', label: 'Pakistani cities covered' },
                 { number: 'B6+', label: 'Armoured protection level' },
                 { number: 'VIP', label: 'Delegation capability' },
               ].map((stat, i) => (
@@ -313,7 +314,7 @@ export default function LuxuryRentalsPage() {
         <section className="py-32 px-5 md:px-24 bg-surface fade-in">
           <div className="max-w-[1600px] mx-auto text-center">
             <h2 className="cinzel-text text-4xl text-on-surface mb-4">Ground transport, <span className="text-primary">elevated.</span></h2>
-            <p className="raleway-text text-on-surface-variant text-base mb-10 max-w-2xl mx-auto">Premium vehicles, professional chauffeurs, and security logistics &mdash; across Pakistan&apos;s major cities.</p>
+            <p className="raleway-text text-on-surface-variant text-base mb-10 max-w-2xl mx-auto">Premium vehicles, professional chauffeurs, and security logistics &mdash; across Pakistan, the Gulf, and the UK.</p>
             <a href="/contact?interest=Luxury%20Car%20Rentals#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Reserve a Vehicle &rarr;</a>
           </div>
         </section>

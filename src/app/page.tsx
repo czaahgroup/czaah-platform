@@ -22,7 +22,7 @@ const sectorCards = [
   { name: 'Engineering & Energy', icon: 'bolt', description: 'HVAC systems, elevators, escalators, power generation, civil works, solar panels, and industrial air conditioning solutions across Pakistan.', tag: '8 Disciplines', slug: 'engineering' },
   { name: 'Aviation', icon: 'flight', description: 'Premium private charter and executive transport across Pakistan. Corporate travel, site access flights, medical evacuation, and VIP delegation logistics.', tag: 'Private Charter', slug: 'aviation' },
   { name: 'Tourism & Hospitality', icon: 'travel_explore', description: 'Luxury hotel investment, destination management, and adventure expeditions across the Karakoram, Hindukush, and Pakistan\'s ancient heritage sites.', tag: 'Destination Mgmt', slug: 'tourism' },
-  { name: 'Luxury Car Rentals', icon: 'directions_car', description: 'Premium executive chauffeur services, armoured transport, corporate fleet management, and VIP delegation logistics across Pakistan.', tag: 'Executive Fleet', slug: 'luxury-rentals' },
+  { name: 'Luxury Car Rentals', icon: 'directions_car', description: 'Premium executive chauffeur services, armoured transport, corporate fleet management, and VIP delegation logistics across Pakistan, the Gulf, and the UK.', tag: 'Executive Fleet', slug: 'luxury-rentals' },
   { name: 'Education', icon: 'school', description: 'University partnerships, campus development, vocational training, and EdTech deployment across Pakistan\'s $8B+ education market.', tag: '230M Population', slug: 'education' },
 ] as const
 
@@ -48,7 +48,7 @@ const verticals = [
   { num: '09', name: 'Aviation', model: 'Charter · Logistics · Executive', description: 'Premium private charter and executive transport across Pakistan and the Gulf. Site access flights, medical evacuation, and VIP delegation logistics.', slug: 'aviation', coreFocus: false },
   { num: '10', name: 'Human Resources', model: 'Gulf · UK · Europe', description: 'Access Pakistan\'s 70M+ workforce — deployment across the Gulf, UK, Europe, and the Balkans, plus domestic staffing, executive search, trade testing, and comprehensive HR advisory services.', slug: 'manpower', coreFocus: false },
   { num: '11', name: 'Tourism & Hospitality', model: 'Hotels · Travel · Adventure', description: 'Luxury hotel investment, destination management, and adventure expeditions across the Karakoram, Hindukush, and Pakistan\'s ancient heritage sites.', slug: 'tourism', coreFocus: false },
-  { num: '12', name: 'Luxury Car Rentals', model: 'Executive · Armoured · Fleet', description: 'Premium executive chauffeur services, armoured transport, corporate fleet management, and VIP delegation logistics across Pakistan.', slug: 'luxury-rentals', coreFocus: false },
+  { num: '12', name: 'Luxury Car Rentals', model: 'Executive · Armoured · Fleet', description: 'Premium executive chauffeur services, armoured transport, corporate fleet management, and VIP delegation logistics across Pakistan, the Gulf, and the UK.', slug: 'luxury-rentals', coreFocus: false },
   { num: '13', name: 'Education', model: 'Universities · EdTech · Vocational', description: 'University partnerships, campus development, vocational training, and EdTech deployment for investors entering Pakistan\'s $8B+ education market.', slug: 'education', coreFocus: false },
 ] as const
 
