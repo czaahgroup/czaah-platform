@@ -87,7 +87,7 @@ export default function ManpowerPage() {
       <div className="page-wrap">
 
         {/* HERO */}
-        <div className="relative w-full min-h-[90dvh] flex items-center bg-cover bg-center" style={{ backgroundImage: "url('/Images/Manpower.jpg')" }}>
+        <div className="relative w-full min-h-[90dvh] flex items-center bg-cover bg-center" style={{ backgroundImage: "url('/Images/Human-Resources.jpg')" }}>
           <div className="absolute inset-0 obsidian-overlay-strong" />
           <section className="relative z-10 py-32 px-5 md:px-24 max-w-[1600px] mx-auto w-full">
             <a href="/" className="inline-flex items-center gap-2 text-on-surface-variant text-sm mb-6 hover:text-primary transition-colors">

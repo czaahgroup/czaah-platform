@@ -279,7 +279,7 @@ export default function HomePage() {
                   <img
                     alt={sector.name}
                     className="w-full h-full object-cover grayscale"
-                    src={`/Images/${sector.slug === 'minerals' ? 'Mines' : sector.slug === 'realestate' ? 'Real-Estate' : sector.slug === 'manpower' ? 'Manpower' : sector.slug === 'technology' ? 'IT' : 'Construction'}.jpg`}
+                    src={`/Images/${sector.slug === 'minerals' ? 'Mines' : sector.slug === 'realestate' ? 'Real-Estate' : sector.slug === 'manpower' ? 'Human-Resources' : sector.slug === 'technology' ? 'IT' : 'Construction'}.jpg`}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
                 </div>
