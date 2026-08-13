@@ -341,10 +341,37 @@ export default function ConstructionPage() {
             <div className="w-12 h-[2px] bg-primary mb-6" />
             <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Infrastructure &amp; Development</div>
             <h1 className="cinzel-text text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">Construction &amp;<br /><span className="text-primary">Development.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Infrastructure megaprojects, commercial development, CPEC corridor builds, and Special Economic Zone construction &mdash; delivered through CZAAH's network of vetted local partners and institutional project management.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Infrastructure megaprojects, commercial development, and Special Economic Zone construction across Pakistan, the United Kingdom, and the Gulf &mdash; including CPEC corridor builds &mdash; delivered through CZAAH's network of vetted local partners and institutional project management.</p>
             <a href="/contact?interest=Construction%20%26%20Development#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Discuss a Project &rarr;</a>
           </section>
         </div>
+
+        <div className="w-full h-px bg-outline-variant/20" />
+
+        {/*  INTERNATIONAL MARKETS  */}
+        <section className="py-32 px-5 md:px-24 bg-surface fade-in">
+          <div className="max-w-[1600px] mx-auto">
+            <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-4">International <span className="text-primary">markets.</span></h2>
+            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-12">Beyond Pakistan, CZAAH facilitates construction and development projects across leading international markets &mdash; local partnerships, regulatory navigation, and end-to-end project oversight.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger">
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">location_city</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">United Kingdom</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Residential and commercial development advisory across London and major UK cities &mdash; planning and permitting navigation, contractor sourcing, and independent project oversight for investors building in a mature, highly regulated market.</p>
+              </div>
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">apartment</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">United Arab Emirates</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Industrial and commercial construction facilitation across Dubai's free zones and mainland developments &mdash; from warehouse and logistics facilities to commercial fit-outs, delivered through vetted local contractor networks.</p>
+              </div>
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">mosque</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Saudi Arabia</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Construction facilitation for investors entering the Kingdom's Vision 2030 development pipeline &mdash; commercial, industrial, and infrastructure projects navigated through local partnership structures.</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <div className="w-full h-px bg-outline-variant/20" />
 
@@ -456,14 +483,14 @@ export default function ConstructionPage() {
           <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
             <div>
               <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Infrastructure</div>
-              <h3 className="cinzel-text text-3xl text-on-surface mb-6">Building Pakistan's <span className="text-primary">backbone.</span></h3>
+              <h3 className="cinzel-text text-3xl text-on-surface mb-6">Building infrastructure that <span className="text-primary">lasts.</span></h3>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">From CPEC motorways and energy transmission lines to bridges, dams, and water treatment facilities — Pakistan's infrastructure pipeline demands capable partners who understand both the engineering and the regulatory landscape.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">CZAAH works with international and domestic contractors to navigate government procurement, NHA and WAPDA requirements, and provincial development authorities. We provide access to tender pipelines, joint venture structuring, and on-the-ground project facilitation.</p>
-              <p className="raleway-text text-on-surface-variant text-base leading-relaxed">Our relationships with federal and provincial planning departments give us early visibility into upcoming projects, allowing partners to prepare competitive bids with local intelligence that others simply don't have.</p>
+              <p className="raleway-text text-on-surface-variant text-base leading-relaxed">Our relationships with federal and provincial planning departments give us early visibility into upcoming projects — the same institutional discipline applies to infrastructure and commercial projects we facilitate in the United Kingdom and across the Gulf.</p>
             </div>
             <div>
               <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Commercial Development</div>
-              <h3 className="cinzel-text text-3xl text-on-surface mb-6">Shaping Pakistan's <span className="text-primary">skyline.</span></h3>
+              <h3 className="cinzel-text text-3xl text-on-surface mb-6">Shaping skylines, <span className="text-primary">across markets.</span></h3>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Rapid urbanisation and a growing middle class are driving demand for commercial towers, mixed-use developments, shopping complexes, and industrial parks across Islamabad, Lahore, and Karachi.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">CZAAH facilitates commercial development projects from land acquisition and zoning approvals through construction management to tenant leasing. We bring together developers, investors, and construction firms into structured partnerships.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed">Our expertise extends to Special Economic Zones along CPEC corridors, where industrial construction offers significant incentives including tax holidays, duty exemptions, and preferential utility rates.</p>
@@ -535,7 +562,7 @@ export default function ConstructionPage() {
                 { number: '$65B+', label: 'CPEC investment pipeline' },
                 { number: '9', label: 'SEZs under development' },
                 { number: '8%', label: 'Annual sector growth' },
-                { number: 'Multi', label: 'Province coverage' },
+                { number: '3', label: 'Markets: Pakistan, UK, Gulf' },
               ].map((stat, i) => (
                 <div key={i}>
                   <div className="cinzel-text text-primary text-4xl font-bold mb-2">{stat.number}</div>
@@ -552,7 +579,7 @@ export default function ConstructionPage() {
         <section className="py-32 px-5 md:px-24 bg-surface fade-in">
           <div className="max-w-[1600px] mx-auto text-center">
             <h2 className="cinzel-text text-4xl text-on-surface mb-4">Build with the right <span className="text-primary">partner.</span></h2>
-            <p className="raleway-text text-on-surface-variant text-base mb-10 max-w-2xl mx-auto">Infrastructure, commercial development, and CPEC corridor projects &mdash; executed through trusted local partnerships.</p>
+            <p className="raleway-text text-on-surface-variant text-base mb-10 max-w-2xl mx-auto">Infrastructure, commercial development, and Special Economic Zone projects across Pakistan, the UK, and the Gulf &mdash; executed through trusted local partnerships.</p>
             <a href="/contact?interest=Construction%20%26%20Development#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Discuss a Project &rarr;</a>
           </div>
         </section>
