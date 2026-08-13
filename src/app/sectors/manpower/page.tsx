@@ -7,18 +7,18 @@ import { Footer } from '@/components/layouts/Footer';
 import { WorkforceRegistrationModal } from '@/components/WorkforceRegistrationModal';
 
 const talentPools = [
-  { title: 'Civil Engineers', badge: 'high', badgeText: 'High Availability', teamSize: '5–50', timeline: '30–45 days', cert: 'Certified by PEC', industry: 'Construction,Mining', role: 'Engineers & Technical', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Pakistan' },
-  { title: 'Welders & Fabricators', badge: 'high', badgeText: 'High Availability', teamSize: '10–200', timeline: '21–30 days', cert: 'AWS/ASME certified', industry: 'Construction,Oil & Gas,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman' },
-  { title: 'Heavy Equipment Operators', badge: 'high', badgeText: 'High Availability', teamSize: '5–100', timeline: '21–30 days', cert: 'CAT/Komatsu trained', industry: 'Construction,Mining', role: 'Drivers & Operators', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Pakistan' },
-  { title: 'Registered Nurses', badge: 'medium', badgeText: 'Medium Availability', teamSize: '10–100', timeline: '45–60 days', cert: 'PNC registered, Prometric/Dataflow ready', industry: 'Healthcare', role: 'Medical & Nursing', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman' },
-  { title: 'Software Developers', badge: 'high', badgeText: 'High Availability', teamSize: '3–50', timeline: '14–21 days', cert: 'Full-stack, mobile, cloud', industry: 'IT & Telecom', role: 'IT Professionals', dest: 'UAE,Saudi Arabia,Pakistan' },
-  { title: 'Hotel & Restaurant Staff', badge: 'high', badgeText: 'High Availability', teamSize: '20–500', timeline: '30–45 days', cert: 'F&B, housekeeping, front desk', industry: 'Hospitality', role: 'Semi-Skilled Labour', dest: 'UAE,Saudi Arabia,Qatar,Oman' },
-  { title: 'Electricians', badge: 'high', badgeText: 'High Availability', teamSize: '10–150', timeline: '21–30 days', cert: 'Licensed, HV/LV certified', industry: 'Construction,Manufacturing,Oil & Gas', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Pakistan' },
-  { title: 'Project Managers', badge: 'medium', badgeText: 'Medium Availability', teamSize: '1–10', timeline: '30–45 days', cert: 'PMP, PRINCE2 holders', industry: 'Construction,Oil & Gas,IT & Telecom', role: 'Management & Supervisory', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Pakistan' },
+  { title: 'Civil Engineers', badge: 'high', badgeText: 'High Availability', teamSize: '5–50', timeline: '30–45 days', cert: 'Certified by PEC', industry: 'Construction,Mining', role: 'Engineers & Technical', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Europe,Pakistan' },
+  { title: 'Welders & Fabricators', badge: 'high', badgeText: 'High Availability', teamSize: '10–200', timeline: '21–30 days', cert: 'AWS/ASME certified', industry: 'Construction,Oil & Gas,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Europe,Albania,Kosovo' },
+  { title: 'Heavy Equipment Operators', badge: 'high', badgeText: 'High Availability', teamSize: '5–100', timeline: '21–30 days', cert: 'CAT/Komatsu trained', industry: 'Construction,Mining', role: 'Drivers & Operators', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Europe,Pakistan' },
+  { title: 'Registered Nurses', badge: 'medium', badgeText: 'Medium Availability', teamSize: '10–100', timeline: '45–60 days', cert: 'PNC registered, Prometric/Dataflow ready', industry: 'Healthcare', role: 'Medical & Nursing', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Europe' },
+  { title: 'Software Developers', badge: 'high', badgeText: 'High Availability', teamSize: '3–50', timeline: '14–21 days', cert: 'Full-stack, mobile, cloud', industry: 'IT & Telecom', role: 'IT Professionals', dest: 'UAE,Saudi Arabia,UK,Europe,Pakistan' },
+  { title: 'Hotel & Restaurant Staff', badge: 'high', badgeText: 'High Availability', teamSize: '20–500', timeline: '30–45 days', cert: 'F&B, housekeeping, front desk', industry: 'Hospitality', role: 'Semi-Skilled Labour', dest: 'UAE,Saudi Arabia,Qatar,Oman,UK,Europe,Albania,Kosovo' },
+  { title: 'Electricians', badge: 'high', badgeText: 'High Availability', teamSize: '10–150', timeline: '21–30 days', cert: 'Licensed, HV/LV certified', industry: 'Construction,Manufacturing,Oil & Gas', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Europe,Pakistan' },
+  { title: 'Project Managers', badge: 'medium', badgeText: 'Medium Availability', teamSize: '1–10', timeline: '30–45 days', cert: 'PMP, PRINCE2 holders', industry: 'Construction,Oil & Gas,IT & Telecom', role: 'Management & Supervisory', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Europe,Pakistan' },
   { title: 'Security Guards', badge: 'high', badgeText: 'High Availability', teamSize: '20–500', timeline: '21–30 days', cert: 'Ex-military, PSIRA eligible', industry: 'Security', role: 'Semi-Skilled Labour', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Pakistan' },
-  { title: 'General Labour', badge: 'high', badgeText: 'High Availability', teamSize: '50–2000', timeline: '14–21 days', cert: 'Physically screened, medically cleared', industry: 'Construction,Manufacturing', role: 'Semi-Skilled Labour', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman' },
-  { title: 'Doctors & Physicians', badge: 'limited', badgeText: 'Limited Availability', teamSize: '1–20', timeline: '60–90 days', cert: 'PMDC registered, SCFHS/DHA eligible', industry: 'Healthcare', role: 'Medical & Nursing', dest: 'Saudi Arabia,UAE,Qatar' },
-  { title: 'HVAC Technicians', badge: 'medium', badgeText: 'Medium Availability', teamSize: '5–50', timeline: '21–30 days', cert: 'Refrigeration & AC certified', industry: 'Construction,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Pakistan' },
+  { title: 'General Labour', badge: 'high', badgeText: 'High Availability', teamSize: '50–2000', timeline: '14–21 days', cert: 'Physically screened, medically cleared', industry: 'Construction,Manufacturing', role: 'Semi-Skilled Labour', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Europe,Albania,Kosovo' },
+  { title: 'Doctors & Physicians', badge: 'limited', badgeText: 'Limited Availability', teamSize: '1–20', timeline: '60–90 days', cert: 'PMDC registered, SCFHS/DHA eligible', industry: 'Healthcare', role: 'Medical & Nursing', dest: 'Saudi Arabia,UAE,Qatar,UK' },
+  { title: 'HVAC Technicians', badge: 'medium', badgeText: 'Medium Availability', teamSize: '5–50', timeline: '21–30 days', cert: 'Refrigeration & AC certified', industry: 'Construction,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Europe,Pakistan' },
 ];
 
 const deploymentSteps = [
@@ -77,7 +77,7 @@ export default function ManpowerPage() {
 
   const industries = ['Construction', 'Oil & Gas', 'Healthcare', 'Hospitality', 'IT & Telecom', 'Manufacturing', 'Security', 'Mining'];
   const roles = ['Engineers & Technical', 'Skilled Trades', 'Semi-Skilled Labour', 'Management & Supervisory', 'Medical & Nursing', 'IT Professionals', 'Drivers & Operators', 'Administrative'];
-  const destinations = ['Saudi Arabia', 'UAE', 'Qatar', 'Kuwait', 'Bahrain', 'Oman', 'Malaysia', 'Pakistan'];
+  const destinations = ['Saudi Arabia', 'UAE', 'Qatar', 'Kuwait', 'Bahrain', 'Oman', 'Malaysia', 'UK', 'Europe', 'Albania', 'Kosovo', 'Pakistan'];
 
   return (
     <>
@@ -236,10 +236,11 @@ export default function ManpowerPage() {
           <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
             <div>
               <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Overseas Deployment</div>
-              <h3 className="cinzel-text text-3xl text-on-surface mb-6">Talent for the <span className="text-primary">Gulf &amp; beyond.</span></h3>
+              <h3 className="cinzel-text text-3xl text-on-surface mb-6">Talent for the <span className="text-primary">Gulf, Europe &amp; beyond.</span></h3>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Pakistan is one of the world&apos;s largest exporters of manpower, with millions deployed across the Gulf, Middle East, and beyond. CZAAH operates as a licensed overseas employment promoter, providing end-to-end recruitment for construction, oil &amp; gas, hospitality, healthcare, and industrial sectors.</p>
+              <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Beyond the Gulf, we&apos;re expanding deployment corridors across the United Kingdom, the wider European Union, and the Balkans — including Albania and Kosovo — opening new pathways for skilled and semi-skilled Pakistani workers into European labour markets.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">We handle demand letter processing, trade testing, medical clearance, visa coordination, and pre-departure orientation — ensuring compliant, deployment-ready candidates on your timeline.</p>
-              <p className="raleway-text text-on-surface-variant text-base leading-relaxed">Our network spans across Punjab, KPK, Sindh, and Balochistan, giving us access to diverse talent pools that match the specific requirements of Gulf, European, and Asian employers.</p>
+              <p className="raleway-text text-on-surface-variant text-base leading-relaxed">Our network spans across Punjab, KPK, Sindh, and Balochistan, giving us access to diverse talent pools that match the specific requirements of Gulf, UK, European, Balkan, and Asian employers.</p>
             </div>
             <div>
               <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Domestic Staffing</div>
@@ -311,7 +312,7 @@ export default function ManpowerPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center stagger">
               {[
                 { number: '70M+', label: 'Labour force' },
-                { number: 'Gulf+', label: 'Deployment reach' },
+                { number: 'Gulf, UK & EU', label: 'Deployment reach' },
                 { number: 'OEP', label: 'Licensed operations' },
                 { number: 'Multi', label: 'Sector coverage' },
               ].map((stat, i) => (
