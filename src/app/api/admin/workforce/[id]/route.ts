@@ -57,6 +57,25 @@ export async function PATCH(
       updates.notes = body.notes
     }
 
+    if (body.photo && typeof body.photo === 'string') {
+      const match = body.photo.match(/^data:([^;]+);base64,(.+)$/)
+      const contentType = match ? match[1] : 'image/jpeg'
+      const base64Data = match ? match[2] : body.photo
+      if (contentType.startsWith('image/')) {
+        const buffer = Buffer.from(base64Data, 'base64')
+        const ext = contentType.split('/')[1] || 'jpg'
+        const filePath = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`
+        const { error: uploadError } = await adminClient.storage
+          .from('worker-photos')
+          .upload(filePath, buffer, { contentType, upsert: false })
+        if (!uploadError) {
+          updates.photo_url = filePath
+        } else {
+          console.error('Failed to upload worker photo:', uploadError.message)
+        }
+      }
+    }
+
     const { data, error } = await adminClient
       .from('workforce_registry')
       .update(updates)

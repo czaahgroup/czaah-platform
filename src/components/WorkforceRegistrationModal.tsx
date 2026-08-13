@@ -27,7 +27,9 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
     passportStatus: 'valid',
     medicalStatus: 'not_done',
     notes: '',
+    photo: '',
   });
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +38,22 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
 
   function updateField(field: string, value: unknown) {
     setFormData(prev => ({ ...prev, [field]: value }));
+  }
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Photo must be under 4MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setPhotoPreview(dataUrl);
+      updateField('photo', dataUrl);
+    };
+    reader.readAsDataURL(file);
   }
 
   function toggleDestination(dest: string) {
@@ -274,6 +292,28 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
                   <label>Full Name <span className="req">*</span></label>
                   <input className="wfm-input" type="text" placeholder="Enter your full name" required
                     value={formData.fullName} onChange={e => updateField('fullName', e.target.value)} />
+                </div>
+
+                {/* Photo */}
+                <div className="wfm-field">
+                  <label>Photo (for your CZAAH Digital ID Card)</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{
+                      width: '56px', height: '56px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+                      border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {photoPreview ? (
+                        <img src={photoPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'rgba(255,255,255,0.2)' }}>person</span>
+                      )}
+                    </div>
+                    <label className="wfm-pill" style={{ padding: '9px 18px' }}>
+                      {photoPreview ? 'Change Photo' : 'Upload Photo'}
+                      <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
+                    </label>
+                  </div>
                 </div>
 
                 {/* Email */}

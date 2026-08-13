@@ -2,6 +2,7 @@
 // @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
+import { WorkerDigitalCard } from '@/components/WorkerDigitalCard';
 
 
 interface WorkforceRecord {
@@ -20,6 +21,7 @@ interface WorkforceRecord {
   passport_status: string;
   medical_status: string;
   notes: string | null;
+  photo_url: string | null;
   status: string;
   created_at: string;
   updated_at: string;
@@ -52,6 +54,9 @@ export default function WorkforcePage() {
   const [editNotes, setEditNotes] = useState('');
   const [editStatus, setEditStatus] = useState('');
   const [saving, setSaving] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoData, setPhotoData] = useState<string | null>(null);
+  const [showCard, setShowCard] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -89,21 +94,39 @@ export default function WorkforcePage() {
     setSelected(record);
     setEditNotes(record.notes || '');
     setEditStatus(record.status);
+    setPhotoPreview(null);
+    setPhotoData(null);
+  }
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setPhotoPreview(dataUrl);
+      setPhotoData(dataUrl);
+    };
+    reader.readAsDataURL(file);
   }
 
   async function saveChanges() {
     if (!selected) return;
     setSaving(true);
     try {
+      const body: Record<string, unknown> = { status: editStatus, notes: editNotes };
+      if (photoData) body.photo = photoData;
       const res = await fetch(`/api/admin/workforce/${selected.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: editStatus, notes: editNotes }),
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const updated = await res.json();
         setRecords(prev => prev.map(r => r.id === updated.id ? updated : r));
         setSelected(updated);
+        setPhotoPreview(null);
+        setPhotoData(null);
       }
     } catch (err) {
       console.error('Failed to save:', err);
@@ -343,7 +366,25 @@ export default function WorkforcePage() {
                         className={selected?.id === record.id ? 'active' : ''}
                         onClick={() => openDetail(record)}
                       >
-                        <td className="wf-name">{record.full_name}</td>
+                        <td className="wf-name">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{
+                              width: '28px', height: '28px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+                              background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                              {record.photo_url ? (
+                                <img
+                                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/worker-photos/${record.photo_url}`}
+                                  alt={record.full_name}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              ) : (
+                                <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'rgba(255,255,255,0.2)' }}>person</span>
+                              )}
+                            </div>
+                            {record.full_name}
+                          </div>
+                        </td>
                         <td>{record.trade_category}</td>
                         <td>{record.specific_role}</td>
                         <td>{record.current_location}</td>
@@ -387,8 +428,41 @@ export default function WorkforcePage() {
         <div className="wf-detail-overlay" onClick={e => { if (e.target === e.currentTarget) setSelected(null); }}>
           <div className="wf-detail-panel">
             <button className="wf-detail-close" onClick={() => setSelected(null)}>&times;</button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '4px' }}>
+              <div style={{
+                width: '64px', height: '64px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+                border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {photoPreview || selected.photo_url ? (
+                  <img
+                    src={photoPreview || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/worker-photos/${selected.photo_url}`}
+                    alt={selected.full_name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <span className="material-symbols-outlined" style={{ fontSize: '28px', color: 'rgba(255,255,255,0.2)' }}>person</span>
+                )}
+              </div>
+              <div>
+                <label className="wf-export" style={{ display: 'inline-block', cursor: 'pointer' }}>
+                  {selected.photo_url || photoPreview ? 'Change Photo' : 'Upload Photo'}
+                  <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} />
+                </label>
+              </div>
+            </div>
+
             <div className="wf-detail-name">{selected.full_name}</div>
             <div className="wf-detail-role">{selected.specific_role} &mdash; {selected.trade_category}</div>
+
+            <button
+              className="wf-export"
+              style={{ marginBottom: '20px' }}
+              onClick={() => setShowCard(true)}
+            >
+              View Digital ID Card
+            </button>
 
             <div className="wf-detail-grid">
               <div className="wf-detail-section">
@@ -474,6 +548,10 @@ export default function WorkforcePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {showCard && selected && (
+        <WorkerDigitalCard worker={selected} onClose={() => setShowCard(false)} />
       )}
     </>
   );
