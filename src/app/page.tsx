@@ -14,13 +14,13 @@ const sectorCards = [
   { name: 'Minerals & Mining', icon: 'diamond', description: 'Access Pakistan\'s $1T+ in untapped mineral reserves — copper, gold, rare earths, coal, and gemstones across Balochistan, KPK, and Gilgit-Baltistan.', tag: '$1T+ Reserves', slug: 'minerals' },
   { name: 'Real Estate', icon: 'location_city', description: 'Invest in Pakistan\'s highest-growth corridors — CPEC zones, commercial hubs, and industrial real estate with structured, transparent investment vehicles.', tag: 'CPEC Corridor', slug: 'realestate' },
   { name: 'Construction & Development', icon: 'architecture', description: 'Civil infrastructure, commercial buildings, CPEC corridor projects, and Special Economic Zone development with trusted construction partners.', tag: 'Infrastructure', slug: 'construction' },
+  { name: 'Human Resources', icon: 'groups', description: 'Access Pakistan\'s 70M+ workforce — overseas manpower deployment, domestic staffing, executive search, trade testing, and HR advisory services.', tag: '70M+ Workforce', slug: 'manpower' },
   { name: 'Technology & IT', icon: 'memory', description: 'Enter Pakistan\'s $3.2B+ IT sector — government digital transformation partnerships and access to 500,000+ skilled technology professionals.', tag: '$3.2B+ Sector', slug: 'technology' },
   { name: 'Textiles & Trade', icon: 'storefront', description: 'Source from the world\'s 4th largest textile exporter — certified, compliant, and competitively priced. Denim, knitwear, home textiles, and sportswear.', tag: '4th Global Exporter', slug: 'textiles' },
   { name: 'Agriculture', icon: 'grass', description: 'Pakistan\'s agricultural sector accounts for 23% of GDP. Large-scale farming, organic food production, and food processing — vast fertile land and growing export demand.', tag: '23% of GDP', slug: 'agriculture' },
   { name: 'Pharmaceuticals', icon: 'medication', description: 'A $4B+ market growing at 12% annually. Medicine production, medical supply chains, and healthcare manufacturing with access to 230M+ domestic consumers.', tag: '$4B+ Market', slug: 'pharmaceuticals' },
   { name: 'Engineering & Energy', icon: 'bolt', description: 'HVAC systems, elevators, escalators, power generation, civil works, solar panels, and industrial air conditioning solutions across Pakistan.', tag: '8 Disciplines', slug: 'engineering' },
   { name: 'Aviation', icon: 'flight', description: 'Premium private charter and executive transport across Pakistan. Corporate travel, site access flights, medical evacuation, and VIP delegation logistics.', tag: 'Private Charter', slug: 'aviation' },
-  { name: 'Human Resources', icon: 'groups', description: 'Access Pakistan\'s 70M+ workforce — overseas manpower deployment, domestic staffing, executive search, trade testing, and HR advisory services.', tag: '70M+ Workforce', slug: 'manpower' },
   { name: 'Tourism & Hospitality', icon: 'travel_explore', description: 'Luxury hotel investment, destination management, and adventure expeditions across the Karakoram, Hindukush, and Pakistan\'s ancient heritage sites.', tag: 'Destination Mgmt', slug: 'tourism' },
   { name: 'Luxury Car Rentals', icon: 'directions_car', description: 'Premium executive chauffeur services, armoured transport, corporate fleet management, and VIP delegation logistics across Pakistan.', tag: 'Executive Fleet', slug: 'luxury-rentals' },
   { name: 'Education', icon: 'school', description: 'University partnerships, campus development, vocational training, and EdTech deployment across Pakistan\'s $8B+ education market.', tag: '230M Population', slug: 'education' },
@@ -254,7 +254,7 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════ */}
-      {/*  STRATEGIC SECTORS (3 featured cards)                         */}
+      {/*  STRATEGIC SECTORS (5 featured cards)                         */}
       {/* ══════════════════════════════════════════════════════════════ */}
       <section className="py-20 md:py-32 bg-surface px-5 md:px-24">
         <div className="max-w-[1600px] mx-auto">
@@ -269,8 +269,8 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
-            {sectorCards.slice(0, 3).map((sector, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-1">
+            {sectorCards.slice(0, 5).map((sector, i) => (
               <Link
                 key={sector.slug}
                 href={`/sectors/${sector.slug}`}
@@ -280,7 +280,7 @@ export default function HomePage() {
                   <img
                     alt={sector.name}
                     className="w-full h-full object-cover grayscale"
-                    src={`/Images/${sector.slug === 'minerals' ? 'Mines' : sector.slug === 'realestate' ? 'Real-Estate' : 'Construction'}.jpg`}
+                    src={`/Images/${sector.slug === 'minerals' ? 'Mines' : sector.slug === 'realestate' ? 'Real-Estate' : sector.slug === 'manpower' ? 'Manpower' : sector.slug === 'technology' ? 'IT' : 'Construction'}.jpg`}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
                 </div>
