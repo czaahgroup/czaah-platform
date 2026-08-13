@@ -284,12 +284,14 @@ export default function HomePage() {
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                   />
                 </div>
-                <div className="absolute inset-0 p-12 flex flex-col justify-end">
-                  <span className="material-symbols-outlined text-primary text-5xl mb-6">{sector.icon}</span>
-                  <h3 className="text-3xl cinzel-text text-on-surface mb-4">{sector.name}</h3>
-                  <p className="text-on-surface-variant raleway-text opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 text-sm leading-relaxed">
-                    {sector.description}
-                  </p>
+                <div className="absolute inset-0 p-12 flex flex-col justify-between">
+                  <span className="material-symbols-outlined text-primary text-5xl">{sector.icon}</span>
+                  <div>
+                    <h3 className="text-3xl cinzel-text text-on-surface mb-4">{sector.name}</h3>
+                    <p className="text-on-surface-variant raleway-text opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0 text-sm leading-relaxed">
+                      {sector.description}
+                    </p>
+                  </div>
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500" />
               </Link>
