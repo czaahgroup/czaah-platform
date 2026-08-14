@@ -8,18 +8,18 @@ import { WorkforceRegistrationModal } from '@/components/WorkforceRegistrationMo
 import { EmployerRegistrationModal } from '@/components/EmployerRegistrationModal';
 
 const talentPools = [
-  { title: 'Civil Engineers', badge: 'high', badgeText: 'High Availability', teamSize: '5–50', timeline: '30–45 days', cert: 'Certified by PEC', industry: 'Construction,Mining', role: 'Engineers & Technical', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan' },
-  { title: 'Welders & Fabricators', badge: 'high', badgeText: 'High Availability', teamSize: '10–200', timeline: '21–30 days', cert: 'AWS/ASME certified', industry: 'Construction,Oil & Gas,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Croatia,Albania,Kosovo' },
+  { title: 'Civil Engineers', badge: 'high', badgeText: 'High Availability', teamSize: '5–50', timeline: '30–45 days', cert: 'Certified by PEC', industry: 'Construction,Mining', role: 'Engineers & Technical', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan', img: 'Labour-4.jpg' },
+  { title: 'Welders & Fabricators', badge: 'high', badgeText: 'High Availability', teamSize: '10–200', timeline: '21–30 days', cert: 'AWS/ASME certified', industry: 'Construction,Oil & Gas,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Croatia,Albania,Kosovo', img: 'Labour-1.jpg' },
   { title: 'Heavy Equipment Operators', badge: 'high', badgeText: 'High Availability', teamSize: '5–100', timeline: '21–30 days', cert: 'CAT/Komatsu trained', industry: 'Construction,Mining', role: 'Drivers & Operators', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Poland,Romania,Croatia,Pakistan' },
   { title: 'Registered Nurses', badge: 'medium', badgeText: 'Medium Availability', teamSize: '10–100', timeline: '45–60 days', cert: 'PNC registered, Prometric/Dataflow ready', industry: 'Healthcare', role: 'Medical & Nursing', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Italy' },
   { title: 'Software Developers', badge: 'high', badgeText: 'High Availability', teamSize: '3–50', timeline: '14–21 days', cert: 'Full-stack, mobile, cloud', industry: 'IT & Telecom', role: 'IT Professionals', dest: 'UAE,Saudi Arabia,UK,Germany,Poland,Pakistan' },
   { title: 'Hotel & Restaurant Staff', badge: 'high', badgeText: 'High Availability', teamSize: '20–500', timeline: '30–45 days', cert: 'F&B, housekeeping, front desk', industry: 'Hospitality', role: 'Semi-Skilled Labour', dest: 'UAE,Saudi Arabia,Qatar,Oman,UK,Italy,Croatia,Montenegro,Albania,Kosovo' },
-  { title: 'Electricians', badge: 'high', badgeText: 'High Availability', teamSize: '10–150', timeline: '21–30 days', cert: 'Licensed, HV/LV certified', industry: 'Construction,Manufacturing,Oil & Gas', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan' },
+  { title: 'Electricians', badge: 'high', badgeText: 'High Availability', teamSize: '10–150', timeline: '21–30 days', cert: 'Licensed, HV/LV certified', industry: 'Construction,Manufacturing,Oil & Gas', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan', img: 'Labour-3.jpg' },
   { title: 'Project Managers', badge: 'medium', badgeText: 'Medium Availability', teamSize: '1–10', timeline: '30–45 days', cert: 'PMP, PRINCE2 holders', industry: 'Construction,Oil & Gas,IT & Telecom', role: 'Management & Supervisory', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan' },
   { title: 'Security Guards', badge: 'high', badgeText: 'High Availability', teamSize: '20–500', timeline: '21–30 days', cert: 'Ex-military, PSIRA eligible', industry: 'Security', role: 'Semi-Skilled Labour', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Pakistan' },
-  { title: 'General Labour', badge: 'high', badgeText: 'High Availability', teamSize: '50–2000', timeline: '14–21 days', cert: 'Physically screened, medically cleared', industry: 'Construction,Manufacturing', role: 'Semi-Skilled Labour', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Poland,Romania,Croatia,Serbia,Montenegro,North Macedonia,Bosnia and Herzegovina,Albania,Kosovo' },
+  { title: 'General Labour', badge: 'high', badgeText: 'High Availability', teamSize: '50–2000', timeline: '14–21 days', cert: 'Physically screened, medically cleared', industry: 'Construction,Manufacturing', role: 'Semi-Skilled Labour', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,Poland,Romania,Croatia,Serbia,Montenegro,North Macedonia,Bosnia and Herzegovina,Albania,Kosovo', img: 'Labour-2.jpg' },
   { title: 'Doctors & Physicians', badge: 'limited', badgeText: 'Limited Availability', teamSize: '1–20', timeline: '60–90 days', cert: 'PMDC registered, SCFHS/DHA eligible', industry: 'Healthcare', role: 'Medical & Nursing', dest: 'Saudi Arabia,UAE,Qatar,UK,Germany' },
-  { title: 'HVAC Technicians', badge: 'medium', badgeText: 'Medium Availability', teamSize: '5–50', timeline: '21–30 days', cert: 'Refrigeration & AC certified', industry: 'Construction,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan' },
+  { title: 'HVAC Technicians', badge: 'medium', badgeText: 'Medium Availability', teamSize: '5–50', timeline: '21–30 days', cert: 'Refrigeration & AC certified', industry: 'Construction,Manufacturing', role: 'Skilled Trades', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan', img: 'Labour-5.jpg' },
 ];
 
 const deploymentSteps = [
@@ -131,9 +131,13 @@ export default function ManpowerPage() {
           .hr-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
           @media (max-width: 900px) { .hr-results { grid-template-columns: repeat(2, 1fr); } }
           @media (max-width: 600px) { .hr-results { grid-template-columns: 1fr; } }
-          .hr-card { background: var(--black-card); border: 1px solid var(--black-border); padding: 24px; transition: opacity 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth); }
+          .hr-card { background: var(--black-card); border: 1px solid var(--black-border); overflow: hidden; transition: opacity 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth); }
           .hr-card.hr-hidden { display: none; }
           .hr-card:hover { border-color: rgba(201,168,76,0.3); }
+          .hr-card-img-wrap { height: 140px; overflow: hidden; }
+          .hr-card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s var(--ease-smooth); }
+          .hr-card:hover .hr-card-img { transform: scale(1.04); }
+          .hr-card-body { padding: 24px; }
           .hr-card-title { font-family: 'Cinzel', serif; font-size: 18px; color: var(--white); margin-bottom: 10px; font-weight: 600; }
           .hr-badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; margin-bottom: 14px; font-family: 'Raleway', sans-serif; }
           .hr-badge-high { background: rgba(34,197,94,0.12); color: #22c55e; }
@@ -194,14 +198,21 @@ export default function ManpowerPage() {
               <div className="hr-results">
                 {talentPools.map((pool, i) => (
                   <div key={i} className={`hr-card${!isCardVisible(pool) ? ' hr-hidden' : ''}`}>
-                    <div className="hr-card-title">{pool.title}</div>
-                    <div className={`hr-badge hr-badge-${pool.badge}`}>{pool.badgeText}</div>
-                    <div className="hr-card-meta">
-                      <strong>Team Size:</strong> {pool.teamSize}<br />
-                      <strong>Timeline:</strong> {pool.timeline}
+                    {pool.img && (
+                      <div className="hr-card-img-wrap">
+                        <img className="hr-card-img" src={`/Images/${pool.img}`} alt={pool.title} loading="lazy" />
+                      </div>
+                    )}
+                    <div className="hr-card-body">
+                      <div className="hr-card-title">{pool.title}</div>
+                      <div className={`hr-badge hr-badge-${pool.badge}`}>{pool.badgeText}</div>
+                      <div className="hr-card-meta">
+                        <strong>Team Size:</strong> {pool.teamSize}<br />
+                        <strong>Timeline:</strong> {pool.timeline}
+                      </div>
+                      <div className="hr-card-cert">{pool.cert}</div>
+                      <a href="/contact" className="hr-card-link">Request Workforce &rarr;</a>
                     </div>
-                    <div className="hr-card-cert">{pool.cert}</div>
-                    <a href="/contact" className="hr-card-link">Request Workforce &rarr;</a>
                   </div>
                 ))}
               </div>
