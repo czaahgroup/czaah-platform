@@ -7,6 +7,13 @@ import { Navbar } from '@/components/layouts/Navbar';
 import { Footer } from '@/components/layouts/Footer';
 import { createClient } from '@/lib/supabase/client';
 
+interface LocationOption {
+  label: string;
+  type: 'city' | 'area';
+  city?: string;
+  country?: string | null;
+}
+
 interface LiveProperty {
   id: string;
   title: string;
@@ -45,6 +52,69 @@ export default function RealEstatePage() {
   const [filterMinPrice, setFilterMinPrice] = useState('');
   const [filterMaxPrice, setFilterMaxPrice] = useState('');
 
+  const [locationOptions, setLocationOptions] = useState<LocationOption[]>([]);
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function fetchLocations() {
+      try {
+        const res = await fetch('/api/public/properties/locations');
+        const json = await res.json();
+        if (!res.ok) return;
+        const cities: LocationOption[] = (json.cities || []).map((c: { label: string; country: string | null }) => ({
+          label: c.label, type: 'city' as const, country: c.country,
+        }));
+        const areas: LocationOption[] = (json.areas || []).map((a: { label: string; city: string }) => ({
+          label: a.label, type: 'area' as const, city: a.city,
+        }));
+        setLocationOptions([...cities, ...areas]);
+      } catch (err) {
+        console.error('Failed to load location suggestions:', err);
+      }
+    }
+    fetchLocations();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target as Node)) {
+        setShowLocationSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const locationSuggestions = searchQuery.trim().length > 0
+    ? locationOptions
+        .filter((opt) => opt.label.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+        .slice(0, 8)
+    : [];
+
+  function selectLocationSuggestion(opt: LocationOption) {
+    setSearchQuery(opt.label);
+    setShowLocationSuggestions(false);
+    setHighlightedIndex(-1);
+  }
+
+  function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!showLocationSuggestions || locationSuggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex((i) => (i + 1) % locationSuggestions.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex((i) => (i <= 0 ? locationSuggestions.length - 1 : i - 1));
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault();
+      selectLocationSuggestion(locationSuggestions[highlightedIndex]);
+    } else if (e.key === 'Escape') {
+      setShowLocationSuggestions(false);
+    }
+  }
+
   useEffect(() => {
     const timeout = setTimeout(async () => {
       setLoading(true);
@@ -75,6 +145,8 @@ export default function RealEstatePage() {
     setFilterListingType('');
     setFilterMinPrice('');
     setFilterMaxPrice('');
+    setShowLocationSuggestions(false);
+    setHighlightedIndex(-1);
   }
 
   async function handleEnquire(propertyId: string) {
@@ -311,6 +383,60 @@ export default function RealEstatePage() {
       display: flex;
       gap: 12px;
       margin-bottom: 16px;
+      position: relative;
+    }
+
+    .location-suggestions {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: #0F0F0F;
+      border: 1px solid var(--black-border);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 20;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+
+    .location-suggestion {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-family: 'Raleway', sans-serif;
+      font-size: 13px;
+      color: var(--white);
+      transition: background 0.15s ease;
+    }
+
+    .location-suggestion:not(:last-child) {
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .location-suggestion:hover,
+    .location-suggestion.highlighted {
+      background: rgba(201,168,76,0.1);
+    }
+
+    .location-suggestion-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .location-suggestion-icon {
+      font-size: 16px;
+      color: var(--gold-dim);
+    }
+
+    .location-suggestion-meta {
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--white-dim);
     }
 
     .search-bar {
@@ -479,14 +605,39 @@ export default function RealEstatePage() {
             <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-2">Hand-selected investment opportunities across our international real estate markets. Each listing is pre-vetted, title-verified, and investment-ready.</p>
 
             <div className="search-panel">
-              <div className="search-bar-row">
+              <div className="search-bar-row" ref={searchWrapRef}>
                 <input
                   type="text"
                   className="search-bar"
-                  placeholder="Search by name, location, or keyword..."
+                  placeholder="Search by location — e.g. London, Dubai, Canary Wharf..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => { setSearchQuery(e.target.value); setShowLocationSuggestions(true); setHighlightedIndex(-1); }}
+                  onFocus={() => setShowLocationSuggestions(true)}
+                  onKeyDown={handleSearchKeyDown}
+                  autoComplete="off"
                 />
+                {showLocationSuggestions && locationSuggestions.length > 0 && (
+                  <div className="location-suggestions">
+                    {locationSuggestions.map((opt, i) => (
+                      <div
+                        key={`${opt.type}-${opt.label}`}
+                        className={`location-suggestion${i === highlightedIndex ? ' highlighted' : ''}`}
+                        onMouseDown={() => selectLocationSuggestion(opt)}
+                        onMouseEnter={() => setHighlightedIndex(i)}
+                      >
+                        <span className="location-suggestion-label">
+                          <span className="material-symbols-outlined location-suggestion-icon">
+                            {opt.type === 'city' ? 'location_city' : 'place'}
+                          </span>
+                          {opt.label}
+                        </span>
+                        <span className="location-suggestion-meta">
+                          {opt.type === 'city' ? (opt.country || 'City') : opt.city}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="search-filters">
                 <select className="filter-select" value={filterCity} onChange={(e) => setFilterCity(e.target.value)}>

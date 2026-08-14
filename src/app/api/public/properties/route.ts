@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     if (listingType) query = query.eq('listing_type', listingType)
     if (minPrice) query = query.gte('price', Number(minPrice))
     if (maxPrice) query = query.lte('price', Number(maxPrice))
-    if (search) query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%`)
+    if (search) query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%,country.ilike.%${search}%`)
 
     const { data: properties, error } = await query
 
