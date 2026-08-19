@@ -256,7 +256,8 @@ export default function ManpowerPage() {
             <div>
               <div className="raleway-text text-xs tracking-[0.2em] uppercase text-primary mb-4 font-medium">Overseas Deployment</div>
               <h3 className="cinzel-text text-3xl text-on-surface mb-6">Talent for the <span className="text-primary">Gulf, Europe &amp; beyond.</span></h3>
-              <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Pakistan is one of the world&apos;s largest exporters of manpower, with millions deployed across the Gulf, Middle East, and beyond. CZAAH operates as a licensed overseas employment promoter, providing end-to-end recruitment for construction, oil &amp; gas, hospitality, healthcare, and industrial sectors.</p>
+              <p className="raleway-text text-primary text-lg font-medium leading-relaxed mb-4">We connect verified European employers with licensed overseas recruitment partners in Pakistan.</p>
+              <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Pakistan is one of the world&apos;s largest exporters of manpower, with millions deployed across the Gulf, Middle East, and beyond. CZAAH operates as a trusted intermediary, connecting employers directly with licensed overseas employment promoters for end-to-end recruitment across construction, oil &amp; gas, hospitality, healthcare, and industrial sectors.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">Beyond the Gulf, we&apos;re expanding deployment corridors across the United Kingdom, the wider European Union, and the Balkans — including Albania and Kosovo — opening new pathways for skilled and semi-skilled Pakistani workers into European labour markets.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed mb-4">We handle demand letter processing, trade testing, medical clearance, visa coordination, and pre-departure orientation — ensuring compliant, deployment-ready candidates on your timeline.</p>
               <p className="raleway-text text-on-surface-variant text-base leading-relaxed">Our network spans across Punjab, KPK, Sindh, and Balochistan, giving us access to diverse talent pools that match the specific requirements of Gulf, UK, European, Balkan, and Asian employers.</p>
@@ -280,7 +281,7 @@ export default function ManpowerPage() {
             <p className="raleway-text text-on-surface-variant text-base mb-12 leading-relaxed">Comprehensive manpower and human resources solutions for domestic and international clients.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
               {[
-                { icon: 'public', title: 'Overseas Recruitment', desc: 'Licensed recruitment for Gulf, Middle East, and international markets. End-to-end processing from candidate sourcing through visa coordination to deployment, compliant with OEP regulations.' },
+                { icon: 'public', title: 'Overseas Recruitment', desc: 'Connecting employers with licensed overseas employment promoters across the Gulf, Middle East, and international markets. End-to-end coordination from candidate sourcing through visa processing to deployment, compliant with OEP regulations.' },
                 { icon: 'person_search', title: 'Executive Search', desc: 'C-suite and senior management recruitment for companies entering or operating in Pakistan. Confidential headhunting with deep networks across finance, engineering, technology, and operations.' },
                 { icon: 'groups', title: 'Bulk Hiring & Mobilisation', desc: 'Large-scale workforce mobilisation for construction, mining, and infrastructure projects. Hundreds or thousands of skilled and semi-skilled workers recruited, tested, and deployed on schedule.' },
                 { icon: 'verified', title: 'Trade Testing & Certification', desc: 'Comprehensive skills assessment and trade testing through accredited centres. Welders, electricians, heavy equipment operators, and technicians verified to international standards.' },
@@ -332,7 +333,7 @@ export default function ManpowerPage() {
               {[
                 { number: '70M+', label: 'Labour force' },
                 { number: 'Gulf, UK & EU', label: 'Deployment reach' },
-                { number: 'OEP', label: 'Licensed operations' },
+                { number: 'OEP', label: 'Licensed partner network' },
                 { number: 'Multi', label: 'Sector coverage' },
               ].map((stat, i) => (
                 <div key={i}>

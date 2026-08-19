@@ -47,6 +47,10 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editSectors, setEditSectors] = useState<string[]>([])
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createForm, setCreateForm] = useState({ fullName: '', email: '', companyName: '', role: 'admin' })
+  const [createLoading, setCreateLoading] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
 
   const loadUsers = useCallback(async () => {
     try {
@@ -196,6 +200,36 @@ export default function AdminUsersPage() {
     }
   }
 
+  async function handleCreateUser(e: React.FormEvent) {
+    e.preventDefault()
+    setCreateError(null)
+    setCreateLoading(true)
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: createForm.email.trim(),
+          fullName: createForm.fullName.trim(),
+          companyName: createForm.companyName.trim(),
+          role: createForm.role,
+        }),
+      })
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error || 'Failed to create user')
+      }
+      setSuccess(`${createForm.email} invited as ${createForm.role.replace(/_/g, ' ')}`)
+      setShowCreateModal(false)
+      setCreateForm({ fullName: '', email: '', companyName: '', role: 'admin' })
+      await loadUsers()
+    } catch (err: unknown) {
+      setCreateError(err instanceof Error ? err.message : 'Failed to create user')
+    } finally {
+      setCreateLoading(false)
+    }
+  }
+
   function toggleSector(sectorId: string) {
     setEditSectors((prev) =>
       prev.includes(sectorId) ? prev.filter((s) => s !== sectorId) : [...prev, sectorId]
@@ -237,6 +271,26 @@ export default function AdminUsersPage() {
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             Export CSV
+          </button>
+          <button
+            onClick={() => { setShowCreateModal(true); setCreateError(null) }}
+            style={{
+              background: '#C9A84C',
+              border: 'none',
+              borderRadius: 0,
+              padding: '6px 14px',
+              color: '#000',
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: '12px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+            Create User
           </button>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -303,7 +357,7 @@ export default function AdminUsersPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.filter((u) => u.role !== 'super_admin').map((user) => (
+                    {users.map((user) => (
                       <tr
                         key={user.id}
                         onClick={() => { setSelectedId(user.id); clearMessages() }}
@@ -336,13 +390,13 @@ export default function AdminUsersPage() {
             </div>
 
             <p className="text-xs text-on-surface-variant/50 mt-3">
-              {users.filter((u) => u.role !== 'super_admin').length} user(s) shown
+              {users.length} user(s) shown
             </p>
           </div>
 
           {/* Detail panel */}
           <div>
-            {selected && selected.role !== 'super_admin' ? (
+            {selected ? (
               <div className="bg-surface-container-low border border-outline-variant/10 rounded-none sticky top-8">
                 {/* User info header */}
                 <div className="px-6 py-4 border-b border-outline-variant/10">
@@ -356,6 +410,14 @@ export default function AdminUsersPage() {
                   </div>
                 </div>
 
+                {selected.role === 'super_admin' ? (
+                  <div className="px-6 py-4">
+                    <p className="text-sm text-on-surface-variant">
+                      Super Admin accounts are protected and cannot be edited from this panel.
+                    </p>
+                  </div>
+                ) : (
+                <>
                 {/* Profile details */}
                 <div className="px-6 py-4 border-b border-outline-variant/10 space-y-3">
                   <DetailRow label="Phone" value={selected.phone} />
@@ -500,12 +562,102 @@ export default function AdminUsersPage() {
                     )}
                   </div>
                 </div>
+                </>
+                )}
               </div>
             ) : (
               <div className="bg-surface-container-low border border-outline-variant/10 rounded-none flex items-center justify-center py-16">
                 <p className="text-on-surface-variant text-sm">Select a user to manage</p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {showCreateModal && (
+        <div
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4"
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div
+            className="bg-surface-container-low border border-outline-variant/10 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 border-b border-outline-variant/10">
+              <h2 className="font-[family-name:var(--font-heading)] text-lg text-on-surface">Create User</h2>
+              <p className="text-xs text-on-surface-variant mt-1">
+                They&apos;ll receive an email invite to set their own password. No KYC review needed &mdash; the account is approved immediately.
+              </p>
+            </div>
+            <form onSubmit={handleCreateUser} className="px-6 py-4 space-y-4">
+              <div>
+                <label className="text-xs text-on-surface-variant block mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={createForm.fullName}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, fullName: e.target.value }))}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-nonepx-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary/50"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-on-surface-variant block mb-1">Email</label>
+                <input
+                  type="email"
+                  required
+                  value={createForm.email}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-nonepx-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary/50"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-on-surface-variant block mb-1">Company (optional)</label>
+                <input
+                  type="text"
+                  value={createForm.companyName}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, companyName: e.target.value }))}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-nonepx-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary/50"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-on-surface-variant block mb-1">Role</label>
+                <select
+                  value={createForm.role}
+                  onChange={(e) => setCreateForm((f) => ({ ...f, role: e.target.value }))}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-nonepx-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary/50"
+                >
+                  <option value="member">Member</option>
+                  <option value="admin">Admin</option>
+                  <option value="investment_partner">Investment Partner</option>
+                  <option value="elite_member">Elite Member</option>
+                  <option value="real_estate_partner">Real Estate Partner</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+              </div>
+
+              {createError && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-none px-3 py-2">
+                  <p className="text-xs text-red-400">{createError}</p>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 border border-outline-variant/20 text-on-surface-variant font-semibold py-2 rounded-nonetext-sm hover:text-on-surface transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createLoading}
+                  className="flex-1 bg-primary text-on-primary font-semibold py-2 rounded-nonetext-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {createLoading ? 'Sending Invite...' : 'Send Invite'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -84,6 +84,80 @@ export async function GET(request: NextRequest) {
   }
 }
 
+const CREATABLE_ROLES = ['member', 'admin', 'investment_partner', 'elite_member', 'real_estate_partner', 'super_admin']
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll() {},
+        },
+      }
+    )
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const adminClient = createAdminClient()
+
+    const { data: callerProfile } = await adminClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (callerProfile?.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { email, fullName, role, companyName } = body
+
+    if (!email || !fullName || !role) {
+      return NextResponse.json({ error: 'email, fullName, and role are required' }, { status: 400 })
+    }
+
+    if (!CREATABLE_ROLES.includes(role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+    }
+
+    // Create the auth user and email them an invite to set their own password
+    const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email)
+
+    if (inviteError || !invited?.user) {
+      return NextResponse.json({ error: inviteError?.message || 'Failed to invite user' }, { status: 500 })
+    }
+
+    const { error: profileError } = await adminClient
+      .from('profiles')
+      .insert({
+        id: invited.user.id,
+        role,
+        status: 'approved',
+        full_name: fullName,
+        email,
+        company_name: companyName || null,
+      })
+
+    if (profileError) {
+      // Roll back the auth user so we don't leave an orphaned account without a profile
+      await adminClient.auth.admin.deleteUser(invited.user.id)
+      return NextResponse.json({ error: profileError.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, userId: invited.user.id })
+  } catch (err) {
+    console.error('Users POST error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
 export async function PATCH(request: NextRequest) {
   try {
     const supabase = createServerClient(

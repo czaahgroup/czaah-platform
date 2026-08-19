@@ -15,26 +15,39 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [ready, setReady] = useState(false)
+  const [linkInvalid, setLinkInvalid] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     // Supabase will have set the session from the reset link
     const supabase = createClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    let resolved = false
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+        resolved = true
         setReady(true)
-      } else {
-        // No session — might need to wait for the hash to be processed
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-          if (event === 'PASSWORD_RECOVERY') {
-            setReady(true)
-          }
-        })
-        // Give it a moment
-        setTimeout(() => setReady(true), 1000)
-        return () => subscription.unsubscribe()
       }
     })
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        resolved = true
+        setReady(true)
+      }
+    })
+
+    // Exchanging the emailed code for a session happens automatically on load —
+    // if nothing resolved after a few seconds, the link is invalid, expired, or
+    // was opened in a different browser than the one that requested it.
+    const timeout = setTimeout(() => {
+      if (!resolved) setLinkInvalid(true)
+    }, 3000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
   }, [])
 
   async function handleReset(e: React.FormEvent) {
@@ -86,6 +99,18 @@ export default function ResetPasswordPage() {
                 <p className="raleway-text text-sm text-on-surface-variant leading-relaxed">
                   Your password has been reset. Redirecting to your dashboard...
                 </p>
+              </div>
+            ) : linkInvalid ? (
+              <div className="text-center">
+                <h2 className="cinzel-text text-xl text-primary mb-3 tracking-wider">
+                  Link Invalid or Expired
+                </h2>
+                <p className="raleway-text text-sm text-on-surface-variant leading-relaxed mb-6">
+                  This password reset link no longer works. It may have expired, already been used, or been opened in a different browser than the one you requested it from. Please request a new link.
+                </p>
+                <Link href="/login" className="text-primary raleway-text text-sm hover:underline">
+                  Back to Login
+                </Link>
               </div>
             ) : !ready ? (
               <div className="text-center">

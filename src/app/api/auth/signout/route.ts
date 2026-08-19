@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
   }
 
-  const response = NextResponse.redirect(new URL('/login', request.url))
+  // 303 forces the browser to follow up with GET — the POST from the sign-out
+  // form must not be replayed against /login (a static asset on Cloudflare Pages
+  // that only serves GET; a preserved-method 307 there fails outright).
+  const response = NextResponse.redirect(new URL('/login', request.url), 303)
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
