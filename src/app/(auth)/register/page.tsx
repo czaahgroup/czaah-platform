@@ -60,6 +60,7 @@ interface FormData {
   otherSector: string
   companyWebsite: string
   businessDescription: string
+  partnerCode: string
   idFront: File | null
   idBack: File | null
   registrationCertificate: File | null
@@ -150,6 +151,7 @@ export default function RegisterPage() {
     otherSector: '',
     companyWebsite: '',
     businessDescription: '',
+    partnerCode: '',
     idFront: null,
     idBack: null,
     registrationCertificate: null,
@@ -273,6 +275,7 @@ export default function RegisterPage() {
             : formData.sectors,
           companyWebsite: formData.companyWebsite.trim() || null,
           companyDescription: formData.businessDescription.trim() || null,
+          partnerCode: formData.partnerCode.trim() || null,
           documents,
         }),
       })
@@ -582,6 +585,18 @@ export default function RegisterPage() {
                   onFocus={e => e.target.style.borderColor = '#C9A84C'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
                   placeholder="https://www.example.com"
+                />
+              </FieldGroup>
+
+              <FieldGroup label="Partner ID or Referral Code (optional)">
+                <input
+                  type="text"
+                  value={formData.partnerCode}
+                  onChange={e => updateField('partnerCode', e.target.value)}
+                  style={baseInputStyle}
+                  onFocus={e => e.target.style.borderColor = '#C9A84C'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                  placeholder="If someone referred you, enter their code here"
                 />
               </FieldGroup>
 

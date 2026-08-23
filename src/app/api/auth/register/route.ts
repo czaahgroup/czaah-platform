@@ -18,6 +18,7 @@ export async function POST(request: Request) {
     companyName, companyRegistrationNumber, country,
     industryInterests, companyWebsite, companyDescription,
     documents, // array of { docType, fileName, fileData (base64) }
+    partnerCode, // optional: a Partner ID or referral code entered at signup
   } = body
 
   // Check file sizes (10MB max per document)
@@ -103,6 +104,31 @@ export async function POST(request: Request) {
   await supabase.from('notification_preferences').insert({
     user_id: userId,
   })
+
+  // 5. If a Partner ID / referral code was entered, connect this profile to
+  // that partner privately. Never blocks registration — an invalid or
+  // mistyped code is silently ignored.
+  const trimmedCode = typeof partnerCode === 'string' ? partnerCode.trim() : ''
+  if (trimmedCode) {
+    try {
+      const { data: partner } = await supabase
+        .from('partners')
+        .select('id, partner_id, referral_code')
+        .eq('status', 'active')
+        .or(`partner_id.eq.${trimmedCode},referral_code.eq.${trimmedCode}`)
+        .maybeSingle()
+
+      if (partner) {
+        await supabase.from('partner_referrals').insert({
+          partner_id: partner.id,
+          referred_profile_id: userId,
+          connected_via: partner.partner_id === trimmedCode ? 'partner_id' : 'referral_code',
+        })
+      }
+    } catch (referralErr) {
+      console.error('Partner referral link failed (non-blocking):', referralErr)
+    }
+  }
 
   return NextResponse.json({ success: true, userId })
 }

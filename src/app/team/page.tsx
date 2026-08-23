@@ -12,7 +12,8 @@ const founders = [
 ]
 
 const seniorExecs = [
-  { initials: 'SK', name: 'Saqib Karamat', title: 'Executive Director', scope: 'Visionary entrepreneur and strategic leader with extensive experience in technology, investment, real estate, and global education sectors. Strong footprint across Europe, China, Hong Kong, and Korea. Built, scaled, and managed multi-sector ventures focused on innovation and cross-border collaboration. Portfolio includes AI-driven innovations, healthcare transformation, and educational mobility programmes empowering youth worldwide. CEO, Europe of Oryx Capital. CEO, Marks Group. COO, Shenzhen Xingyi Intelligent Technology Co., Ltd. COO, Olive Healthcare Europe. CEO, Inturnationally Limited.' },
+  { initials: 'SK', name: 'Saqib Karamat', title: 'Managing Director', scope: 'Visionary entrepreneur and strategic leader with extensive experience in technology, investment, real estate, and global education sectors. Strong footprint across Europe, China, Hong Kong, and Korea. Built, scaled, and managed multi-sector ventures focused on innovation and cross-border collaboration. Portfolio includes AI-driven innovations, healthcare transformation, and educational mobility programmes empowering youth worldwide. CEO, Europe of Oryx Capital. CEO, Marks Group. COO, Shenzhen Xingyi Intelligent Technology Co., Ltd. COO, Olive Healthcare Europe. CEO, Inturnationally Limited.' },
+  { initials: 'SH', name: 'Syed Hashim Ali', title: 'Investment Director', scope: 'Investment professional with cross-sector experience spanning agriculture, mining, energy, IT, and defence production. Held a key position at Pakistan’s Special Investment Facilitation Council (SIFC), the apex platform coordinating investment facilitation between government and private-sector stakeholders. Brings hands-on experience in deal origination, investor engagement, and project facilitation across a wide range of industries.' },
 ]
 
 const cSuite = [
@@ -22,7 +23,7 @@ const cSuite = [
 ]
 
 const directors = [
-  { initials: 'ZM', name: 'Zainab Malik', title: 'Director, Minerals & Mining', scope: 'Provincial mining leases, exploration licensing, offtake agreements. Balochistan & KPK coverage.' },
+  { initials: 'HZ', photo: '/Images/team/hafiz-ali-zulqarnain.jpeg', name: 'Hafiz Ali Zulqarnain', title: 'Director, Minerals & Mining', scope: 'Advocate, Lahore High Court. Mining leases, stone & crushing, placer gold mining, soapstone & potash feldspar. Legal and commercial project development.' },
   { initials: 'JW', name: 'James Whitfield', title: 'Director, Technology & IT', scope: 'Government IT integration, software development partnerships, EdTech initiatives. UK tech sector liaison.' },
   { initials: 'NA', name: 'Nadia Al-Sayed', title: 'Director, Real Estate & Construction', scope: 'CPEC corridor development, commercial property, infrastructure projects. Gulf investor relations.' },
   { initials: 'IK', name: 'Imran Khawaja', title: 'Director, Textiles & Agriculture', scope: 'Export trading, mill aggregation, organic certification, cold chain logistics. TDAP coordination.' },
@@ -37,13 +38,19 @@ const divisionHeads = [
 
 const divisionHeadExtra = { initials: 'HQ', name: 'Hassan Qureshi', title: 'Head of Pharmaceuticals & Energy', scope: 'DRAP registration, GMP compliance, manufacturing partnerships. NEPRA & energy sector coordination.' }
 
-function TeamCard({ person, large = false }: { person: { initials: string; name: string; title: string; scope: string }; large?: boolean }) {
+function TeamCard({ person, large = false }: { person: { initials: string; name: string; title: string; scope: string; photo?: string }; large?: boolean }) {
   return (
     <div className="bg-surface-container border border-outline-variant/10 hover:border-primary/30 p-8 text-center transition-all duration-500 relative group">
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      <div className={`${large ? 'w-20 h-20 text-2xl' : 'w-16 h-16 text-lg'} mx-auto mb-4 flex items-center justify-center cinzel-text font-semibold text-primary border ${large ? 'border-primary/40 bg-primary/10' : 'border-primary/20 bg-primary/5'} rounded-full`}>
-        {person.initials}
-      </div>
+      {person.photo ? (
+        <div className={`${large ? 'w-20 h-20' : 'w-16 h-16'} mx-auto mb-4 rounded-full overflow-hidden border ${large ? 'border-primary/40' : 'border-primary/20'}`}>
+          <img src={person.photo} alt={person.name} className="w-full h-full object-cover" loading="lazy" />
+        </div>
+      ) : (
+        <div className={`${large ? 'w-20 h-20 text-2xl' : 'w-16 h-16 text-lg'} mx-auto mb-4 flex items-center justify-center cinzel-text font-semibold text-primary border ${large ? 'border-primary/40 bg-primary/10' : 'border-primary/20 bg-primary/5'} rounded-full`}>
+          {person.initials}
+        </div>
+      )}
       <div className="cinzel-text text-base font-semibold text-on-surface mb-1">{person.name}</div>
       <div className="raleway-text text-xs font-medium tracking-[0.08em] uppercase text-primary mb-3">{person.title}</div>
       <div className="raleway-text text-xs text-on-surface-variant/60 leading-relaxed">{person.scope}</div>

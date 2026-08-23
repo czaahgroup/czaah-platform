@@ -112,7 +112,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <SectionHeader label="Enquiries" />
         <NavLink href="/admin/enquiries" label="All Enquiries" icon="contact_mail" />
+        {isSuperAdmin && <NavLink href="/admin/messages" label="Website Messages" icon="mail" />}
         {isSuperAdmin && <NavLink href="/admin/chats" label="Chat Monitor" icon="forum" />}
+
+        {isSuperAdmin && (
+          <>
+            <SectionHeader label="Partner Network" />
+            <NavLink href="/admin/partners" label="Partners" icon="handshake" />
+            <NavLink href="/admin/partner-opportunities" label="Opportunities" icon="work" />
+            <NavLink href="/admin/partner-messages" label="Partner Messages" icon="mark_email_unread" />
+          </>
+        )}
 
         <SectionHeader label="Real Estate" />
         <NavLink href="/admin/properties" label="Properties" icon="apartment" />

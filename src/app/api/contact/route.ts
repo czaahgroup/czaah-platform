@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'edge';
 
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, email, phone, interest, message } = body
+    const { name, email, phone, interest, message, source } = body
 
     // Validate required fields
     if (!name || !email || !interest || !message) {
@@ -58,6 +59,21 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid email address.' },
         { status: 400 }
       )
+    }
+
+    // Store in the admin portal — best-effort, never blocks email delivery
+    try {
+      const supabase = createAdminClient()
+      await supabase.from('public_messages').insert({
+        name,
+        email,
+        phone: phone || null,
+        interest,
+        message,
+        source: source === 'ai_chat' ? 'ai_chat' : 'contact_form',
+      })
+    } catch (dbErr) {
+      console.error('Failed to store public_messages row:', dbErr)
     }
 
     // Send notification email to info@czaah.com

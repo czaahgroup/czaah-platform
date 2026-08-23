@@ -95,7 +95,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // /partner — investment_partner and super_admin only
-  if (pathname.startsWith('/partner') && profile.role !== 'investment_partner' && profile.role !== 'super_admin' && profile.role !== 'admin') {
+  const isLegacyPartnerRoute = pathname === '/partner' || pathname.startsWith('/partner/')
+  if (isLegacyPartnerRoute && profile.role !== 'investment_partner' && profile.role !== 'super_admin' && profile.role !== 'admin') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // /partner-network — CZAAH Partner Network, partner and super_admin only
+  if (pathname.startsWith('/partner-network') && profile.role !== 'partner' && profile.role !== 'super_admin') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
