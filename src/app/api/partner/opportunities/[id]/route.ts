@@ -49,6 +49,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const {
       title, sectorId, country, opportunityType, summary, description,
       estimatedValue, contactOrCompany, partnerRole, confidentialityLevel,
+      workersNeeded, tradeSkill,
       submit,
     } = body
 
@@ -69,6 +70,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (contactOrCompany !== undefined) updates.contact_or_company = contactOrCompany
     if (partnerRole !== undefined) updates.partner_role = partnerRole
     if (confidentialityLevel !== undefined) updates.confidentiality_level = confidentialityLevel
+    if (workersNeeded !== undefined) updates.workers_needed = workersNeeded ? Number(workersNeeded) : null
+    if (tradeSkill !== undefined) updates.trade_skill = tradeSkill || null
     if (submit) updates.status = 'submitted'
 
     const { error } = await supabase!.from('partner_opportunities').update(updates).eq('id', id)

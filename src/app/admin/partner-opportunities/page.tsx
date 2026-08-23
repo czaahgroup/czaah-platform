@@ -14,6 +14,8 @@ interface Opportunity {
   estimated_value: string | null
   contact_or_company: string | null
   partner_role: string | null
+  workers_needed: number | null
+  trade_skill: string | null
   confidentiality_level: string
   status: string
   visibility_scope: string
@@ -157,6 +159,8 @@ export default function AdminPartnerOpportunitiesPage() {
                       {o.estimated_value && <div>Estimated value: <span className="text-on-surface">{o.estimated_value}</span></div>}
                       {o.contact_or_company && <div>Contact/company: <span className="text-on-surface">{o.contact_or_company}</span></div>}
                       {o.partner_role && <div>Partner's role: <span className="text-on-surface">{o.partner_role}</span></div>}
+                      {o.workers_needed != null && <div>Workers needed: <span className="text-on-surface">{o.workers_needed}</span></div>}
+                      {o.trade_skill && <div>Trade/skill: <span className="text-on-surface">{o.trade_skill}</span></div>}
                       <div>Confidentiality: <span className="text-on-surface">{o.confidentiality_level.replace(/_/g, ' ')}</span></div>
                     </div>
 

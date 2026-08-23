@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
     const {
       title, sectorId, country, opportunityType, summary, description,
       estimatedValue, contactOrCompany, partnerRole, confidentialityLevel,
+      workersNeeded, tradeSkill,
       submit,
     } = body
 
@@ -79,6 +80,8 @@ export async function POST(request: NextRequest) {
         contact_or_company: contactOrCompany || null,
         partner_role: partnerRole || null,
         confidentiality_level: confidentialityLevel || 'standard',
+        workers_needed: opportunityType === 'recruitment_requirement' && workersNeeded ? Number(workersNeeded) : null,
+        trade_skill: opportunityType === 'recruitment_requirement' ? (tradeSkill || null) : null,
         status: submit ? 'submitted' : 'draft',
       })
       .select()

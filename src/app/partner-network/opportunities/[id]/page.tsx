@@ -44,7 +44,10 @@ export default function EditOpportunityPage() {
   const [form, setForm] = useState({
     title: '', sectorId: '', country: '', opportunityType: '', summary: '', description: '',
     estimatedValue: '', contactOrCompany: '', partnerRole: '', confidentialityLevel: 'standard',
+    workersNeeded: '', tradeSkill: '',
   })
+
+  const isRecruitment = form.opportunityType === 'recruitment_requirement'
 
   useEffect(() => {
     Promise.all([
@@ -60,6 +63,7 @@ export default function EditOpportunityPage() {
           opportunityType: o.opportunity_type || '', summary: o.summary || '', description: o.description || '',
           estimatedValue: o.estimated_value || '', contactOrCompany: o.contact_or_company || '',
           partnerRole: o.partner_role || '', confidentialityLevel: o.confidentiality_level || 'standard',
+          workersNeeded: o.workers_needed != null ? String(o.workers_needed) : '', tradeSkill: o.trade_skill || '',
         })
         setStatus(o.status)
         setDocuments(o.partner_opportunity_documents || [])
@@ -133,7 +137,7 @@ export default function EditOpportunityPage() {
             </select>
           </div>
           <div>
-            <label className={labelClass}>Country</label>
+            <label className={labelClass}>{isRecruitment ? 'Deployment Country' : 'Country'}</label>
             <input type="text" className={inputClass} value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} />
           </div>
         </div>
@@ -144,6 +148,19 @@ export default function EditOpportunityPage() {
             {OPPORTUNITY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
         </div>
+
+        {isRecruitment && (
+          <div className="grid sm:grid-cols-2 gap-5 bg-surface-container border border-outline-variant/10 p-4">
+            <div>
+              <label className={labelClass}>Number of Workers Needed</label>
+              <input type="number" min={1} className={inputClass} value={form.workersNeeded} onChange={(e) => setForm((f) => ({ ...f, workersNeeded: e.target.value }))} />
+            </div>
+            <div>
+              <label className={labelClass}>Trade / Skill</label>
+              <input type="text" placeholder="e.g. Welders, Electricians, Drivers" className={inputClass} value={form.tradeSkill} onChange={(e) => setForm((f) => ({ ...f, tradeSkill: e.target.value }))} />
+            </div>
+          </div>
+        )}
 
         <div>
           <label className={labelClass}>Short Summary</label>
