@@ -114,15 +114,8 @@ export default function PartnerMembershipCardPage() {
     })
   }
 
-  async function downloadFront() {
+  function drawFrontFace(ctx: CanvasRenderingContext2D, markhorImg: HTMLImageElement | null) {
     if (!card) return
-    const markhorImg = await loadMarkhorImage().catch(() => null)
-    const canvas = document.createElement('canvas')
-    canvas.width = 680
-    canvas.height = 428
-    const ctx = canvas.getContext('2d')!
-    drawCardBase(ctx)
-
     ctx.fillStyle = '#C9A84C'
     ctx.font = '600 28px Cinzel, serif'
     ctx.textAlign = 'right'
@@ -165,23 +158,9 @@ export default function PartnerMembershipCardPage() {
     ctx.font = '400 12px Raleway, sans-serif'
     ctx.textAlign = 'left'
     ctx.fillText(`Partner Since ${card.memberSince}`, 40, 400)
-
-    const link = document.createElement('a')
-    link.download = 'czaah-partner-card-front.png'
-    link.href = canvas.toDataURL('image/png')
-    link.click()
   }
 
-  async function downloadBack() {
-    if (!card) return
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(card.qrData)}&size=300x300&bgcolor=080808&color=C9A84C`
-    const qrImg = await loadExternalImage(qrUrl).catch(() => null)
-    const canvas = document.createElement('canvas')
-    canvas.width = 680
-    canvas.height = 428
-    const ctx = canvas.getContext('2d')!
-    drawCardBase(ctx)
-
+  function drawBackFace(ctx: CanvasRenderingContext2D, qrImg: HTMLImageElement | null) {
     if (qrImg) {
       ctx.drawImage(qrImg, 290, 84, 100, 100)
     }
@@ -198,24 +177,71 @@ export default function PartnerMembershipCardPage() {
     ctx.fillStyle = '#C9A84C'
     ctx.font = '500 14px Raleway, sans-serif'
     ctx.fillText('czaah.com', 340, 282)
+  }
 
-    const link = document.createElement('a')
-    link.download = 'czaah-partner-card-back.png'
-    link.href = canvas.toDataURL('image/png')
-    link.click()
+  const CARD_W = 680
+  const CARD_H = 428
+  const CARD_GAP = 40
+
+  async function buildCombinedCardCanvas(): Promise<HTMLCanvasElement | null> {
+    if (!card) return null
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(card.qrData)}&size=300x300&bgcolor=080808&color=C9A84C`
+    const [markhorImg, qrImg] = await Promise.all([
+      loadMarkhorImage().catch(() => null),
+      loadExternalImage(qrUrl).catch(() => null),
+    ])
+
+    const canvas = document.createElement('canvas')
+    canvas.width = CARD_W * 2 + CARD_GAP
+    canvas.height = CARD_H
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = '#000000'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    ctx.save()
+    drawCardBase(ctx)
+    drawFrontFace(ctx, markhorImg)
+    ctx.restore()
+
+    ctx.save()
+    ctx.translate(CARD_W + CARD_GAP, 0)
+    drawCardBase(ctx)
+    drawBackFace(ctx, qrImg)
+    ctx.restore()
+
+    return canvas
   }
 
   async function downloadCard() {
-    if (flipped) {
-      await downloadBack()
-    } else {
-      await downloadFront()
-    }
+    const canvas = await buildCombinedCardCanvas()
+    if (!canvas) return
+    const link = document.createElement('a')
+    link.download = 'czaah-partner-card.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
   }
 
   async function shareCard() {
     if (!card || !navigator.share) return
     try {
+      const canvas = await buildCombinedCardCanvas()
+      const blob: Blob | null = canvas
+        ? await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+        : null
+
+      if (blob) {
+        const file = new File([blob], 'czaah-partner-card.png', { type: 'image/png' })
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'CZAAH Partner Card',
+            text: `${card.fullName} — CZAAH Partner | ID: ${card.memberId}`,
+            files: [file],
+          })
+          return
+        }
+      }
+
+      // Fallback for browsers that can't share files
       await navigator.share({
         title: 'CZAAH Partner Card',
         text: `${card.fullName} - CZAAH Partner | ID: ${card.memberId}`,
@@ -268,7 +294,7 @@ export default function PartnerMembershipCardPage() {
         color: 'rgba(255,255,255,0.35)',
         marginBottom: '40px',
       }}>
-        Your digital CZAAH Partner credential. Click the card to flip, then download whichever side is showing.
+        Your digital CZAAH Partner credential. Click the card to flip. Download or Share gives both sides in one image.
       </p>
 
       <div
@@ -497,7 +523,7 @@ export default function PartnerMembershipCardPage() {
             transition: 'all 0.3s ease',
           }}
         >
-          Download {flipped ? 'Back' : 'Front'}
+          Download Card
         </button>
 
         {canShare && (
