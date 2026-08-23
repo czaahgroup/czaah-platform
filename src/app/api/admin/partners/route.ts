@@ -67,8 +67,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'email and fullName are required' }, { status: 400 })
     }
 
-    // Invite the auth user (Supabase sends the password-setup email)
-    const { data: invited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email)
+    // Invite the auth user (Supabase sends the password-setup email).
+    // Without redirectTo, Supabase falls back to the project's default
+    // Site URL (the homepage) instead of the password-setup page.
+    const { data: invited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
+      redirectTo: `${new URL(request.url).origin}/reset-password`,
+    })
     if (inviteError || !invited?.user) {
       return NextResponse.json({ error: inviteError?.message || 'Failed to invite user' }, { status: 500 })
     }
