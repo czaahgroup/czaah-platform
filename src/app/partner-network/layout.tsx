@@ -81,9 +81,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
       </aside>
 
       <main className="flex-1 min-w-0 p-5 sm:p-8">
-        <div className="max-w-5xl w-full mx-auto">
-          {children}
-        </div>
+        {children}
       </main>
     </div>
   )
