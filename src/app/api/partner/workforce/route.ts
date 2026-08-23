@@ -28,6 +28,20 @@ export async function POST(request: NextRequest) {
     if (auth.error) return auth.error
     const { supabase, partner } = auth
 
+    // Server-side enforcement — not just a hidden nav link. Only partners
+    // authorised for a workforce/recruitment-related sector may submit
+    // candidates, even if they call this endpoint directly.
+    const { data: access } = await supabase!
+      .from('partner_sector_access')
+      .select('sectors(name)')
+      .eq('partner_id', partner!.id)
+    const isAuthorised = (access || []).some((row: { sectors: { name: string } | null }) =>
+      row.sectors && /human resources|workforce|recruitment/i.test(row.sectors.name)
+    )
+    if (!isAuthorised) {
+      return NextResponse.json({ error: 'You are not authorised to submit workforce candidates' }, { status: 403 })
+    }
+
     const body = await request.json()
     const {
       fullName, email, phone, nationality, currentLocation, tradeCategory, specificRole,
