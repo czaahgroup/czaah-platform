@@ -6,11 +6,16 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-const NAV_LINKS = [
+const BASE_NAV_LINKS = [
   { href: '/partner-network', label: 'Dashboard', icon: 'dashboard' },
   { href: '/partner-network/membership-card', label: 'Membership Card', icon: 'badge' },
   { href: '/partner-network/add-opportunity', label: 'Add Opportunity', icon: 'add_business' },
   { href: '/partner-network/opportunities', label: 'My Opportunities', icon: 'work' },
+]
+
+const WORKFORCE_NAV_LINK = { href: '/partner-network/add-workforce', label: 'Add Workforce', icon: 'groups' }
+
+const TAIL_NAV_LINKS = [
   { href: '/partner-network/messages', label: 'Messages', icon: 'mail' },
   { href: '/partner-network/profile', label: 'My Profile', icon: 'account_circle' },
 ]
@@ -18,6 +23,7 @@ const NAV_LINKS = [
 export default function PartnerNetworkLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [fullName, setFullName] = useState('')
+  const [showWorkforce, setShowWorkforce] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -33,9 +39,23 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
       }
       setFullName(profile.full_name || '')
       setLoading(false)
+
+      // Only show "Add Workforce" for partners authorised in a recruitment/workforce-related sector
+      try {
+        const res = await fetch('/api/partner/sectors')
+        const json = await res.json()
+        const sectors: { name: string }[] = json.data || []
+        setShowWorkforce(sectors.some((s) => /human resources|workforce|recruitment/i.test(s.name)))
+      } catch {
+        setShowWorkforce(false)
+      }
     }
     checkAuth()
   }, [])
+
+  const NAV_LINKS = showWorkforce
+    ? [...BASE_NAV_LINKS, WORKFORCE_NAV_LINK, ...TAIL_NAV_LINKS]
+    : [...BASE_NAV_LINKS, ...TAIL_NAV_LINKS]
 
   if (loading) {
     return (
