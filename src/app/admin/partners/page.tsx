@@ -32,6 +32,15 @@ export default function AdminPartnersPage() {
   const [resendingId, setResendingId] = useState<string | null>(null)
   const [resendSuccessId, setResendSuccessId] = useState<string | null>(null)
 
+  interface PartnerDetail {
+    referrals: { id: string; connected_via: string; created_at: string; profiles: { full_name: string; email: string; role: string } | null }[]
+    opportunityCounts: { total: number; underReview: number; approved: number; inProgress: number; completed: number }
+  }
+  const [detailById, setDetailById] = useState<Record<string, PartnerDetail>>({})
+  const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null)
+  const [notesDraft, setNotesDraft] = useState<Record<string, string>>({})
+  const [savingNotesId, setSavingNotesId] = useState<string | null>(null)
+
   const [form, setForm] = useState({ email: '', fullName: '', companyName: '', sectorIds: [] as string[] })
 
   useEffect(() => {
@@ -111,6 +120,44 @@ export default function AdminPartnersPage() {
       setError(err instanceof Error ? err.message : 'Update failed')
     } finally {
       setSavingId(null)
+    }
+  }
+
+  async function toggleExpand(id: string) {
+    const next = expandedId === id ? null : id
+    setExpandedId(next)
+    if (next && !detailById[next]) {
+      setLoadingDetailId(next)
+      try {
+        const res = await fetch(`/api/admin/partners/${next}`)
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Failed to load partner profile')
+        setDetailById((prev) => ({ ...prev, [next]: { referrals: json.referrals || [], opportunityCounts: json.opportunityCounts } }))
+        setNotesDraft((prev) => ({ ...prev, [next]: json.data?.notes || '' }))
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load partner profile')
+      } finally {
+        setLoadingDetailId(null)
+      }
+    }
+  }
+
+  async function saveNotes(id: string) {
+    setSavingNotesId(id)
+    try {
+      const res = await fetch(`/api/admin/partners/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: notesDraft[id] || '' }),
+      })
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error || 'Failed to save notes')
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save notes')
+    } finally {
+      setSavingNotesId(null)
     }
   }
 
@@ -220,7 +267,7 @@ export default function AdminPartnersPage() {
             const isExpanded = expandedId === p.id
             return (
               <div key={p.id} className="bg-surface-container-low border border-outline-variant/10">
-                <button onClick={() => setExpandedId(isExpanded ? null : p.id)} className="w-full text-left px-5 py-4">
+                <button onClick={() => toggleExpand(p.id)} className="w-full text-left px-5 py-4">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-3 mb-1 flex-wrap">
@@ -241,6 +288,75 @@ export default function AdminPartnersPage() {
 
                 {isExpanded && (
                   <div className="px-5 pb-5 border-t border-outline-variant/10 pt-4 flex flex-col gap-4">
+                    {loadingDetailId === p.id ? (
+                      <p className="text-xs text-on-surface-variant/50">Loading profile…</p>
+                    ) : (
+                      <>
+                        <div>
+                          <div className="text-xs text-on-surface-variant/60 mb-2">Partner Profile</div>
+                          <div className="bg-surface-container-high px-4 py-3 grid sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
+                            <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Name:</span> {p.profiles?.full_name || '—'}</div>
+                            <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Email:</span> {p.profiles?.email || '—'}</div>
+                            <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Phone:</span> {p.profiles?.phone || '—'}</div>
+                            <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Company:</span> {p.profiles?.company_name || '—'}</div>
+                            <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Partner ID:</span> {p.partner_id}</div>
+                            <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Referral Code:</span> {p.referral_code || '—'}</div>
+                          </div>
+                        </div>
+
+                        {detailById[p.id] && (
+                          <div>
+                            <div className="text-xs text-on-surface-variant/60 mb-2">Opportunities</div>
+                            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center">
+                              {[
+                                ['Total', detailById[p.id].opportunityCounts.total],
+                                ['Under Review', detailById[p.id].opportunityCounts.underReview],
+                                ['Approved', detailById[p.id].opportunityCounts.approved],
+                                ['In Progress', detailById[p.id].opportunityCounts.inProgress],
+                                ['Completed', detailById[p.id].opportunityCounts.completed],
+                              ].map(([label, value]) => (
+                                <div key={label as string} className="bg-surface-container-high px-2 py-3">
+                                  <div className="text-base text-primary">{value as number}</div>
+                                  <div className="text-[10px] text-on-surface-variant/50 uppercase tracking-wide">{label}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {detailById[p.id] && detailById[p.id].referrals.length > 0 && (
+                          <div>
+                            <div className="text-xs text-on-surface-variant/60 mb-2">Referred Users ({detailById[p.id].referrals.length})</div>
+                            <div className="flex flex-col gap-1">
+                              {detailById[p.id].referrals.map((r) => (
+                                <div key={r.id} className="bg-surface-container-high px-3 py-2 text-xs text-on-surface-variant flex justify-between">
+                                  <span>{r.profiles?.full_name || '—'} ({r.profiles?.email})</span>
+                                  <span className="text-on-surface-variant/50">{r.connected_via.replace('_', ' ')}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div>
+                          <div className="text-xs text-on-surface-variant/60 mb-1">Internal Notes (admin-only)</div>
+                          <textarea
+                            value={notesDraft[p.id] ?? ''}
+                            onChange={(e) => setNotesDraft((prev) => ({ ...prev, [p.id]: e.target.value }))}
+                            rows={2}
+                            className="bg-surface-container border border-outline-variant/20 px-3 py-2 text-sm text-on-surface w-full resize-none"
+                          />
+                          <button
+                            onClick={() => saveNotes(p.id)}
+                            disabled={savingNotesId === p.id}
+                            className="mt-2 text-xs px-3 py-1.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors disabled:opacity-40"
+                          >
+                            {savingNotesId === p.id ? 'Saving…' : 'Save Notes'}
+                          </button>
+                        </div>
+                      </>
+                    )}
+
                     <div>
                       <div className="text-xs text-on-surface-variant/60 mb-2">Authorised sectors</div>
                       <div className="flex flex-wrap gap-2">

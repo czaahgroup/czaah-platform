@@ -54,6 +54,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     })
 
     if (inviteError) {
+      // @ts-expect-error — AuthApiError carries a `code` beyond the base Error type
+      if (inviteError.code === 'email_exists' || inviteError.status === 422) {
+        return NextResponse.json(
+          { error: 'This partner has already confirmed their account and set a password — there’s no invite left to resend. If they’ve forgotten their password, tell them to use "Forgot Password" on the login page.' },
+          { status: 409 }
+        )
+      }
       return NextResponse.json({ error: inviteError.message }, { status: 500 })
     }
 

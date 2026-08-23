@@ -50,7 +50,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       .eq('partner_id', id)
       .order('created_at', { ascending: false })
 
-    return NextResponse.json({ data: partner, referrals: referrals || [] })
+    const { data: opportunities } = await auth.supabase!
+      .from('partner_opportunities')
+      .select('status')
+      .eq('partner_id', id)
+
+    const opportunityCounts = {
+      total: opportunities?.length || 0,
+      underReview: opportunities?.filter((o) => o.status === 'submitted' || o.status === 'more_info_required').length || 0,
+      approved: opportunities?.filter((o) => o.status === 'approved').length || 0,
+      inProgress: opportunities?.filter((o) => o.status === 'in_progress').length || 0,
+      completed: opportunities?.filter((o) => o.status === 'completed').length || 0,
+    }
+
+    return NextResponse.json({ data: partner, referrals: referrals || [], opportunityCounts })
   } catch (err) {
     console.error('GET /api/admin/partners/[id] error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
