@@ -31,6 +31,12 @@ const ACTION_BADGES: Record<string, { bg: string; text: string }> = {
   settings_updated: { bg: 'bg-neutral-500/20', text: 'text-neutral-400' },
   login: { bg: 'bg-cyan-500/20', text: 'text-cyan-400' },
   logout: { bg: 'bg-neutral-500/20', text: 'text-neutral-400' },
+  partner_created: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  partner_suspended: { bg: 'bg-red-500/20', text: 'text-red-400' },
+  partner_reactivated: { bg: 'bg-green-500/20', text: 'text-green-400' },
+  partner_sectors_updated: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
+  partner_opportunity_status_changed: { bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
+  partner_referral_removed: { bg: 'bg-red-500/20', text: 'text-red-400' },
 }
 
 const ACTION_OPTIONS = [

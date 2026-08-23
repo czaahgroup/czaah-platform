@@ -40,6 +40,7 @@ export default function AdminPartnersPage() {
   const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null)
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({})
   const [savingNotesId, setSavingNotesId] = useState<string | null>(null)
+  const [removingReferralId, setRemovingReferralId] = useState<string | null>(null)
 
   const [form, setForm] = useState({ email: '', fullName: '', companyName: '', sectorIds: [] as string[] })
 
@@ -158,6 +159,26 @@ export default function AdminPartnersPage() {
       setError(err instanceof Error ? err.message : 'Failed to save notes')
     } finally {
       setSavingNotesId(null)
+    }
+  }
+
+  async function removeReferral(partnerId: string, referralId: string) {
+    setRemovingReferralId(referralId)
+    try {
+      const res = await fetch(`/api/admin/partners/${partnerId}/referrals/${referralId}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error || 'Failed to remove referral')
+      }
+      setDetailById((prev) => {
+        const current = prev[partnerId]
+        if (!current) return prev
+        return { ...prev, [partnerId]: { ...current, referrals: current.referrals.filter((r) => r.id !== referralId) } }
+      })
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to remove referral')
+    } finally {
+      setRemovingReferralId(null)
     }
   }
 
@@ -329,9 +350,18 @@ export default function AdminPartnersPage() {
                             <div className="text-xs text-on-surface-variant/60 mb-2">Referred Users ({detailById[p.id].referrals.length})</div>
                             <div className="flex flex-col gap-1">
                               {detailById[p.id].referrals.map((r) => (
-                                <div key={r.id} className="bg-surface-container-high px-3 py-2 text-xs text-on-surface-variant flex justify-between">
-                                  <span>{r.profiles?.full_name || '—'} ({r.profiles?.email})</span>
-                                  <span className="text-on-surface-variant/50">{r.connected_via.replace('_', ' ')}</span>
+                                <div key={r.id} className="bg-surface-container-high px-3 py-2 text-xs text-on-surface-variant flex items-center justify-between gap-2">
+                                  <span className="min-w-0 truncate">{r.profiles?.full_name || '—'} ({r.profiles?.email})</span>
+                                  <span className="flex items-center gap-2 shrink-0">
+                                    <span className="text-on-surface-variant/50">{r.connected_via.replace('_', ' ')}</span>
+                                    <button
+                                      onClick={() => removeReferral(p.id, r.id)}
+                                      disabled={removingReferralId === r.id}
+                                      className="text-red-400 hover:text-red-300 transition-colors disabled:opacity-40"
+                                    >
+                                      {removingReferralId === r.id ? '…' : 'Remove'}
+                                    </button>
+                                  </span>
                                 </div>
                               ))}
                             </div>

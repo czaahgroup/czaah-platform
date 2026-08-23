@@ -16,10 +16,16 @@ export async function GET(request: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    const { count: referralCount } = await auth.supabase!
+      .from('partner_referrals')
+      .select('id', { count: 'exact', head: true })
+      .eq('partner_id', auth.partner!.id)
+
     return NextResponse.json({
       profile,
       partnerId: auth.partner!.partner_id,
       referralCode: auth.partner!.referral_code,
+      referralCount: referralCount || 0,
     })
   } catch (err) {
     console.error('GET /api/partner/profile error:', err)

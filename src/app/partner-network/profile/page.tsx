@@ -14,6 +14,7 @@ export default function PartnerProfilePage() {
   const [saved, setSaved] = useState(false)
   const [partnerId, setPartnerId] = useState('')
   const [referralCode, setReferralCode] = useState<string | null>(null)
+  const [referralCount, setReferralCount] = useState(0)
   const [email, setEmail] = useState('')
   const [form, setForm] = useState({ fullName: '', phone: '', companyName: '' })
 
@@ -30,6 +31,7 @@ export default function PartnerProfilePage() {
         if (json.error) throw new Error(json.error)
         setPartnerId(json.partnerId)
         setReferralCode(json.referralCode)
+        setReferralCount(json.referralCount || 0)
         setEmail(json.profile.email)
         setForm({
           fullName: json.profile.full_name || '',
@@ -117,6 +119,13 @@ export default function PartnerProfilePage() {
           <div>
             <label className={labelClass}>Referral Code</label>
             <div className="bg-surface-container-high px-3 py-2.5 text-sm text-primary">{referralCode || '—'}</div>
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Referrals</label>
+          <div className="bg-surface-container-high px-3 py-2.5 text-sm text-on-surface-variant">
+            {referralCount} {referralCount === 1 ? 'person has' : 'people have'} registered using your Partner ID or referral code.
           </div>
         </div>
 

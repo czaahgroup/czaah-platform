@@ -113,6 +113,14 @@ export async function POST(request: NextRequest) {
       await supabase.from('partner_sector_access').insert(rows)
     }
 
+    await supabase.from('audit_log').insert({
+      actor_id: auth.userId,
+      action: 'partner_created',
+      target_type: 'partner',
+      target_id: partner.id,
+      metadata: { partner_id: partner.partner_id, email, fullName },
+    })
+
     return NextResponse.json({ success: true, partner })
   } catch (err) {
     console.error('POST /api/admin/partners error:', err)

@@ -22,6 +22,11 @@ export async function GET(request: NextRequest) {
       completed: opportunities?.filter((o) => o.status === 'completed').length || 0,
     }
 
+    const { count: referralCount } = await supabase!
+      .from('partner_referrals')
+      .select('id', { count: 'exact', head: true })
+      .eq('partner_id', partner!.id)
+
     const { data: chat } = await supabase!.from('partner_chats').select('id').eq('partner_id', partner!.id).single()
     let newMessages = 0
     if (chat) {
@@ -34,7 +39,7 @@ export async function GET(request: NextRequest) {
       newMessages = count || 0
     }
 
-    return NextResponse.json({ partner, counts, newMessages })
+    return NextResponse.json({ partner, counts, newMessages, referralCount: referralCount || 0 })
   } catch (err) {
     console.error('GET /api/partner/me error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

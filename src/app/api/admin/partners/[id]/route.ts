@@ -27,7 +27,7 @@ async function requireSuperAdmin(request: NextRequest) {
   if (!profile || profile.role !== 'super_admin') {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
-  return { supabase }
+  return { supabase, userId: user.id }
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -93,9 +93,25 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       updates.updated_at = new Date().toISOString()
       const { error } = await supabase.from('partners').update(updates).eq('id', id)
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+      if (status !== undefined) {
+        await supabase.from('audit_log').insert({
+          actor_id: auth.userId,
+          action: status === 'suspended' ? 'partner_suspended' : 'partner_reactivated',
+          target_type: 'partner',
+          target_id: id,
+        })
+      }
     }
 
     if (Array.isArray(sectorIds)) {
+      await supabase.from('audit_log').insert({
+        actor_id: auth.userId,
+        action: 'partner_sectors_updated',
+        target_type: 'partner',
+        target_id: id,
+        metadata: { sectorIds },
+      })
       await supabase.from('partner_sector_access').delete().eq('partner_id', id)
       if (sectorIds.length > 0) {
         const rows = sectorIds.map((sectorId: string) => ({ partner_id: id, sector_id: sectorId }))

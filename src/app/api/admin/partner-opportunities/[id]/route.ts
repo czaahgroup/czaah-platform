@@ -68,6 +68,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { error } = await supabase.from('partner_opportunities').update(updates).eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    if (status !== undefined) {
+      await supabase.from('audit_log').insert({
+        actor_id: auth.userId,
+        action: 'partner_opportunity_status_changed',
+        target_type: 'partner_opportunity',
+        target_id: id,
+        metadata: { status },
+      })
+    }
+
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('PATCH /api/admin/partner-opportunities/[id] error:', err)
