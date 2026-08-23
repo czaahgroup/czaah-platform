@@ -29,6 +29,8 @@ export default function AdminPartnersPage() {
   const [creating, setCreating] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [savingId, setSavingId] = useState<string | null>(null)
+  const [resendingId, setResendingId] = useState<string | null>(null)
+  const [resendSuccessId, setResendSuccessId] = useState<string | null>(null)
 
   const [form, setForm] = useState({ email: '', fullName: '', companyName: '', sectorIds: [] as string[] })
 
@@ -109,6 +111,24 @@ export default function AdminPartnersPage() {
       setError(err instanceof Error ? err.message : 'Update failed')
     } finally {
       setSavingId(null)
+    }
+  }
+
+  async function resendInvite(id: string) {
+    setResendingId(id)
+    setResendSuccessId(null)
+    try {
+      const res = await fetch(`/api/admin/partners/${id}/resend-invite`, { method: 'POST' })
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error || 'Failed to resend invite')
+      }
+      setResendSuccessId(id)
+      setTimeout(() => setResendSuccessId((current) => (current === id ? null : current)), 4000)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to resend invite')
+    } finally {
+      setResendingId(null)
     }
   }
 
@@ -243,7 +263,7 @@ export default function AdminPartnersPage() {
                         })}
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       {p.status === 'active' ? (
                         <button
                           onClick={() => updateStatus(p.id, 'suspended')}
@@ -260,6 +280,16 @@ export default function AdminPartnersPage() {
                         >
                           Reactivate Partner
                         </button>
+                      )}
+                      <button
+                        onClick={() => resendInvite(p.id)}
+                        disabled={resendingId === p.id}
+                        className="text-xs px-3 py-1.5 border border-primary/40 text-primary hover:border-primary transition-colors disabled:opacity-40"
+                      >
+                        {resendingId === p.id ? 'Sending…' : 'Resend Invite'}
+                      </button>
+                      {resendSuccessId === p.id && (
+                        <span className="text-xs text-green-400">Invite sent</span>
                       )}
                     </div>
                   </div>
