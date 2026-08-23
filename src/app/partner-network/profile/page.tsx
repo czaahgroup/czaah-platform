@@ -2,6 +2,7 @@
 // @ts-nocheck
 
 import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 const inputClass = 'bg-surface-container border border-outline-variant/20 px-3 py-2.5 text-sm text-on-surface raleway-text w-full focus:border-primary outline-none transition-colors'
 const labelClass = 'raleway-text text-xs font-medium tracking-[0.05em] uppercase text-on-surface-variant/60 mb-1.5 block'
@@ -15,6 +16,12 @@ export default function PartnerProfilePage() {
   const [referralCode, setReferralCode] = useState<string | null>(null)
   const [email, setEmail] = useState('')
   const [form, setForm] = useState({ fullName: '', phone: '', companyName: '' })
+
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [savingPassword, setSavingPassword] = useState(false)
+  const [passwordMsg, setPasswordMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/partner/profile')
@@ -51,6 +58,44 @@ export default function PartnerProfilePage() {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault()
+    setPasswordMsg(null)
+
+    if (newPassword.length < 8) {
+      setPasswordMsg({ type: 'error', text: 'New password must be at least 8 characters.' })
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordMsg({ type: 'error', text: 'New passwords do not match.' })
+      return
+    }
+
+    setSavingPassword(true)
+    try {
+      const supabase = createClient()
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: currentPassword })
+      if (signInError) {
+        setPasswordMsg({ type: 'error', text: 'Current password is incorrect.' })
+        setSavingPassword(false)
+        return
+      }
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
+      if (updateError) {
+        setPasswordMsg({ type: 'error', text: updateError.message })
+      } else {
+        setPasswordMsg({ type: 'success', text: 'Password changed successfully.' })
+        setCurrentPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+      }
+    } catch {
+      setPasswordMsg({ type: 'error', text: 'Failed to change password.' })
+    } finally {
+      setSavingPassword(false)
     }
   }
 
@@ -98,6 +143,32 @@ export default function PartnerProfilePage() {
         <button onClick={handleSave} disabled={saving} className="self-start text-sm px-5 py-2.5 bg-primary text-on-primary disabled:opacity-40 transition-opacity raleway-text">
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
+      </div>
+
+      <div className="max-w-lg mt-10">
+        <h2 className="cinzel-text text-lg text-on-surface mb-4">Change Password</h2>
+        {passwordMsg && (
+          <div className={`px-4 py-3 mb-5 ${passwordMsg.type === 'error' ? 'bg-red-500/10 border border-red-500/20' : 'bg-green-500/10 border border-green-500/20'}`}>
+            <p className={`text-sm ${passwordMsg.type === 'error' ? 'text-red-400' : 'text-green-400'}`}>{passwordMsg.text}</p>
+          </div>
+        )}
+        <form onSubmit={changePassword} className="flex flex-col gap-5">
+          <div>
+            <label className={labelClass}>Current Password</label>
+            <input type="password" required className={inputClass} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Enter your current password" />
+          </div>
+          <div>
+            <label className={labelClass}>New Password</label>
+            <input type="password" required minLength={8} className={inputClass} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Minimum 8 characters" />
+          </div>
+          <div>
+            <label className={labelClass}>Confirm New Password</label>
+            <input type="password" required minLength={8} className={inputClass} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Re-enter your new password" />
+          </div>
+          <button type="submit" disabled={savingPassword} className="self-start text-sm px-5 py-2.5 bg-primary text-on-primary disabled:opacity-40 transition-opacity raleway-text">
+            {savingPassword ? 'Changing…' : 'Change Password'}
+          </button>
+        </form>
       </div>
     </div>
   )
