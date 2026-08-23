@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 function createAuthClient(request: NextRequest) {
   return createServerClient(
@@ -42,4 +43,19 @@ export async function requirePartner(request: NextRequest) {
   }
 
   return { supabase, userId: user.id, partner }
+}
+
+/**
+ * True if this partner is authorised for a Human Resources / Workforce /
+ * Recruitment sector — gates workforce, employer, and OEP submission,
+ * both the nav link and (here) the actual API enforcement.
+ */
+export async function hasWorkforceSectorAccess(supabase: SupabaseClient, partnerId: string): Promise<boolean> {
+  const { data: access } = await supabase
+    .from('partner_sector_access')
+    .select('sectors(name)')
+    .eq('partner_id', partnerId)
+  return (access || []).some((row: { sectors: { name: string } | null }) =>
+    row.sectors && /human resources|workforce|recruitment/i.test(row.sectors.name)
+  )
 }

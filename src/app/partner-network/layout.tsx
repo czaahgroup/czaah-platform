@@ -13,7 +13,7 @@ const BASE_NAV_LINKS = [
   { href: '/partner-network/opportunities', label: 'My Opportunities', icon: 'work' },
 ]
 
-const WORKFORCE_NAV_LINK = { href: '/partner-network/add-workforce', label: 'Add Workforce', icon: 'groups' }
+const WORKFORCE_NAV_LINK = { href: '/partner-network/recruitment', label: 'Recruitment', icon: 'groups' }
 
 const TAIL_NAV_LINKS = [
   { href: '/partner-network/messages', label: 'Messages', icon: 'mail' },
