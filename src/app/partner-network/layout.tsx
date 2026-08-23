@@ -54,7 +54,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
             <span className="raleway-text text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/50">Partner Network</span>
           </Link>
         </div>
-        <nav className="px-3 py-4 flex flex-col gap-1">
+        <div className="px-3 py-4 flex flex-col gap-1">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href
             return (
@@ -70,7 +70,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
               </Link>
             )
           })}
-        </nav>
+        </div>
         <div className="px-5 py-4 border-t border-outline-variant/10 flex flex-col gap-3 mt-auto">
           <p className="raleway-text text-xs text-on-surface-variant/50 truncate">{fullName}</p>
           <Link href="/dashboard" className="raleway-text text-xs text-on-surface-variant/50 hover:text-primary transition-colors">&larr; Main Site</Link>
