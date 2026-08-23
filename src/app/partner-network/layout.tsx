@@ -46,15 +46,15 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-surface-container-lowest">
-      <aside className="w-full lg:w-64 lg:shrink-0 bg-surface-container border-b lg:border-b-0 lg:border-r border-outline-variant/10 flex flex-col lg:min-h-screen">
-        <div className="px-6 py-6 border-b border-outline-variant/10 flex items-center justify-between lg:block">
+    <div className="min-h-screen flex bg-surface-container-lowest">
+      <aside className="w-64 shrink-0 bg-surface-container border-r border-outline-variant/10 flex flex-col min-h-screen">
+        <div className="px-6 py-6 border-b border-outline-variant/10">
           <Link href="/partner-network" className="no-underline">
             <span className="cinzel-text text-lg tracking-[0.15em] text-primary block">CZAAH</span>
             <span className="raleway-text text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/50">Partner Network</span>
           </Link>
         </div>
-        <nav className="px-3 py-4 flex flex-row lg:flex-col flex-wrap gap-1">
+        <nav className="px-3 py-4 flex flex-col gap-1">
           {NAV_LINKS.map((link) => {
             const active = pathname === link.href
             return (
@@ -71,7 +71,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
             )
           })}
         </nav>
-        <div className="px-5 py-4 border-t border-outline-variant/10 flex flex-col gap-3 lg:mt-auto">
+        <div className="px-5 py-4 border-t border-outline-variant/10 flex flex-col gap-3 mt-auto">
           <p className="raleway-text text-xs text-on-surface-variant/50 truncate">{fullName}</p>
           <Link href="/dashboard" className="raleway-text text-xs text-on-surface-variant/50 hover:text-primary transition-colors">&larr; Main Site</Link>
           <form action="/api/auth/signout" method="POST">
