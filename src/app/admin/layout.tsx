@@ -86,16 +86,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               fontSize: '10px', letterSpacing: '3px',
               textTransform: 'uppercase' as const, color: '#e6c364',
               opacity: 0.4, marginTop: '4px', display: 'block',
-            }}>Admin Panel</span>
+            }}>Super Admin</span>
           </div>
         </Link>
       </div>
 
-      {/* View Main Site */}
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-outline-variant, #4d4637)' }}>
+      {/* View Main Site / Go to Dashboard */}
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-outline-variant, #4d4637)', display: 'flex', flexDirection: 'column' }}>
         <Link href="/" className="admin-nav-link" style={{ opacity: 0.5, fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', padding: '6px 16px' }}>
           <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_back</span>
           View Main Site
+        </Link>
+        <Link href="/dashboard" className="admin-nav-link" style={{ opacity: 0.7, fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', padding: '6px 16px', color: '#e6c364' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>space_dashboard</span>
+          Go to Dashboard
         </Link>
       </div>
 
