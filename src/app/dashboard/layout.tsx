@@ -78,6 +78,7 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
   if (!profile) return null
 
   const isElite = profile.role === 'elite_member' || profile.role === 'super_admin'
+  const isAdminRole = profile.role === 'admin' || profile.role === 'super_admin'
   const isRealEstatePartner = profile.role === 'real_estate_partner'
 
   // Grouped navigation sections
@@ -187,6 +188,16 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_back</span>
             View Main Site
           </Link>
+          {isAdminRole && (
+            <Link
+              href="/admin"
+              className="member-nav-link"
+              style={{ opacity: 0.7, fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', padding: '6px 16px', color: 'var(--color-primary)' }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>admin_panel_settings</span>
+              Go to Super Admin
+            </Link>
+          )}
         </div>
 
         {/* Navigation */}
