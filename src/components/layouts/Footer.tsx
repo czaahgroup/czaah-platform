@@ -85,7 +85,7 @@ export function Footer() {
             <span className="footer-wordmark">CZAAH</span>
           </div>
           <div className="footer-tagline">Capital &middot; Ventures &middot; Infrastructure</div>
-          <p>Pakistan&apos;s institutional investment facilitation group at the intersection of government, resources, and international capital.</p>
+          <p>A London-based international investment facilitation group at the intersection of government, resources, and international capital.</p>
         </div>
         <div className="footer-cols">
           <div className="footer-col">

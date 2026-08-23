@@ -4,9 +4,9 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://czaah.com'),
-  title: "CZAAH — Investing in Pakistan's Future",
+  title: "CZAAH — International Investment Facilitation Group",
   description:
-    "CZAAH — Pakistan's institutional gateway for global capital. Investment facilitation across 13 sectors including minerals, real estate, technology, and textiles.",
+    "CZAAH — London-based international investment facilitation group. Connecting global capital with opportunities across the UK, Pakistan, and international markets across 13 sectors.",
   manifest: "/favicon/manifest.json",
   appleWebApp: {
     capable: true,
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CZAAH — Capital · Ventures · Infrastructure",
     description:
-      "Pakistan's institutional investment facilitation group. Connecting international capital with Pakistan's trillion-dollar resource base.",
+      "A London-based international investment facilitation group connecting global capital with opportunities across the UK, Pakistan, and international markets.",
     siteName: "CZAAH",
     type: "website",
     images: [{ url: "/favicon/czaah-shared.png" }],
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CZAAH — Capital · Ventures · Infrastructure",
     description:
-      "Pakistan's institutional investment facilitation group.",
+      "London-based international investment facilitation group.",
     images: ["/favicon/czaah-shared.png"],
   },
   icons: {

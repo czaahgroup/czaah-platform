@@ -72,7 +72,7 @@ export default function ContactPage() {
             <div className="h-px w-16 bg-primary mb-8"></div>
             <p className="raleway-text text-xs font-semibold tracking-[0.2em] uppercase text-primary mb-6">Get in Touch</p>
             <h1 className="cinzel-text text-2xl sm:text-4xl md:text-6xl font-bold text-on-surface mb-8">Contact <span className="text-primary">us.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Institutional investors, family offices, sovereign entities, and corporate leadership evaluating Pakistan &mdash; we welcome a confidential conversation.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Institutional investors, family offices, sovereign entities, and corporate leadership evaluating opportunities across the UK, Pakistan, and our international markets &mdash; we welcome a confidential conversation.</p>
             <a href="#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Send a Message &rarr;</a>
           </div>
         </section>
@@ -153,8 +153,8 @@ export default function ContactPage() {
               </div>
               <div className="flex flex-col gap-4">
                 {[
-                  { icon: 'apartment', title: 'Islamabad Office', desc: 'CZAAH Capital & Ventures\nEmirates Tower, F-7 Markaz\nIslamabad, Pakistan' },
                   { icon: 'location_city', title: 'London Office', desc: 'CZAAH International\nBerkeley Square, Mayfair\nLondon, W1J 6BD' },
+                  { icon: 'apartment', title: 'Islamabad Office', desc: 'CZAAH Capital & Ventures\nEmirates Tower, F-7 Markaz\nIslamabad, Pakistan' },
                   { icon: 'euro', title: 'Brussels Office', desc: 'Rue de la Tour Japonaise, 14\n1120 Bruxelles\nBelgium' },
                   { icon: 'domain', title: 'Hong Kong Office', desc: 'RM 1805-06, 18/F\nHollywood Plaza, 610 Nathan Road\nKowloon, Hong Kong' },
                   { icon: 'mail', title: 'Email', desc: 'info@czaah.com', isEmail: true },

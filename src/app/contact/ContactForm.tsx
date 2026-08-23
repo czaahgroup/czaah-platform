@@ -174,7 +174,7 @@ export function ContactForm() {
           rows={5}
           required
           className="w-full bg-czaah-card border border-czaah-border rounded px-4 py-3 text-czaah-white font-[family-name:var(--font-body)] text-sm placeholder:text-czaah-muted-dim focus:border-czaah-gold focus:outline-none transition-colors resize-none"
-          placeholder="Tell us about your interest in Pakistan..."
+          placeholder="Tell us about your interest..."
         />
       </div>
 

@@ -24,7 +24,7 @@ const FAQ_DATA: FaqCategory[] = [
     items: [
       {
         question: 'What is CZAAH?',
-        answer: 'CZAAH is a diversified investment facilitation group headquartered in Islamabad, Pakistan, with international reach across key global markets. We connect international investors with Pakistan\u2019s highest-growth opportunities across minerals, real estate, technology, textiles, agriculture, and pharmaceuticals.',
+        answer: 'CZAAH is a London-based, diversified international investment facilitation group with on-the-ground operations across key global markets, including Pakistan. We connect international investors with high-growth opportunities across minerals, real estate, technology, textiles, agriculture, and pharmaceuticals.',
       },
       {
         question: 'Who can invest through CZAAH?',

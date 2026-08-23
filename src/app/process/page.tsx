@@ -8,7 +8,7 @@ const processSteps = [
   { num: '02', title: 'Investment Assessment & Proposal', desc: "Our team conducts comprehensive market analysis, feasibility assessment, and due diligence on shortlisted opportunities. You receive a detailed investment proposal with financial projections, risk analysis, regulatory requirements, and recommended deal structure." },
   { num: '03', title: 'Legal & Licensing Facilitation', desc: "We handle all regulatory navigation \u2014 SECP registration, BOI approvals, FBR compliance, industry licensing, and provincial permits. Our institutional structure provides clean legal frameworks for international investors." },
   { num: '04', title: 'Investment Execution', desc: "With approvals in place, we execute the investment \u2014 whether it's acquiring a mining lease, purchasing commercial property, securing a government contract, or establishing a manufacturing JV. Every transaction is documented, insured, and transparent." },
-  { num: '05', title: 'Ongoing Portfolio Management', desc: "Post-investment, CZAAH provides continuous oversight \u2014 financial reporting, asset management, regulatory compliance, performance monitoring, and strategic guidance. You have a dedicated team managing your Pakistan portfolio." },
+  { num: '05', title: 'Ongoing Portfolio Management', desc: "Post-investment, CZAAH provides continuous oversight \u2014 financial reporting, asset management, regulatory compliance, performance monitoring, and strategic guidance. You have a dedicated team managing your portfolio." },
 ]
 
 const principles = [
