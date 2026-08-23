@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.updateUser({ password })
+    const { data, error } = await supabase.auth.updateUser({ password })
 
     if (error) {
       setError(error.message)
@@ -73,8 +73,15 @@ export default function ResetPasswordPage() {
       return
     }
 
+    let destination = '/dashboard'
+    if (data.user) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
+      if (profile?.role === 'partner') destination = '/partner-network'
+      else if (profile?.role === 'super_admin' || profile?.role === 'admin') destination = '/admin'
+    }
+
     setSuccess(true)
-    setTimeout(() => router.push('/dashboard'), 2000)
+    setTimeout(() => router.push(destination), 2000)
   }
 
   return (

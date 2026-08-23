@@ -43,6 +43,8 @@ function LoginForm() {
       router.push('/dashboard')
     } else if (profile.role === 'member') {
       router.push('/dashboard')
+    } else if (profile.role === 'partner') {
+      router.push('/partner-network')
     } else {
       router.push('/')
     }
