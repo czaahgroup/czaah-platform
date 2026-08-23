@@ -73,14 +73,7 @@ export default function PartnerMembershipCardPage() {
     })
   }
 
-  async function downloadCard() {
-    if (!card) return
-    const markhorImg = await loadMarkhorImage().catch(() => null)
-    const canvas = document.createElement('canvas')
-    canvas.width = 680
-    canvas.height = 428
-    const ctx = canvas.getContext('2d')!
-
+  function drawCardBase(ctx: CanvasRenderingContext2D) {
     const grad = ctx.createLinearGradient(0, 0, 680, 428)
     grad.addColorStop(0, '#0a0a0a')
     grad.addColorStop(1, '#111111')
@@ -109,6 +102,26 @@ export default function PartnerMembershipCardPage() {
       ctx.lineTo(i, 428)
       ctx.stroke()
     }
+  }
+
+  function loadExternalImage(src: string): Promise<HTMLImageElement> {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = src
+    return new Promise((resolve, reject) => {
+      img.onload = () => resolve(img)
+      img.onerror = reject
+    })
+  }
+
+  async function downloadFront() {
+    if (!card) return
+    const markhorImg = await loadMarkhorImage().catch(() => null)
+    const canvas = document.createElement('canvas')
+    canvas.width = 680
+    canvas.height = 428
+    const ctx = canvas.getContext('2d')!
+    drawCardBase(ctx)
 
     ctx.fillStyle = '#C9A84C'
     ctx.font = '600 28px Cinzel, serif'
@@ -154,9 +167,50 @@ export default function PartnerMembershipCardPage() {
     ctx.fillText(`Partner Since ${card.memberSince}`, 40, 400)
 
     const link = document.createElement('a')
-    link.download = 'czaah-partner-card.png'
+    link.download = 'czaah-partner-card-front.png'
     link.href = canvas.toDataURL('image/png')
     link.click()
+  }
+
+  async function downloadBack() {
+    if (!card) return
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(card.qrData)}&size=300x300&bgcolor=080808&color=C9A84C`
+    const qrImg = await loadExternalImage(qrUrl).catch(() => null)
+    const canvas = document.createElement('canvas')
+    canvas.width = 680
+    canvas.height = 428
+    const ctx = canvas.getContext('2d')!
+    drawCardBase(ctx)
+
+    if (qrImg) {
+      ctx.drawImage(qrImg, 290, 84, 100, 100)
+    }
+
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.font = '400 13px Raleway, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('SCAN TO VERIFY PARTNER', 340, 218)
+
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'
+    ctx.font = '400 13px Raleway, sans-serif'
+    ctx.fillText('CZAAH Capital & Ventures', 340, 260)
+
+    ctx.fillStyle = '#C9A84C'
+    ctx.font = '500 14px Raleway, sans-serif'
+    ctx.fillText('czaah.com', 340, 282)
+
+    const link = document.createElement('a')
+    link.download = 'czaah-partner-card-back.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+
+  async function downloadCard() {
+    if (flipped) {
+      await downloadBack()
+    } else {
+      await downloadFront()
+    }
   }
 
   async function shareCard() {
@@ -214,7 +268,7 @@ export default function PartnerMembershipCardPage() {
         color: 'rgba(255,255,255,0.35)',
         marginBottom: '40px',
       }}>
-        Your digital CZAAH Partner credential. Click the card to flip.
+        Your digital CZAAH Partner credential. Click the card to flip, then download whichever side is showing.
       </p>
 
       <div
@@ -443,7 +497,7 @@ export default function PartnerMembershipCardPage() {
             transition: 'all 0.3s ease',
           }}
         >
-          Download Card
+          Download {flipped ? 'Back' : 'Front'}
         </button>
 
         {canShare && (

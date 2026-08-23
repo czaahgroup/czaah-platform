@@ -50,7 +50,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
       <aside className="w-64 shrink-0 bg-surface-container border-r border-outline-variant/10 flex flex-col min-h-screen">
         <div className="px-6 py-6 border-b border-outline-variant/10">
           <Link href="/partner-network" className="no-underline flex items-center gap-3">
-            <svg viewBox="-5 -12 100 128" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-8 w-auto shrink-0">
+            <svg viewBox="-5 -12 100 128" width="100" height="128" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto shrink-0">
               <defs>
                 <linearGradient id="pnHornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#8a6f2e"/>
