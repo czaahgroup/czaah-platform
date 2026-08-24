@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
     // TEMP DIAGNOSTIC: auth check disabled to confirm this file is actually
     // reachable in the deployed build (vs. middleware masking a 404 as 401).
     void request
+    return NextResponse.json({ marker: 'CANARY_9f3k2m_v2', hasTurnKeyId: !!process.env.CLOUDFLARE_TURN_KEY_ID, hasTurnApiToken: !!process.env.CLOUDFLARE_TURN_KEY_API_TOKEN })
+    // eslint-disable-next-line no-unreachable
     const keyId = process.env.CLOUDFLARE_TURN_KEY_ID
     const apiToken = process.env.CLOUDFLARE_TURN_KEY_API_TOKEN
     if (!keyId || !apiToken) {
