@@ -2066,7 +2066,7 @@ footer {
 
 @media (max-width: 768px) {
   /* Nav */
-  nav { padding: 0 16px; gap: 8px; }
+  nav { padding: 0 16px; padding-top: env(safe-area-inset-top); gap: 8px; }
   .nav-search-btn { display: none; }
   .nav-logo .nav-wordmark { font-size: 18px; letter-spacing: 5px; text-indent: 5px; }
   .nav-logo .markhor-mark { height: 28px; }
@@ -2143,7 +2143,7 @@ footer {
 }
 
 @media (max-width: 480px) {
-  nav { padding: 0 12px; }
+  nav { padding: 0 12px; padding-top: env(safe-area-inset-top); }
   .nav-logo .nav-wordmark { font-size: 16px; letter-spacing: 4px; text-indent: 4px; }
 
   .v-hero { padding: 88px 16px 40px; }
