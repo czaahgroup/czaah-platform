@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   typescript: {
@@ -6,6 +7,15 @@ const nextConfig: NextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  webpack: (config) => {
+    // Avoid bundling @react-email/render's prettier dependency (~250KB) —
+    // it's never actually used, see src/stubs/react-email-render.ts.
+    config.resolve.alias["@react-email/render"] = path.resolve(
+      __dirname,
+      "src/stubs/react-email-render.ts"
+    );
+    return config;
   },
   async headers() {
     return [
