@@ -47,12 +47,14 @@ export interface UseCallReturn {
   canRejoin: boolean
 }
 
-const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-  ],
-}
+// Fallback used only until /api/calls/turn-credentials resolves (or if it
+// fails). STUN alone can't relay media, so calls across different networks
+// won't connect on this fallback — it exists purely so a call attempt made
+// in the first instant after mount doesn't hard-crash with no ICE servers.
+const FALLBACK_ICE_SERVERS: RTCIceServer[] = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+]
 
 const CALL_TIMEOUT_MS = 30000
 
@@ -116,6 +118,26 @@ export function useCall({
   const lastTargetUserIdRef = useRef<string | null>(null)
   const lastTargetNameRef = useRef<string | null>(null)
   const activeCallRef = useRef(false)
+  const iceServersRef = useRef<RTCIceServer[]>(FALLBACK_ICE_SERVERS)
+
+  // Fetch short-lived Cloudflare TURN credentials once on mount, so a real
+  // relay path is ready before any call is actually placed or accepted.
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/calls/turn-credentials')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.iceServers?.length) {
+          iceServersRef.current = data.iceServers
+        }
+      })
+      .catch(() => {
+        // Keep the STUN-only fallback — calls on friendly networks still work
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Keep refs in sync
   useEffect(() => {
@@ -185,7 +207,7 @@ export function useCall({
       existing.close()
     }
 
-    const pc = new RTCPeerConnection(ICE_SERVERS)
+    const pc = new RTCPeerConnection({ iceServers: iceServersRef.current })
     peerConnectionsRef.current.set(participantId, pc)
 
     // Send ICE candidates via broadcast
