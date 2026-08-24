@@ -16,6 +16,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useCall } from '@/lib/hooks/useCall'
 import type { CallType, UseCallReturn } from '@/lib/hooks/useCall'
 import { CallUI } from '@/components/chat/CallUI'
+import { primeAudioUnlock } from '@/lib/audioUnlock'
 
 interface ChatRef {
   id: string
@@ -45,6 +46,10 @@ export function PartnerCallProvider({
   const [chats, setChats] = useState<ChatRef[]>([])
   const callsRef = useRef<Map<string, UseCallReturn>>(new Map())
   const [, bumpVersion] = useState(0)
+
+  useEffect(() => {
+    primeAudioUnlock()
+  }, [])
 
   useEffect(() => {
     let cancelled = false

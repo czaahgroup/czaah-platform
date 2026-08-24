@@ -9,6 +9,7 @@ import { useVoiceRecorder } from '@/lib/hooks/useVoiceRecorder'
 import { useCall } from '@/lib/hooks/useCall'
 import type { CallType } from '@/lib/hooks/useCall'
 import { CallUI } from '@/components/chat/CallUI'
+import { primeAudioUnlock } from '@/lib/audioUnlock'
 
 
 interface Chat {
@@ -104,6 +105,10 @@ export default function AdminEliteChatsPage() {
       await startRecording()
     }
   }
+
+  useEffect(() => {
+    primeAudioUnlock()
+  }, [])
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {

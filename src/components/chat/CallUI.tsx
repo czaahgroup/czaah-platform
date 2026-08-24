@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import type { CallState, CallType, Participant } from '@/lib/hooks/useCall'
+import { getSharedAudioContext } from '@/lib/audioUnlock'
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -86,8 +87,17 @@ function VideoElement({
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream
+    const el = videoRef.current
+    if (!el) return
+    el.srcObject = stream
+    if (stream) {
+      // The `autoPlay` attribute alone is unreliable for unmuted remote
+      // media — many browsers (mobile Safari especially) silently refuse
+      // to start it without an explicit play() call, with no error and no
+      // visible symptom besides a stuck avatar / silent audio.
+      el.play().catch((err) => {
+        console.warn('[CallUI] video/audio play() was blocked:', err)
+      })
     }
   }, [stream])
 
@@ -178,14 +188,23 @@ export function CallUI({
   useEffect(() => {
     if (callState !== 'ringing' && callState !== 'calling') return
 
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-    const ctx = new AudioContextClass()
+    // Reuse the context unlocked on the page's first click/tap (see
+    // audioUnlock.ts) rather than a fresh one — a brand-new AudioContext
+    // created here has no user gesture of its own to unlock it, especially
+    // for an incoming ring, which starts purely from a realtime event.
+    const ctx = getSharedAudioContext()
+    if (!ctx) return
     let stopped = false
     let timer: ReturnType<typeof setTimeout>
 
-    function playCycle() {
+    async function playCycle() {
+      if (stopped || !ctx) return
+      try {
+        await ctx.resume()
+      } catch (err) {
+        console.warn('[CallUI] ring tone AudioContext.resume() was blocked:', err)
+      }
       if (stopped) return
-      ctx.resume().catch(() => {})
       const now = ctx.currentTime
       // Incoming call: classic dual-tone ring (440Hz + 480Hz). Outgoing/waiting:
       // a single softer ringback tone, distinct enough to tell the two apart.
@@ -217,7 +236,6 @@ export function CallUI({
     return () => {
       stopped = true
       clearTimeout(timer)
-      ctx.close().catch(() => {})
     }
   }, [callState])
 

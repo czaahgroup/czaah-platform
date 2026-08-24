@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useCall } from '@/lib/hooks/useCall'
 import type { CallType } from '@/lib/hooks/useCall'
 import { CallUI } from '@/components/chat/CallUI'
+import { primeAudioUnlock } from '@/lib/audioUnlock'
 
 interface Message {
   id: string
@@ -73,6 +74,10 @@ export default function PartnerMessagesPage() {
     onCallEnded: handleCallEnded,
     onCallMissed: handleCallMissed,
   })
+
+  useEffect(() => {
+    primeAudioUnlock()
+  }, [])
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {

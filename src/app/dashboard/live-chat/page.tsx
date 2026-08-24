@@ -9,6 +9,7 @@ import { VoiceNotePlayer, isVoiceNote } from '@/components/chat/VoiceNotePlayer'
 import { useVoiceRecorder } from '@/lib/hooks/useVoiceRecorder'
 import { useCall } from '@/lib/hooks/useCall'
 import type { CallType } from '@/lib/hooks/useCall'
+import { primeAudioUnlock } from '@/lib/audioUnlock'
 import { CallUI } from '@/components/chat/CallUI'
 
 interface Chat {
@@ -150,6 +151,10 @@ export default function LiveChatPage() {
       await startRecording()
     }
   }
+
+  useEffect(() => {
+    primeAudioUnlock()
+  }, [])
 
   // Get current user
   useEffect(() => {
