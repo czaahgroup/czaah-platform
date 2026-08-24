@@ -47,8 +47,21 @@ export default function MembershipCardPage() {
       })
   }, [])
 
-  function downloadCard() {
+  function loadExternalImage(src: string): Promise<HTMLImageElement> {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = src
+    return new Promise((resolve, reject) => {
+      img.onload = () => resolve(img)
+      img.onerror = reject
+    })
+  }
+
+  async function downloadCard() {
     if (!card) return
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(card.qrData)}&size=300x300&bgcolor=080808&color=C9A84C`
+    const qrImg = await loadExternalImage(qrUrl).catch(() => null)
+
     const canvas = document.createElement('canvas')
     canvas.width = 680
     canvas.height = 428
@@ -109,6 +122,16 @@ export default function MembershipCardPage() {
     ctx.fillStyle = 'rgba(201,168,76,0.7)'
     ctx.fill()
     ctx.restore()
+
+    // QR code — lets anyone who receives this image (e.g. shared via
+    // WhatsApp as a picture, with no accompanying link) verify the card
+    if (qrImg) {
+      ctx.drawImage(qrImg, 480, 90, 140, 140)
+      ctx.fillStyle = 'rgba(255,255,255,0.35)'
+      ctx.font = '400 10px Raleway, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('SCAN TO VERIFY', 550, 250)
+    }
 
     // Member name
     ctx.fillStyle = '#ffffff'

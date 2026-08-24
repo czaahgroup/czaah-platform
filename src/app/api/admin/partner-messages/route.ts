@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     const { data: chats, error } = await auth.supabase!
       .from('partner_chats')
-      .select('*, partners(id, partner_id, profiles!partners_profile_id_fkey(full_name, email)), partner_messages(id, is_read, sender_id)')
+      .select('*, partners(id, partner_id, profile_id, profiles!partners_profile_id_fkey(full_name, email)), partner_messages(id, is_read, sender_id)')
       .order('last_message_at', { ascending: false, nullsFirst: false })
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })

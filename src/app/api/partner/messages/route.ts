@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       .eq('partner_id', partner!.id)
       .single()
 
-    if (!chat) return NextResponse.json({ data: [] })
+    if (!chat) return NextResponse.json({ data: [], chatId: null, admin: null })
 
     const { data: messages, error } = await supabase!
       .from('partner_messages')
@@ -32,7 +32,18 @@ export async function GET(request: NextRequest) {
       .eq('chat_id', chat.id)
       .neq('sender_id', userId)
 
-    return NextResponse.json({ data: messages })
+    // A representative super_admin to ring — the call itself is broadcast
+    // to the shared chat channel, so whichever super_admin has this
+    // conversation open answers, regardless of which one this resolves to.
+    const { data: admin } = await supabase!
+      .from('profiles')
+      .select('id, full_name')
+      .eq('role', 'super_admin')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    return NextResponse.json({ data: messages, chatId: chat.id, admin })
   } catch (err) {
     console.error('GET /api/partner/messages error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

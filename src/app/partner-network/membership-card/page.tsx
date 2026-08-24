@@ -232,9 +232,13 @@ export default function PartnerMembershipCardPage() {
       if (blob) {
         const file = new File([blob], 'czaah-partner-card.png', { type: 'image/png' })
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // Most share targets (WhatsApp included) drop a separate `url`
+          // once `files` is present, so the verify link is folded into
+          // the caption text instead — it still shows up as a tappable
+          // link there.
           await navigator.share({
             title: 'CZAAH Partner Card',
-            text: `${card.fullName} — CZAAH Partner | ID: ${card.memberId}`,
+            text: `${card.fullName} — CZAAH Partner | ID: ${card.memberId}\nVerify: ${card.qrData}`,
             files: [file],
           })
           return

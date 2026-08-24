@@ -6,10 +6,12 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { AdminSidebarWrapper } from '@/components/AdminSidebarWrapper'
+import { PartnerCallProvider } from '@/lib/contexts/PartnerCallContext'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [fullName, setFullName] = useState('')
+  const [userId, setUserId] = useState('')
   const router = useRouter()
   const pathname = usePathname()
 
@@ -25,6 +27,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         return
       }
       setFullName(profile.full_name || '')
+      setUserId(session.user.id)
       setLoading(false)
     }
     checkAuth()
@@ -165,9 +168,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <>
-      <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
-        {children}
-      </AdminSidebarWrapper>
+      <PartnerCallProvider userId={userId} userName={fullName}>
+        <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
+          {children}
+        </AdminSidebarWrapper>
+      </PartnerCallProvider>
 
       <style>{`
         .admin-nav-link {
