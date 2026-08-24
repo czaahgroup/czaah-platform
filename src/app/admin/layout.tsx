@@ -9,7 +9,6 @@ import { AdminSidebarWrapper } from '@/components/AdminSidebarWrapper'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [fullName, setFullName] = useState('')
   const router = useRouter()
   const pathname = usePathname()
@@ -21,11 +20,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (!session?.user) { window.location.href = '/login'; return }
 
       const { data: profile } = await supabase.from('profiles').select('role, full_name').eq('id', session.user.id).single()
-      if (!profile || (profile.role !== 'super_admin' && profile.role !== 'admin')) {
+      if (!profile || profile.role !== 'super_admin') {
         window.location.href = '/dashboard'
         return
       }
-      setIsSuperAdmin(profile.role === 'super_admin')
       setFullName(profile.full_name || '')
       setLoading(false)
     }
@@ -112,50 +110,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/kyc" label="KYC Review" icon="verified_user" />
         <NavLink href="/admin/workforce" label="Workforce" icon="engineering" />
         <NavLink href="/admin/employers" label="Employers" icon="apartment" />
-        {isSuperAdmin && <NavLink href="/admin/users" label="Users" icon="group" />}
+        <NavLink href="/admin/oep" label="Employment Promoters" icon="flight_takeoff" />
+        <NavLink href="/admin/users" label="Users" icon="group" />
 
         <SectionHeader label="Enquiries" />
         <NavLink href="/admin/enquiries" label="All Enquiries" icon="contact_mail" />
-        {isSuperAdmin && <NavLink href="/admin/messages" label="Website Messages" icon="mail" />}
-        {isSuperAdmin && <NavLink href="/admin/chats" label="Chat Monitor" icon="forum" />}
+        <NavLink href="/admin/messages" label="Website Messages" icon="mail" />
+        <NavLink href="/admin/chats" label="Chat Monitor" icon="forum" />
 
-        {isSuperAdmin && (
-          <>
-            <SectionHeader label="Partner Network" />
-            <NavLink href="/admin/partners" label="Partners" icon="handshake" />
-            <NavLink href="/admin/partner-opportunities" label="Opportunities" icon="work" />
-            <NavLink href="/admin/partner-messages" label="Partner Messages" icon="mark_email_unread" />
-          </>
-        )}
+        <SectionHeader label="Partner Network" />
+        <NavLink href="/admin/partners" label="Partners" icon="handshake" />
+        <NavLink href="/admin/partner-opportunities" label="Opportunities" icon="work" />
+        <NavLink href="/admin/partner-messages" label="Partner Messages" icon="mark_email_unread" />
 
         <SectionHeader label="Real Estate" />
         <NavLink href="/admin/properties" label="Properties" icon="apartment" />
 
         <SectionHeader label="Communication" />
         <NavLink href="/admin/elite-chats" label="Elite Chats" icon="chat" />
-        {isSuperAdmin && <NavLink href="/admin/property-chats" label="Property Chats" icon="maps_home_work" />}
+        <NavLink href="/admin/property-chats" label="Property Chats" icon="maps_home_work" />
+        <NavLink href="/admin/registrant-messages" label="Registrant Messages" icon="support_agent" />
         <NavLink href="/admin/contacts" label="Contacts" icon="contacts" />
 
-        {isSuperAdmin && (
-          <>
-            <SectionHeader label="Content" />
-            <NavLink href="/admin/content/sectors" label="Sectors" icon="category" />
-            <NavLink href="/admin/content/services" label="Services" icon="design_services" />
-            <NavLink href="/admin/content/products" label="Products" icon="inventory_2" />
-          </>
-        )}
+        <SectionHeader label="Content" />
+        <NavLink href="/admin/content/sectors" label="Sectors" icon="category" />
+        <NavLink href="/admin/content/services" label="Services" icon="design_services" />
+        <NavLink href="/admin/content/products" label="Products" icon="inventory_2" />
 
         <SectionHeader label="Investments" />
         <NavLink href="/admin/content/investments" label="All Investments" icon="trending_up" />
         <NavLink href="/admin/content/investments/pending" label="Pending Deals" icon="hourglass_top" />
 
-        {isSuperAdmin && (
-          <>
-            <SectionHeader label="System" />
-            <NavLink href="/admin/settings" label="Settings" icon="settings" />
-            <NavLink href="/admin/audit-log" label="Audit Log" icon="history" />
-          </>
-        )}
+        <SectionHeader label="System" />
+        <NavLink href="/admin/settings" label="Settings" icon="settings" />
+        <NavLink href="/admin/audit-log" label="Audit Log" icon="history" />
       </div>
 
       {/* Footer */}

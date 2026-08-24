@@ -117,8 +117,9 @@ export async function PATCH(
     const { role, status, sectorAssignments } = body
 
     // Update profile fields
+    const EDITABLE_ROLES = ['member', 'admin', 'investment_partner', 'elite_member', 'real_estate_partner', 'worker', 'employer', 'oep_partner']
     const updates: Record<string, string> = {}
-    if (role && (role === 'member' || role === 'admin' || role === 'investment_partner' || role === 'elite_member' || role === 'real_estate_partner')) {
+    if (role && EDITABLE_ROLES.includes(role)) {
       updates.role = role
     }
     if (status) {

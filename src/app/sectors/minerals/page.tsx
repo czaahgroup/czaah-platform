@@ -210,7 +210,7 @@ export default function MineralsPage() {
 
           // Fallback to representative prices
           renderPrices(FALLBACK_PRICES, false);
-          updateTimestamp(false);
+          updateTimestamp(false, undefined);
         }
 
         fetchMetalPrices();

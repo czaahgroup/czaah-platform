@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    if (callerProfile?.role !== 'super_admin' && callerProfile?.role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (callerProfile?.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Only super admins can reject applications' }, { status: 403 })
     }
 
     const { userId, reason } = await request.json()

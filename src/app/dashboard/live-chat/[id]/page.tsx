@@ -369,7 +369,6 @@ export default function LiveChatDetailPage() {
         background: '#0e0e0e',
         borderRadius: '0 0 8px 8px',
         border: '1px solid rgba(77,70,55,0.25)',
-        borderTop: '1px solid rgba(77,70,55,0.25)',
         display: 'flex',
         gap: '8px',
         alignItems: 'flex-end',

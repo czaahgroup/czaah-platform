@@ -191,7 +191,7 @@ export default function PropertyChatsPage() {
     const reader = new FileReader()
     reader.onload = async () => {
       const base64 = (reader.result as string).split(',')[1]
-      await sendMessage(null, file.name, base64)
+      await sendMessage(undefined, file.name, base64)
     }
     reader.readAsDataURL(file)
   }
@@ -204,7 +204,7 @@ export default function PropertyChatsPage() {
         reader.onload = async () => {
           const base64 = (reader.result as string).split(',')[1]
           const fileName = `voice_${Date.now()}.webm`
-          await sendMessage(null, fileName, base64)
+          await sendMessage(undefined, fileName, base64)
         }
         reader.readAsDataURL(blob)
       }
@@ -316,7 +316,7 @@ export default function PropertyChatsPage() {
                         border: `1px solid ${isMine ? 'rgba(201,168,76,0.2)' : 'rgba(77,70,55,0.25)'}`,
                       }}>
                         {msg.file_url && msg.file_name && isVoiceNote(msg.file_name) ? (
-                          <VoiceNotePlayer fileUrl={msg.file_url} />
+                          <VoiceNotePlayer fileUrl={msg.file_url} fileName={msg.file_name} />
                         ) : msg.file_url && msg.file_name ? (
                           <button
                             onClick={() => openFile(msg.file_url!)}

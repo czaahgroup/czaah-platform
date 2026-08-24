@@ -6,6 +6,8 @@ import { Navbar } from '@/components/layouts/Navbar';
 import { Footer } from '@/components/layouts/Footer';
 import { WorkforceRegistrationModal } from '@/components/WorkforceRegistrationModal';
 import { EmployerRegistrationModal } from '@/components/EmployerRegistrationModal';
+import { OEPRegistrationModal } from '@/components/OEPRegistrationModal';
+import { RegistrationChooserModal } from '@/components/RegistrationChooserModal';
 
 const talentPools = [
   { title: 'Civil Engineers', badge: 'high', badgeText: 'High Availability', teamSize: '5–50', timeline: '30–45 days', cert: 'Certified by PEC', industry: 'Construction,Mining', role: 'Engineers & Technical', dest: 'Saudi Arabia,UAE,Qatar,Kuwait,Bahrain,Oman,UK,Germany,Poland,Romania,Pakistan', img: 'Labour-4.jpg' },
@@ -34,8 +36,33 @@ const deploymentSteps = [
 export default function ManpowerPage() {
   const [filters, setFilters] = useState<{ industry: Set<string>; role: Set<string>; dest: Set<string> }>({ industry: new Set(), role: new Set(), dest: new Set() });
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
+  const [showChooser, setShowChooser] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
   const [showEmployerRegistration, setShowEmployerRegistration] = useState(false);
+  const [showOEPRegistration, setShowOEPRegistration] = useState(false);
+  const [verifiedPartners, setVerifiedPartners] = useState<Array<{
+    id: string;
+    company_name: string;
+    head_office_location: string;
+    years_in_operation: number;
+    sectors_specialization: string[];
+    destination_countries: string[];
+    company_website: string | null;
+  }>>([]);
+
+  useEffect(() => {
+    fetch('/api/public/oep')
+      .then(res => res.json())
+      .then(data => setVerifiedPartners(data.data || []))
+      .catch(() => {});
+  }, []);
+
+  function handleChooserSelect(type: 'worker' | 'employer' | 'oep') {
+    setShowChooser(false);
+    if (type === 'worker') setShowRegistration(true);
+    if (type === 'employer') setShowEmployerRegistration(true);
+    if (type === 'oep') setShowOEPRegistration(true);
+  }
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -100,16 +127,10 @@ export default function ManpowerPage() {
             <div className="flex gap-4 flex-wrap items-center">
               <a href="/contact?interest=Human%20Resources#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Discuss Workforce Needs &rarr;</a>
               <button
-                onClick={() => setShowRegistration(true)}
-                className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm"
-              >
-                Register as a Worker &rarr;
-              </button>
-              <button
-                onClick={() => setShowEmployerRegistration(true)}
+                onClick={() => setShowChooser(true)}
                 className="border border-primary/40 text-primary hover:bg-primary/10 px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm transition-colors"
               >
-                Register as an Employer &rarr;
+                Register Now &rarr;
               </button>
             </div>
           </section>
@@ -274,6 +295,46 @@ export default function ManpowerPage() {
 
         <div className="w-full h-px bg-outline-variant/20" />
 
+        {/* VERIFIED PARTNER NETWORK */}
+        {verifiedPartners.length > 0 && (
+          <>
+            <section className="py-32 px-5 md:px-24 bg-surface-container-lowest fade-in">
+              <div className="max-w-[1600px] mx-auto">
+                <h2 className="cinzel-text text-4xl text-on-surface mb-2">Verified Partner <span className="text-primary">Network.</span></h2>
+                <p className="raleway-text text-on-surface-variant text-base mb-12 leading-relaxed">Licensed Overseas Employment Promoters vetted and approved by CZAAH for cross-border workforce deployment.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
+                  {verifiedPartners.map(partner => (
+                    <div key={partner.id} className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="material-symbols-outlined text-primary text-3xl">verified</span>
+                        <h3 className="cinzel-text text-lg text-on-surface">{partner.company_name}</h3>
+                      </div>
+                      <p className="raleway-text text-on-surface-variant text-sm mb-3">
+                        <span className="material-symbols-outlined align-middle text-base mr-1" style={{ verticalAlign: 'middle' }}>location_on</span>
+                        {partner.head_office_location} &middot; {partner.years_in_operation}+ yrs
+                      </p>
+                      {partner.sectors_specialization?.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {partner.sectors_specialization.map(s => (
+                            <span key={s} className="raleway-text text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">{s}</span>
+                          ))}
+                        </div>
+                      )}
+                      {partner.destination_countries?.length > 0 && (
+                        <p className="raleway-text text-on-surface-variant text-xs">
+                          Deploys to: {partner.destination_countries.join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <div className="w-full h-px bg-outline-variant/20" />
+          </>
+        )}
+
         {/* SERVICES */}
         <section className="py-32 px-5 md:px-24 bg-surface-container-lowest fade-in">
           <div className="max-w-[1600px] mx-auto">
@@ -355,16 +416,10 @@ export default function ManpowerPage() {
             <div className="flex gap-4 flex-wrap justify-center items-center">
               <a href="/contact?interest=Human%20Resources#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Discuss Workforce Needs &rarr;</a>
               <button
-                onClick={() => setShowRegistration(true)}
+                onClick={() => setShowChooser(true)}
                 className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm"
               >
-                Register as a Worker &rarr;
-              </button>
-              <button
-                onClick={() => setShowEmployerRegistration(true)}
-                className="border border-primary/40 text-primary hover:bg-primary/10 px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm transition-colors"
-              >
-                Register as an Employer &rarr;
+                Register Now &rarr;
               </button>
             </div>
           </div>
@@ -372,8 +427,10 @@ export default function ManpowerPage() {
 
       </div>
 
+      <RegistrationChooserModal open={showChooser} onClose={() => setShowChooser(false)} onSelect={handleChooserSelect} />
       <WorkforceRegistrationModal open={showRegistration} onClose={() => setShowRegistration(false)} />
       <EmployerRegistrationModal open={showEmployerRegistration} onClose={() => setShowEmployerRegistration(false)} />
+      <OEPRegistrationModal open={showOEPRegistration} onClose={() => setShowOEPRegistration(false)} />
 
       <Footer />
     </>

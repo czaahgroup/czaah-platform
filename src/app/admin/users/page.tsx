@@ -33,7 +33,7 @@ interface SectorAssignment {
   sector_id: string
 }
 
-type TabFilter = 'all' | 'members' | 'admins' | 'partners' | 'elite' | 're_partners' | 'pending' | 'deactivated'
+type TabFilter = 'all' | 'members' | 'admins' | 'partners' | 'elite' | 're_partners' | 'workers' | 'employers' | 'oep_partners' | 'pending' | 'deactivated'
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserProfile[]>([])
@@ -48,7 +48,11 @@ export default function AdminUsersPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editSectors, setEditSectors] = useState<string[]>([])
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [createForm, setCreateForm] = useState({ fullName: '', email: '', companyName: '', role: 'admin' })
+  const [createForm, setCreateForm] = useState({ fullName: '', email: '', companyName: '', role: 'super_admin' })
+  const [showPurgeModal, setShowPurgeModal] = useState(false)
+  const [purgeConfirmEmail, setPurgeConfirmEmail] = useState('')
+  const [purging, setPurging] = useState(false)
+  const [purgeError, setPurgeError] = useState<string | null>(null)
   const [createLoading, setCreateLoading] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
 
@@ -60,6 +64,9 @@ export default function AdminUsersPage() {
       if (tab === 'partners') params.set('role', 'investment_partner')
       if (tab === 'elite') params.set('role', 'elite_member')
       if (tab === 're_partners') params.set('role', 'real_estate_partner')
+      if (tab === 'workers') params.set('role', 'worker')
+      if (tab === 'employers') params.set('role', 'employer')
+      if (tab === 'oep_partners') params.set('role', 'oep_partner')
       if (tab === 'pending') params.set('status', 'pending')
       if (tab === 'deactivated') params.set('status', 'deactivated')
       if (search.trim()) params.set('search', search.trim())
@@ -112,7 +119,7 @@ export default function AdminUsersPage() {
     setSuccess(null)
   }
 
-  async function handleChangeRole(userId: string, newRole: 'member' | 'admin' | 'investment_partner' | 'elite_member' | 'real_estate_partner') {
+  async function handleChangeRole(userId: string, newRole: 'member' | 'investment_partner' | 'elite_member' | 'real_estate_partner' | 'worker' | 'employer' | 'oep_partner') {
     clearMessages()
     setActionLoading(true)
     try {
@@ -178,6 +185,33 @@ export default function AdminUsersPage() {
     }
   }
 
+  async function handlePurge() {
+    if (!selected) return
+    setPurgeError(null)
+    setPurging(true)
+    try {
+      const res = await fetch(`/api/admin/users/${selected.id}/purge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmEmail: purgeConfirmEmail }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setPurgeError(json.error || 'Failed to delete user')
+        return
+      }
+      setShowPurgeModal(false)
+      setPurgeConfirmEmail('')
+      setSelectedId(null)
+      setSuccess(json.fullyDeleted ? 'User permanently deleted.' : (json.message || 'User anonymized and locked out.'))
+      await loadUsers()
+    } catch {
+      setPurgeError('Network error. Please try again.')
+    } finally {
+      setPurging(false)
+    }
+  }
+
   async function handleSaveSectors(userId: string) {
     clearMessages()
     setActionLoading(true)
@@ -221,7 +255,7 @@ export default function AdminUsersPage() {
       }
       setSuccess(`${createForm.email} invited as ${createForm.role.replace(/_/g, ' ')}`)
       setShowCreateModal(false)
-      setCreateForm({ fullName: '', email: '', companyName: '', role: 'admin' })
+      setCreateForm({ fullName: '', email: '', companyName: '', role: 'super_admin' })
       await loadUsers()
     } catch (err: unknown) {
       setCreateError(err instanceof Error ? err.message : 'Failed to create user')
@@ -240,9 +274,11 @@ export default function AdminUsersPage() {
     { key: 'all', label: 'All' },
     { key: 'members', label: 'Members' },
     { key: 'elite', label: 'Elite' },
-    { key: 'admins', label: 'Admins' },
     { key: 'partners', label: 'Inv. Partners' },
     { key: 're_partners', label: 'RE Partners' },
+    { key: 'workers', label: 'Workers' },
+    { key: 'employers', label: 'Employers' },
+    { key: 'oep_partners', label: 'Employment Promoters' },
     { key: 'pending', label: 'Pending' },
     { key: 'deactivated', label: 'Deactivated' },
   ]
@@ -451,17 +487,6 @@ export default function AdminUsersPage() {
                       Member
                     </button>
                     <button
-                      onClick={() => handleChangeRole(selected.id, 'admin')}
-                      disabled={actionLoading || selected.role === 'admin'}
-                      className={`flex-1 py-2 rounded-nonetext-sm font-medium transition-colors disabled:opacity-40 ${
-                        selected.role === 'admin'
-                          ? 'bg-primary/20 text-primary border border-primary/40'
-                          : 'bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-on-surface'
-                      }`}
-                    >
-                      Admin
-                    </button>
-                    <button
                       onClick={() => handleChangeRole(selected.id, 'investment_partner')}
                       disabled={actionLoading || selected.role === 'investment_partner'}
                       className={`flex-1 py-2 rounded-nonetext-sm font-medium transition-colors disabled:opacity-40 ${
@@ -494,40 +519,41 @@ export default function AdminUsersPage() {
                     >
                       RE Partner
                     </button>
-                  </div>
-                </div>
-
-                {/* Sector assignments (admin only) */}
-                {selected.role === 'admin' && sectors.length > 0 && (
-                  <div className="px-6 py-4 border-b border-outline-variant/10">
-                    <p className="text-xs text-on-surface-variant mb-2">Sector Assignments</p>
-                    <div className="space-y-2 mb-3">
-                      {sectors.map((sector) => (
-                        <label
-                          key={sector.id}
-                          className="flex items-center gap-2 cursor-pointer group"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={editSectors.includes(sector.id)}
-                            onChange={() => toggleSector(sector.id)}
-                            className="rounded border-outline-variant/10 bg-surface-container-lowest text-primary focus:ring-primary/50"
-                          />
-                          <span className="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
-                            {sector.name}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
                     <button
-                      onClick={() => handleSaveSectors(selected.id)}
-                      disabled={actionLoading}
-                      className="w-full bg-primary text-on-primary font-semibold py-2 rounded-nonetext-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
+                      onClick={() => handleChangeRole(selected.id, 'worker')}
+                      disabled={actionLoading || selected.role === 'worker'}
+                      className={`flex-1 py-2 rounded-nonetext-sm font-medium transition-colors disabled:opacity-40 ${
+                        selected.role === 'worker'
+                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                          : 'bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-on-surface'
+                      }`}
                     >
-                      {actionLoading ? 'Saving...' : 'Save Sectors'}
+                      Worker
+                    </button>
+                    <button
+                      onClick={() => handleChangeRole(selected.id, 'employer')}
+                      disabled={actionLoading || selected.role === 'employer'}
+                      className={`flex-1 py-2 rounded-nonetext-sm font-medium transition-colors disabled:opacity-40 ${
+                        selected.role === 'employer'
+                          ? 'bg-teal-500/20 text-teal-400 border border-teal-500/40'
+                          : 'bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-on-surface'
+                      }`}
+                    >
+                      Employer
+                    </button>
+                    <button
+                      onClick={() => handleChangeRole(selected.id, 'oep_partner')}
+                      disabled={actionLoading || selected.role === 'oep_partner'}
+                      className={`flex-1 py-2 rounded-nonetext-sm font-medium transition-colors disabled:opacity-40 ${
+                        selected.role === 'oep_partner'
+                          ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/40'
+                          : 'bg-surface-container-lowest border border-outline-variant/10 text-on-surface-variant hover:text-on-surface'
+                      }`}
+                    >
+                      Employment Promoter
                     </button>
                   </div>
-                )}
+                </div>
 
                 {/* Status actions */}
                 <div className="px-6 py-4">
@@ -561,6 +587,18 @@ export default function AdminUsersPage() {
                       </button>
                     )}
                   </div>
+                </div>
+
+                {/* Danger zone */}
+                <div className="px-6 py-4 border-t border-error/20">
+                  <p className="text-xs text-error mb-1 font-semibold">Danger Zone</p>
+                  <p className="text-xs text-on-surface-variant/60 mb-3">Permanently delete this account. This cannot be undone.</p>
+                  <button
+                    onClick={() => { setShowPurgeModal(true); setPurgeConfirmEmail(''); setPurgeError(null) }}
+                    className="w-full border border-error text-error font-semibold py-2 rounded-nonetext-sm hover:bg-error/10 transition-colors"
+                  >
+                    Permanently Delete User
+                  </button>
                 </div>
                 </>
                 )}
@@ -627,13 +665,23 @@ export default function AdminUsersPage() {
                   className="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-nonepx-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary/50"
                 >
                   <option value="member">Member</option>
-                  <option value="admin">Admin</option>
                   <option value="investment_partner">Investment Partner</option>
                   <option value="elite_member">Elite Member</option>
                   <option value="real_estate_partner">Real Estate Partner</option>
+                  <option value="worker">Worker</option>
+                  <option value="employer">Employer</option>
+                  <option value="oep_partner">Employment Promoter</option>
                   <option value="super_admin">Super Admin</option>
                 </select>
               </div>
+
+              {['worker', 'employer', 'oep_partner'].includes(createForm.role) && (
+                <div className="bg-primary/5 border border-primary/20 rounded-none px-3 py-2">
+                  <p className="text-xs text-on-surface-variant">
+                    This creates the login account only. The applicant&apos;s trade/company details are normally collected through the public registration form &mdash; they won&apos;t appear here unless submitted separately.
+                  </p>
+                </div>
+              )}
 
               {createError && (
                 <div className="bg-red-500/10 border border-red-500/20 rounded-none px-3 py-2">
@@ -661,6 +709,63 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
+
+      {showPurgeModal && selected && (
+        <div
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4"
+          onClick={() => { if (!purging) setShowPurgeModal(false) }}
+        >
+          <div
+            className="bg-surface-container-low border border-error/30 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 border-b border-error/20">
+              <h2 className="font-[family-name:var(--font-heading)] text-lg text-error">Permanently Delete User</h2>
+              <p className="text-xs text-on-surface-variant mt-1">
+                This will permanently erase <strong className="text-on-surface">{selected.full_name}</strong> ({selected.email}) from the platform, or fully anonymize and lock the account out if linked activity (messages, KYC reviews, audit history) prevents outright removal. <strong className="text-error">This cannot be undone.</strong>
+              </p>
+            </div>
+            <div className="px-6 py-4 space-y-4">
+              <div>
+                <label className="text-xs text-on-surface-variant block mb-1">
+                  Type <span className="text-on-surface font-semibold">{selected.email}</span> to confirm
+                </label>
+                <input
+                  type="text"
+                  value={purgeConfirmEmail}
+                  onChange={(e) => setPurgeConfirmEmail(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/10 rounded-nonepx-3 py-2 text-sm text-on-surface focus:outline-none focus:border-error/50"
+                  placeholder="Confirm email address"
+                  autoComplete="off"
+                />
+              </div>
+              {purgeError && (
+                <div className="bg-error/10 border border-error/20 rounded-none px-3 py-2">
+                  <p className="text-xs text-error">{purgeError}</p>
+                </div>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPurgeModal(false)}
+                  disabled={purging}
+                  className="flex-1 border border-outline-variant/20 text-on-surface-variant font-semibold py-2 rounded-nonetext-sm hover:text-on-surface transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePurge}
+                  disabled={purging || purgeConfirmEmail.trim().toLowerCase() !== selected.email.trim().toLowerCase()}
+                  className="flex-1 bg-error text-white font-semibold py-2 rounded-nonetext-sm hover:bg-error/80 transition-colors disabled:opacity-40"
+                >
+                  {purging ? 'Deleting...' : 'Permanently Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -683,6 +788,9 @@ function RoleBadge({ role }: { role: string }) {
     investment_partner: 'bg-purple-500/20 text-purple-400',
     elite_member: 'bg-emerald-500/20 text-emerald-400',
     real_estate_partner: 'bg-cyan-500/20 text-cyan-400',
+    worker: 'bg-amber-500/20 text-amber-400',
+    employer: 'bg-teal-500/20 text-teal-400',
+    oep_partner: 'bg-indigo-500/20 text-indigo-400',
   }
   return (
     <span className={`text-xs px-2 py-0.5 rounded-none${styles[role] || 'bg-neutral-500/20 text-neutral-400'}`}>

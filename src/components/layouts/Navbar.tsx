@@ -338,7 +338,7 @@ export function Navbar() {
             {userDropdownOpen && (
               <div className="nav-user-dropdown">
                 {(userRole === 'super_admin' || userRole === 'admin') && (
-                  <Link href="/admin" onClick={() => setUserDropdownOpen(false)}>Admin Panel</Link>
+                  <Link href="/admin" onClick={() => setUserDropdownOpen(false)}>Super Admin</Link>
                 )}
                 {userRole === 'investment_partner' ? (
                   <Link href="/partner" onClick={() => setUserDropdownOpen(false)}>Partner Portal</Link>
@@ -486,7 +486,7 @@ export function Navbar() {
                 </>
               )}
               {(userRole === 'super_admin' || userRole === 'admin') && (
-                <Link href="/admin" className="mobile-nav-cta mobile-nav-cta-outline">Admin Panel</Link>
+                <Link href="/admin" className="mobile-nav-cta mobile-nav-cta-outline">Super Admin</Link>
               )}
               <button
                 onClick={handleSignOut}

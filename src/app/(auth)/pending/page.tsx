@@ -31,7 +31,7 @@ export default function PendingPage() {
         .single()
 
       if (profile?.status === 'approved') {
-        if (profile.role === 'super_admin') {
+        if (profile.role === 'super_admin' || profile.role === 'admin') {
           router.push('/admin')
         } else {
           router.push('/dashboard')

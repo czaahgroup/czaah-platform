@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface WorkforceRegistrationModalProps {
   open: boolean;
@@ -12,9 +14,12 @@ const tradeCategories = ['Construction', 'Oil & Gas', 'Healthcare', 'IT & Teleco
 const destinationOptions = ['Saudi Arabia', 'UAE', 'Qatar', 'Kuwait', 'Bahrain', 'Oman', 'Pakistan', 'Other'];
 
 export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrationModalProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    password: '',
+    confirmPassword: '',
     phone: '',
     nationality: '',
     currentLocation: '',
@@ -28,10 +33,11 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
     medicalStatus: 'not_done',
     notes: '',
     photo: '',
+    identityDocument: '',
   });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [identityDocName, setIdentityDocName] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!open) return null;
@@ -56,6 +62,21 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
     reader.readAsDataURL(file);
   }
 
+  function handleIdentityDocChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Identity document must be under 8MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setIdentityDocName(file.name);
+      updateField('identityDocument', reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
   function toggleDestination(dest: string) {
     setFormData(prev => {
       const current = prev.preferredDestinations;
@@ -69,6 +90,22 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!formData.identityDocument) {
+      setError('Please upload a copy of your CNIC or passport — registrations cannot be approved without an identity document.');
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -82,13 +119,15 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
 
       if (!res.ok) {
         setError(data.error || 'Registration failed. Please try again.');
+        setSubmitting(false);
         return;
       }
 
-      setSuccess(data.reference || 'WR-XXXXXX');
+      const supabase = createClient();
+      await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+      router.push('/pending');
     } catch {
       setError('Network error. Please check your connection and try again.');
-    } finally {
       setSubmitting(false);
     }
   }
@@ -208,35 +247,6 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
           border-radius: 6px; padding: 12px 16px; color: #f87171;
           font-family: 'Raleway', sans-serif; font-size: 13px;
         }
-        .wfm-success {
-          display: flex; flex-direction: column; align-items: center; justify-content: center;
-          padding: 60px 32px; text-align: center;
-        }
-        .wfm-success-icon {
-          width: 64px; height: 64px; border-radius: 50%;
-          background: rgba(34,197,94,0.1); border: 2px solid rgba(34,197,94,0.3);
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 20px; font-size: 28px; color: #22c55e;
-        }
-        .wfm-success h3 {
-          font-family: 'Cinzel', serif; font-size: 22px; color: #fff;
-          margin: 0 0 12px; font-weight: 600;
-        }
-        .wfm-success p {
-          font-family: 'Raleway', sans-serif; font-size: 14px;
-          color: rgba(255,255,255,0.5); line-height: 1.7; margin: 0 0 6px;
-        }
-        .wfm-success .ref-code {
-          font-family: 'Raleway', sans-serif; font-size: 13px;
-          color: #c9a84c; font-weight: 600; letter-spacing: 1px; margin-top: 8px;
-        }
-        .wfm-success-close {
-          margin-top: 28px; padding: 12px 32px; border-radius: 4px;
-          border: 1px solid rgba(201,168,76,0.3); background: transparent;
-          color: #c9a84c; font-family: 'Raleway', sans-serif; font-size: 13px;
-          cursor: pointer; transition: all 0.2s; font-weight: 500;
-        }
-        .wfm-success-close:hover { border-color: #c9a84c; background: rgba(201,168,76,0.06); }
         @media (max-width: 640px) {
           .wfm-header, .wfm-form { padding-left: 20px; padding-right: 20px; }
           .wfm-title { font-size: 19px; }
@@ -247,17 +257,8 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
         <div className="wfm-modal">
           <button className="wfm-close" onClick={onClose} aria-label="Close">&times;</button>
 
-          {success ? (
-            <div className="wfm-success">
-              <div className="wfm-success-icon">&#10003;</div>
-              <h3>Registration Submitted!</h3>
-              <p>We&apos;ll review your profile and contact you if a matching opportunity arises.</p>
-              <div className="ref-code">Reference: {success}</div>
-              <button className="wfm-success-close" onClick={onClose}>Close</button>
-            </div>
-          ) : (
-            <>
-              <div className="wfm-header">
+          <>
+            <div className="wfm-header">
                 <div className="wfm-icon">
                   <svg viewBox="-5 -12 100 128" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ height: '40px', width: 'auto' }}>
                     <defs>
@@ -316,6 +317,19 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
                   </div>
                 </div>
 
+                {/* Identity Document */}
+                <div className="wfm-field">
+                  <label>Identity Document (CNIC / Passport copy) <span className="req">*</span></label>
+                  <label className="wfm-pill" style={{ padding: '9px 18px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>upload_file</span>
+                    {identityDocName ? identityDocName : 'Upload Identity Document'}
+                    <input type="file" accept="image/*,.pdf" onChange={handleIdentityDocChange} style={{ display: 'none' }} />
+                  </label>
+                  <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '6px' }}>
+                    Required for admin approval. Accepted: images or PDF, up to 8MB.
+                  </div>
+                </div>
+
                 {/* Email */}
                 <div className="wfm-field">
                   <label>Email <span className="req">*</span></label>
@@ -328,6 +342,20 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
                   <label>Phone with Country Code <span className="req">*</span></label>
                   <input className="wfm-input" type="text" placeholder="+92 300 1234567" required
                     value={formData.phone} onChange={e => updateField('phone', e.target.value)} />
+                </div>
+
+                {/* Password */}
+                <div className="wfm-field">
+                  <label>Password <span className="req">*</span></label>
+                  <input className="wfm-input" type="password" placeholder="Min. 8 characters" required
+                    value={formData.password} onChange={e => updateField('password', e.target.value)} />
+                </div>
+
+                {/* Confirm Password */}
+                <div className="wfm-field">
+                  <label>Confirm Password <span className="req">*</span></label>
+                  <input className="wfm-input" type="password" placeholder="Re-enter your password" required
+                    value={formData.confirmPassword} onChange={e => updateField('confirmPassword', e.target.value)} />
                 </div>
 
                 {/* Nationality */}
@@ -464,8 +492,7 @@ export function WorkforceRegistrationModal({ open, onClose }: WorkforceRegistrat
                   {submitting ? 'Submitting...' : 'Submit Registration'}
                 </button>
               </form>
-            </>
-          )}
+          </>
         </div>
       </div>
     </>

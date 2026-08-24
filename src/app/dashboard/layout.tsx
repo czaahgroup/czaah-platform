@@ -80,24 +80,39 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
   const isElite = profile.role === 'elite_member' || profile.role === 'super_admin'
   const isAdminRole = profile.role === 'admin' || profile.role === 'super_admin'
   const isRealEstatePartner = profile.role === 'real_estate_partner'
+  const isRegistrant = ['worker', 'employer', 'oep_partner'].includes(profile.role)
+  const canLiveChat = ['employer', 'oep_partner'].includes(profile.role)
+
+  const portalLabels: Record<string, string> = {
+    worker: 'Worker Portal',
+    employer: 'Employer Portal',
+    oep_partner: 'Employment Promoter Portal',
+  }
+  const portalLabel = portalLabels[profile.role] || 'Member Portal'
 
   // Grouped navigation sections
   const navSections: { label?: string; links: { href: string; label: string; icon: string }[] }[] = [
     {
       links: [
         { href: '/dashboard', label: 'Overview', icon: 'dashboard' },
-        { href: '/dashboard/membership-card', label: 'Membership Card', icon: 'card_membership' },
+        ...(!isRegistrant ? [{ href: '/dashboard/membership-card', label: 'Membership Card', icon: 'card_membership' }] : []),
         { href: '/dashboard/notifications', label: 'Notifications', icon: 'notifications' },
       ],
     },
-    {
+    ...(isRegistrant ? [{
+      links: [
+        { href: '/dashboard/registration', label: 'My Registration', icon: 'assignment_ind' },
+        ...(canLiveChat ? [{ href: '/dashboard/messages', label: 'Live Chat', icon: 'chat' }] : []),
+      ],
+    }] : []),
+    ...(!isRegistrant ? [{
       label: 'Business',
       links: [
         { href: '/dashboard/enquiries', label: 'Enquiries', icon: 'mail' },
         { href: '/dashboard/investments', label: 'Investments', icon: 'trending_up' },
         { href: '/dashboard/meetings', label: 'Meetings', icon: 'event' },
       ],
-    },
+    }] : []),
     ...(isRealEstatePartner ? [{
       label: 'Properties',
       links: [
@@ -116,15 +131,17 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
       label: 'Resources',
       links: [
         { href: '/dashboard/documents', label: 'Documents', icon: 'description' },
-        { href: '/dashboard/paperwork', label: 'Paperwork', icon: 'assignment' },
-        { href: '/dashboard/broadcasts', label: 'Broadcasts', icon: 'campaign' },
-        { href: '/dashboard/bookmarks', label: 'Bookmarks', icon: 'bookmark' },
+        ...(!isRegistrant ? [
+          { href: '/dashboard/paperwork', label: 'Paperwork', icon: 'assignment' },
+          { href: '/dashboard/broadcasts', label: 'Broadcasts', icon: 'campaign' },
+          { href: '/dashboard/bookmarks', label: 'Bookmarks', icon: 'bookmark' },
+        ] : []),
       ],
     },
     {
       label: 'Account',
       links: [
-        { href: '/dashboard/history', label: 'History', icon: 'history' },
+        ...(!isRegistrant ? [{ href: '/dashboard/history', label: 'History', icon: 'history' }] : []),
         { href: '/dashboard/settings', label: 'Settings', icon: 'settings' },
       ],
     },
@@ -173,7 +190,7 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
             </svg>
             <div>
               <span className="cinzel-text font-semibold text-lg tracking-[6px] text-primary block leading-none">CZAAH</span>
-              <span className="raleway-text text-[10px] tracking-[3px] uppercase text-primary/40 mt-1 block">Member Portal</span>
+              <span className="raleway-text text-[10px] tracking-[3px] uppercase text-primary/40 mt-1 block">{portalLabel}</span>
             </div>
           </Link>
         </div>
@@ -234,12 +251,14 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
 
         {/* Footer */}
         <div className="px-5 py-4 border-t border-outline-variant/10 flex flex-col gap-2.5">
-          <Link
-            href="/dashboard/enquiries/new"
-            className="member-footer-link raleway-text text-[11px] tracking-[1.5px] text-primary/50 no-underline uppercase transition-colors duration-300"
-          >
-            + New Enquiry
-          </Link>
+          {!isRegistrant && (
+            <Link
+              href="/dashboard/enquiries/new"
+              className="member-footer-link raleway-text text-[11px] tracking-[1.5px] text-primary/50 no-underline uppercase transition-colors duration-300"
+            >
+              + New Enquiry
+            </Link>
+          )}
           <p className="raleway-text text-xs text-on-surface/30 m-0 overflow-hidden text-ellipsis whitespace-nowrap">{profile.full_name}</p>
           <form action="/api/auth/signout" method="POST">
             <button

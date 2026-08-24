@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     })
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://czaah.com'
-    const qrData = `${baseUrl}/verify?member=${memberId}`
+    const qrData = `${baseUrl}/verify/member/${profile.id}`
 
     return NextResponse.json({
       fullName: profile.full_name,

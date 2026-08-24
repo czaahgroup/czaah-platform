@@ -73,7 +73,9 @@ export default function SettingsPage() {
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault(); if (!profile) return; setSavingProfile(true); setProfileMsg(null)
-    const { error } = await supabase.from('profiles').update({ full_name: fullName.trim(), phone: phone.trim() || null, company_name: companyName.trim() || null, country: country.trim() || null, company_website: companyWebsite.trim() || null, company_description: companyDescription.trim() || null }).eq('id', profile.id)
+    const updates: Record<string, unknown> = { phone: phone.trim() || null, company_name: companyName.trim() || null, country: country.trim() || null, company_website: companyWebsite.trim() || null, company_description: companyDescription.trim() || null }
+    if (!isIdentityLocked) updates.full_name = fullName.trim()
+    const { error } = await supabase.from('profiles').update(updates).eq('id', profile.id)
     if (error) { setProfileMsg({ type: 'error', text: error.message }) } else { setProfileMsg({ type: 'success', text: 'Profile updated successfully.' }); setProfile(prev => prev ? { ...prev, full_name: fullName.trim() } : null) }
     setSavingProfile(false)
   }
@@ -100,6 +102,7 @@ export default function SettingsPage() {
 
   const displayAvatar = avatarPreview || avatarSignedUrl
   const userInitial = profile?.full_name?.[0]?.toUpperCase() || '?'
+  const isIdentityLocked = ['worker', 'employer', 'oep_partner'].includes(profile?.role || '')
   const inputCls = "w-full bg-transparent border-b border-outline-variant focus:border-primary px-1 py-2.5 text-sm text-on-surface outline-none transition-colors raleway-text"
   const disabledInputCls = "w-full bg-surface-container border-b border-outline-variant/30 px-1 py-2.5 text-sm text-on-surface-variant/40 cursor-not-allowed raleway-text"
 
@@ -116,13 +119,23 @@ export default function SettingsPage() {
                 {displayAvatar ? <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" /> : <span className="cinzel-text text-3xl text-primary">{userInitial}</span>}
               </div>
               <div>
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarSelect} className="hidden" />
-                <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingAvatar} className="text-sm text-primary border border-outline-variant/40 hover:border-primary px-4 py-2 transition-colors disabled:opacity-50 cursor-pointer bg-transparent raleway-text">{uploadingAvatar ? 'Uploading...' : 'Change Photo'}</button>
-                <p className="text-xs text-on-surface-variant/40 mt-1.5 raleway-text">JPG, PNG. Max 5MB.</p>
+                {isIdentityLocked ? (
+                  <p className="text-xs text-on-surface-variant/40 raleway-text">Your photo was verified during registration and can&apos;t be changed. Contact support if this needs correcting.</p>
+                ) : (
+                  <>
+                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarSelect} className="hidden" />
+                    <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingAvatar} className="text-sm text-primary border border-outline-variant/40 hover:border-primary px-4 py-2 transition-colors disabled:opacity-50 cursor-pointer bg-transparent raleway-text">{uploadingAvatar ? 'Uploading...' : 'Change Photo'}</button>
+                    <p className="text-xs text-on-surface-variant/40 mt-1.5 raleway-text">JPG, PNG. Max 5MB.</p>
+                  </>
+                )}
               </div>
             </div>
             <div><label className="block text-sm text-on-surface-variant/50 mb-1.5 raleway-text">Email</label><input type="email" value={profile?.email || ''} disabled className={disabledInputCls} /></div>
-            <div><label className="block text-sm text-on-surface-variant/50 mb-1.5 raleway-text">Full Name</label><input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required className={inputCls} /></div>
+            <div>
+              <label className="block text-sm text-on-surface-variant/50 mb-1.5 raleway-text">Full Name</label>
+              <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required disabled={isIdentityLocked} className={isIdentityLocked ? disabledInputCls : inputCls} />
+              {isIdentityLocked && <p className="text-xs text-on-surface-variant/40 mt-1.5 raleway-text">Your name was verified during registration and can&apos;t be changed. Contact support if this needs correcting.</p>}
+            </div>
             <div><label className="block text-sm text-on-surface-variant/50 mb-1.5 raleway-text">Phone</label><input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputCls} placeholder="+1 234 567 8900" /></div>
             <div><label className="block text-sm text-on-surface-variant/50 mb-1.5 raleway-text">Company Name</label><input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={inputCls} /></div>
             <div><label className="block text-sm text-on-surface-variant/50 mb-1.5 raleway-text">Country</label><input type="text" value={country} onChange={(e) => setCountry(e.target.value)} className={inputCls} /></div>

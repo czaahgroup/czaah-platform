@@ -2,6 +2,7 @@
 // @ts-nocheck
 
 import { useEffect, useState } from 'react'
+import { DocumentPreviewModal, resolveDocumentPreview } from '@/components/DocumentPreviewModal'
 
 
 interface KYCApplication {
@@ -28,6 +29,7 @@ export default function KYCReviewPage() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [filter, setFilter] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending')
+  const [preview, setPreview] = useState<{ title: string; url: string; contentType: string | null } | null>(null)
 
   async function loadApplications() {
     try {
@@ -93,15 +95,14 @@ export default function KYCReviewPage() {
     loadApplications()
   }
 
-  async function handleViewDocument(filePath: string) {
+  async function handleViewDocument(filePath: string, title: string) {
     try {
-      const res = await fetch(`/api/admin/kyc/document?path=${encodeURIComponent(filePath)}`)
-      if (!res.ok) {
+      const resolved = await resolveDocumentPreview(`/api/admin/kyc/document?path=${encodeURIComponent(filePath)}`)
+      if (!resolved) {
         console.error('Document fetch failed')
         return
       }
-      const { url } = await res.json()
-      window.open(url, '_blank')
+      setPreview({ title, ...resolved })
     } catch (err) {
       console.error('Document error:', err)
     }
@@ -112,6 +113,7 @@ export default function KYCReviewPage() {
     government_id_back: 'Government ID (Back)',
     company_registration: 'Company Registration',
     proof_of_address: 'Proof of Address',
+    identity_document: 'Identity Document',
   }
 
   return (
@@ -198,7 +200,7 @@ export default function KYCReviewPage() {
                         {docTypeLabels[doc.document_type] || doc.document_type}
                       </span>
                       <button
-                        onClick={() => handleViewDocument(doc.file_url)}
+                        onClick={() => handleViewDocument(doc.file_url, docTypeLabels[doc.document_type] || doc.document_type)}
                         className="text-sm text-primary hover:text-primary-light transition-colors"
                       >
                         View
@@ -256,6 +258,10 @@ export default function KYCReviewPage() {
           )}
         </div>
       )}
+
+      {preview && (
+        <DocumentPreviewModal title={preview.title} url={preview.url} contentType={preview.contentType} onClose={() => setPreview(null)} />
+      )}
     </div>
   )
 }
@@ -266,6 +272,9 @@ function RoleBadge({ role }: { role: string }) {
     member: 'bg-neutral-500/20 text-neutral-400',
     elite_member: 'bg-emerald-500/20 text-emerald-400',
     investment_partner: 'bg-purple-500/20 text-purple-400',
+    worker: 'bg-amber-500/20 text-amber-400',
+    employer: 'bg-cyan-500/20 text-cyan-400',
+    oep_partner: 'bg-indigo-500/20 text-indigo-400',
   }
   return (
     <span className={`text-xs px-2 py-0.5 rounded-none${styles[role] || 'bg-neutral-500/20 text-neutral-400'}`}>

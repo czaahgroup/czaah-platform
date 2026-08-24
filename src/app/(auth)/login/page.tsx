@@ -37,16 +37,12 @@ function LoginForm() {
   function navigateByRole(profile: { role: string }) {
     if (redirect !== '/') {
       router.push(redirect)
-    } else if (profile.role === 'super_admin') {
+    } else if (profile.role === 'super_admin' || profile.role === 'admin') {
       router.push('/admin')
-    } else if (profile.role === 'admin') {
-      router.push('/dashboard')
-    } else if (profile.role === 'member') {
-      router.push('/dashboard')
     } else if (profile.role === 'partner') {
       router.push('/partner-network')
     } else {
-      router.push('/')
+      router.push('/dashboard')
     }
   }
 

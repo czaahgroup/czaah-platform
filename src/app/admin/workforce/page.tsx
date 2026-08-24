@@ -3,6 +3,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { WorkerDigitalCard } from '@/components/WorkerDigitalCard';
+import { DocumentPreviewModal, resolveDocumentPreview } from '@/components/DocumentPreviewModal';
+import { DeleteAccountModal } from '@/components/DeleteAccountModal';
 
 
 interface WorkforceRecord {
@@ -22,6 +24,8 @@ interface WorkforceRecord {
   medical_status: string;
   notes: string | null;
   photo_url: string | null;
+  identity_document_url: string | null;
+  profile_id: string | null;
   status: string;
   created_at: string;
   updated_at: string;
@@ -57,6 +61,10 @@ export default function WorkforcePage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoData, setPhotoData] = useState<string | null>(null);
   const [showCard, setShowCard] = useState(false);
+  const [docPreview, setDocPreview] = useState<{ title: string; url: string; contentType: string | null } | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Debounce search
   useEffect(() => {
@@ -96,6 +104,7 @@ export default function WorkforcePage() {
     setEditStatus(record.status);
     setPhotoPreview(null);
     setPhotoData(null);
+    setSaveError(null);
   }
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -113,23 +122,27 @@ export default function WorkforcePage() {
   async function saveChanges() {
     if (!selected) return;
     setSaving(true);
+    setSaveError(null);
     try {
-      const body: Record<string, unknown> = { status: editStatus, notes: editNotes };
+      const body: Record<string, unknown> = { notes: editNotes, status: editStatus };
       if (photoData) body.photo = photoData;
       const res = await fetch(`/api/admin/workforce/${selected.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
+      const data = await res.json();
       if (res.ok) {
-        const updated = await res.json();
-        setRecords(prev => prev.map(r => r.id === updated.id ? updated : r));
-        setSelected(updated);
+        setRecords(prev => prev.map(r => r.id === data.id ? data : r));
+        setSelected(data);
         setPhotoPreview(null);
         setPhotoData(null);
+      } else {
+        setSaveError(data.error || 'Failed to save changes.');
       }
     } catch (err) {
       console.error('Failed to save:', err);
+      setSaveError('Network error. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -175,6 +188,42 @@ export default function WorkforcePage() {
     if (val === 'other_medical') return 'Other Medical';
     if (val === 'not_done') return 'Not Done';
     return val;
+  }
+
+  async function viewIdentityDocument(path: string) {
+    try {
+      const resolved = await resolveDocumentPreview(`/api/admin/registration-documents?path=${encodeURIComponent(path)}`);
+      if (resolved) setDocPreview({ title: 'Identity Document', ...resolved });
+    } catch (err) {
+      console.error('Failed to open identity document:', err);
+    }
+  }
+
+  async function handleDeleteOrphaned() {
+    if (!selected) return;
+    if (!confirm(`Permanently delete ${selected.full_name}'s registration? This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/workforce/${selected.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        setRecords(prev => prev.filter(r => r.id !== selected.id));
+        setSelected(null);
+      } else {
+        setSaveError(data.error || 'Failed to delete record.');
+      }
+    } catch {
+      setSaveError('Network error. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  function handleAccountDeleted(result: { fullyDeleted: boolean; message?: string }) {
+    if (selected) setRecords(prev => prev.filter(r => r.id !== selected.id));
+    setSelected(null);
+    setShowDeleteModal(false);
+    if (result.message) alert(result.message);
   }
 
   return (
@@ -456,13 +505,24 @@ export default function WorkforcePage() {
             <div className="wf-detail-name">{selected.full_name}</div>
             <div className="wf-detail-role">{selected.specific_role} &mdash; {selected.trade_category}</div>
 
-            <button
-              className="wf-export"
-              style={{ marginBottom: '20px' }}
-              onClick={() => setShowCard(true)}
-            >
-              View Digital ID Card
-            </button>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+              <button className="wf-export" onClick={() => setShowCard(true)}>
+                View Digital ID Card
+              </button>
+              {selected.identity_document_url ? (
+                <button className="wf-export" onClick={() => viewIdentityDocument(selected.identity_document_url!)}>
+                  View Identity Document
+                </button>
+              ) : (
+                <span style={{
+                  padding: '9px 20px', borderRadius: '4px', fontFamily: "'Raleway', sans-serif",
+                  fontSize: '12px', fontWeight: 500, letterSpacing: '0.5px',
+                  background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)',
+                }}>
+                  No Identity Document
+                </span>
+              )}
+            </div>
 
             <div className="wf-detail-grid">
               <div className="wf-detail-section">
@@ -539,9 +599,33 @@ export default function WorkforcePage() {
               />
             </div>
 
-            <button className="wf-detail-save" onClick={saveChanges} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </button>
+            {saveError && (
+              <div style={{
+                marginBottom: '12px', padding: '10px 14px', borderRadius: '6px',
+                background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                color: '#f87171', fontFamily: "'Raleway', sans-serif", fontSize: '12px',
+              }}>
+                {saveError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button className="wf-detail-save" style={{ flex: 1 }} onClick={saveChanges} disabled={saving}>
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button
+                onClick={() => selected.profile_id ? setShowDeleteModal(true) : handleDeleteOrphaned()}
+                disabled={deleting}
+                style={{
+                  padding: '10px 20px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.4)',
+                  background: 'transparent', color: '#f87171', fontFamily: "'Raleway', sans-serif",
+                  fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+                  opacity: deleting ? 0.5 : 1,
+                }}
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
 
             <div style={{ marginTop: '16px', fontFamily: "'Raleway', sans-serif", fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>
               Ref: WR-{selected.id.substring(0, 6).toUpperCase()} &middot; Registered {formatDate(selected.created_at)}
@@ -552,6 +636,21 @@ export default function WorkforcePage() {
 
       {showCard && selected && (
         <WorkerDigitalCard worker={selected} onClose={() => setShowCard(false)} />
+      )}
+
+      {docPreview && (
+        <DocumentPreviewModal title={docPreview.title} url={docPreview.url} contentType={docPreview.contentType} onClose={() => setDocPreview(null)} />
+      )}
+
+      {selected?.profile_id && (
+        <DeleteAccountModal
+          open={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          targetId={selected.profile_id}
+          targetEmail={selected.email}
+          targetName={selected.full_name}
+          onDeleted={handleAccountDeleted}
+        />
       )}
     </>
   );

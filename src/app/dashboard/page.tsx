@@ -5,6 +5,29 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { WorkerDigitalCard } from '@/components/WorkerDigitalCard'
+import { EmployerDigitalCard } from '@/components/EmployerDigitalCard'
+import { OEPDigitalCard } from '@/components/OEPDigitalCard'
+
+const REGISTRANT_ROLES = ['worker', 'employer', 'oep_partner']
+
+const digitalCardLabel: Record<string, string> = {
+  worker: 'View Digital ID Card',
+  employer: 'View Digital Certificate',
+  oep_partner: 'View Digital Certificate',
+}
+
+const pipelineLabels: Record<string, Record<string, string>> = {
+  worker: { registered: 'Registered', shortlisted: 'Shortlisted', placed: 'Placed', inactive: 'Inactive' },
+  employer: { registered: 'Registered', contacted: 'Contacted', active_client: 'Active Client', inactive: 'Inactive' },
+  oep_partner: { registered: 'Registered', contacted: 'Contacted', verified: 'Verified Partner', inactive: 'Inactive' },
+}
+
+const registrantStatLabel: Record<string, string> = {
+  worker: 'Trade Category',
+  employer: 'Industry',
+  oep_partner: 'License Number',
+}
 
 interface Profile {
   id: string
@@ -29,6 +52,9 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [loading, setLoading] = useState(true)
+  const [registration, setRegistration] = useState<Record<string, unknown> | null>(null)
+  const [kycStatus, setKycStatus] = useState<string | null>(null)
+  const [showCard, setShowCard] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -46,11 +72,20 @@ export default function DashboardPage() {
       if (!prof) { router.push('/pending'); return }
       setProfile(prof)
 
-      // Load enquiries — use API route which handles role-based filtering
-      const res = await fetch('/api/enquiries')
-      if (res.ok) {
-        const json = await res.json()
-        setEnquiries((json.data || []).slice(0, 10))
+      if (REGISTRANT_ROLES.includes(prof.role)) {
+        const regRes = await fetch('/api/member/registration')
+        if (regRes.ok) {
+          const regJson = await regRes.json()
+          setRegistration(regJson.registration || null)
+          setKycStatus(regJson.kycStatus || null)
+        }
+      } else {
+        // Load enquiries — use API route which handles role-based filtering
+        const res = await fetch('/api/enquiries')
+        if (res.ok) {
+          const json = await res.json()
+          setEnquiries((json.data || []).slice(0, 10))
+        }
       }
 
       setLoading(false)
@@ -75,10 +110,29 @@ export default function DashboardPage() {
   const activeEnquiries = enquiries.filter(e => ['submitted', 'assigned', 'active', 'waiting'].includes(e.status))
   const resolvedEnquiries = enquiries.filter(e => e.status === 'resolved')
   const isAdmin = profile.role === 'admin' || profile.role === 'super_admin'
+  const isRegistrant = REGISTRANT_ROLES.includes(profile.role)
+  const pipelineStatus = registration?.status as string | undefined
+  const pipelineLabel = pipelineStatus ? (pipelineLabels[profile.role]?.[pipelineStatus] || pipelineStatus) : null
+  const registrantStatValue = registration
+    ? (profile.role === 'worker' ? registration.trade_category
+      : profile.role === 'employer' ? registration.industry
+      : profile.role === 'oep_partner' ? registration.license_number
+      : null) as string | null
+    : null
   const assignedEnquiries = isAdmin ? enquiries.filter(e => e.assigned_admin_id === profile.id && e.member_id !== profile.id) : []
   const myEnquiries = isAdmin ? enquiries.filter(e => e.member_id === profile.id) : enquiries
 
-  const tierLabel = profile.role === 'super_admin' ? 'SUPER ADMIN' : profile.role === 'admin' ? 'ADMIN' : 'MEMBER'
+  const tierLabels: Record<string, string> = {
+    super_admin: 'SUPER ADMIN',
+    admin: 'ADMIN',
+    elite_member: 'ELITE MEMBER',
+    investment_partner: 'INVESTMENT PARTNER',
+    real_estate_partner: 'REAL ESTATE PARTNER',
+    worker: 'WORKER',
+    employer: 'EMPLOYER',
+    oep_partner: 'EMPLOYMENT PROMOTER',
+  }
+  const tierLabel = tierLabels[profile.role] || 'MEMBER'
 
   const statusConfig: Record<string, { bg: string; color: string }> = {
     submitted: { bg: 'bg-primary/10', color: 'text-primary' },
@@ -123,6 +177,77 @@ export default function DashboardPage() {
         </p>
       </div>
 
+      {isRegistrant && (
+        <div className="bg-surface-container-low border border-outline-variant/10 border-l-2 border-l-primary/40 p-6 mb-10 flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <span className="material-symbols-outlined text-primary" style={{ fontSize: '32px' }}>badge</span>
+            <div>
+              <div className="cinzel-text text-base text-on-surface mb-0.5">
+                {kycStatus === 'approved' ? 'Your account is verified' : 'Account verification pending'}
+              </div>
+              <div className="raleway-text text-xs text-on-surface-variant/50">
+                {kycStatus === 'approved'
+                  ? 'View your Digital ID Card, or see your full registration details.'
+                  : 'Your Digital ID Card will be available once your account is approved.'}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {kycStatus === 'approved' && registration && (
+              <button
+                onClick={() => setShowCard(true)}
+                className="liquid-gold-bg text-on-primary raleway-text font-semibold text-xs tracking-wide px-5 py-2.5"
+              >
+                {digitalCardLabel[profile.role]}
+              </button>
+            )}
+            <Link href="/dashboard/registration" className="raleway-text text-xs text-primary no-underline hover:text-primary/80 transition-colors">
+              My Registration &rarr;
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {isRegistrant && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          <div className="bg-surface-container-low border border-outline-variant/10 p-6 relative overflow-hidden">
+            <p className="raleway-text text-[11px] tracking-[1.5px] uppercase text-on-surface-variant/50 mb-2">Account Verification</p>
+            <p className={`cinzel-text text-2xl m-0 font-semibold leading-none capitalize ${kycStatus === 'approved' ? 'text-green-400' : kycStatus === 'rejected' ? 'text-red-400' : 'text-yellow-400'}`}>
+              {kycStatus === 'approved' ? 'Approved' : kycStatus === 'rejected' ? 'Rejected' : 'Pending'}
+            </p>
+            <span className="material-symbols-outlined absolute top-6 right-6 text-primary/15" style={{ fontSize: '28px' }}>shield</span>
+          </div>
+
+          {pipelineLabel && (
+            <div className="bg-surface-container-low border border-outline-variant/10 p-6 relative overflow-hidden">
+              <p className="raleway-text text-[11px] tracking-[1.5px] uppercase text-on-surface-variant/50 mb-2">Pipeline Stage</p>
+              <p className="cinzel-text text-2xl text-primary m-0 font-semibold leading-none">{pipelineLabel}</p>
+              <span className="material-symbols-outlined absolute top-6 right-6 text-primary/15" style={{ fontSize: '28px' }}>timeline</span>
+            </div>
+          )}
+
+          {registrantStatValue && (
+            <div className="bg-surface-container-low border border-outline-variant/10 p-6 relative overflow-hidden">
+              <p className="raleway-text text-[11px] tracking-[1.5px] uppercase text-on-surface-variant/50 mb-2">{registrantStatLabel[profile.role]}</p>
+              <p className="cinzel-text text-lg text-on-surface m-0 font-semibold leading-tight">{registrantStatValue}</p>
+              <span className="material-symbols-outlined absolute top-6 right-6 text-primary/15" style={{ fontSize: '28px' }}>work</span>
+            </div>
+          )}
+
+          {registration?.created_at != null && (
+            <div className="bg-surface-container-low border border-outline-variant/10 p-6 relative overflow-hidden">
+              <p className="raleway-text text-[11px] tracking-[1.5px] uppercase text-on-surface-variant/50 mb-2">Registered Since</p>
+              <p className="cinzel-text text-lg text-on-surface m-0 font-semibold leading-tight">
+                {new Date(registration.created_at as string).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </p>
+              <span className="material-symbols-outlined absolute top-6 right-6 text-primary/15" style={{ fontSize: '28px' }}>event</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!isRegistrant && (
+      <>
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <div className="bg-surface-container-low border border-outline-variant/10 p-6 relative overflow-hidden transition-all duration-300 hover:border-primary/20 hover:-translate-y-0.5">
@@ -294,6 +419,49 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+      )}
+      </>
+      )}
+
+      {showCard && registration && profile.role === 'worker' && (
+        <WorkerDigitalCard
+          worker={{
+            id: registration.id as string,
+            full_name: registration.full_name as string,
+            trade_category: registration.trade_category as string,
+            specific_role: registration.specific_role as string,
+            nationality: registration.nationality as string,
+            photo_url: registration.photo_url as string | null,
+            status: registration.status as string,
+          }}
+          onClose={() => setShowCard(false)}
+        />
+      )}
+
+      {showCard && registration && profile.role === 'employer' && (
+        <EmployerDigitalCard
+          employer={{
+            id: registration.id as string,
+            company_name: registration.company_name as string,
+            industry: registration.industry as string,
+            country: registration.country as string,
+            status: registration.status as string,
+          }}
+          onClose={() => setShowCard(false)}
+        />
+      )}
+
+      {showCard && registration && profile.role === 'oep_partner' && (
+        <OEPDigitalCard
+          oep={{
+            id: registration.id as string,
+            company_name: registration.company_name as string,
+            license_number: registration.license_number as string,
+            head_office_location: registration.head_office_location as string,
+            status: registration.status as string,
+          }}
+          onClose={() => setShowCard(false)}
+        />
       )}
     </div>
   )

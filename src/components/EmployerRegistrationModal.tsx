@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface EmployerRegistrationModalProps {
   open: boolean;
@@ -10,11 +12,38 @@ interface EmployerRegistrationModalProps {
 const industries = ['Construction', 'Oil & Gas', 'Healthcare', 'IT & Telecom', 'Hospitality', 'Manufacturing', 'Security', 'Mining', 'Agriculture', 'Transportation', 'Other'];
 const nationalityOptions = ['Pakistan', 'Bangladesh', 'Nepal', 'India', 'Sri Lanka', 'Philippines', 'Other'];
 
+// Country-specific guidance on what proves a company is real — keyed by lowercase country name.
+// Falls back to generic wording below when the typed country isn't in this list.
+const macedoniaHint = 'For North Macedonia: upload your Central Registry (CRM) trade register extract — shows your registry and tax number — plus the ID/passport of the person registering.';
+const bosniaHint = 'For Bosnia and Herzegovina: upload your court register extract (Federation of BiH, Republika Srpska, or Brčko District, as applicable) plus the ID/passport of the person registering.';
+
+const countryDocHints: Record<string, string> = {
+  serbia: 'For Serbia: upload your APR extract (Izvod iz APR — shows your matični broj and PIB) plus the ID/passport of the person registering.',
+  albania: 'For Albania: upload your QKB extract (Ekstrakt i regjistrit — shows your NIPT tax number) plus the ID/passport of the person registering.',
+  kosovo: 'For Kosovo: upload your ARBK business certificate/extract (shows your fiscal number) plus the ID/passport of the person registering.',
+  croatia: 'For Croatia: upload your Sudski registar (court register) extract — shows your OIB — plus the ID/passport of the person registering.',
+  montenegro: 'For Montenegro: upload your CRPS extract (Centralni registar privrednih subjekata) plus the ID/passport of the person registering.',
+  'north macedonia': macedoniaHint,
+  macedonia: macedoniaHint,
+  'bosnia and herzegovina': bosniaHint,
+  bosnia: bosniaHint,
+  romania: 'For Romania: upload your Certificat Constatator from ONRC (shows your CUI) plus the ID/passport of the person registering.',
+  bulgaria: 'For Bulgaria: upload your Commercial Register (Targovski Registar) extract — shows your EIK — plus the ID/passport of the person registering.',
+};
+
+function getDocHint(country: string): string | null {
+  const key = country.trim().toLowerCase();
+  return countryDocHints[key] || null;
+}
+
 export function EmployerRegistrationModal({ open, onClose }: EmployerRegistrationModalProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     companyName: '',
     contactPerson: '',
     email: '',
+    password: '',
+    confirmPassword: '',
     phone: '',
     country: '',
     industry: '',
@@ -23,15 +52,31 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
     hiringTimeline: 'immediate',
     preferredNationalities: [] as string[],
     notes: '',
+    identityDocument: '',
   });
+  const [identityDocName, setIdentityDocName] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!open) return null;
 
   function updateField(field: string, value: unknown) {
     setFormData(prev => ({ ...prev, [field]: value }));
+  }
+
+  function handleIdentityDocChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Identity document must be under 8MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setIdentityDocName(file.name);
+      updateField('identityDocument', reader.result as string);
+    };
+    reader.readAsDataURL(file);
   }
 
   function toggleNationality(nat: string) {
@@ -47,6 +92,22 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    if (!formData.identityDocument) {
+      setError('Please upload an identity document — registrations cannot be approved without one.');
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -60,13 +121,15 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
 
       if (!res.ok) {
         setError(data.error || 'Registration failed. Please try again.');
+        setSubmitting(false);
         return;
       }
 
-      setSuccess(data.reference || 'ER-XXXXXX');
+      const supabase = createClient();
+      await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+      router.push('/pending');
     } catch {
       setError('Network error. Please check your connection and try again.');
-    } finally {
       setSubmitting(false);
     }
   }
@@ -186,35 +249,6 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
           border-radius: 6px; padding: 12px 16px; color: #f87171;
           font-family: 'Raleway', sans-serif; font-size: 13px;
         }
-        .erm-success {
-          display: flex; flex-direction: column; align-items: center; justify-content: center;
-          padding: 60px 32px; text-align: center;
-        }
-        .erm-success-icon {
-          width: 64px; height: 64px; border-radius: 50%;
-          background: rgba(34,197,94,0.1); border: 2px solid rgba(34,197,94,0.3);
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 20px; font-size: 28px; color: #22c55e;
-        }
-        .erm-success h3 {
-          font-family: 'Cinzel', serif; font-size: 22px; color: #fff;
-          margin: 0 0 12px; font-weight: 600;
-        }
-        .erm-success p {
-          font-family: 'Raleway', sans-serif; font-size: 14px;
-          color: rgba(255,255,255,0.5); line-height: 1.7; margin: 0 0 6px;
-        }
-        .erm-success .ref-code {
-          font-family: 'Raleway', sans-serif; font-size: 13px;
-          color: #c9a84c; font-weight: 600; letter-spacing: 1px; margin-top: 8px;
-        }
-        .erm-success-close {
-          margin-top: 28px; padding: 12px 32px; border-radius: 4px;
-          border: 1px solid rgba(201,168,76,0.3); background: transparent;
-          color: #c9a84c; font-family: 'Raleway', sans-serif; font-size: 13px;
-          cursor: pointer; transition: all 0.2s; font-weight: 500;
-        }
-        .erm-success-close:hover { border-color: #c9a84c; background: rgba(201,168,76,0.06); }
         @media (max-width: 640px) {
           .erm-header, .erm-form { padding-left: 20px; padding-right: 20px; }
           .erm-title { font-size: 19px; }
@@ -225,17 +259,8 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
         <div className="erm-modal">
           <button className="erm-close" onClick={onClose} aria-label="Close">&times;</button>
 
-          {success ? (
-            <div className="erm-success">
-              <div className="erm-success-icon">&#10003;</div>
-              <h3>Registration Submitted!</h3>
-              <p>Our workforce team will review your requirements and get in touch to discuss candidates.</p>
-              <div className="ref-code">Reference: {success}</div>
-              <button className="erm-success-close" onClick={onClose}>Close</button>
-            </div>
-          ) : (
-            <>
-              <div className="erm-header">
+          <>
+            <div className="erm-header">
                 <div className="erm-icon">
                   <span className="material-symbols-outlined" style={{ fontSize: '40px', color: '#c9a84c' }}>apartment</span>
                 </div>
@@ -251,6 +276,24 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
                   <label>Company Name <span className="req">*</span></label>
                   <input className="erm-input" type="text" placeholder="Enter your company name" required
                     value={formData.companyName} onChange={e => updateField('companyName', e.target.value)} />
+                </div>
+
+                {/* Identity Document */}
+                <div className="erm-field">
+                  <label>Identity Document <span className="req">*</span></label>
+                  <label className="erm-pill" style={{ padding: '9px 18px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>upload_file</span>
+                    {identityDocName ? identityDocName : 'Upload Document'}
+                    <input type="file" accept="image/*,.pdf" onChange={handleIdentityDocChange} style={{ display: 'none' }} />
+                  </label>
+                  <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '6px' }}>
+                    Company registration certificate, personal ID, passport, or any other legal government-approved proof of identity/residence. Required for admin approval. Images or PDF, up to 8MB.
+                  </div>
+                  {getDocHint(formData.country) && (
+                    <div style={{ fontFamily: "'Raleway', sans-serif", fontSize: '11px', color: '#c9a84c', marginTop: '6px' }}>
+                      {getDocHint(formData.country)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Contact Person */}
@@ -272,6 +315,20 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
                   <label>Phone with Country Code <span className="req">*</span></label>
                   <input className="erm-input" type="text" placeholder="+971 50 1234567" required
                     value={formData.phone} onChange={e => updateField('phone', e.target.value)} />
+                </div>
+
+                {/* Password */}
+                <div className="erm-field">
+                  <label>Password <span className="req">*</span></label>
+                  <input className="erm-input" type="password" placeholder="Min. 8 characters" required
+                    value={formData.password} onChange={e => updateField('password', e.target.value)} />
+                </div>
+
+                {/* Confirm Password */}
+                <div className="erm-field">
+                  <label>Confirm Password <span className="req">*</span></label>
+                  <input className="erm-input" type="password" placeholder="Re-enter your password" required
+                    value={formData.confirmPassword} onChange={e => updateField('confirmPassword', e.target.value)} />
                 </div>
 
                 {/* Country */}
@@ -351,8 +408,7 @@ export function EmployerRegistrationModal({ open, onClose }: EmployerRegistratio
                   {submitting ? 'Submitting...' : 'Submit Registration'}
                 </button>
               </form>
-            </>
-          )}
+          </>
         </div>
       </div>
     </>

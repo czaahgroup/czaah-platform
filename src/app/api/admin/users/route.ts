@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-const CREATABLE_ROLES = ['member', 'admin', 'investment_partner', 'elite_member', 'real_estate_partner', 'super_admin']
+const CREATABLE_ROLES = ['member', 'admin', 'investment_partner', 'elite_member', 'real_estate_partner', 'worker', 'employer', 'oep_partner', 'super_admin']
 
 export async function POST(request: NextRequest) {
   try {
@@ -210,8 +210,9 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot modify super_admin users' }, { status: 403 })
     }
 
+    const EDITABLE_ROLES = ['member', 'admin', 'investment_partner', 'elite_member', 'real_estate_partner', 'worker', 'employer', 'oep_partner']
     const updates: Record<string, string> = {}
-    if (role && (role === 'member' || role === 'admin' || role === 'investment_partner' || role === 'elite_member' || role === 'real_estate_partner')) {
+    if (role && EDITABLE_ROLES.includes(role)) {
       updates.role = role
     }
     if (status) {
