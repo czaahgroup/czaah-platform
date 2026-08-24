@@ -173,6 +173,54 @@ export function CallUI({
     }
   }, [callState, callDuration, callType])
 
+  // Ring tone (incoming call) and ringback tone (waiting for the other side
+  // to answer) — synthesized so there's no audio file to host or license.
+  useEffect(() => {
+    if (callState !== 'ringing' && callState !== 'calling') return
+
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const ctx = new AudioContextClass()
+    let stopped = false
+    let timer: ReturnType<typeof setTimeout>
+
+    function playCycle() {
+      if (stopped) return
+      ctx.resume().catch(() => {})
+      const now = ctx.currentTime
+      // Incoming call: classic dual-tone ring (440Hz + 480Hz). Outgoing/waiting:
+      // a single softer ringback tone, distinct enough to tell the two apart.
+      const freqs = callState === 'ringing' ? [440, 480] : [425]
+      const toneDuration = 1.8
+      const cycleDuration = callState === 'ringing' ? 3.6 : 5
+
+      const gain = ctx.createGain()
+      gain.gain.setValueAtTime(0, now)
+      gain.gain.linearRampToValueAtTime(0.12, now + 0.05)
+      gain.gain.setValueAtTime(0.12, now + toneDuration - 0.1)
+      gain.gain.linearRampToValueAtTime(0, now + toneDuration)
+      gain.connect(ctx.destination)
+
+      freqs.forEach((f) => {
+        const osc = ctx.createOscillator()
+        osc.type = 'sine'
+        osc.frequency.value = f
+        osc.connect(gain)
+        osc.start(now)
+        osc.stop(now + toneDuration)
+      })
+
+      timer = setTimeout(playCycle, cycleDuration * 1000)
+    }
+
+    playCycle()
+
+    return () => {
+      stopped = true
+      clearTimeout(timer)
+      ctx.close().catch(() => {})
+    }
+  }, [callState])
+
   if (callState === 'idle' && !endedVisible) return null
 
   // Disconnected — show rejoin option
