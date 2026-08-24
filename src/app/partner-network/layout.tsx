@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { AdminSidebarWrapper } from '@/components/AdminSidebarWrapper'
 
 const BASE_NAV_LINKS = [
   { href: '/partner-network', label: 'Dashboard', icon: 'dashboard' },
@@ -65,9 +66,8 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
     )
   }
 
-  return (
-    <div className="min-h-screen flex bg-surface-container-lowest">
-      <aside className="w-64 shrink-0 bg-surface-container border-r border-outline-variant/10 flex flex-col min-h-screen">
+  const sidebarContent = (
+    <>
         <div className="px-6 py-6 border-b border-outline-variant/10">
           <Link href="/partner-network" className="no-underline flex items-center gap-3">
             <svg viewBox="-5 -12 100 128" width="100" height="128" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-auto shrink-0">
@@ -134,11 +134,12 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
             <button type="submit" className="raleway-text text-xs text-primary/70 hover:text-primary transition-colors">Sign Out</button>
           </form>
         </div>
-      </aside>
+    </>
+  )
 
-      <main className="flex-1 min-w-0 p-5 sm:p-8">
-        {children}
-      </main>
-    </div>
+  return (
+    <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
+      {children}
+    </AdminSidebarWrapper>
   )
 }
