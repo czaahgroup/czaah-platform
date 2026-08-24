@@ -125,14 +125,24 @@ export function useCall({
   useEffect(() => {
     let cancelled = false
     fetch('/api/calls/turn-credentials')
-      .then((res) => (res.ok ? res.json() : null))
+      .then(async (res) => {
+        if (!res.ok) {
+          console.warn('[useCall] TURN credentials request failed:', res.status, await res.text().catch(() => ''))
+          return null
+        }
+        return res.json()
+      })
       .then((data) => {
-        if (!cancelled && data?.iceServers?.length) {
+        if (cancelled) return
+        if (data?.iceServers?.length) {
           iceServersRef.current = data.iceServers
+          console.info('[useCall] Using TURN-backed ICE servers:', data.iceServers.map((s: RTCIceServer) => s.urls))
+        } else {
+          console.warn('[useCall] No iceServers in TURN response, staying on STUN-only fallback')
         }
       })
-      .catch(() => {
-        // Keep the STUN-only fallback — calls on friendly networks still work
+      .catch((err) => {
+        console.warn('[useCall] TURN credentials fetch errored, staying on STUN-only fallback:', err)
       })
     return () => {
       cancelled = true
@@ -207,12 +217,21 @@ export function useCall({
       existing.close()
     }
 
+    console.info('[useCall] Creating peer connection with', iceServersRef.current.length, 'ICE server entries')
     const pc = new RTCPeerConnection({ iceServers: iceServersRef.current })
     peerConnectionsRef.current.set(participantId, pc)
+
+    pc.onicegatheringstatechange = () => {
+      console.info('[useCall] ICE gathering state:', pc.iceGatheringState)
+    }
+    pc.oniceconnectionstatechange = () => {
+      console.info('[useCall] ICE connection state:', pc.iceConnectionState)
+    }
 
     // Send ICE candidates via broadcast
     pc.onicecandidate = (event) => {
       if (event.candidate) {
+        console.info('[useCall] Local ICE candidate:', event.candidate.type, event.candidate.protocol)
         channel.send({
           type: 'broadcast',
           event: 'ice-candidate',
@@ -222,6 +241,8 @@ export function useCall({
             candidate: event.candidate.toJSON(),
           },
         })
+      } else {
+        console.info('[useCall] ICE candidate gathering complete')
       }
     }
 
@@ -249,6 +270,7 @@ export function useCall({
     }
 
     pc.onconnectionstatechange = () => {
+      console.info('[useCall] Peer connection state:', pc.connectionState)
       if (pc.connectionState === 'connected') {
         // If this is the first connection and we haven't started timer yet
         if (callStateRef.current !== 'connected') {
