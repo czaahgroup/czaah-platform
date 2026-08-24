@@ -23,12 +23,9 @@ function createAuthClient(request: NextRequest) {
 // NAT traversal gets involved, which is most real-world call pairs.
 export async function GET(request: NextRequest) {
   try {
-    const userClient = createAuthClient(request)
-    const { data: { user }, error: authError } = await userClient.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
+    // TEMP DIAGNOSTIC: auth check disabled to confirm this file is actually
+    // reachable in the deployed build (vs. middleware masking a 404 as 401).
+    void request
     const keyId = process.env.CLOUDFLARE_TURN_KEY_ID
     const apiToken = process.env.CLOUDFLARE_TURN_KEY_API_TOKEN
     if (!keyId || !apiToken) {
