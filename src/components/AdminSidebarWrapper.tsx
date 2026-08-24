@@ -76,6 +76,7 @@ export function AdminSidebarWrapper({
             top: 0;
             bottom: 0;
             z-index: 50;
+            padding-top: env(safe-area-inset-top);
             transition: left 0.3s ease;
           }
           .admin-sidebar.closed {

@@ -274,7 +274,8 @@ nav {
   right: 0;
   z-index: 100;
   padding: 0 48px;
-  height: 64px;
+  padding-top: env(safe-area-inset-top);
+  height: calc(64px + env(safe-area-inset-top));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1794,7 +1795,7 @@ footer {
 
 .mobile-drawer {
   position: fixed;
-  top: 64px;
+  top: calc(64px + env(safe-area-inset-top));
   right: 0;
   bottom: 0;
   width: 340px;
