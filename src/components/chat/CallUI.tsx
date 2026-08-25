@@ -831,20 +831,22 @@ export function CallUI({
     )
   }
 
-  // Connected -- voice call (compact bar)
+  // Connected -- voice call (full-screen, WhatsApp-style)
   if (callState === 'connected' && callType === 'voice') {
-    const participantNames = participants.map((p) => p.userName).join(', ')
+    const displayName = participants.map((p) => p.userName).join(', ') || callerName || 'Call'
     return (
       <div
         style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000 70%)',
+          zIndex: 50,
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          gap: '12px',
-          padding: '8px 16px',
-          background: '#080808',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
+        <style>{STYLES}</style>
         {participants.map((participant) => (
           <AudioElement
             key={participant.userId}
@@ -854,199 +856,179 @@ export function CallUI({
           />
         ))}
 
-        <span
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: '#22c55e',
-            boxShadow: '0 0 6px rgba(34,197,94,0.5)',
-            flexShrink: 0,
-          }}
-        />
-
-        <span
-          style={{
-            fontFamily: "'Raleway', sans-serif",
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#fff',
-            flex: 1,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {participantNames || callerName || 'Call'}
-        </span>
-
-        {participants.length >= 2 && (
-          <span
-            style={{
-              background: 'rgba(201,168,76,0.2)',
-              color: '#C9A84C',
-              fontSize: '10px',
-              fontWeight: 700,
-              padding: '1px 6px',
-              borderRadius: '10px',
-              fontFamily: "'Raleway', sans-serif",
-              flexShrink: 0,
-            }}
-          >
-            {participants.length + 1}
-          </span>
-        )}
-
-        <span
-          style={{
-            fontFamily: "'Raleway', sans-serif",
-            fontSize: '13px',
-            color: '#fff',
-            fontVariantNumeric: 'tabular-nums',
-            letterSpacing: '0.5px',
-            flexShrink: 0,
-          }}
-        >
-          {formatDuration(callDuration)}
-        </span>
-
-        <button
-          onClick={onToggleMute}
-          style={{
-            background: 'none',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '6px',
-            padding: '4px 8px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: isMuted ? '#ef4444' : '#C9A84C',
-            transition: 'all 0.15s ease',
-            flexShrink: 0,
-          }}
-          title={isMuted ? 'Unmute' : 'Mute'}
-        >
-          {isMuted ? (
-            <MicOffIcon size={18} color="#ef4444" />
-          ) : (
-            <MicIcon size={18} color="#C9A84C" />
-          )}
-        </button>
-
-        <button
-          onClick={toggleSpeaker}
-          style={{
-            background: 'none',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '6px',
-            padding: '4px 8px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: isSpeakerOn ? '#C9A84C' : 'rgba(255,255,255,0.4)',
-            transition: 'all 0.15s ease',
-            flexShrink: 0,
-          }}
-          title={isSpeakerOn ? 'Turn off speaker' : 'Turn on speaker'}
-        >
-          {isSpeakerOn ? (
-            <SpeakerIcon size={18} color="#C9A84C" />
-          ) : (
-            <SpeakerOffIcon size={18} color="rgba(255,255,255,0.4)" />
-          )}
-        </button>
-
-        <button
-          onClick={onToggleVideo}
-          style={{
-            background: 'none',
-            border: '1px solid rgba(201,168,76,0.3)',
-            borderRadius: '6px',
-            padding: '4px 8px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#C9A84C',
-            transition: 'all 0.15s ease',
-            flexShrink: 0,
-          }}
-          title="Switch to video call"
-        >
-          <VideoIcon size={18} color="#C9A84C" />
-        </button>
-
-        {onMinimize && (
-          <button
-            onClick={onMinimize}
-            style={{
-              background: 'none',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '6px',
-              padding: '4px 8px',
-              cursor: 'pointer',
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
+          <div style={{ position: 'relative', width: '140px', height: '140px' }}>
+            <div style={{
+              width: '140px',
+              height: '140px',
+              borderRadius: '50%',
+              background: 'rgba(201,168,76,0.12)',
+              border: '1px solid rgba(201,168,76,0.2)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'rgba(255,255,255,0.5)',
-              flexShrink: 0,
-            }}
-            title="Minimize"
-          >
-            <MinimizeIcon size={16} color="rgba(255,255,255,0.5)" />
-          </button>
-        )}
+            }}>
+              <span style={{ fontFamily: "'Cinzel', serif", fontSize: '48px', color: '#C9A84C' }}>
+                {displayName.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          </div>
 
-        {onAddParticipant && (
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontFamily: "'Cinzel', serif", fontSize: '20px', color: '#fff', letterSpacing: '1px', margin: '0 0 8px 0' }}>
+              {displayName}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px rgba(34,197,94,0.5)' }} />
+              <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: '13px', color: 'rgba(255,255,255,0.5)', fontVariantNumeric: 'tabular-nums', letterSpacing: '0.5px' }}>
+                {formatDuration(callDuration)}
+              </span>
+              {participants.length >= 2 && (
+                <span style={{
+                  background: 'rgba(201,168,76,0.2)',
+                  color: '#C9A84C',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  padding: '1px 8px',
+                  borderRadius: '10px',
+                  fontFamily: "'Raleway', sans-serif",
+                }}>
+                  {participants.length + 1} on call
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Control bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            flexWrap: 'wrap',
+            padding: '0 16px 32px',
+          }}
+        >
           <button
-            onClick={onAddParticipant}
+            onClick={onToggleMute}
             style={{
-              background: 'none',
-              border: '1px solid rgba(201,168,76,0.3)',
-              borderRadius: '6px',
-              padding: '4px 8px',
-              cursor: 'pointer',
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              border: 'none',
+              background: isMuted ? '#ef4444' : 'rgba(255,255,255,0.08)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              cursor: 'pointer',
               transition: 'all 0.15s ease',
-              flexShrink: 0,
             }}
-            title="Add participant"
+            title={isMuted ? 'Unmute' : 'Mute'}
           >
-            <AddIcon size={16} color="#C9A84C" />
+            {isMuted ? <MicOffIcon size={20} color="#fff" /> : <MicIcon size={20} color="#C9A84C" />}
           </button>
-        )}
 
-        <button
-          onClick={onEndCall}
-          style={{
-            background: '#ef4444',
-            border: 'none',
-            borderRadius: '6px',
-            padding: '4px 10px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            flexShrink: 0,
-          }}
-          title="End call"
-        >
-          <PhoneEndIcon size={14} color="#fff" />
-          <span
+          <button
+            onClick={toggleSpeaker}
             style={{
-              fontFamily: "'Raleway', sans-serif",
-              fontSize: '11px',
-              color: '#fff',
-              fontWeight: 600,
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              border: 'none',
+              background: isSpeakerOn ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
+            title={isSpeakerOn ? 'Turn off speaker' : 'Turn on speaker'}
           >
-            End
-          </span>
-        </button>
+            {isSpeakerOn ? <SpeakerIcon size={20} color="#C9A84C" /> : <SpeakerOffIcon size={20} color="rgba(255,255,255,0.6)" />}
+          </button>
+
+          <button
+            onClick={onToggleVideo}
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              border: 'none',
+              background: 'rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            title="Switch to video call"
+          >
+            <VideoIcon size={20} color="#C9A84C" />
+          </button>
+
+          {onMinimize && (
+            <button
+              onClick={onMinimize}
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                border: 'none',
+                background: 'rgba(255,255,255,0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              title="Minimize"
+            >
+              <MinimizeIcon size={20} color="rgba(255,255,255,0.7)" />
+            </button>
+          )}
+
+          {onAddParticipant && (
+            <button
+              onClick={onAddParticipant}
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                border: '1px solid rgba(201,168,76,0.3)',
+                background: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              title="Add participant"
+            >
+              <AddIcon size={20} color="#C9A84C" />
+            </button>
+          )}
+
+          <button
+            onClick={onEndCall}
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              border: 'none',
+              background: '#ef4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            title="End call"
+          >
+            <PhoneEndIcon size={20} color="#fff" />
+          </button>
+        </div>
       </div>
     )
   }
