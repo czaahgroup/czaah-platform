@@ -146,34 +146,62 @@ export function useCall({
   const lastTargetNameRef = useRef<string | null>(null)
   const activeCallRef = useRef(false)
   const iceServersRef = useRef<RTCIceServer[]>(FALLBACK_ICE_SERVERS)
+  // Resolved once TURN credentials have loaded (or definitively failed after
+  // retries) — awaited just before creating a peer connection so a call
+  // placed/accepted moments after page load doesn't silently get stuck on
+  // the STUN-only fallback, which can't relay media across different
+  // networks. A random-seeming "sometimes we can't hear each other" is
+  // exactly what that race condition looks like from the outside.
+  const turnReadyRef = useRef<Promise<void>>(Promise.resolve())
 
-  // Fetch short-lived Cloudflare TURN credentials once on mount, so a real
-  // relay path is ready before any call is actually placed or accepted.
+  // Fetch short-lived Cloudflare TURN credentials once on mount, with a
+  // couple of retries, so a real relay path is ready before any call is
+  // actually placed or accepted.
   useEffect(() => {
     let cancelled = false
-    fetch('/api/calls/turn-credentials')
-      .then(async (res) => {
-        if (!res.ok) {
-          console.warn('[useCall] TURN credentials request failed:', res.status, await res.text().catch(() => ''))
-          return null
+
+    async function loadTurnCredentials() {
+      const maxAttempts = 3
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const res = await fetch('/api/calls/turn-credentials')
+          if (res.ok) {
+            const data = await res.json()
+            if (data?.iceServers?.length) {
+              if (!cancelled) {
+                iceServersRef.current = data.iceServers
+                console.info('[useCall] Using TURN-backed ICE servers:', data.iceServers.map((s: RTCIceServer) => s.urls))
+              }
+              return
+            }
+            console.warn('[useCall] No iceServers in TURN response (attempt', attempt, 'of', maxAttempts, ')')
+          } else {
+            console.warn('[useCall] TURN credentials request failed (attempt', attempt, 'of', maxAttempts, '):', res.status, await res.text().catch(() => ''))
+          }
+        } catch (err) {
+          console.warn('[useCall] TURN credentials fetch errored (attempt', attempt, 'of', maxAttempts, '):', err)
         }
-        return res.json()
-      })
-      .then((data) => {
-        if (cancelled) return
-        if (data?.iceServers?.length) {
-          iceServersRef.current = data.iceServers
-          console.info('[useCall] Using TURN-backed ICE servers:', data.iceServers.map((s: RTCIceServer) => s.urls))
-        } else {
-          console.warn('[useCall] No iceServers in TURN response, staying on STUN-only fallback')
+        if (attempt < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, 500 * attempt))
         }
-      })
-      .catch((err) => {
-        console.warn('[useCall] TURN credentials fetch errored, staying on STUN-only fallback:', err)
-      })
+      }
+      console.warn('[useCall] Giving up on TURN credentials — staying on STUN-only fallback')
+    }
+
+    turnReadyRef.current = loadTurnCredentials()
+
     return () => {
       cancelled = true
     }
+  }, [])
+
+  // Never blocks longer than this even if TURN is genuinely unreachable —
+  // a slow call beats one that hangs waiting on a dead credentials service.
+  const waitForTurnReady = useCallback(() => {
+    return Promise.race([
+      turnReadyRef.current,
+      new Promise<void>((resolve) => setTimeout(resolve, 4000)),
+    ])
   }, [])
 
   // Keep refs in sync
@@ -446,6 +474,7 @@ export function useCall({
             const ct = callTypeRef.current || 'voice'
             let stream = localStreamRef.current
             if (!stream) stream = await getLocalMedia(ct)
+            await waitForTurnReady()
             const pc = createPeerConnection(payload.senderId, payload.senderName, channel)
             const offer = await pc.createOffer()
             await pc.setLocalDescription(offer)
@@ -474,6 +503,7 @@ export function useCall({
           if (!stream) {
             stream = await getLocalMedia(ct)
           }
+          await waitForTurnReady()
           const pc = createPeerConnection(payload.senderId, payload.senderName, channel)
           // Tracks already added in createPeerConnection
 
@@ -517,6 +547,7 @@ export function useCall({
             console.error('[useCall] Failed to get local media for incoming group offer:', e)
             return
           }
+          await waitForTurnReady()
           pc = createPeerConnection(payload.senderId, payload.senderName || 'Participant', channel)
         }
 
@@ -664,6 +695,7 @@ export function useCall({
           if (!stream) {
             stream = await getLocalMedia(ct)
           }
+          await waitForTurnReady()
           const pc = createPeerConnection(payload.senderId, payload.senderName, channel)
 
           const offer = await pc.createOffer()
@@ -882,6 +914,7 @@ export function useCall({
       const senderId = targetUserIdRef.current
       if (!senderId) return
 
+      await waitForTurnReady()
       const pc = createPeerConnection(senderId, callerName || 'Unknown', channel)
       // Tracks already added in createPeerConnection via localStreamRef
 
@@ -903,7 +936,7 @@ export function useCall({
       setCallState('idle')
       setCallType(null)
     }
-  }, [currentUserId, currentUserName, callerName, callerType, getLocalMedia, createPeerConnection, cleanup])
+  }, [currentUserId, currentUserName, callerName, callerType, getLocalMedia, createPeerConnection, cleanup, waitForTurnReady])
 
   const declineCall = useCallback(() => {
     if (callStateRef.current !== 'ringing') return
