@@ -51,40 +51,48 @@ function LoginForm() {
     setError('')
     setLoading(true)
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
-    }
+      if (error) {
+        setError(error.message)
+        return
+      }
 
-    // Check if MFA is required
-    const { data: mfaData } = await supabase.auth.mfa.listFactors()
-    const verifiedFactors = mfaData?.totp?.filter(f => f.status === 'verified') || []
+      // Check if MFA is required
+      const { data: mfaData } = await supabase.auth.mfa.listFactors()
+      const verifiedFactors = mfaData?.totp?.filter(f => f.status === 'verified') || []
 
-    if (verifiedFactors.length > 0) {
-      setMfaFactorId(verifiedFactors[0].id)
-      setMfaRequired(true)
-      setLoading(false)
-      return
-    }
+      if (verifiedFactors.length > 0) {
+        setMfaFactorId(verifiedFactors[0].id)
+        setMfaRequired(true)
+        return
+      }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const { data: profile } = await supabase
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setError('Signed in, but could not load your account. Please try again.')
+        return
+      }
+
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, status')
         .eq('id', user.id)
         .single()
 
-      if (!profile || profile.status !== 'approved') {
+      if (profileError || !profile || profile.status !== 'approved') {
         router.push('/pending')
         return
       }
 
       navigateByRole(profile)
+    } catch (err) {
+      console.error('[Login] Unexpected error during sign-in:', err)
+      setError('Something went wrong signing you in. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -94,33 +102,42 @@ function LoginForm() {
     setError('')
     setLoading(true)
 
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({
-      factorId: mfaFactorId,
-      code: mfaCode,
-    })
+      const { error: verifyError } = await supabase.auth.mfa.challengeAndVerify({
+        factorId: mfaFactorId,
+        code: mfaCode,
+      })
 
-    if (verifyError) {
-      setError(verifyError.message)
-      setLoading(false)
-      return
-    }
+      if (verifyError) {
+        setError(verifyError.message)
+        return
+      }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const { data: profile } = await supabase
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setError('Verified, but could not load your account. Please try again.')
+        return
+      }
+
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, status')
         .eq('id', user.id)
         .single()
 
-      if (!profile || profile.status !== 'approved') {
+      if (profileError || !profile || profile.status !== 'approved') {
         router.push('/pending')
         return
       }
 
       navigateByRole(profile)
+    } catch (err) {
+      console.error('[Login] Unexpected error during MFA verify:', err)
+      setError('Something went wrong verifying your code. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
