@@ -21,6 +21,7 @@ import { primeAudioUnlock } from '@/lib/audioUnlock'
 interface ChatRef {
   id: string
   partnerName: string
+  partnerProfileId: string | null
 }
 
 interface PartnerCallContextValue {
@@ -75,9 +76,10 @@ export function PartnerCallProvider({
         const json = await res.json()
         if (cancelled) return
         setChats(
-          (json.data || []).map((c: { id: string; partners: { profiles: { full_name: string } | null } | null }) => ({
+          (json.data || []).map((c: { id: string; partners: { profile_id: string | null; profiles: { full_name: string } | null } | null }) => ({
             id: c.id,
             partnerName: c.partners?.profiles?.full_name || 'Partner',
+            partnerProfileId: c.partners?.profile_id || null,
           }))
         )
       } catch {
@@ -116,6 +118,7 @@ export function PartnerCallProvider({
           userId={userId}
           userName={userName}
           admins={admins}
+          otherPartners={chats.filter((other) => other.id !== c.id && other.partnerProfileId)}
           onRegister={registerCall}
           onStateChange={() => bumpVersion((n) => n + 1)}
         />
@@ -131,6 +134,7 @@ function PartnerCallSlot({
   userId,
   userName,
   admins,
+  otherPartners,
   onRegister,
   onStateChange,
 }: {
@@ -139,6 +143,7 @@ function PartnerCallSlot({
   userId: string
   userName: string
   admins: { id: string; full_name: string }[]
+  otherPartners: ChatRef[]
   onRegister: (chatId: string, call: UseCallReturn) => void
   onStateChange: () => void
 }) {
@@ -275,6 +280,56 @@ function PartnerCallSlot({
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 {a.full_name}
+              </button>
+            ))
+          )}
+          <div style={{
+            padding: '8px 12px',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: '11px',
+            color: 'rgba(201,168,76,0.6)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+          }}>
+            Add another partner
+          </div>
+          {otherPartners.filter((p) => !call.participants.some((cp) => cp.userId === p.partnerProfileId)).length === 0 ? (
+            <div style={{
+              padding: '8px 12px',
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: '12px',
+              color: 'rgba(255,255,255,0.4)',
+            }}>
+              No other partners available
+            </div>
+          ) : (
+            otherPartners.filter((p) => !call.participants.some((cp) => cp.userId === p.partnerProfileId)).map((p) => (
+              <button
+                key={p.id}
+                onClick={() => {
+                  call.inviteExternalUser(p.partnerProfileId!, p.partnerName)
+                  setShowAddParticipant(false)
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '8px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  color: '#fff',
+                  fontFamily: "'Raleway', sans-serif",
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background 0.15s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                {p.partnerName}
               </button>
             ))
           )}

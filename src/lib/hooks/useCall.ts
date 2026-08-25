@@ -16,6 +16,14 @@ export interface UseCallOptions {
   chatContextId?: string
   onCallEnded?: (durationSeconds: number, type: CallType) => void
   onCallMissed?: (targetUserId: string, targetName: string, type: CallType) => void
+  // Set by the caller right before it redirects `chatId` to someone else's
+  // chat, in response to a cross-chat group-call invite (see
+  // inviteExternalUser below). Once this hook's channel for that new chatId
+  // finishes subscribing, it enters the 'ringing' state using this info
+  // directly — it can't rely on receiving a normal add-participant broadcast
+  // on that channel, because that broadcast may already have gone out
+  // before this hook finished switching channels.
+  externalInvite?: { callerId: string; callerName: string; callType: CallType } | null
 }
 
 export interface Participant {
@@ -44,6 +52,10 @@ export interface UseCallReturn {
   toggleMute: () => void
   toggleVideo: () => void
   addParticipant: (userId: string, userName: string) => void
+  // For inviting someone who is NOT already listening on this call's
+  // channel (e.g. a different partner than the one this chat belongs to).
+  // Delivered via that person's own personal invite channel instead.
+  inviteExternalUser: (targetProfileId: string, targetName: string) => void
   rejoinCall: () => void
   canRejoin: boolean
 }
@@ -91,6 +103,7 @@ export function useCall({
   chatContextId,
   onCallEnded,
   onCallMissed,
+  externalInvite,
 }: UseCallOptions): UseCallReturn {
   const [callState, setCallState] = useState<CallState>('idle')
   const [callType, setCallType] = useState<CallType | null>(null)
@@ -126,6 +139,7 @@ export function useCall({
   const isCallerRef = useRef(false)
   const targetUserIdRef = useRef<string | null>(null)
   const participantsRef = useRef<Participant[]>([])
+  const externalInviteRef = useRef<UseCallOptions['externalInvite']>(externalInvite)
   const [canRejoin, setCanRejoin] = useState(false)
   const lastCallTypeRef = useRef<CallType | null>(null)
   const lastTargetUserIdRef = useRef<string | null>(null)
@@ -166,6 +180,10 @@ export function useCall({
   useEffect(() => {
     callStateRef.current = callState
   }, [callState])
+
+  useEffect(() => {
+    externalInviteRef.current = externalInvite
+  }, [externalInvite])
 
   useEffect(() => {
     callTypeRef.current = callType
@@ -295,6 +313,7 @@ export function useCall({
     pc.onconnectionstatechange = () => {
       console.info('[useCall] Peer connection state:', pc.connectionState)
       if (pc.connectionState === 'connected') {
+        const isNewParticipant = !participantsRef.current.some((p) => p.userId === participantId)
         // If this is the first connection and we haven't started timer yet
         if (callStateRef.current !== 'connected') {
           setCallState('connected')
@@ -318,6 +337,16 @@ export function useCall({
             },
           ]
         })
+        // Tell any OTHER already-connected member of a group call that a
+        // new participant has arrived, so they connect directly too --
+        // WebRTC has no built-in relay, every pair needs its own connection.
+        if (isNewParticipant) {
+          channel.send({
+            type: 'broadcast',
+            event: 'participant-joined',
+            payload: { senderId: currentUserId, senderName: currentUserName },
+          })
+        }
       }
       if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
         // Remove this participant
@@ -366,7 +395,7 @@ export function useCall({
     }
 
     return pc
-  }, [currentUserId, cleanup, onCallEnded, startDurationTimer])
+  }, [currentUserId, currentUserName, cleanup, onCallEnded, startDurationTimer])
 
   // Flush pending ICE candidates for a specific peer
   const flushPendingCandidates = useCallback(async (participantId: string) => {
@@ -407,6 +436,36 @@ export function useCall({
       })
       .on('broadcast', { event: 'call-accept' }, async ({ payload }) => {
         if (payload.senderId === currentUserId) return
+
+        if (callStateRef.current === 'connected') {
+          // Someone we (or another connected member) invited into this
+          // already-active call just accepted -- connect to them the same
+          // way a newly-joined participant is connected below, since
+          // nothing else will ever create this specific peer connection.
+          try {
+            const ct = callTypeRef.current || 'voice'
+            let stream = localStreamRef.current
+            if (!stream) stream = await getLocalMedia(ct)
+            const pc = createPeerConnection(payload.senderId, payload.senderName, channel)
+            const offer = await pc.createOffer()
+            await pc.setLocalDescription(offer)
+            channel.send({
+              type: 'broadcast',
+              event: 'sdp-offer',
+              payload: {
+                senderId: currentUserId,
+                senderName: currentUserName,
+                targetId: payload.senderId,
+                sdp: pc.localDescription?.toJSON(),
+              },
+            })
+            await flushPendingCandidates(payload.senderId)
+          } catch (e) {
+            console.error('Error connecting to invited participant:', e)
+          }
+          return
+        }
+
         if (callStateRef.current !== 'calling') return
         // The receiver accepted -- caller creates the offer
         try {
@@ -426,6 +485,7 @@ export function useCall({
             event: 'sdp-offer',
             payload: {
               senderId: currentUserId,
+              senderName: currentUserName,
               targetId: payload.senderId,
               sdp: pc.localDescription?.toJSON(),
             },
@@ -443,8 +503,22 @@ export function useCall({
         if (payload.senderId === currentUserId) return
         if (payload.targetId && payload.targetId !== currentUserId) return
 
-        const pc = peerConnectionsRef.current.get(payload.senderId)
-        if (!pc) return
+        let pc = peerConnectionsRef.current.get(payload.senderId)
+        if (!pc) {
+          // Offer from someone we have no connection with yet -- another
+          // member of a group call we just joined, reaching us directly
+          // (WebRTC has no built-in relay; every pair needs its own
+          // connection). Treat it as an implicit invitation to connect.
+          if (callStateRef.current !== 'connected' && callStateRef.current !== 'calling' && callStateRef.current !== 'ringing') return
+          try {
+            let stream = localStreamRef.current
+            if (!stream) stream = await getLocalMedia(callTypeRef.current || 'voice')
+          } catch (e) {
+            console.error('[useCall] Failed to get local media for incoming group offer:', e)
+            return
+          }
+          pc = createPeerConnection(payload.senderId, payload.senderName || 'Participant', channel)
+        }
 
         try {
           await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp))
@@ -580,6 +654,7 @@ export function useCall({
       .on('broadcast', { event: 'participant-joined' }, async ({ payload }) => {
         if (payload.senderId === currentUserId) return
         if (callStateRef.current !== 'connected') return
+        if (peerConnectionsRef.current.has(payload.senderId)) return // already connected to them
 
         // New participant joined the call -- create a peer connection with them
         // Only the existing participants who are already connected need to connect
@@ -599,6 +674,7 @@ export function useCall({
             event: 'sdp-offer',
             payload: {
               senderId: currentUserId,
+              senderName: currentUserName,
               targetId: payload.senderId,
               sdp: pc.localDescription?.toJSON(),
             },
@@ -648,6 +724,14 @@ export function useCall({
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
           await channel.track({ online_at: new Date().toISOString() })
+
+          const invite = externalInviteRef.current
+          if (invite && callStateRef.current === 'idle') {
+            setCallerName(invite.callerName)
+            setCallerType(invite.callType)
+            targetUserIdRef.current = invite.callerId
+            setCallState('ringing')
+          }
         }
       })
 
@@ -933,6 +1017,7 @@ export function useCall({
             event: 'sdp-offer',
             payload: {
               senderId: currentUserId,
+              senderName: currentUserName,
               targetId: participantId,
               sdp: pc.localDescription?.toJSON(),
             },
@@ -970,7 +1055,7 @@ export function useCall({
         },
       })
     }
-  }, [currentUserId, isMuted])
+  }, [currentUserId, currentUserName, isMuted])
 
   const addParticipant = useCallback((userId: string, userName: string) => {
     const channel = channelRef.current
@@ -990,6 +1075,30 @@ export function useCall({
     })
   }, [currentUserId, currentUserName])
 
+  // Invite someone who isn't already listening on this call's channel — a
+  // one-off send on their personal invite channel rather than a broadcast
+  // here, since they have no reason to be subscribed to this specific chat.
+  const inviteExternalUser = useCallback((targetProfileId: string, targetName: string) => {
+    if (callStateRef.current !== 'connected') return
+    const inviteChannel = supabase.channel(`partner-invite:${targetProfileId}`)
+    inviteChannel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        inviteChannel.send({
+          type: 'broadcast',
+          event: 'group-call-invite',
+          payload: {
+            chatId,
+            callerId: currentUserId,
+            callerName: currentUserName,
+            callType: callTypeRef.current || 'voice',
+          },
+        })
+        setTimeout(() => supabase.removeChannel(inviteChannel), 2000)
+      }
+    })
+    console.info('[useCall] Sent external call invite to', targetName)
+  }, [chatId, currentUserId, currentUserName, supabase])
+
   return {
     callState,
     callType,
@@ -1008,6 +1117,7 @@ export function useCall({
     toggleMute,
     toggleVideo,
     addParticipant,
+    inviteExternalUser,
     rejoinCall,
     canRejoin,
   }
