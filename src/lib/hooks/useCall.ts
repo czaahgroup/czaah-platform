@@ -104,6 +104,13 @@ export function useCall({
   const channelRef = useRef<RealtimeChannel | null>(null)
   const peerConnectionsRef = useRef<Map<string, RTCPeerConnection>>(new Map())
   const localStreamRef = useRef<MediaStream | null>(null)
+  // Built up manually from individual `ontrack` events rather than trusting
+  // `event.streams[0]` — that "associated stream" is populated inconsistently
+  // across browsers (notably Safari/mobile), so one side of a call can end
+  // up with a track that never gets attached to anything, showing as a
+  // placeholder avatar even though the connection and the track itself are
+  // fine.
+  const remoteStreamsRef = useRef<Map<string, MediaStream>>(new Map())
   const durationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const callStartTimeRef = useRef<number>(0)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -181,6 +188,7 @@ export function useCall({
     setLocalStream(null)
     peerConnectionsRef.current.forEach((pc) => pc.close())
     peerConnectionsRef.current.clear()
+    remoteStreamsRef.current.clear()
     pendingCandidatesRef.current.clear()
     targetUserIdRef.current = null
     isCallerRef.current = false
@@ -216,6 +224,9 @@ export function useCall({
     if (existing) {
       existing.close()
     }
+    // Start this participant's remote stream fresh — a rejoin/reconnect
+    // shouldn't carry over tracks from the previous connection attempt.
+    remoteStreamsRef.current.delete(participantId)
 
     console.info('[useCall] Creating peer connection with', iceServersRef.current.length, 'ICE server entries')
     const pc = new RTCPeerConnection({ iceServers: iceServersRef.current })
@@ -248,7 +259,13 @@ export function useCall({
 
     // Handle remote stream
     pc.ontrack = (event) => {
-      const remoteStream = event.streams[0]
+      console.info('[useCall] ontrack fired:', event.track.kind, 'streams:', event.streams.length)
+      const existing = remoteStreamsRef.current.get(participantId)
+      const remoteStream = existing || new MediaStream()
+      if (!existing) remoteStreamsRef.current.set(participantId, remoteStream)
+      if (!remoteStream.getTracks().some((t) => t.id === event.track.id)) {
+        remoteStream.addTrack(event.track)
+      }
       setParticipants((prev) => {
         const idx = prev.findIndex((p) => p.userId === participantId)
         if (idx >= 0) {
@@ -299,6 +316,7 @@ export function useCall({
       if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
         // Remove this participant
         peerConnectionsRef.current.delete(participantId)
+        remoteStreamsRef.current.delete(participantId)
         pc.close()
         setParticipants((prev) => prev.filter((p) => p.userId !== participantId))
 
@@ -508,6 +526,7 @@ export function useCall({
             pc.close()
             peerConnectionsRef.current.delete(payload.senderId)
           }
+          remoteStreamsRef.current.delete(payload.senderId)
           setParticipants((prev) => prev.filter((p) => p.userId !== payload.senderId))
           return
         }
@@ -584,6 +603,7 @@ export function useCall({
           pc.close()
           peerConnectionsRef.current.delete(payload.senderId)
         }
+        remoteStreamsRef.current.delete(payload.senderId)
         setParticipants((prev) => prev.filter((p) => p.userId !== payload.senderId))
 
         if (peerConnectionsRef.current.size === 0 && callStateRef.current === 'connected') {
@@ -596,6 +616,12 @@ export function useCall({
           setTimeout(() => {
             if (callStateRef.current === 'ended') setCallState('idle')
           }, 2000)
+        }
+      })
+      .on('broadcast', { event: 'call-type-change' }, ({ payload }) => {
+        if (payload.senderId === currentUserId) return
+        if (payload.callType && payload.callType !== callTypeRef.current) {
+          setCallType(payload.callType)
         }
       })
       .on('broadcast', { event: 'mute-status' }, ({ payload }) => {
@@ -865,17 +891,58 @@ export function useCall({
     }
   }, [currentUserId, isVideoOff])
 
-  const toggleVideo = useCallback(() => {
+  const toggleVideo = useCallback(async () => {
     const stream = localStreamRef.current
     if (!stream) return
-    const track = stream.getVideoTracks()[0]
-    if (!track) return
-    track.enabled = !track.enabled
-    const videoOff = !track.enabled
+    const channel = channelRef.current
+    const existingTrack = stream.getVideoTracks()[0]
+
+    // No video track yet — this call started as voice-only. Acquire the
+    // camera now, add the track to every active peer connection, and
+    // renegotiate so the other side(s) start receiving video without
+    // anyone hanging up and re-calling.
+    if (!existingTrack) {
+      try {
+        const videoStream = await navigator.mediaDevices.getUserMedia({ video: true })
+        const videoTrack = videoStream.getVideoTracks()[0]
+        if (!videoTrack) return
+        stream.addTrack(videoTrack)
+
+        for (const [participantId, pc] of peerConnectionsRef.current.entries()) {
+          pc.addTrack(videoTrack, stream)
+          const offer = await pc.createOffer()
+          await pc.setLocalDescription(offer)
+          channel?.send({
+            type: 'broadcast',
+            event: 'sdp-offer',
+            payload: {
+              senderId: currentUserId,
+              targetId: participantId,
+              sdp: pc.localDescription?.toJSON(),
+            },
+          })
+        }
+
+        if (callTypeRef.current !== 'video') {
+          setCallType('video')
+          channel?.send({
+            type: 'broadcast',
+            event: 'call-type-change',
+            payload: { senderId: currentUserId, callType: 'video' },
+          })
+        }
+        setIsVideoOff(false)
+      } catch (e) {
+        console.error('[useCall] Failed to enable video:', e)
+      }
+      return
+    }
+
+    existingTrack.enabled = !existingTrack.enabled
+    const videoOff = !existingTrack.enabled
     setIsVideoOff(videoOff)
 
     // Broadcast video status
-    const channel = channelRef.current
     if (channel) {
       channel.send({
         type: 'broadcast',

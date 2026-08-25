@@ -848,6 +848,26 @@ export function CallUI({
           )}
         </button>
 
+        <button
+          onClick={onToggleVideo}
+          style={{
+            background: 'none',
+            border: '1px solid rgba(201,168,76,0.3)',
+            borderRadius: '6px',
+            padding: '4px 8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#C9A84C',
+            transition: 'all 0.15s ease',
+            flexShrink: 0,
+          }}
+          title="Switch to video call"
+        >
+          <VideoIcon size={18} color="#C9A84C" />
+        </button>
+
         {onAddParticipant && (
           <button
             onClick={onAddParticipant}
