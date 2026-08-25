@@ -44,11 +44,26 @@ export function PartnerCallProvider({
   children: React.ReactNode
 }) {
   const [chats, setChats] = useState<ChatRef[]>([])
+  const [admins, setAdmins] = useState<{ id: string; full_name: string }[]>([])
   const callsRef = useRef<Map<string, UseCallReturn>>(new Map())
   const [, bumpVersion] = useState(0)
 
   useEffect(() => {
     primeAudioUnlock()
+  }, [])
+
+  // Loaded once for the "add another admin to this call" picker.
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/elite/admins')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (!cancelled && json?.data) setAdmins(json.data)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   useEffect(() => {
@@ -100,6 +115,7 @@ export function PartnerCallProvider({
           partnerName={c.partnerName}
           userId={userId}
           userName={userName}
+          admins={admins}
           onRegister={registerCall}
           onStateChange={() => bumpVersion((n) => n + 1)}
         />
@@ -114,6 +130,7 @@ function PartnerCallSlot({
   partnerName,
   userId,
   userName,
+  admins,
   onRegister,
   onStateChange,
 }: {
@@ -121,9 +138,11 @@ function PartnerCallSlot({
   partnerName: string
   userId: string
   userName: string
+  admins: { id: string; full_name: string }[]
   onRegister: (chatId: string, call: UseCallReturn) => void
   onStateChange: () => void
 }) {
+  const [showAddParticipant, setShowAddParticipant] = useState(false)
   const postCallMessage = useCallback(
     async (content: string) => {
       try {
@@ -193,9 +212,74 @@ function PartnerCallSlot({
         onEndCall={call.endCall}
         onToggleMute={call.toggleMute}
         onToggleVideo={call.toggleVideo}
+        onAddParticipant={() => setShowAddParticipant((v) => !v)}
         onRejoin={call.rejoinCall}
         canRejoin={call.canRejoin}
       />
+      {/* Add participant dropdown -- admin can invite another admin into this call */}
+      {showAddParticipant && call.callState === 'connected' && (
+        <div style={{
+          position: 'absolute',
+          top: '50px',
+          right: '16px',
+          zIndex: 60,
+          background: '#111',
+          border: '1px solid rgba(255,255,255,0.1)',
+          maxHeight: '200px',
+          overflowY: 'auto',
+          minWidth: '180px',
+        }}>
+          <div style={{
+            padding: '8px 12px',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            fontFamily: "'Raleway', sans-serif",
+            fontSize: '11px',
+            color: 'rgba(201,168,76,0.6)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+          }}>
+            Add to call
+          </div>
+          {admins.filter((a) => a.id !== userId && !call.participants.some((p) => p.userId === a.id)).length === 0 ? (
+            <div style={{
+              padding: '8px 12px',
+              fontFamily: "'Raleway', sans-serif",
+              fontSize: '12px',
+              color: 'rgba(255,255,255,0.4)',
+            }}>
+              No additional admins available
+            </div>
+          ) : (
+            admins.filter((a) => a.id !== userId && !call.participants.some((p) => p.userId === a.id)).map((a) => (
+              <button
+                key={a.id}
+                onClick={() => {
+                  call.addParticipant(a.id, a.full_name)
+                  setShowAddParticipant(false)
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '8px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  color: '#fff',
+                  fontFamily: "'Raleway', sans-serif",
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background 0.15s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                {a.full_name}
+              </button>
+            ))
+          )}
+        </div>
+      )}
     </div>
   )
 }
