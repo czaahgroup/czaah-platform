@@ -68,7 +68,7 @@ export default function InvestorProtectionPage() {
               Investor<br /><span className="text-primary">Protection.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              Protecting international investors through comprehensive due diligence, legal safeguards, transparent reporting, and risk management — ensuring every investment across the UK, Pakistan, and our international markets is secure, verified, and properly structured.
+              Protecting international investors through comprehensive due diligence, legal safeguards, transparent reporting, and risk management — ensuring every investment across the UK and our international markets is secure, verified, and properly structured.
             </p>
             <Link href="/contact?interest=Investor%20Protection#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Protect Your Investment &rarr;
@@ -182,7 +182,7 @@ export default function InvestorProtectionPage() {
             <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">International investors trust CZAAH because we combine local intelligence with institutional-grade protection frameworks.</p>
             <div className="space-y-4">
               {[
-                { icon: 'visibility', title: 'Local Intelligence', desc: "Deep on-the-ground knowledge of the regulatory, legal, and commercial landscape in every market we operate — UK, Pakistan, and beyond. We identify risks that remote due diligence simply cannot uncover — protecting you from hidden exposures." },
+                { icon: 'visibility', title: 'Local Intelligence', desc: "Deep on-the-ground knowledge of the regulatory, legal, and commercial landscape in every market we operate — the UK and beyond. We identify risks that remote due diligence simply cannot uncover — protecting you from hidden exposures." },
                 { icon: 'gavel', title: 'Legal Expertise', desc: "Access to leading commercial law firms and international arbitration specialists across our operating markets. Our contracts are drafted to protect investor interests across multiple jurisdictions and enforcement regimes." },
                 { icon: 'analytics', title: 'Transparent Reporting', desc: 'No opacity, no guesswork. Every investment is tracked through independent valuations, auditable financial reports, and regular performance updates — delivered to international reporting standards.' },
                 { icon: 'workspace_premium', title: 'Proven Track Record', desc: 'A portfolio of successfully protected investments across minerals, real estate, technology, and trade. Our investors receive the confidence that comes from rigorous process and demonstrated results.' },

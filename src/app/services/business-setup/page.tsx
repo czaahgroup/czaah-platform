@@ -123,7 +123,7 @@ export default function BusinessSetupPage() {
               Business<br /><span className="text-primary">Setup.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              CZAAH guides investors through every step of establishing a business presence in the United Kingdom, Pakistan, and international markets — from company incorporation and corporate structuring to legal documentation, bank account opening, and office establishment. Your market entry, managed from formation through operations.
+              CZAAH guides investors through every step of establishing a business presence in the United Kingdom and international markets — from company incorporation and corporate structuring to legal documentation, bank account opening, and office establishment. Your market entry, managed from formation through operations.
             </p>
             <Link href="/contact?interest=Business%20Setup#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Start Your Setup &rarr;
@@ -222,7 +222,7 @@ export default function BusinessSetupPage() {
               Our <span className="text-primary">services.</span>
             </h2>
             <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">
-              Complete business establishment across the UK, Pakistan, and international markets &mdash; from entity formation through to operational readiness.
+              Complete business establishment across the UK and international markets &mdash; from entity formation through to operational readiness.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {serviceCards.map((card, i) => (

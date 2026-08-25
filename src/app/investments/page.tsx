@@ -64,7 +64,7 @@ export default function InvestmentsPage() {
             <div className="h-px w-16 bg-primary mb-8"></div>
             <p className="raleway-text text-xs font-semibold tracking-[0.2em] uppercase text-primary mb-6">Investment Opportunities</p>
             <h1 className="cinzel-text text-2xl sm:text-4xl md:text-6xl font-bold text-on-surface mb-8">Investment <span className="text-primary">Opportunities.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Pre-vetted, legally structured opportunities across the UK, Pakistan, and our international markets &mdash; each assessed for feasibility, regulatory compliance, and investor-ready execution.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Pre-vetted, legally structured opportunities across the UK and our international markets &mdash; each assessed for feasibility, regulatory compliance, and investor-ready execution.</p>
             <Link href="/contact#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">View Opportunities &rarr;</Link>
           </div>
         </section>
@@ -76,7 +76,7 @@ export default function InvestmentsPage() {
           <div className="max-w-[1600px] mx-auto">
             <div className="text-center mb-16">
               <h2 className="cinzel-text text-3xl md:text-4xl font-bold text-on-surface mb-4">Active deal <span className="text-primary">flow.</span></h2>
-              <p className="raleway-text text-on-surface-variant text-base max-w-[700px] mx-auto">Pre-vetted, structured investment opportunities across the UK, Pakistan, and our international markets. Each opportunity is assessed for regulatory compliance, financial viability, and defined exit strategy.</p>
+              <p className="raleway-text text-on-surface-variant text-base max-w-[700px] mx-auto">Pre-vetted, structured investment opportunities across the UK and our international markets. Each opportunity is assessed for regulatory compliance, financial viability, and defined exit strategy.</p>
             </div>
 
             {/* Filters */}

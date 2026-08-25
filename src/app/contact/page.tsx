@@ -72,7 +72,7 @@ export default function ContactPage() {
             <div className="h-px w-16 bg-primary mb-8"></div>
             <p className="raleway-text text-xs font-semibold tracking-[0.2em] uppercase text-primary mb-6">Get in Touch</p>
             <h1 className="cinzel-text text-2xl sm:text-4xl md:text-6xl font-bold text-on-surface mb-8">Contact <span className="text-primary">us.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Institutional investors, family offices, sovereign entities, and corporate leadership evaluating opportunities across the UK, Pakistan, and our international markets &mdash; we welcome a confidential conversation.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Institutional investors, family offices, sovereign entities, and corporate leadership evaluating opportunities across the UK and our international markets &mdash; we welcome a confidential conversation.</p>
             <a href="#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Send a Message &rarr;</a>
           </div>
         </section>

@@ -28,7 +28,7 @@ export default function AboutPage() {
               <div className="h-px w-16 bg-primary mb-8"></div>
               <p className="raleway-text text-xs font-semibold tracking-[0.2em] uppercase text-primary mb-6">About CZAAH</p>
               <h1 className="cinzel-text text-2xl sm:text-4xl md:text-6xl font-bold text-on-surface mb-8">About <span className="text-primary">CZAAH.</span></h1>
-              <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">CZAAH Group is a London-based International Investment Facilitation Group connecting investors, businesses and strategic partners with opportunities across the United Kingdom, Pakistan and international markets &mdash; with additional presence in Brussels and Hong Kong.</p>
+              <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">CZAAH Group is a London-based International Investment Facilitation Group connecting investors, businesses and strategic partners with opportunities across the United Kingdom and international markets &mdash; with additional presence in Brussels and Hong Kong.</p>
             </div>
           </div>
         </section>
@@ -45,11 +45,11 @@ export default function AboutPage() {
               <div className="fade-in-left">
                 <h3 className="cinzel-text text-xl font-bold text-on-surface mb-4">Our <span className="text-primary">Mission</span></h3>
                 <p className="raleway-text text-on-surface-variant text-[15px] leading-relaxed mb-4">With London at the centre of our international operations, we facilitate opportunities across International Real Estate, Construction &amp; Development, International Manpower, Mines &amp; Minerals, and other strategic sectors.</p>
-                <p className="raleway-text text-on-surface-variant text-[15px] leading-relaxed">Our international network connects capital, businesses, projects, resources and talent across borders, combining our London presence with strong relationships in Pakistan and selected global markets.</p>
+                <p className="raleway-text text-on-surface-variant text-[15px] leading-relaxed">Our international network connects capital, businesses, projects, resources and talent across borders, combining our London presence with strong relationships across selected global markets.</p>
               </div>
               <div className="fade-in-right">
                 <h3 className="cinzel-text text-xl font-bold text-on-surface mb-4">Our <span className="text-primary">Vision</span></h3>
-                <p className="raleway-text text-on-surface-variant text-[15px] leading-relaxed mb-4">To build the definitive international investment facilitation group &mdash; a trusted counterparty connecting capital, businesses and strategic partners across the United Kingdom, Pakistan, and beyond.</p>
+                <p className="raleway-text text-on-surface-variant text-[15px] leading-relaxed mb-4">To build the definitive international investment facilitation group &mdash; a trusted counterparty connecting capital, businesses and strategic partners across the United Kingdom and beyond.</p>
                 <p className="raleway-text text-on-surface-variant text-[15px] leading-relaxed">We are building an institution that outlasts any single deal, any single administration, and any single market cycle.</p>
               </div>
             </div>
@@ -68,7 +68,7 @@ export default function AboutPage() {
               <div className="bg-surface-container p-10 border border-outline-variant/10 hover:border-primary/30 transition-all duration-500">
                 <span className="material-symbols-outlined text-primary text-3xl mb-6 block">location_city</span>
                 <h3 className="cinzel-text text-lg font-bold text-on-surface mb-3">CZAAH Group (London)</h3>
-                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Our London-based parent entity, coordinating international operations, investor relations, and strategic partnerships across the United Kingdom, Pakistan, and global markets.</p>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Our London-based parent entity, coordinating international operations, investor relations, and strategic partnerships across the United Kingdom and global markets.</p>
               </div>
               <div className="bg-surface-container p-10 border border-outline-variant/10 hover:border-primary/30 transition-all duration-500">
                 <span className="material-symbols-outlined text-primary text-3xl mb-6 block">diamond</span>

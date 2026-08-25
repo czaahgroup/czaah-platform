@@ -237,7 +237,7 @@ export default function HomePage() {
               Facilitation Group.
             </h1>
             <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">
-              CZAAH Group is a <span className="text-on-surface font-semibold">London-based</span> International Investment Facilitation Group connecting investors, businesses and strategic partners with opportunities across the <span className="text-on-surface font-semibold">United Kingdom</span>, <span className="text-on-surface font-semibold">Pakistan</span> and international markets.
+              CZAAH Group is a <span className="text-on-surface font-semibold">London-based</span> International Investment Facilitation Group connecting investors, businesses and strategic partners with opportunities across the <span className="text-on-surface font-semibold">United Kingdom</span> and international markets.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6">
@@ -578,7 +578,7 @@ export default function HomePage() {
         <div className="relative text-center max-w-2xl mx-auto">
           <h2 className="text-4xl md:text-5xl cinzel-text text-on-surface mb-6">Begin the <span className="text-primary">conversation.</span></h2>
           <p className="text-on-surface-variant raleway-text text-lg leading-relaxed mb-12 italic" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
-            Structured access to the UK, Pakistan, and our most compelling international sectors — with a single, institutional-grade counterparty.
+            Structured access to the UK and our most compelling international sectors — with a single, institutional-grade counterparty.
           </p>
           <Link href="/contact" className="liquid-gold-bg text-on-primary px-12 py-5 font-bold tracking-[0.2em] uppercase text-sm transition-transform hover:-translate-y-1 raleway-text inline-block">
             Request a Consultation

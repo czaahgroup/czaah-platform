@@ -71,9 +71,9 @@ export default function InsightsPage() {
           <div className="relative z-10 py-32 px-5 md:px-24 max-w-[1600px] mx-auto w-full">
             <Link href="/" className="raleway-text text-xs tracking-[0.15em] uppercase text-on-surface-variant hover:text-primary transition-colors mb-6 inline-block">&larr; Back to Overview</Link>
             <div className="h-px w-16 bg-primary mb-8"></div>
-            <p className="raleway-text text-xs font-semibold tracking-[0.2em] uppercase text-primary mb-6">Pakistan Market Intelligence</p>
+            <p className="raleway-text text-xs font-semibold tracking-[0.2em] uppercase text-primary mb-6">Global Market Intelligence</p>
             <h1 className="cinzel-text text-2xl sm:text-4xl md:text-6xl font-bold text-on-surface mb-8">Insights &amp; <span className="text-primary">Analysis.</span></h1>
-            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">Strategic intelligence on Pakistan&rsquo;s investment landscape &mdash; mining, real estate, construction, and beyond. Published every Friday. Coverage of our other markets will expand here over time.</p>
+            <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl">Strategic intelligence on global investment landscapes &mdash; mining, real estate, construction, and beyond. Published every Friday.</p>
           </div>
         </section>
 

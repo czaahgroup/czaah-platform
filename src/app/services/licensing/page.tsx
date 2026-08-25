@@ -130,7 +130,7 @@ export default function LicensingPage() {
               Licensing &amp;<br /><span className="text-primary">Compliance.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              Navigating regulatory landscapes across the UK, Pakistan, and international markets requires deep institutional knowledge. In Pakistan, CZAAH manages FBR registration, Board of Investment approvals, industry-specific licensing, provincial permits, and environmental clearances — so you can operate with full confidence, wherever you're doing business.
+              Navigating regulatory landscapes across the UK and international markets requires deep institutional knowledge. In Pakistan, CZAAH manages FBR registration, Board of Investment approvals, industry-specific licensing, provincial permits, and environmental clearances — so you can operate with full confidence, wherever you're doing business.
             </p>
             <Link href="/contact?interest=Licensing%20%26%20Compliance#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Navigate Regulations &rarr;

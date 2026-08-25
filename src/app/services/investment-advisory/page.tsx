@@ -77,7 +77,7 @@ export default function InvestmentAdvisoryPage() {
               Investment<br /><span className="text-primary">Advisory.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              Data-driven investment advisory across the UK, Pakistan, and international markets — feasibility studies, market analysis, financial modelling, opportunity identification, and strategic guidance across all sectors.
+              Data-driven investment advisory across the UK and international markets — feasibility studies, market analysis, financial modelling, opportunity identification, and strategic guidance across all sectors.
             </p>
             <Link href="/contact?interest=Investment%20Advisory#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Get Advisory &rarr;
@@ -171,7 +171,7 @@ export default function InvestmentAdvisoryPage() {
                 { icon: 'calculate', title: 'Financial Modelling', desc: 'Revenue projections, IRR analysis, sensitivity testing, capital structuring. Rigorous financial models built with local cost data and realistic assumptions for each market we cover.' },
                 { icon: 'lightbulb', title: 'Opportunity Identification', desc: 'Proactive deal sourcing across minerals, real estate, technology, textiles, pharmaceuticals, and agriculture in Pakistan, plus opportunities across our UK and international markets. We surface opportunities that match your investment thesis and risk appetite.' },
                 { icon: 'warning', title: 'Risk Assessment', desc: "Political, regulatory, currency, and operational risk evaluation with mitigation strategies. We quantify risks that other advisors treat as unknowns — because we operate inside the system." },
-                { icon: 'strategy', title: 'Strategic Advisory', desc: "Board-level guidance on market entry, expansion, and portfolio strategy across the UK, Pakistan, and international markets. Whether you're making your first investment or scaling an existing position, we provide the strategic clarity you need." },
+                { icon: 'strategy', title: 'Strategic Advisory', desc: "Board-level guidance on market entry, expansion, and portfolio strategy across the UK and international markets. Whether you're making your first investment or scaling an existing position, we provide the strategic clarity you need." },
               ].map((card, i) => (
                 <div key={i} className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all duration-300">
                   <span className="material-symbols-outlined text-primary text-3xl mb-4 block">{card.icon}</span>
@@ -229,7 +229,7 @@ export default function InvestmentAdvisoryPage() {
         <section className="py-32 px-5 md:px-24 text-center">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">Informed decisions in <span className="text-primary">complex markets.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Feasibility, financial modelling, and strategic guidance &mdash; grounded in real operational experience across the UK, Pakistan, and our international markets.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Feasibility, financial modelling, and strategic guidance &mdash; grounded in real operational experience across the UK and our international markets.</p>
             <Link href="/contact?interest=Investment%20Advisory#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Request an Assessment &rarr;
             </Link>

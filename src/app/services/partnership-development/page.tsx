@@ -125,7 +125,7 @@ export default function PartnershipDevelopmentPage() {
               Partnership<br /><span className="text-primary">Development.</span>
             </h1>
             <p className="raleway-text text-lg md:text-xl text-on-surface-variant max-w-3xl leading-relaxed mb-10">
-              CZAAH&apos;s deepest value is our network. We connect investors with the most relevant government departments, industry leaders, legal experts, financial institutions, and operational partners across the UK, Pakistan, and our international markets &mdash; curated introductions that accelerate your success.
+              CZAAH&apos;s deepest value is our network. We connect investors with the most relevant government departments, industry leaders, legal experts, financial institutions, and operational partners across the UK and our international markets &mdash; curated introductions that accelerate your success.
             </p>
             <Link href="/contact?interest=Partnership%20Development#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Build Partnerships &rarr;
@@ -139,7 +139,7 @@ export default function PartnershipDevelopmentPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Our network <span className="text-primary">constellation.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-10">Explore CZAAH&apos;s institutional relationships across the UK, Pakistan, and international government, industry, and financial landscape.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-10">Explore CZAAH&apos;s institutional relationships across the UK and international government, industry, and financial landscape.</p>
 
             {/* Category Selector */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
@@ -193,7 +193,7 @@ export default function PartnershipDevelopmentPage() {
         <section className="py-32 px-5 md:px-24">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-4">Our <span className="text-primary">services.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Curated introductions and partnership structuring &mdash; connecting you with the right people at the right level across our institutions in the UK, Pakistan, and beyond.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Curated introductions and partnership structuring &mdash; connecting you with the right people at the right level across our institutions in the UK and beyond.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { icon: 'account_balance', title: 'Government Liaison', desc: "Direct introductions to relevant government departments, ministries, and regulatory bodies across our operating markets. We navigate the bureaucracy so you don't have to — opening doors that matter." },
@@ -220,7 +220,7 @@ export default function PartnershipDevelopmentPage() {
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-12">Partnership network <span className="text-primary">at a glance.</span></h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[{ number: 'UK · Pakistan · UAE', label: 'Markets covered' }, { number: 'Cross-party', label: 'Pakistan political coverage' }, { number: 'Vetted', label: 'Partner network' }, { number: 'Decades', label: 'Relationship depth' }].map((stat, i) => (
+              {[{ number: 'UK · UAE · Global', label: 'Markets covered' }, { number: 'Cross-party', label: 'Pakistan political coverage' }, { number: 'Vetted', label: 'Partner network' }, { number: 'Decades', label: 'Relationship depth' }].map((stat, i) => (
                 <div key={i}><div className="cinzel-text text-2xl md:text-3xl text-primary mb-2">{stat.number}</div><div className="raleway-text text-xs uppercase tracking-[0.1em] text-on-surface-variant">{stat.label}</div></div>
               ))}
             </div>
@@ -236,7 +236,7 @@ export default function PartnershipDevelopmentPage() {
             <p className="raleway-text text-on-surface-variant max-w-2xl mb-12">Across every market we operate in, relationships determine outcomes. Ours are the ones that move deals forward.</p>
             <div className="space-y-4">
               {[
-                { icon: 'diamond', title: 'Relationship Depth', desc: "Our network is built on years of direct engagement with government officials, industry leaders, and institutional stakeholders across the UK, Pakistan, and our international markets. These are not cold introductions — they are warm, trusted connections with established credibility." },
+                { icon: 'diamond', title: 'Relationship Depth', desc: "Our network is built on years of direct engagement with government officials, industry leaders, and institutional stakeholders across the UK and our international markets. These are not cold introductions — they are warm, trusted connections with established credibility." },
                 { icon: 'diversity_3', title: 'Cross-Party Access', desc: "Pakistan's political landscape shifts between administrations. CZAAH maintains relationships across all major political parties, ensuring your partnerships and projects have continuity regardless of who governs." },
                 { icon: 'person_search', title: 'Curated Introductions', desc: "We don't provide contact lists — we provide curated, purposeful introductions to the specific individuals who can advance your objectives. Every connection is selected for relevance, capability, and reliability." },
                 { icon: 'handshake', title: 'Long-Term Partnership Approach', desc: "We invest in relationships that endure. CZAAH doesn't facilitate one-off introductions — we build partnership ecosystems that support your investment through every phase, from entry to expansion to exit." },
@@ -259,7 +259,7 @@ export default function PartnershipDevelopmentPage() {
         <section className="py-32 px-5 md:px-24 text-center">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-4xl text-on-surface mb-6">The relationships that <span className="text-primary">matter.</span></h2>
-            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Government departments, industry leaders, legal experts, and institutional partners across the UK, Pakistan, and beyond &mdash; curated introductions that accelerate outcomes.</p>
+            <p className="raleway-text text-on-surface-variant max-w-2xl mx-auto mb-10">Government departments, industry leaders, legal experts, and institutional partners across the UK and beyond &mdash; curated introductions that accelerate outcomes.</p>
             <Link href="/contact?interest=Partnership%20Development#contact-form" className="inline-block liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm">
               Discuss Your Objectives &rarr;
             </Link>

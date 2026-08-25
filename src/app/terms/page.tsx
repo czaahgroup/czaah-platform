@@ -41,7 +41,7 @@ export default function TermsPage() {
             <h2 className="cinzel-text text-2xl font-bold text-on-surface mb-6">3. Services Description</h2>
             <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4">CZAAH offers a range of professional services, including but not limited to:</p>
             <ul className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4 ml-6 space-y-2 list-none">
-              <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[10px] before:w-1.5 before:h-1.5 before:bg-primary">Investment facilitation and structuring across Pakistani and international markets</li>
+              <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[10px] before:w-1.5 before:h-1.5 before:bg-primary">Investment facilitation and structuring across international markets</li>
               <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[10px] before:w-1.5 before:h-1.5 before:bg-primary">Business setup and entity formation advisory (SECP and related jurisdictions)</li>
               <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[10px] before:w-1.5 before:h-1.5 before:bg-primary">Licensing, compliance, and regulatory navigation</li>
               <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[10px] before:w-1.5 before:h-1.5 before:bg-primary">Due diligence and investor protection services</li>

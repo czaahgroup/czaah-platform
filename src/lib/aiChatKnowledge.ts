@@ -36,7 +36,7 @@ const GENERAL_TOPICS: Topic[] = [
   },
   {
     test: (m) => includesAny(m, ['what is czaah', 'about czaah', 'who are you', 'who is czaah', 'tell me about czaah', 'what does czaah do']),
-    reply: "CZAAH is a London-based, diversified international investment facilitation group with on-the-ground operations across key global markets, including Pakistan. We connect international investors with high-growth opportunities across minerals, real estate, technology, textiles, agriculture, pharmaceuticals, and more.",
+    reply: "CZAAH is a London-based, diversified international investment facilitation group with on-the-ground operations across key global markets. We connect international investors with high-growth opportunities across minerals, real estate, technology, textiles, agriculture, pharmaceuticals, and more.",
   },
   {
     test: (m) => includesAny(m, ['minimum investment', 'how much to invest', 'entry point', 'minimum amount']),

@@ -562,7 +562,7 @@ export default function ConstructionPage() {
                 { number: '$65B+', label: 'CPEC investment pipeline' },
                 { number: '9', label: 'SEZs under development' },
                 { number: '8%', label: 'Annual sector growth' },
-                { number: '3', label: 'Markets: Pakistan, UK, Gulf' },
+                { number: 'Global', label: 'Markets served' },
               ].map((stat, i) => (
                 <div key={i}>
                   <div className="cinzel-text text-primary text-4xl font-bold mb-2">{stat.number}</div>
