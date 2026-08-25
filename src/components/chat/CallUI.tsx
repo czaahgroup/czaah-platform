@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import type { CallState, CallType, Participant } from '@/lib/hooks/useCall'
 import { getSharedAudioContext } from '@/lib/audioUnlock'
+import { getRingtonePreset, vibrateForRing, stopVibration } from '@/lib/ringtones'
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60)
@@ -334,6 +335,13 @@ export function CallUI({
     let stopped = false
     let timer: ReturnType<typeof setTimeout>
 
+    // Incoming call rings and vibrates using the device's chosen ringtone
+    // preset (see ringtones.ts); outgoing/waiting uses a fixed, softer
+    // ringback tone — same as a real phone, only the receiver's ring is
+    // personalizable, and vibration only makes sense for the person being
+    // rung, not the one dialing out.
+    if (callState === 'ringing') vibrateForRing()
+
     async function playCycle() {
       if (stopped || !ctx) return
       try {
@@ -343,9 +351,7 @@ export function CallUI({
       }
       if (stopped) return
       const now = ctx.currentTime
-      // Incoming call: classic dual-tone ring (440Hz + 480Hz). Outgoing/waiting:
-      // a single softer ringback tone, distinct enough to tell the two apart.
-      const freqs = callState === 'ringing' ? [440, 480] : [425]
+      const freqs = callState === 'ringing' ? getRingtonePreset().frequencies : [425]
       const toneDuration = 1.8
       const cycleDuration = callState === 'ringing' ? 3.6 : 5
 
@@ -365,6 +371,7 @@ export function CallUI({
         osc.stop(now + toneDuration)
       })
 
+      if (callState === 'ringing') vibrateForRing()
       timer = setTimeout(playCycle, cycleDuration * 1000)
     }
 
@@ -373,6 +380,7 @@ export function CallUI({
     return () => {
       stopped = true
       clearTimeout(timer)
+      stopVibration()
     }
   }, [callState])
 

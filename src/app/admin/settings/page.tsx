@@ -2,6 +2,7 @@
 // @ts-nocheck
 
 import { useEffect, useState } from 'react'
+import { RingtonePicker } from '@/components/RingtonePicker'
 
 
 interface AdminProfile {
@@ -193,6 +194,16 @@ export default function AdminSettingsPage() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Call Settings */}
+      <div className="bg-surface-container-low border border-outline-variant/10 rounded-none mt-6">
+        <div className="px-6 py-4 border-b border-outline-variant/10">
+          <h2 className="font-[family-name:var(--font-heading)] text-lg text-on-surface">Call Settings</h2>
+        </div>
+        <div className="px-6 py-4">
+          <RingtonePicker />
+        </div>
       </div>
     </div>
   )

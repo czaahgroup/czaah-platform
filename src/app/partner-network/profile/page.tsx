@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { RingtonePicker } from '@/components/RingtonePicker'
 
 const inputClass = 'bg-surface-container border border-outline-variant/20 px-3 py-2.5 text-sm text-on-surface raleway-text w-full focus:border-primary outline-none transition-colors'
 const labelClass = 'raleway-text text-xs font-medium tracking-[0.05em] uppercase text-on-surface-variant/60 mb-1.5 block'
@@ -152,6 +153,11 @@ export default function PartnerProfilePage() {
         <button onClick={handleSave} disabled={saving} className="self-start text-sm px-5 py-2.5 bg-primary text-on-primary disabled:opacity-40 transition-opacity raleway-text">
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
+      </div>
+
+      <div className="max-w-lg mt-10">
+        <h2 className="cinzel-text text-lg text-on-surface mb-4">Call Settings</h2>
+        <RingtonePicker />
       </div>
 
       <div className="max-w-lg mt-10">
