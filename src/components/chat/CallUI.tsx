@@ -113,6 +113,26 @@ function VideoElement({
   )
 }
 
+// Hidden audio element for voice calls — the compact voice-call bar has no
+// <video> tag to carry the remote stream's audio, so without this the
+// connection succeeds but neither side ever hears anything.
+function AudioElement({ stream }: { stream: MediaStream | null }) {
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  useEffect(() => {
+    const el = audioRef.current
+    if (!el) return
+    el.srcObject = stream
+    if (stream) {
+      el.play().catch((err) => {
+        console.warn('[CallUI] audio play() was blocked:', err)
+      })
+    }
+  }, [stream])
+
+  return <audio ref={audioRef} autoPlay style={{ display: 'none' }} />
+}
+
 export interface CallUIProps {
   callState: CallState
   callType: CallType | null
@@ -616,6 +636,10 @@ export function CallUI({
           borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
+        {participants.map((participant) => (
+          <AudioElement key={participant.userId} stream={participant.stream} />
+        ))}
+
         <span
           style={{
             width: '8px',
@@ -807,9 +831,14 @@ export function CallUI({
                 overflow: 'hidden',
               }}
             >
+              {/* Audio plays independently of whether the video tile is shown,
+                  so turning the camera off doesn't also cut the remote mic. */}
+              <AudioElement stream={participant.stream} />
+
               {participant.stream && !participant.isVideoOff ? (
                 <VideoElement
                   stream={participant.stream}
+                  muted
                   style={{
                     width: '100%',
                     height: '100%',
