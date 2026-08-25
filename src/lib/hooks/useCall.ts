@@ -249,11 +249,16 @@ export function useCall({
     setParticipants([])
   }, [])
 
-  // Get local media stream
+  // Get local media stream. Video is capped to 720p/24fps rather than
+  // whatever resolution the camera defaults to (often 1080p+) — on a
+  // marginal or TURN-relayed connection, video is what runs out of
+  // bandwidth first while audio (far cheaper) keeps working fine, which is
+  // exactly what shows up as "I don't see them" or muddy audio on a call
+  // that otherwise connects.
   const getLocalMedia = useCallback(async (type: CallType): Promise<MediaStream> => {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
-      video: type === 'video',
+      video: type === 'video' ? { width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 }, frameRate: { ideal: 24, max: 30 } } : false,
     })
     localStreamRef.current = stream
     setLocalStream(stream)
@@ -1036,7 +1041,9 @@ export function useCall({
     // anyone hanging up and re-calling.
     if (!existingTrack) {
       try {
-        const videoStream = await navigator.mediaDevices.getUserMedia({ video: true })
+        const videoStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280, max: 1280 }, height: { ideal: 720, max: 720 }, frameRate: { ideal: 24, max: 30 } },
+        })
         const videoTrack = videoStream.getVideoTracks()[0]
         if (!videoTrack) return
         stream.addTrack(videoTrack)
