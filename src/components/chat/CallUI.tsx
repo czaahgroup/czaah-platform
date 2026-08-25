@@ -72,17 +72,41 @@ function AddIcon({ size = 18, color = 'currentColor' }: { size?: number; color?:
   )
 }
 
+function SpeakerIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill={color} stroke="none" />
+      <path d="M15.54 8.46a5 5 0 010 7.07" />
+      <path d="M19.07 4.93a10 10 0 010 14.14" />
+    </svg>
+  )
+}
+
+function SpeakerOffIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill={color} stroke="none" />
+      <line x1="23" y1="9" x2="17" y2="15" />
+      <line x1="17" y1="9" x2="23" y2="15" />
+    </svg>
+  )
+}
+
 // Video element component that handles srcObject via ref
 function VideoElement({
   stream,
   muted = false,
   style,
   className,
+  onRegister,
+  onUnregister,
 }: {
   stream: MediaStream | null
   muted?: boolean
   style?: React.CSSProperties
   className?: string
+  onRegister?: (el: HTMLMediaElement) => void
+  onUnregister?: (el: HTMLMediaElement) => void
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -101,6 +125,13 @@ function VideoElement({
     }
   }, [stream])
 
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    onRegister?.(el)
+    return () => onUnregister?.(el)
+  }, [onRegister, onUnregister])
+
   return (
     <video
       ref={videoRef}
@@ -113,14 +144,26 @@ function VideoElement({
   )
 }
 
-// Hidden audio element for voice calls — the compact voice-call bar has no
-// <video> tag to carry the remote stream's audio, so without this the
-// connection succeeds but neither side ever hears anything.
-function AudioElement({ stream }: { stream: MediaStream | null }) {
-  const audioRef = useRef<HTMLAudioElement>(null)
+// Hidden element carrying a remote participant's audio when no visible video
+// tile is playing their stream (voice calls, or a video call where they've
+// turned their camera off). Deliberately rendered as a hidden <video> tag
+// rather than <audio> — on iOS Safari, an <audio>-only WebRTC session
+// defaults output to the earpiece (like a native phone call), while a
+// <video> tag reliably defaults to the loudspeaker, which is what people
+// expect from a hands-free web call.
+function AudioElement({
+  stream,
+  onRegister,
+  onUnregister,
+}: {
+  stream: MediaStream | null
+  onRegister?: (el: HTMLMediaElement) => void
+  onUnregister?: (el: HTMLMediaElement) => void
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    const el = audioRef.current
+    const el = videoRef.current
     if (!el) return
     el.srcObject = stream
     if (stream) {
@@ -130,7 +173,14 @@ function AudioElement({ stream }: { stream: MediaStream | null }) {
     }
   }, [stream])
 
-  return <audio ref={audioRef} autoPlay style={{ display: 'none' }} />
+  useEffect(() => {
+    const el = videoRef.current
+    if (!el) return
+    onRegister?.(el)
+    return () => onUnregister?.(el)
+  }, [onRegister, onUnregister])
+
+  return <video ref={videoRef} autoPlay playsInline style={{ display: 'none' }} />
 }
 
 export interface CallUIProps {
@@ -190,6 +240,55 @@ export function CallUI({
   const [endedVisible, setEndedVisible] = useState(false)
   const [endedDuration, setEndedDuration] = useState(0)
   const [endedType, setEndedType] = useState<CallType | null>(null)
+
+  // Loudspeaker toggle. Default on — calls should be hands-free by default,
+  // matching how the video-call path already plays audio through a <video>
+  // tag (which browsers route to the loudspeaker). Where the browser exposes
+  // `setSinkId` (Chrome on Android/desktop; not supported on iOS Safari) we
+  // additionally try to route to a device explicitly labeled "speaker" or
+  // "earpiece" so the toggle has a real effect there too.
+  const [isSpeakerOn, setIsSpeakerOn] = useState(true)
+  const isSpeakerOnRef = useRef(isSpeakerOn)
+  const mediaElsRef = useRef<Set<HTMLMediaElement>>(new Set())
+
+  useEffect(() => {
+    isSpeakerOnRef.current = isSpeakerOn
+  }, [isSpeakerOn])
+
+  const applySinkToElement = useCallback(async (el: HTMLMediaElement) => {
+    const sinkEl = el as HTMLMediaElement & { setSinkId?: (id: string) => Promise<void> }
+    if (typeof sinkEl.setSinkId !== 'function') return
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      const outputs = devices.filter((d) => d.kind === 'audiooutput')
+      const speaker = outputs.find((d) => /speaker/i.test(d.label))
+      const earpiece = outputs.find((d) => /earpiece|receiver/i.test(d.label))
+      const targetId = isSpeakerOnRef.current
+        ? speaker?.deviceId || 'default'
+        : earpiece?.deviceId || outputs.find((d) => d.deviceId !== speaker?.deviceId)?.deviceId || 'default'
+      await sinkEl.setSinkId(targetId)
+    } catch (err) {
+      console.warn('[CallUI] setSinkId failed:', err)
+    }
+  }, [])
+
+  const registerMediaEl = useCallback((el: HTMLMediaElement) => {
+    mediaElsRef.current.add(el)
+    applySinkToElement(el)
+  }, [applySinkToElement])
+
+  const unregisterMediaEl = useCallback((el: HTMLMediaElement) => {
+    mediaElsRef.current.delete(el)
+  }, [])
+
+  const toggleSpeaker = useCallback(() => {
+    setIsSpeakerOn((prev) => {
+      const next = !prev
+      isSpeakerOnRef.current = next
+      mediaElsRef.current.forEach((el) => applySinkToElement(el))
+      return next
+    })
+  }, [applySinkToElement])
 
   useEffect(() => {
     if (callState === 'ended') {
@@ -637,7 +736,12 @@ export function CallUI({
         }}
       >
         {participants.map((participant) => (
-          <AudioElement key={participant.userId} stream={participant.stream} />
+          <AudioElement
+            key={participant.userId}
+            stream={participant.stream}
+            onRegister={registerMediaEl}
+            onUnregister={unregisterMediaEl}
+          />
         ))}
 
         <span
@@ -717,6 +821,30 @@ export function CallUI({
             <MicOffIcon size={18} color="#ef4444" />
           ) : (
             <MicIcon size={18} color="#C9A84C" />
+          )}
+        </button>
+
+        <button
+          onClick={toggleSpeaker}
+          style={{
+            background: 'none',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '6px',
+            padding: '4px 8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: isSpeakerOn ? '#C9A84C' : 'rgba(255,255,255,0.4)',
+            transition: 'all 0.15s ease',
+            flexShrink: 0,
+          }}
+          title={isSpeakerOn ? 'Turn off speaker' : 'Turn on speaker'}
+        >
+          {isSpeakerOn ? (
+            <SpeakerIcon size={18} color="#C9A84C" />
+          ) : (
+            <SpeakerOffIcon size={18} color="rgba(255,255,255,0.4)" />
           )}
         </button>
 
@@ -833,7 +961,11 @@ export function CallUI({
             >
               {/* Audio plays independently of whether the video tile is shown,
                   so turning the camera off doesn't also cut the remote mic. */}
-              <AudioElement stream={participant.stream} />
+              <AudioElement
+                stream={participant.stream}
+                onRegister={registerMediaEl}
+                onUnregister={unregisterMediaEl}
+              />
 
               {participant.stream && !participant.isVideoOff ? (
                 <VideoElement
@@ -1012,6 +1144,30 @@ export function CallUI({
               <VideoOffIcon size={20} color="#fff" />
             ) : (
               <VideoIcon size={20} color="#C9A84C" />
+            )}
+          </button>
+
+          {/* Speaker toggle */}
+          <button
+            onClick={toggleSpeaker}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              border: 'none',
+              background: isSpeakerOn ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            title={isSpeakerOn ? 'Turn off speaker' : 'Turn on speaker'}
+          >
+            {isSpeakerOn ? (
+              <SpeakerIcon size={20} color="#C9A84C" />
+            ) : (
+              <SpeakerOffIcon size={20} color="rgba(255,255,255,0.5)" />
             )}
           </button>
 
