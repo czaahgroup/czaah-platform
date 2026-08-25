@@ -31,6 +31,10 @@ export default function AdminPartnersPage() {
   const [savingId, setSavingId] = useState<string | null>(null)
   const [resendingId, setResendingId] = useState<string | null>(null)
   const [resendSuccessId, setResendSuccessId] = useState<string | null>(null)
+  const [passwordFormId, setPasswordFormId] = useState<string | null>(null)
+  const [passwordDraft, setPasswordDraft] = useState<Record<string, string>>({})
+  const [settingPasswordId, setSettingPasswordId] = useState<string | null>(null)
+  const [passwordSuccessId, setPasswordSuccessId] = useState<string | null>(null)
 
   interface PartnerDetail {
     referrals: { id: string; connected_via: string; created_at: string; profiles: { full_name: string; email: string; role: string } | null }[]
@@ -197,6 +201,32 @@ export default function AdminPartnersPage() {
       setError(err instanceof Error ? err.message : 'Failed to resend invite')
     } finally {
       setResendingId(null)
+    }
+  }
+
+  async function setPartnerPassword(id: string) {
+    const password = passwordDraft[id] || ''
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters')
+      return
+    }
+    setSettingPasswordId(id)
+    try {
+      const res = await fetch(`/api/admin/partners/${id}/set-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to set password')
+      setPasswordSuccessId(id)
+      setPasswordDraft((prev) => ({ ...prev, [id]: '' }))
+      setPasswordFormId(null)
+      setTimeout(() => setPasswordSuccessId((current) => (current === id ? null : current)), 4000)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to set password')
+    } finally {
+      setSettingPasswordId(null)
     }
   }
 
@@ -437,7 +467,35 @@ export default function AdminPartnersPage() {
                       {resendSuccessId === p.id && (
                         <span className="text-xs text-green-400">Invite sent</span>
                       )}
+                      <button
+                        onClick={() => setPasswordFormId(passwordFormId === p.id ? null : p.id)}
+                        className="text-xs px-3 py-1.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors"
+                      >
+                        {passwordFormId === p.id ? 'Cancel' : 'Set Password'}
+                      </button>
+                      {passwordSuccessId === p.id && (
+                        <span className="text-xs text-green-400">Password set</span>
+                      )}
                     </div>
+
+                    {passwordFormId === p.id && (
+                      <div className="flex flex-col sm:flex-row gap-2 sm:items-center bg-surface-container-high px-4 py-3">
+                        <input
+                          type="password"
+                          placeholder="New password (min. 8 characters)"
+                          value={passwordDraft[p.id] || ''}
+                          onChange={(e) => setPasswordDraft((prev) => ({ ...prev, [p.id]: e.target.value }))}
+                          className="bg-surface-container border border-outline-variant/20 px-3 py-2 text-sm text-on-surface flex-1"
+                        />
+                        <button
+                          onClick={() => setPartnerPassword(p.id)}
+                          disabled={settingPasswordId === p.id || (passwordDraft[p.id] || '').length < 8}
+                          className="text-xs px-4 py-2 bg-primary text-on-primary disabled:opacity-40 transition-opacity shrink-0"
+                        >
+                          {settingPasswordId === p.id ? 'Saving…' : 'Save Password'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

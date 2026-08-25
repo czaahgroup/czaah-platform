@@ -27,7 +27,7 @@ async function requireSuperAdmin(request: NextRequest) {
   if (!profile || profile.role !== 'super_admin') {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
-  return { supabase }
+  return { supabase, userId: user.id }
 }
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -37,36 +37,38 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const supabase = auth.supabase!
     const { id } = await params
 
+    const body = await request.json()
+    const { password } = body
+
+    if (!password || typeof password !== 'string' || password.length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
+    }
+
     const { data: partner } = await supabase
       .from('partners')
-      .select('profile_id, profiles!partners_profile_id_fkey(email)')
+      .select('profile_id')
       .eq('id', id)
       .single()
 
-    // @ts-expect-error — nested relation shape from Supabase's typed client
-    const email: string | undefined = partner?.profiles?.email
-    if (!partner || !email) {
+    if (!partner?.profile_id) {
       return NextResponse.json({ error: 'Partner not found' }, { status: 404 })
     }
 
-    const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${new URL(request.url).origin}/api/auth/callback?redirect=${encodeURIComponent('/reset-password')}`,
-    })
-
-    if (inviteError) {
-      // @ts-expect-error — AuthApiError carries a `code` beyond the base Error type
-      if (inviteError.code === 'email_exists' || inviteError.status === 422) {
-        return NextResponse.json(
-          { error: 'This partner has already confirmed their account and set a password — there’s no invite left to resend. If they’ve forgotten their password, tell them to use "Forgot Password" on the login page.' },
-          { status: 409 }
-        )
-      }
-      return NextResponse.json({ error: inviteError.message }, { status: 500 })
+    const { error: updateError } = await supabase.auth.admin.updateUserById(partner.profile_id, { password })
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
+
+    await supabase.from('audit_log').insert({
+      actor_id: auth.userId,
+      action: 'partner_password_set',
+      target_type: 'partner',
+      target_id: id,
+    })
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('POST /api/admin/partners/[id]/resend-invite error:', err)
+    console.error('POST /api/admin/partners/[id]/set-password error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

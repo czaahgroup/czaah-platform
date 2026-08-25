@@ -19,9 +19,32 @@ export default function ResetPasswordPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Supabase will have set the session from the reset link
+    // The normal path is /api/auth/callback exchanging the emailed code for
+    // a session server-side (setting proper cookies) before redirecting
+    // here, so getSession() below just finds it already established. This
+    // fallback also handles a ?code= landing directly on this page (e.g. an
+    // invite link sent before that redirect was wired up) by exchanging it
+    // client-side instead of leaving the user stuck on "Link Invalid".
     const supabase = createClient()
     let resolved = false
+
+    async function init() {
+      const code = new URLSearchParams(window.location.search).get('code')
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        if (!error) {
+          resolved = true
+          setReady(true)
+          return
+        }
+      }
+
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        resolved = true
+        setReady(true)
+      }
+    }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
@@ -30,19 +53,13 @@ export default function ResetPasswordPage() {
       }
     })
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        resolved = true
-        setReady(true)
-      }
-    })
+    init()
 
-    // Exchanging the emailed code for a session happens automatically on load —
-    // if nothing resolved after a few seconds, the link is invalid, expired, or
-    // was opened in a different browser than the one that requested it.
+    // If nothing resolved after a few seconds, the link is invalid, expired,
+    // or was opened in a different browser than the one that requested it.
     const timeout = setTimeout(() => {
       if (!resolved) setLinkInvalid(true)
-    }, 3000)
+    }, 5000)
 
     return () => {
       subscription.unsubscribe()
