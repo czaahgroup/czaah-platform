@@ -36,6 +36,7 @@ export interface UseCallReturn {
   callerName: string | null
   callerType: CallType | null
   localStream: MediaStream | null
+  onlineUserIds: Set<string>
   initiateCall: (targetUserId: string, targetName: string, type: CallType) => void
   acceptCall: () => void
   declineCall: () => void
@@ -100,6 +101,11 @@ export function useCall({
   const [callerType, setCallerType] = useState<CallType | null>(null)
   const [participants, setParticipants] = useState<Participant[]>([])
   const [localStream, setLocalStream] = useState<MediaStream | null>(null)
+  // Who else is currently subscribed to this chat's channel — reused as a
+  // lightweight "online" indicator via Supabase Realtime Presence, tracked
+  // on the same channel already used for call signaling rather than a
+  // separate connection.
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set())
 
   const channelRef = useRef<RealtimeChannel | null>(null)
   const peerConnectionsRef = useRef<Map<string, RTCPeerConnection>>(new Map())
@@ -382,9 +388,14 @@ export function useCall({
     if (!chatId || !currentUserId) return
 
     const channelName = `${channelPrefix}:${chatId}`
-    const channel = supabase.channel(channelName)
+    const channel = supabase.channel(channelName, {
+      config: { presence: { key: currentUserId } },
+    })
 
     channel
+      .on('presence', { event: 'sync' }, () => {
+        setOnlineUserIds(new Set(Object.keys(channel.presenceState())))
+      })
       .on('broadcast', { event: 'call-request' }, async ({ payload }) => {
         if (payload.senderId === currentUserId) return
         if (callStateRef.current !== 'idle') return
@@ -634,11 +645,16 @@ export function useCall({
           )
         )
       })
-      .subscribe()
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ online_at: new Date().toISOString() })
+        }
+      })
 
     channelRef.current = channel
 
     return () => {
+      setOnlineUserIds(new Set())
       if (callStateRef.current !== 'idle' && callStateRef.current !== 'ended') {
         channel.send({
           type: 'broadcast',
@@ -984,6 +1000,7 @@ export function useCall({
     callerName,
     callerType,
     localStream,
+    onlineUserIds,
     initiateCall,
     acceptCall,
     declineCall,

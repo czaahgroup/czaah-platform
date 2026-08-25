@@ -165,23 +165,32 @@ export default function AdminPartnerMessagesPage() {
               <p className="text-on-surface-variant text-sm">No partner conversations yet.</p>
             </div>
           ) : (
-            chats.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => openChat(c.id)}
-                className={`w-full text-left px-4 py-3 border transition-colors ${
-                  selectedChatId === c.id ? 'bg-surface-container-low border-primary' : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/40'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium text-on-surface truncate">{c.partners?.profiles?.full_name || '—'}</span>
-                  <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary shrink-0">{c.partners?.partner_id}</span>
-                </div>
-                <div className="text-xs text-on-surface-variant/50 mt-1">
-                  {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : 'No messages yet'}
-                </div>
-              </button>
-            ))
+            chats.map((c) => {
+              const isOnline = !!(c.partners?.profile_id && partnerCall?.getCallState(c.id)?.onlineUserIds.has(c.partners.profile_id))
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => openChat(c.id)}
+                  className={`w-full text-left px-4 py-3 border transition-colors ${
+                    selectedChatId === c.id ? 'bg-surface-container-low border-primary' : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-on-surface truncate">
+                      <span
+                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                        style={{ background: isOnline ? '#22c55e' : 'rgba(255,255,255,0.2)' }}
+                      />
+                      {c.partners?.profiles?.full_name || '—'}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary shrink-0">{c.partners?.partner_id}</span>
+                  </div>
+                  <div className="text-xs text-on-surface-variant/50 mt-1">
+                    {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : 'No messages yet'}
+                  </div>
+                </button>
+              )
+            })
           )}
         </div>
 
@@ -193,9 +202,23 @@ export default function AdminPartnerMessagesPage() {
           ) : (
             <div className="bg-surface-container-low border border-outline-variant/10 flex flex-col h-[600px]">
               <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-outline-variant/10">
-                <span className="text-sm font-medium text-on-surface truncate">
-                  {selectedChat?.partners?.profiles?.full_name || 'Partner'}
-                </span>
+                <div>
+                  <span className="text-sm font-medium text-on-surface truncate block">
+                    {selectedChat?.partners?.profiles?.full_name || 'Partner'}
+                  </span>
+                  {(() => {
+                    const isOnline = !!(selectedChat?.partners?.profile_id && callForChat?.onlineUserIds.has(selectedChat.partners.profile_id))
+                    return (
+                      <span className="flex items-center gap-1.5 mt-0.5">
+                        <span
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={{ background: isOnline ? '#22c55e' : 'rgba(255,255,255,0.2)' }}
+                        />
+                        <span className="text-xs text-on-surface-variant/50">{isOnline ? 'Online' : 'Offline'}</span>
+                      </span>
+                    )
+                  })()}
+                </div>
                 {selectedChat?.partners?.profile_id && userId && partnerCall && (
                   <div className="flex items-center gap-2 shrink-0">
                     <button

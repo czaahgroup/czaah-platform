@@ -171,7 +171,23 @@ export default function PartnerMessagesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="cinzel-text text-2xl text-on-surface">Live Chat</h1>
+        <div>
+          <h1 className="cinzel-text text-2xl text-on-surface">Live Chat</h1>
+          {admin && (
+            <div className="flex items-center gap-1.5 mt-1">
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{
+                  background: call.onlineUserIds.has(admin.id) ? '#22c55e' : 'rgba(255,255,255,0.2)',
+                  boxShadow: call.onlineUserIds.has(admin.id) ? '0 0 6px rgba(34,197,94,0.5)' : 'none',
+                }}
+              />
+              <span className="raleway-text text-xs text-on-surface-variant/60">
+                {admin.full_name} &middot; {call.onlineUserIds.has(admin.id) ? 'Online' : 'Offline'}
+              </span>
+            </div>
+          )}
+        </div>
         {admin && userId && (
           <div className="flex items-center gap-2">
             <button
