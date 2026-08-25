@@ -98,7 +98,7 @@ export function AdminSidebarWrapper({
             padding: 16px !important;
           }
           .admin-topbar {
-            padding: 12px 16px 0 !important;
+            padding: calc(12px + env(safe-area-inset-top)) 16px 0 !important;
           }
         }
         @media (min-width: 768px) {
