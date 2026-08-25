@@ -30,15 +30,39 @@ export default function AdminPartnerMessagesPage() {
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string | null>(null)
+  const [clearingHistory, setClearingHistory] = useState(false)
   const supabase = createClient()
   const partnerCall = usePartnerCall()
 
   useEffect(() => {
     loadChats()
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserId(session?.user?.id || null)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const uid = session?.user?.id || null
+      setUserId(uid)
+      if (uid) {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', uid).single()
+        setUserRole(profile?.role || null)
+      }
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function clearHistory() {
+    if (!selectedChatId) return
+    if (!window.confirm('Permanently delete this entire conversation history? This cannot be undone.')) return
+    setClearingHistory(true)
+    try {
+      const res = await fetch(`/api/admin/partner-messages?chat_id=${selectedChatId}`, { method: 'DELETE' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to clear history')
+      setMessages([])
+      await loadChats()
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to clear history')
+    } finally {
+      setClearingHistory(false)
+    }
+  }
 
   const selectedChat = chats.find((c) => c.id === selectedChatId) || null
   const callForChat = selectedChatId ? partnerCall?.getCallState(selectedChatId) : undefined
@@ -219,45 +243,62 @@ export default function AdminPartnerMessagesPage() {
                     )
                   })()}
                 </div>
-                {selectedChat?.partners?.profile_id && userId && partnerCall && (
-                  <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
+                  {selectedChat?.partners?.profile_id && userId && partnerCall && (
+                    <>
+                      <button
+                        onClick={() => partnerCall.initiateCall(
+                          selectedChatId!,
+                          selectedChat.partners!.profile_id,
+                          selectedChat.partners!.profiles?.full_name || 'Partner',
+                          'voice'
+                        )}
+                        disabled={callState !== 'idle'}
+                        className="flex items-center gap-1.5 border border-primary/30 px-3 py-1.5 text-xs disabled:opacity-40"
+                        style={{ background: 'none', cursor: callState === 'idle' ? 'pointer' : 'default' }}
+                        title="Start voice call"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C">
+                          <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                        </svg>
+                        <span className="text-primary font-semibold">Call</span>
+                      </button>
+                      <button
+                        onClick={() => partnerCall.initiateCall(
+                          selectedChatId!,
+                          selectedChat.partners!.profile_id,
+                          selectedChat.partners!.profiles?.full_name || 'Partner',
+                          'video'
+                        )}
+                        disabled={callState !== 'idle'}
+                        className="flex items-center gap-1.5 border border-primary/30 px-3 py-1.5 text-xs disabled:opacity-40"
+                        style={{ background: 'none', cursor: callState === 'idle' ? 'pointer' : 'default' }}
+                        title="Start video call"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polygon points="23 7 16 12 23 17 23 7" fill="#C9A84C" />
+                          <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                        </svg>
+                        <span className="text-primary font-semibold">Video</span>
+                      </button>
+                    </>
+                  )}
+                  {userRole === 'super_admin' && messages.length > 0 && (
                     <button
-                      onClick={() => partnerCall.initiateCall(
-                        selectedChatId!,
-                        selectedChat.partners!.profile_id,
-                        selectedChat.partners!.profiles?.full_name || 'Partner',
-                        'voice'
-                      )}
-                      disabled={callState !== 'idle'}
-                      className="flex items-center gap-1.5 border border-primary/30 px-3 py-1.5 text-xs disabled:opacity-40"
-                      style={{ background: 'none', cursor: callState === 'idle' ? 'pointer' : 'default' }}
-                      title="Start voice call"
+                      onClick={clearHistory}
+                      disabled={clearingHistory}
+                      className="flex items-center gap-1.5 border border-red-500/30 px-3 py-1.5 text-xs disabled:opacity-40"
+                      style={{ background: 'none', cursor: clearingHistory ? 'default' : 'pointer' }}
+                      title="Permanently delete this conversation's history"
                     >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C">
-                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                       </svg>
-                      <span className="text-primary font-semibold">Call</span>
+                      <span className="text-red-400 font-semibold">{clearingHistory ? 'Clearing…' : 'Clear History'}</span>
                     </button>
-                    <button
-                      onClick={() => partnerCall.initiateCall(
-                        selectedChatId!,
-                        selectedChat.partners!.profile_id,
-                        selectedChat.partners!.profiles?.full_name || 'Partner',
-                        'video'
-                      )}
-                      disabled={callState !== 'idle'}
-                      className="flex items-center gap-1.5 border border-primary/30 px-3 py-1.5 text-xs disabled:opacity-40"
-                      style={{ background: 'none', cursor: callState === 'idle' ? 'pointer' : 'default' }}
-                      title="Start video call"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="23 7 16 12 23 17 23 7" fill="#C9A84C" />
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                      </svg>
-                      <span className="text-primary font-semibold">Video</span>
-                    </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-3">
                 {loadingMessages ? (

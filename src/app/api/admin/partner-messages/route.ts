@@ -104,3 +104,41 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const auth = await requireSuperAdmin(request)
+    if (auth.error) return auth.error
+    const supabase = auth.supabase!
+
+    const { searchParams } = new URL(request.url)
+    const chatId = searchParams.get('chat_id')
+    if (!chatId) {
+      return NextResponse.json({ error: 'chat_id is required' }, { status: 400 })
+    }
+
+    const { data: chat, error: chatError } = await supabase
+      .from('partner_chats')
+      .select('id')
+      .eq('id', chatId)
+      .single()
+
+    if (chatError || !chat) {
+      return NextResponse.json({ error: 'Chat not found' }, { status: 404 })
+    }
+
+    const { error: deleteError } = await supabase
+      .from('partner_messages')
+      .delete()
+      .eq('chat_id', chatId)
+
+    if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 })
+
+    await supabase.from('partner_chats').update({ last_message_at: null }).eq('id', chatId)
+
+    return NextResponse.json({ data: { success: true } })
+  } catch (err) {
+    console.error('DELETE /api/admin/partner-messages error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

@@ -55,6 +55,8 @@ export default function AdminEliteChatsPage() {
   const [sending, setSending] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [userName, setUserName] = useState<string>('Admin')
+  const [userRole, setUserRole] = useState<string | null>(null)
+  const [clearingHistory, setClearingHistory] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -117,10 +119,11 @@ export default function AdminEliteChatsPage() {
       if (uid) {
         const { data: prof } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, role')
           .eq('id', uid)
           .single()
         if (prof?.full_name) setUserName(prof.full_name)
+        setUserRole(prof?.role || null)
       }
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -228,6 +231,23 @@ export default function AdminEliteChatsPage() {
   useEffect(() => {
     if (selectedChatId) loadChat(selectedChatId)
   }, [selectedChatId, loadChat])
+
+  const clearHistory = useCallback(async () => {
+    if (!selectedChatId) return
+    if (!window.confirm('Permanently delete this entire conversation history? This cannot be undone.')) return
+    setClearingHistory(true)
+    try {
+      const res = await fetch(`/api/elite/chats/${selectedChatId}`, { method: 'DELETE' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to clear history')
+      setMessages([])
+      loadChats()
+    } catch (err) {
+      console.error('Failed to clear history:', err)
+    } finally {
+      setClearingHistory(false)
+    }
+  }, [selectedChatId, loadChats])
 
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -676,6 +696,38 @@ export default function AdminEliteChatsPage() {
                 </div>
                 {selectedChat && userId && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {userRole === 'super_admin' && messages.length > 0 && (
+                      <button
+                        onClick={clearHistory}
+                        disabled={clearingHistory}
+                        style={{
+                          background: 'none',
+                          border: '1px solid rgba(239,68,68,0.3)',
+                          borderRadius: 0,
+                          padding: '4px 10px',
+                          cursor: clearingHistory ? 'default' : 'pointer',
+                          opacity: clearingHistory ? 0.4 : 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          transition: 'all 0.2s ease',
+                        }}
+                        title="Permanently delete this conversation's history"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                        <span style={{
+                          fontFamily: "'Raleway', sans-serif",
+                          fontSize: '11px',
+                          color: '#ef4444',
+                          fontWeight: 600,
+                        }}>
+                          {clearingHistory ? 'Clearing…' : 'Clear History'}
+                        </span>
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         const targetId = selectedChat.elite_member_id

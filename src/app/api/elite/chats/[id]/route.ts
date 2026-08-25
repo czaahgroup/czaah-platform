@@ -103,3 +103,70 @@ export async function GET(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: chatId } = await params
+    const userClient = getAuthClient(request)
+    const { data: { user }, error: authError } = await userClient.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const supabase = createAdminClient()
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Forbidden — only a super admin can clear chat history' }, { status: 403 })
+    }
+
+    const { data: chat, error: chatError } = await supabase
+      .from('direct_chats')
+      .select('id')
+      .eq('id', chatId)
+      .single()
+
+    if (chatError || !chat) {
+      return NextResponse.json({ error: 'Chat not found' }, { status: 404 })
+    }
+
+    // Best-effort cleanup of any uploaded files before deleting the rows
+    const { data: filesToDelete } = await supabase
+      .from('direct_messages')
+      .select('file_url')
+      .eq('chat_id', chatId)
+      .not('file_url', 'is', null)
+
+    const paths = (filesToDelete || []).map((m) => m.file_url).filter(Boolean) as string[]
+    if (paths.length > 0) {
+      await supabase.storage.from('platform-files').remove(paths)
+    }
+
+    const { error: deleteError } = await supabase
+      .from('direct_messages')
+      .delete()
+      .eq('chat_id', chatId)
+
+    if (deleteError) {
+      return NextResponse.json({ error: deleteError.message }, { status: 500 })
+    }
+
+    await supabase
+      .from('direct_chats')
+      .update({ last_message_at: null })
+      .eq('id', chatId)
+
+    return NextResponse.json({ data: { success: true } })
+  } catch (err) {
+    console.error('DELETE /api/elite/chats/[id] error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
