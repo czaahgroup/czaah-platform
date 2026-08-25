@@ -148,6 +148,7 @@ function PartnerCallSlot({
   onStateChange: () => void
 }) {
   const [showAddParticipant, setShowAddParticipant] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
   const postCallMessage = useCallback(
     async (content: string) => {
       try {
@@ -198,10 +199,15 @@ function PartnerCallSlot({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [call.callState])
 
+  // Reset minimize state once the call is fully over, so the next one starts full.
+  useEffect(() => {
+    if (call.callState === 'idle' && isMinimized) setIsMinimized(false)
+  }, [call.callState, isMinimized])
+
   if (call.callState === 'idle') return null
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+    <div style={{ position: 'fixed', inset: isMinimized ? 'auto' : 0, zIndex: 9999 }}>
       <CallUI
         callState={call.callState}
         callType={call.callType}
@@ -220,9 +226,12 @@ function PartnerCallSlot({
         onAddParticipant={() => setShowAddParticipant((v) => !v)}
         onRejoin={call.rejoinCall}
         canRejoin={call.canRejoin}
+        isMinimized={isMinimized}
+        onMinimize={() => setIsMinimized(true)}
+        onRestore={() => setIsMinimized(false)}
       />
       {/* Add participant dropdown -- admin can invite another admin into this call */}
-      {showAddParticipant && call.callState === 'connected' && (
+      {showAddParticipant && call.callState === 'connected' && !isMinimized && (
         <div style={{
           position: 'absolute',
           top: '50px',

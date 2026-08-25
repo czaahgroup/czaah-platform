@@ -3,21 +3,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useCall } from '@/lib/hooks/useCall'
-import type { CallType } from '@/lib/hooks/useCall'
-import { CallUI } from '@/components/chat/CallUI'
-import { primeAudioUnlock } from '@/lib/audioUnlock'
+import { usePartnerOwnCall } from '@/lib/contexts/PartnerOwnCallContext'
 
 interface Message {
   id: string
   sender_id: string
   content: string
   created_at: string
-}
-
-interface Admin {
-  id: string
-  full_name: string
 }
 
 interface CallLogEntry {
@@ -34,26 +26,20 @@ interface CallLogEntry {
 
 export default function PartnerMessagesPage() {
   const [messages, setMessages] = useState<Message[]>([])
-  const [chatId, setChatId] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
-  const [userName, setUserName] = useState('Partner')
-  const [admin, setAdmin] = useState<Admin | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
-  const [admins, setAdmins] = useState<Admin[]>([])
-  const [showAddParticipant, setShowAddParticipant] = useState(false)
-  // Normally the call channel is this partner's own chat. When invited into
-  // someone else's call (see the group-call-invite listener below), it's
-  // temporarily redirected to that chat instead, then reset once the call ends.
-  const [activeChatId, setActiveChatId] = useState<string | null>(null)
-  const [autoRing, setAutoRing] = useState<{ callerId: string; callerName: string; callType: CallType } | null>(null)
   const [tab, setTab] = useState<'chat' | 'calls'>('chat')
   const [callHistory, setCallHistory] = useState<CallLogEntry[]>([])
   const [callsLoading, setCallsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
+  const partnerCall = usePartnerOwnCall()
+  const call = partnerCall?.call
+  const admin = partnerCall?.admin
+  const chatId = partnerCall?.chatId
 
   const loadCallHistory = useCallback(async () => {
     setCallsLoading(true)
@@ -88,97 +74,9 @@ export default function PartnerMessagesPage() {
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
 
-  const postCallMessage = useCallback(async (content: string) => {
-    try {
-      const res = await fetch('/api/partner/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === json.data.id)) return prev
-          return [...prev, json.data]
-        })
-      }
-    } catch {
-      // Best-effort — the call itself already happened
-    }
-  }, [])
-
-  const handleCallEnded = useCallback(async (durationSeconds: number, type: CallType) => {
-    const m = Math.floor(durationSeconds / 60).toString().padStart(2, '0')
-    const s = (durationSeconds % 60).toString().padStart(2, '0')
-    const label = type === 'video' ? 'Video call' : 'Voice call'
-    postCallMessage(`☎ ${label} — ${m}:${s}`)
-  }, [postCallMessage])
-
-  const handleCallMissed = useCallback(async (_targetUserId: string, targetName: string, type: CallType) => {
-    const label = type === 'video' ? 'video call' : 'voice call'
-    postCallMessage(`☎ Missed ${label} to ${targetName}`)
-  }, [postCallMessage])
-
-  const call = useCall({
-    currentUserId: userId || '',
-    currentUserName: userName,
-    channelPrefix: 'partner-call',
-    chatId: activeChatId || chatId || '',
-    chatContextType: 'direct',
-    chatContextId: chatId || '',
-    onCallEnded: handleCallEnded,
-    onCallMissed: handleCallMissed,
-    externalInvite: autoRing,
-  })
-
   useEffect(() => {
-    primeAudioUnlock()
-  }, [])
-
-  // Once a cross-chat call this partner was invited into finishes, hand the
-  // call channel back to their own chat.
-  useEffect(() => {
-    if (call.callState === 'idle' && activeChatId) {
-      setActiveChatId(null)
-      setAutoRing(null)
-    }
-  }, [call.callState, activeChatId])
-
-  // Listen for group-call invites from an admin currently on a call with a
-  // different partner — see useCall's inviteExternalUser for the sender side.
-  useEffect(() => {
-    if (!userId) return
-    const channel = supabase
-      .channel(`partner-invite:${userId}`)
-      .on('broadcast', { event: 'group-call-invite' }, ({ payload }) => {
-        if (call.callState !== 'idle') return
-        setAutoRing({ callerId: payload.callerId, callerName: payload.callerName, callType: payload.callType })
-        setActiveChatId(payload.chatId)
-      })
-      .subscribe()
-    return () => {
-      supabase.removeChannel(channel)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId])
-
-  useEffect(() => {
-    fetch('/api/elite/admins')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json) => {
-        if (json?.data) setAdmins(json.data)
-      })
-      .catch(() => {})
-  }, [])
-
-  useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const uid = session?.user?.id || null
-      setUserId(uid)
-      if (uid) {
-        const { data: prof } = await supabase.from('profiles').select('full_name').eq('id', uid).single()
-        if (prof?.full_name) setUserName(prof.full_name)
-      }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id || null)
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -228,8 +126,6 @@ export default function PartnerMessagesPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to load messages')
       setMessages(json.data || [])
-      setChatId(json.chatId || null)
-      setAdmin(json.admin || null)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -258,7 +154,7 @@ export default function PartnerMessagesPage() {
     }
   }
 
-  if (loading) return <div className="text-on-surface-variant py-12 text-center">Loading messages...</div>
+  if (loading || !call) return <div className="text-on-surface-variant py-12 text-center">Loading messages...</div>
 
   return (
     <div>
@@ -327,85 +223,7 @@ export default function PartnerMessagesPage() {
       </div>
       {error && <div className="bg-red-500/10 border border-red-500/20 px-4 py-3 mb-6"><p className="text-sm text-red-400">{error}</p></div>}
 
-      <div className="bg-surface-container border border-outline-variant/10 flex flex-col h-[550px]" style={{ position: 'relative' }}>
-        {userId && (
-          <CallUI
-            callState={call.callState}
-            callType={call.callType}
-            callDuration={call.callDuration}
-            isMuted={call.isMuted}
-            isVideoOff={call.isVideoOff}
-            participants={call.participants}
-            localStream={call.localStream}
-            callerName={call.callerName}
-            callerType={call.callerType}
-            onAccept={call.acceptCall}
-            onDecline={call.declineCall}
-            onEndCall={call.endCall}
-            onToggleMute={call.toggleMute}
-            onToggleVideo={call.toggleVideo}
-            onAddParticipant={() => setShowAddParticipant((v) => !v)}
-            onRejoin={call.rejoinCall}
-            canRejoin={call.canRejoin}
-          />
-        )}
-        {showAddParticipant && call.callState === 'connected' && (
-          <div style={{
-            position: 'absolute',
-            top: '50px',
-            right: '16px',
-            zIndex: 60,
-            background: '#111',
-            border: '1px solid rgba(255,255,255,0.1)',
-            maxHeight: '200px',
-            overflowY: 'auto',
-            minWidth: '180px',
-          }}>
-            <div style={{
-              padding: '8px 12px',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
-              fontFamily: "'Raleway', sans-serif",
-              fontSize: '11px',
-              color: 'rgba(201,168,76,0.6)',
-              textTransform: 'uppercase',
-              letterSpacing: '1px',
-            }}>
-              Add another admin
-            </div>
-            {admins.filter((a) => a.id !== userId && !call.participants.some((p) => p.userId === a.id)).length === 0 ? (
-              <div style={{ padding: '8px 12px', fontFamily: "'Raleway', sans-serif", fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                No additional admins available
-              </div>
-            ) : (
-              admins.filter((a) => a.id !== userId && !call.participants.some((p) => p.userId === a.id)).map((a) => (
-                <button
-                  key={a.id}
-                  onClick={() => {
-                    call.addParticipant(a.id, a.full_name)
-                    setShowAddParticipant(false)
-                  }}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '8px 12px',
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: '1px solid rgba(255,255,255,0.04)',
-                    color: '#fff',
-                    fontFamily: "'Raleway', sans-serif",
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  {a.full_name}
-                </button>
-              ))
-            )}
-          </div>
-        )}
+      <div className="bg-surface-container border border-outline-variant/10 flex flex-col h-[550px]">
         {tab === 'chat' ? (
           <>
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 flex flex-col gap-3">

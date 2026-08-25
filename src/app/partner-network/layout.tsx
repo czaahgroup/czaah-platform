@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AdminSidebarWrapper } from '@/components/AdminSidebarWrapper'
+import { PartnerOwnCallProvider } from '@/lib/contexts/PartnerOwnCallContext'
 
 const BASE_NAV_LINKS = [
   { href: '/partner-network', label: 'Dashboard', icon: 'dashboard' },
@@ -23,6 +24,7 @@ const TAIL_NAV_LINKS = [
 
 export default function PartnerNetworkLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState('')
   const [fullName, setFullName] = useState('')
   const [showWorkforce, setShowWorkforce] = useState(false)
   const pathname = usePathname()
@@ -38,6 +40,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
         window.location.href = '/dashboard'
         return
       }
+      setUserId(session.user.id)
       setFullName(profile.full_name || '')
       setLoading(false)
 
@@ -138,8 +141,10 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
   )
 
   return (
-    <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
-      {children}
-    </AdminSidebarWrapper>
+    <PartnerOwnCallProvider userId={userId} userName={fullName}>
+      <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
+        {children}
+      </AdminSidebarWrapper>
+    </PartnerOwnCallProvider>
   )
 }

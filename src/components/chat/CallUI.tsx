@@ -92,6 +92,14 @@ function SpeakerOffIcon({ size = 18, color = 'currentColor' }: { size?: number; 
   )
 }
 
+function MinimizeIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  )
+}
+
 // Video element component that handles srcObject via ref
 function VideoElement({
   stream,
@@ -201,6 +209,13 @@ export interface CallUIProps {
   onAddParticipant?: () => void
   onRejoin?: () => void
   canRejoin?: boolean
+  // Floating picture-in-picture mode for a connected call, so the rest of
+  // the site is usable while a call is ongoing instead of it blocking
+  // everything. Only meaningful while callState === 'connected' — ringing/
+  // calling/disconnected always show full-attention UI regardless.
+  isMinimized?: boolean
+  onMinimize?: () => void
+  onRestore?: () => void
 }
 
 const STYLES = `
@@ -236,6 +251,9 @@ export function CallUI({
   onAddParticipant,
   onRejoin,
   canRejoin,
+  isMinimized,
+  onMinimize,
+  onRestore,
 }: CallUIProps) {
   const [endedVisible, setEndedVisible] = useState(false)
   const [endedDuration, setEndedDuration] = useState(0)
@@ -721,6 +739,90 @@ export function CallUI({
     )
   }
 
+  // Floating picture-in-picture widget -- lets the rest of the site stay
+  // usable during a connected call instead of it occupying the whole view.
+  if (isMinimized && callState === 'connected') {
+    const displayName = participants.map((p) => p.userName).join(', ') || callerName || 'Call'
+    const firstParticipant = participants[0]
+    const showVideoThumb = callType === 'video' && firstParticipant?.stream && !firstParticipant.isVideoOff
+
+    return (
+      <div
+        onClick={onRestore}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 9998,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          background: 'rgba(8,8,8,0.95)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(201,168,76,0.25)',
+          borderRadius: '32px',
+          padding: '8px 14px 8px 8px',
+          cursor: 'pointer',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+        }}
+        title="Tap to return to call"
+      >
+        {showVideoThumb ? (
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', flexShrink: 0 }}>
+            <VideoElement
+              stream={firstParticipant.stream}
+              muted
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+        ) : (
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            background: 'rgba(201,168,76,0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <span style={{ fontFamily: "'Cinzel', serif", fontSize: '16px', color: '#C9A84C' }}>
+              {displayName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: '12px', fontWeight: 600, color: '#fff', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {displayName}
+          </span>
+          <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontVariantNumeric: 'tabular-nums' }}>
+            {formatDuration(callDuration)}
+          </span>
+        </div>
+
+        <button
+          onClick={(e) => { e.stopPropagation(); onEndCall() }}
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            border: 'none',
+            background: '#ef4444',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            flexShrink: 0,
+          }}
+          title="End call"
+        >
+          <PhoneEndIcon size={14} color="#fff" />
+        </button>
+      </div>
+    )
+  }
+
   // Connected -- voice call (compact bar)
   if (callState === 'connected' && callType === 'voice') {
     const participantNames = participants.map((p) => p.userName).join(', ')
@@ -867,6 +969,27 @@ export function CallUI({
         >
           <VideoIcon size={18} color="#C9A84C" />
         </button>
+
+        {onMinimize && (
+          <button
+            onClick={onMinimize}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '6px',
+              padding: '4px 8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'rgba(255,255,255,0.5)',
+              flexShrink: 0,
+            }}
+            title="Minimize"
+          >
+            <MinimizeIcon size={16} color="rgba(255,255,255,0.5)" />
+          </button>
+        )}
 
         {onAddParticipant && (
           <button
@@ -1190,6 +1313,28 @@ export function CallUI({
               <SpeakerOffIcon size={20} color="rgba(255,255,255,0.5)" />
             )}
           </button>
+
+          {/* Minimize */}
+          {onMinimize && (
+            <button
+              onClick={onMinimize}
+              style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                border: 'none',
+                background: 'rgba(255,255,255,0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              title="Minimize"
+            >
+              <MinimizeIcon size={20} color="rgba(255,255,255,0.7)" />
+            </button>
+          )}
 
           {/* Add participant */}
           {onAddParticipant && (
