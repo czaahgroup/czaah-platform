@@ -6,9 +6,56 @@ import Link from 'next/link'
 import { Navbar } from '@/components/layouts/Navbar'
 import { Footer } from '@/components/layouts/Footer'
 
+interface PartnerOpportunity {
+  id: string
+  reference_number: string
+  title: string
+  country: string | null
+  opportunity_type: string
+  summary: string | null
+  description: string | null
+  estimated_value: string | null
+  created_at: string
+  sectors: { name: string; slug: string } | null
+}
+
+const OPPORTUNITY_TYPE_LABELS: Record<string, string> = {
+  buyer_required: 'Buyer Required',
+  seller_supplier_available: 'Seller / Supplier Available',
+  investor_required: 'Investor Required',
+  investment_available: 'Investment Available',
+  project_available: 'Project Available',
+  joint_venture: 'Joint Venture',
+  property_opportunity: 'Property Opportunity',
+  other: 'Opportunity',
+}
+
+// Maps real sector slugs (from the sectors table) onto this page's existing
+// filter-button keys so partner opportunities slot into the same filters as
+// the curated deals below. Sectors with no matching filter (e.g. Aviation)
+// fall back to null and only appear under "All Sectors".
+const SECTOR_SLUG_TO_FILTER: Record<string, string> = {
+  'minerals-mining': 'minerals',
+  'real-estate': 'realestate',
+  'construction-development': 'construction',
+  'technology-it': 'technology',
+  'textiles-trade': 'textiles',
+  'agriculture': 'agriculture',
+  'pharmaceuticals': 'pharma',
+  'tourism-hospitality': 'tourism',
+}
+
 export default function InvestmentsPage() {
   const [activeFilter, setActiveFilter] = useState('all')
+  const [partnerOpportunities, setPartnerOpportunities] = useState<PartnerOpportunity[]>([])
   const dealsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    fetch('/api/public/partner-opportunities')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setPartnerOpportunities(Array.isArray(data) ? data : []))
+      .catch(() => setPartnerOpportunities([]))
+  }, [])
 
   const deals = [
     { sector: 'minerals' },
@@ -23,9 +70,20 @@ export default function InvestmentsPage() {
     { sector: 'minerals' },
   ]
 
-  const visibleCount = activeFilter === 'all'
+  const partnerOpportunitiesWithFilter = partnerOpportunities.map(o => ({
+    ...o,
+    filterKey: (o.sectors ? SECTOR_SLUG_TO_FILTER[o.sectors.slug] : undefined) || null,
+  }))
+
+  const visiblePartnerCount = activeFilter === 'all'
+    ? partnerOpportunitiesWithFilter.length
+    : partnerOpportunitiesWithFilter.filter(o => o.filterKey === activeFilter).length
+
+  const visibleCount = (activeFilter === 'all'
     ? deals.length
-    : deals.filter(d => d.sector === activeFilter).length
+    : deals.filter(d => d.sector === activeFilter).length) + visiblePartnerCount
+
+  const totalCount = deals.length + partnerOpportunitiesWithFilter.length
 
   function filterDeals(filter: string) {
     setActiveFilter(filter)
@@ -92,9 +150,41 @@ export default function InvestmentsPage() {
               ))}
             </div>
 
-            <div className="text-center mb-8 raleway-text text-sm text-on-surface-variant">Showing <span className="text-primary font-medium">{visibleCount}</span> of 10 opportunities</div>
+            <div className="text-center mb-8 raleway-text text-sm text-on-surface-variant">Showing <span className="text-primary font-medium">{visibleCount}</span> of {totalCount} opportunities</div>
 
             <div className="flex flex-col gap-5" ref={dealsRef}>
+
+              {/* PARTNER-SUBMITTED OPPORTUNITIES (live from Supabase) */}
+              {partnerOpportunitiesWithFilter.map(o => (
+                <div
+                  key={o.id}
+                  className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== o.filterKey ? 'hidden' : ''}`}
+                  data-sector={o.filterKey || 'other'}
+                >
+                  <div className="p-8 lg:p-10 flex flex-col">
+                    <div className="flex items-start gap-4 mb-4 flex-wrap">
+                      <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">handshake</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="raleway-text text-[11px] font-semibold tracking-[0.1em] uppercase text-primary mb-1">{o.sectors?.name || 'Cross-Sector'}{o.country ? ` · ${o.country}` : ''}</div>
+                        <div className="cinzel-text text-xl font-semibold text-on-surface leading-tight">{o.title}</div>
+                      </div>
+                      <span className="raleway-text text-[10px] font-semibold tracking-[0.08em] uppercase px-3 py-1.5 bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">Open</span>
+                    </div>
+                    <p className="raleway-text text-sm text-on-surface-variant leading-relaxed mb-5 flex-1">{o.summary || o.description}</p>
+                    <div className="flex gap-2 flex-wrap mb-5">
+                      {[OPPORTUNITY_TYPE_LABELS[o.opportunity_type] || 'Opportunity', 'Partner Network', o.reference_number].map(t => (
+                        <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
+                      ))}
+                    </div>
+                    <Link href={`/contact?interest=${encodeURIComponent(`${o.title} (${o.reference_number})`)}#contact-form`} className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  </div>
+                  <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
+                    <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Estimated Value</div><div className="raleway-text text-xl font-semibold text-primary">{o.estimated_value || 'On Request'}</div></div>
+                    <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Opportunity Type</div><div className="raleway-text text-xl font-semibold text-on-surface">{OPPORTUNITY_TYPE_LABELS[o.opportunity_type] || 'Opportunity'}</div></div>
+                    <div><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Reference</div><div className="raleway-text text-sm text-on-surface-variant mt-1">{o.reference_number}</div></div>
+                  </div>
+                </div>
+              ))}
 
               {/* PLACER GOLD */}
               <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'minerals' ? 'hidden' : ''}`} data-sector="minerals">
