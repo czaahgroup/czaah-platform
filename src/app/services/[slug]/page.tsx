@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { BookmarkButton } from '@/components/BookmarkButton'
 
 export const runtime = 'edge';
 
@@ -124,9 +125,14 @@ export default function ServiceDetailPage() {
       {/* Hero */}
       <section className="pt-8 pb-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="font-[family-name:var(--font-heading)] text-5xl md:text-6xl lg:text-7xl text-czaah-gold tracking-wide mb-8">
+          <h1 className="font-[family-name:var(--font-heading)] text-5xl md:text-6xl lg:text-7xl text-czaah-gold tracking-wide mb-6">
             {service.name}.
           </h1>
+          {isLoggedIn && (
+            <div className="mb-8">
+              <BookmarkButton type="service" id={service.id} />
+            </div>
+          )}
           <p className="font-[family-name:var(--font-display)] italic text-xl md:text-2xl text-czaah-muted max-w-4xl leading-relaxed">
             {service.description}
           </p>
