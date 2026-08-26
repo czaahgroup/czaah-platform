@@ -344,14 +344,13 @@ export function Navbar() {
                   <Link href="/partner" onClick={() => setUserDropdownOpen(false)}>Partner Portal</Link>
                 ) : userRole === 'partner' ? (
                   <Link href="/partner-network" onClick={() => setUserDropdownOpen(false)}>Partner Network</Link>
+                ) : (userRole === 'admin' || userRole === 'super_admin') ? (
+                  <Link href="/partner" onClick={() => setUserDropdownOpen(false)}>Submit Deal</Link>
                 ) : (
                   <>
                     <Link href="/dashboard" onClick={() => setUserDropdownOpen(false)}>My Dashboard</Link>
                     {userRole === 'real_estate_partner' && (
                       <Link href="/dashboard/properties" onClick={() => setUserDropdownOpen(false)}>My Properties</Link>
-                    )}
-                    {(userRole === 'admin' || userRole === 'super_admin') && (
-                      <Link href="/partner" onClick={() => setUserDropdownOpen(false)}>Submit Deal</Link>
                     )}
                   </>
                 )}
@@ -475,16 +474,13 @@ export function Navbar() {
                 <Link href="/partner" className="mobile-nav-cta">Partner Portal</Link>
               ) : userRole === 'partner' ? (
                 <Link href="/partner-network" className="mobile-nav-cta">Partner Network</Link>
-              ) : (
+              ) : (userRole === 'admin' || userRole === 'super_admin') ? (
                 <>
-                  <Link href="/dashboard" className="mobile-nav-cta">My Dashboard</Link>
-                  {(userRole === 'admin' || userRole === 'super_admin') && (
-                    <Link href="/partner" className="mobile-nav-cta mobile-nav-cta-outline">Submit Deal</Link>
-                  )}
+                  <Link href="/admin" className="mobile-nav-cta">Super Admin</Link>
+                  <Link href="/partner" className="mobile-nav-cta mobile-nav-cta-outline">Submit Deal</Link>
                 </>
-              )}
-              {(userRole === 'super_admin' || userRole === 'admin') && (
-                <Link href="/admin" className="mobile-nav-cta mobile-nav-cta-outline">Super Admin</Link>
+              ) : (
+                <Link href="/dashboard" className="mobile-nav-cta">My Dashboard</Link>
               )}
               <button
                 onClick={handleSignOut}

@@ -17,6 +17,22 @@ function createAuthClient(request: NextRequest) {
   )
 }
 
+async function requireStaff(request: NextRequest) {
+  const userClient = createAuthClient(request)
+  const { data: { user }, error: authError } = await userClient.auth.getUser()
+  if (authError || !user) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
+
+  const supabase = createAdminClient()
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
+  }
+  return { supabase, userId: user.id }
+}
+
+// Deleting an entire conversation's history is a group/membership-style
+// management action reserved for super_admin, same as adding participants
+// to a call — a plain admin can read and reply, but not erase.
 async function requireSuperAdmin(request: NextRequest) {
   const userClient = createAuthClient(request)
   const { data: { user }, error: authError } = await userClient.auth.getUser()
@@ -32,7 +48,7 @@ async function requireSuperAdmin(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await requireSuperAdmin(request)
+    const auth = await requireStaff(request)
     if (auth.error) return auth.error
 
     const { searchParams } = new URL(request.url)
@@ -72,7 +88,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireSuperAdmin(request)
+    const auth = await requireStaff(request)
     if (auth.error) return auth.error
     const supabase = auth.supabase!
 
@@ -96,6 +112,44 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: message })
   } catch (err) {
     console.error('POST /api/admin/registrant-messages error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const auth = await requireSuperAdmin(request)
+    if (auth.error) return auth.error
+    const supabase = auth.supabase!
+
+    const { searchParams } = new URL(request.url)
+    const chatId = searchParams.get('chat_id')
+    if (!chatId) {
+      return NextResponse.json({ error: 'chat_id is required' }, { status: 400 })
+    }
+
+    const { data: chat, error: chatError } = await supabase
+      .from('registrant_chats')
+      .select('id')
+      .eq('id', chatId)
+      .single()
+
+    if (chatError || !chat) {
+      return NextResponse.json({ error: 'Chat not found' }, { status: 404 })
+    }
+
+    const { error: deleteError } = await supabase
+      .from('registrant_messages')
+      .delete()
+      .eq('chat_id', chatId)
+
+    if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 })
+
+    await supabase.from('registrant_chats').update({ last_message_at: null }).eq('id', chatId)
+
+    return NextResponse.json({ data: { success: true } })
+  } catch (err) {
+    console.error('DELETE /api/admin/registrant-messages error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

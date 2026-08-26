@@ -3,8 +3,15 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+
+// This page also renders at /admin/my-investments via a re-export — keep
+// every internal link scoped to whichever portal shell it's viewed under.
+function useInvestmentsBasePath() {
+  const pathname = usePathname()
+  return pathname?.startsWith('/admin') ? '/admin/my-investments' : '/dashboard/investments'
+}
 
 interface Investment {
   id: string
@@ -47,6 +54,7 @@ export default function InvestmentsBrowsePage() {
   const [search, setSearch] = useState('')
   const [sectorFilter, setSectorFilter] = useState('')
   const router = useRouter()
+  const basePath = useInvestmentsBasePath()
   const supabase = createClient()
 
   useEffect(() => {
@@ -135,7 +143,7 @@ export default function InvestmentsBrowsePage() {
           {filtered.map((inv) => (
             <Link
               key={inv.id}
-              href={`/dashboard/investments/${inv.id}`}
+              href={`${basePath}/${inv.id}`}
               className="group bg-surface-container-low border border-outline-variant/10 overflow-hidden hover:border-primary/30 transition-all no-underline"
             >
               <div className="p-5">

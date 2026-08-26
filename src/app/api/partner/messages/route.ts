@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
             title: `New message from ${senderProfile?.full_name || 'a partner'}`,
             body: content.slice(0, 120),
             tag: 'czaah-new-message',
-            url: '/admin/partner-messages',
+            url: '/admin/registrant-messages',
           })
         )
       )

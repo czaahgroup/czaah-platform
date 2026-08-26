@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 export const runtime = 'edge';
@@ -31,6 +31,11 @@ export default function InvestmentDetailPage() {
   const [expressed, setExpressed] = useState(false)
   const router = useRouter()
   const params = useParams()
+  const pathname = usePathname()
+  // This page also renders at /admin/my-investments/[id] via a re-export —
+  // keep every internal link scoped to whichever portal shell it's viewed under.
+  const investmentsBasePath = pathname?.startsWith('/admin') ? '/admin/my-investments' : '/dashboard/investments'
+  const enquiriesBasePath = pathname?.startsWith('/admin') ? '/admin/my-enquiries' : '/dashboard/enquiries'
   const supabase = createClient()
   const id = params.id as string
 
@@ -62,12 +67,12 @@ export default function InvestmentDetailPage() {
   }
 
   if (loading) return <div className="flex items-center justify-center py-20"><div className="raleway-text text-on-surface-variant/50">Loading...</div></div>
-  if (error && !investment) return <div className="flex items-center justify-center py-20"><div className="text-center"><p className="text-error mb-4">{error}</p><Link href="/dashboard/investments" className="text-primary text-sm no-underline">Back to Investments</Link></div></div>
+  if (error && !investment) return <div className="flex items-center justify-center py-20"><div className="text-center"><p className="text-error mb-4">{error}</p><Link href={investmentsBasePath} className="text-primary text-sm no-underline">Back to Investments</Link></div></div>
   if (!investment) return null
 
   return (
     <>
-      <Link href="/dashboard/investments" className="text-sm text-on-surface-variant/50 hover:text-primary transition-colors mb-6 inline-block raleway-text no-underline">&larr; Back to Investments</Link>
+      <Link href={investmentsBasePath} className="text-sm text-on-surface-variant/50 hover:text-primary transition-colors mb-6 inline-block raleway-text no-underline">&larr; Back to Investments</Link>
 
       {error && <div className="bg-error/10 border border-error/20 px-4 py-3 mb-6"><p className="text-sm text-error">{error}</p></div>}
 
@@ -135,7 +140,7 @@ export default function InvestmentDetailPage() {
                 <span className="material-symbols-outlined text-green-400 text-3xl mb-3 block">check_circle</span>
                 <h3 className="cinzel-text text-lg text-on-surface mb-2">Interest Submitted</h3>
                 <p className="text-sm text-on-surface-variant/50 mb-4 raleway-text">Your enquiry has been created. Our team will be in touch shortly.</p>
-                <Link href="/dashboard/enquiries" className="text-sm text-primary no-underline raleway-text">View My Enquiries &rarr;</Link>
+                <Link href={enquiriesBasePath} className="text-sm text-primary no-underline raleway-text">View My Enquiries &rarr;</Link>
               </div>
             ) : (
               <>

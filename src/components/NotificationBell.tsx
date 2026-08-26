@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { updateAppBadge } from '@/lib/appBadge'
 
 interface Notification {
@@ -32,6 +32,8 @@ export function NotificationBell() {
   const [loading, setLoading] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const pathname = usePathname()
+  const notificationsHref = pathname?.startsWith('/admin') ? '/admin/notifications' : '/dashboard/notifications'
 
   // Fetch unread count
   const fetchCount = useCallback(async () => {
@@ -280,7 +282,7 @@ export function NotificationBell() {
 
           {/* Footer */}
           <a
-            href="/dashboard/notifications"
+            href={notificationsHref}
             style={{
               display: 'block',
               padding: '12px 16px',

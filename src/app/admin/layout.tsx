@@ -7,11 +7,15 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { AdminSidebarWrapper } from '@/components/AdminSidebarWrapper'
 import { PartnerCallProvider } from '@/lib/contexts/PartnerCallContext'
+import { MemberCallProvider } from '@/lib/contexts/MemberCallContext'
+import { generateMeetingCode } from '@/lib/utils/meetingCode'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [fullName, setFullName] = useState('')
   const [userId, setUserId] = useState('')
+  const [roleLabel, setRoleLabel] = useState('Super Admin')
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -22,16 +26,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (!session?.user) { window.location.href = '/login'; return }
 
       const { data: profile } = await supabase.from('profiles').select('role, full_name').eq('id', session.user.id).single()
-      if (!profile || profile.role !== 'super_admin') {
+      if (!profile || (profile.role !== 'super_admin' && profile.role !== 'admin')) {
         window.location.href = '/dashboard'
         return
       }
       setFullName(profile.full_name || '')
+      setRoleLabel(profile.role === 'super_admin' ? 'Super Admin' : 'Admin')
+      setIsSuperAdmin(profile.role === 'super_admin')
       setUserId(session.user.id)
       setLoading(false)
     }
     checkAuth()
   }, [])
+
+  function startMeeting() {
+    router.push(`/meet/${generateMeetingCode()}`)
+  }
 
   if (loading) {
     return (
@@ -87,27 +97,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               fontSize: '10px', letterSpacing: '3px',
               textTransform: 'uppercase' as const, color: '#e6c364',
               opacity: 0.4, marginTop: '4px', display: 'block',
-            }}>Super Admin</span>
+            }}>{roleLabel}</span>
           </div>
         </Link>
       </div>
 
-      {/* View Main Site / Go to Dashboard */}
+      {/* View Main Site */}
       <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-outline-variant, #4d4637)', display: 'flex', flexDirection: 'column' }}>
         <Link href="/" className="admin-nav-link" style={{ opacity: 0.5, fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', padding: '6px 16px' }}>
           <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>arrow_back</span>
           View Main Site
-        </Link>
-        <Link href="/dashboard" className="admin-nav-link" style={{ opacity: 0.7, fontSize: '11px', letterSpacing: '1.5px', textTransform: 'uppercase', padding: '6px 16px', color: '#e6c364' }}>
-          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>space_dashboard</span>
-          Go to Dashboard
         </Link>
       </div>
 
       {/* Navigation */}
       <div style={{ flex: 1, padding: '16px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1px' }}>
         <NavLink href="/admin" label="Overview" icon="dashboard" />
+        <NavLink href="/admin/registrant-messages" label="Live Chat" icon="support_agent" />
+        {isSuperAdmin && (
+          <button onClick={startMeeting} className="admin-nav-link" style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>videocam</span>
+            Start a Meeting
+          </button>
+        )}
         <NavLink href="/admin/analytics" label="Analytics" icon="analytics" />
+        <NavLink href="/admin/notifications" label="Notifications" icon="notifications" />
+        <NavLink href="/admin/membership-card" label="Membership Card" icon="card_membership" />
 
         <SectionHeader label="Members" />
         <NavLink href="/admin/kyc" label="KYC Review" icon="verified_user" />
@@ -124,14 +139,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <SectionHeader label="Partner Network" />
         <NavLink href="/admin/partners" label="Partners" icon="handshake" />
         <NavLink href="/admin/partner-opportunities" label="Opportunities" icon="work" />
-        <NavLink href="/admin/partner-messages" label="Partner Messages" icon="mark_email_unread" />
 
         <SectionHeader label="Real Estate" />
         <NavLink href="/admin/properties" label="Properties" icon="apartment" />
 
         <SectionHeader label="Communication" />
         <NavLink href="/admin/property-chats" label="Property Chats" icon="maps_home_work" />
-        <NavLink href="/admin/registrant-messages" label="Registrant Messages" icon="support_agent" />
         <NavLink href="/admin/contacts" label="Contacts" icon="contacts" />
 
         <SectionHeader label="Content" />
@@ -145,6 +158,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <SectionHeader label="System" />
         <NavLink href="/admin/settings" label="Settings" icon="settings" />
+        <NavLink href="/admin/account" label="Account & Security" icon="lock" />
+        <NavLink href="/admin/history" label="History" icon="history" />
         <NavLink href="/admin/audit-log" label="Audit Log" icon="history" />
       </div>
 
@@ -154,6 +169,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         borderTop: '1px solid var(--color-outline-variant, #4d4637)',
         display: 'flex', flexDirection: 'column', gap: '10px',
       }}>
+        <Link href="/admin/my-enquiries/new" className="raleway-text" style={{ fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', color: '#e6c364', opacity: 0.5, textDecoration: 'none' }}>+ New Enquiry</Link>
         <p className="raleway-text" style={{ fontSize: '12px', color: '#e5e2e1', opacity: 0.4, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName}</p>
         <form action="/api/auth/signout" method="POST">
           <button type="submit" className="admin-signout-btn raleway-text" style={{
@@ -168,9 +184,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <PartnerCallProvider userId={userId} userName={fullName}>
-        <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
-          {children}
-        </AdminSidebarWrapper>
+        <MemberCallProvider userId={userId} userName={fullName} canManageGroup={isSuperAdmin}>
+          <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
+            {children}
+          </AdminSidebarWrapper>
+        </MemberCallProvider>
       </PartnerCallProvider>
 
       <style>{`

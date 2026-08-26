@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { NotificationBell } from '@/components/NotificationBell'
+import { MemberOwnCallProvider } from '@/lib/contexts/MemberOwnCallContext'
 
 interface Profile {
   full_name: string
@@ -15,6 +16,7 @@ interface Profile {
 
 export default function MemberDashboardLayout({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [userId, setUserId] = useState('')
   const [loading, setLoading] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const router = useRouter()
@@ -53,6 +55,7 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
       if (prof.status !== 'approved') { window.location.href = '/pending'; return }
 
       setProfile(prof)
+      setUserId(session.user.id)
       setLoading(false)
     }
     checkAuth()
@@ -80,7 +83,6 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
   const isAdminRole = profile.role === 'admin' || profile.role === 'super_admin'
   const isRealEstatePartner = profile.role === 'real_estate_partner'
   const isRegistrant = ['worker', 'employer', 'oep_partner'].includes(profile.role)
-  const canLiveChat = ['employer', 'oep_partner'].includes(profile.role)
 
   const portalLabels: Record<string, string> = {
     worker: 'Worker Portal',
@@ -96,12 +98,12 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
         { href: '/dashboard', label: 'Overview', icon: 'dashboard' },
         ...(!isRegistrant ? [{ href: '/dashboard/membership-card', label: 'Membership Card', icon: 'card_membership' }] : []),
         { href: '/dashboard/notifications', label: 'Notifications', icon: 'notifications' },
+        ...(!isAdminRole ? [{ href: '/dashboard/messages', label: 'Live Chat', icon: 'chat' }] : []),
       ],
     },
     ...(isRegistrant ? [{
       links: [
         { href: '/dashboard/registration', label: 'My Registration', icon: 'assignment_ind' },
-        ...(canLiveChat ? [{ href: '/dashboard/messages', label: 'Live Chat', icon: 'chat' }] : []),
       ],
     }] : []),
     ...(!isRegistrant ? [{
@@ -141,6 +143,7 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
   ]
 
   return (
+    <MemberOwnCallProvider userId={userId} userName={profile.full_name}>
     <div className="min-h-screen flex">
       {/* Mobile backdrop */}
       {sidebarOpen && (
@@ -367,5 +370,6 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
         }
       `}</style>
     </div>
+    </MemberOwnCallProvider>
   )
 }

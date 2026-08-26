@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
           type: 'new_message',
           title: 'New Message',
           body: `You have a new message on enquiry ${enquiry.reference_number}.`,
-          link: `/portal/enquiries/${enquiryId}`,
+          link: `/dashboard/enquiries/${enquiryId}`,
           is_read: false,
         })
       }

@@ -111,6 +111,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/partner-network', request.url))
   }
 
+  // Admin/super_admin's home is /admin — bounce bare /dashboard there so
+  // there's a single landing portal instead of two competing ones.
+  if (pathname === '/dashboard' && (profile.role === 'admin' || profile.role === 'super_admin')) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
+
   // /dashboard — approved members, admins, and investment partners
   // /sectors, /services, /investments — approved users
   // These are all allowed for approved users, no extra check needed

@@ -4,6 +4,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useMemberOwnCall } from '@/lib/contexts/MemberOwnCallContext'
+
+const STAFF_OR_PARTNER_ROLES = ['admin', 'super_admin', 'partner']
 
 interface Message {
   id: string
@@ -23,13 +26,14 @@ export default function RegistrantMessagesPage() {
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const memberOwnCall = useMemberOwnCall()
 
   useEffect(() => {
     async function init() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.user) { router.push('/login'); return }
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
-      if (!profile || !['employer', 'oep_partner'].includes(profile.role)) {
+      if (!profile || STAFF_OR_PARTNER_ROLES.includes(profile.role)) {
         router.push('/dashboard')
         return
       }
@@ -99,9 +103,32 @@ export default function RegistrantMessagesPage() {
 
   if (loading) return <div className="text-on-surface-variant py-12 text-center">Loading messages...</div>
 
+  const admin = memberOwnCall?.admin
+  const chatId = memberOwnCall?.chatId
+
   return (
     <div>
-      <h1 className="cinzel-text text-2xl text-on-surface mb-6">Live Chat</h1>
+      <div className="flex items-center justify-between gap-2 mb-6">
+        <h1 className="cinzel-text text-2xl text-on-surface">Live Chat</h1>
+        {admin && chatId && (
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={() => memberOwnCall?.call.initiateCall(admin.id, admin.full_name, 'voice')}
+              className="w-9 h-9 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
+              title="Voice call"
+            >
+              <span className="material-symbols-outlined text-primary" style={{ fontSize: '18px' }}>call</span>
+            </button>
+            <button
+              onClick={() => memberOwnCall?.call.initiateCall(admin.id, admin.full_name, 'video')}
+              className="w-9 h-9 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors"
+              title="Video call"
+            >
+              <span className="material-symbols-outlined text-primary" style={{ fontSize: '18px' }}>videocam</span>
+            </button>
+          </div>
+        )}
+      </div>
       {error && <div className="bg-red-500/10 border border-red-500/20 px-4 py-3 mb-6"><p className="text-sm text-red-400">{error}</p></div>}
 
       <div className="bg-surface-container border border-outline-variant/10 flex flex-col h-[550px]">

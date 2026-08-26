@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { ChatPanel } from '@/components/chat/ChatPanel'
 import { openFile } from '@/lib/utils/openFile'
@@ -75,6 +75,10 @@ export default function EnquiryDetailPage() {
   const [resolving, setResolving] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const pathname = usePathname()
+  // This page also renders at /admin/my-enquiries/[id] via a re-export —
+  // keep the "back" links scoped to whichever portal shell it's viewed under.
+  const basePath = pathname?.startsWith('/admin') ? '/admin/my-enquiries' : '/dashboard/enquiries'
 
   useEffect(() => {
     async function load() {
@@ -164,7 +168,7 @@ export default function EnquiryDetailPage() {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <p className="text-error mb-4">{error || 'Enquiry not found'}</p>
-          <Link href="/dashboard/enquiries" className="text-sm text-primary hover:underline no-underline">
+          <Link href={basePath} className="text-sm text-primary hover:underline no-underline">
             &larr; Back to Enquiries
           </Link>
         </div>
@@ -177,7 +181,7 @@ export default function EnquiryDetailPage() {
   return (
     <>
       <Link
-        href="/dashboard/enquiries"
+        href={basePath}
         className="text-sm text-on-surface-variant/50 hover:text-primary transition-colors mb-6 inline-block raleway-text no-underline"
       >
         &larr; Back to Enquiries
