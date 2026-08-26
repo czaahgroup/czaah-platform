@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { AdminSidebarWrapper } from '@/components/AdminSidebarWrapper'
 import { PartnerCallProvider } from '@/lib/contexts/PartnerCallContext'
 import { MemberCallProvider } from '@/lib/contexts/MemberCallContext'
+import { StaffCallProvider } from '@/lib/contexts/StaffCallContext'
 import { NewMeetingMenu } from '@/components/NewMeetingMenu'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -135,7 +136,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <SectionHeader label="Communication" />
         <NavLink href="/admin/property-chats" label="Property Chats" icon="maps_home_work" />
-        <NavLink href="/admin/contacts" label="Contacts" icon="contacts" />
 
         <SectionHeader label="Content" />
         <NavLink href="/admin/content/sectors" label="Sectors" icon="category" />
@@ -147,6 +147,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/content/investments/pending" label="Pending Deals" icon="hourglass_top" />
 
         <SectionHeader label="System" />
+        <NavLink href="/admin/contacts" label="Team Tools" icon="groups" />
         <NavLink href="/admin/settings" label="Settings" icon="settings" />
         <NavLink href="/admin/account" label="Account & Security" icon="lock" />
         <NavLink href="/admin/history" label="History" icon="history" />
@@ -175,9 +176,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <>
       <PartnerCallProvider userId={userId} userName={fullName}>
         <MemberCallProvider userId={userId} userName={fullName} canManageGroup={isSuperAdmin}>
-          <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
-            {children}
-          </AdminSidebarWrapper>
+          <StaffCallProvider userId={userId} userName={fullName}>
+            <AdminSidebarWrapper sidebar={sidebarContent} userName={fullName}>
+              {children}
+            </AdminSidebarWrapper>
+          </StaffCallProvider>
         </MemberCallProvider>
       </PartnerCallProvider>
 

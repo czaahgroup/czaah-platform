@@ -5,12 +5,14 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useMemberCall } from '@/lib/contexts/MemberCallContext'
 import { usePartnerCall } from '@/lib/contexts/PartnerCallContext'
+import { useStaffCall } from '@/lib/contexts/StaffCallContext'
 
-// One inbox for every contact — regular members (all account roles) AND
-// Partner Network partners — so there's a single place to message or call
-// anyone, instead of two separate pages backed by two separate tables
-// (registrant_chats vs partner_chats).
-type ContactKind = 'member' | 'partner'
+// One inbox for every contact — regular members (all account roles),
+// Partner Network partners, AND fellow staff (admin/super_admin) — so
+// there's a single place to message or call anyone, instead of separate
+// pages backed by separate tables (registrant_chats, partner_chats,
+// admin_chats).
+type ContactKind = 'member' | 'partner' | 'staff'
 
 interface RegistrantChat {
   id: string
@@ -25,8 +27,22 @@ interface PartnerChat {
   partners: { profile_id: string | null; profiles: { full_name: string; email: string } | null } | null
 }
 
+interface StaffProfile {
+  id: string
+  full_name: string
+  role: string
+}
+
+interface StaffChat {
+  id: string
+  other_user_id: string
+  last_message_at: string | null
+}
+
 interface Contact {
-  chatId: string
+  // null for a staff colleague you haven't started a chat with yet — the
+  // chat is created lazily the first time you open them.
+  chatId: string | null
   kind: ContactKind
   name: string
   subLabel: string
@@ -36,7 +52,7 @@ interface Contact {
 
 interface Message {
   id: string
-  chat_id: string
+  chat_id?: string
   sender_id: string
   content: string
   created_at: string
@@ -51,8 +67,14 @@ const roleLabels: Record<string, string> = {
   oep_partner: 'Employment Promoter',
 }
 
-function endpointFor(kind: ContactKind) {
-  return kind === 'partner' ? '/api/admin/partner-messages' : '/api/admin/registrant-messages'
+function contactKey(kind: ContactKind, profileId: string | null, chatId: string | null) {
+  return `${kind}:${profileId || chatId}`
+}
+
+function messagesUrl(kind: ContactKind, chatId: string) {
+  if (kind === 'staff') return `/api/admin/contacts/${chatId}`
+  if (kind === 'partner') return `/api/admin/partner-messages?chat_id=${chatId}`
+  return `/api/admin/registrant-messages?chat_id=${chatId}`
 }
 
 function formatTime(dateStr: string): string {
@@ -71,8 +93,9 @@ export default function AdminLiveChatPage() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
-  const [selectedKind, setSelectedKind] = useState<ContactKind | null>(null)
+  const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [activeChatId, setActiveChatId] = useState<string | null>(null)
+  const [activeKind, setActiveKind] = useState<ContactKind | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [loadingMessages, setLoadingMessages] = useState(false)
   const [reply, setReply] = useState('')
@@ -82,8 +105,9 @@ export default function AdminLiveChatPage() {
   const [clearingHistory, setClearingHistory] = useState(false)
   const memberCall = useMemberCall()
   const partnerCall = usePartnerCall()
+  const staffCall = useStaffCall()
 
-  const selectedContact = contacts.find((c) => c.chatId === selectedChatId) || null
+  const selectedContact = contacts.find((c) => contactKey(c.kind, c.profileId, c.chatId) === selectedKey) || null
 
   useEffect(() => {
     loadContacts()
@@ -100,12 +124,14 @@ export default function AdminLiveChatPage() {
 
   async function loadContacts() {
     try {
-      const [registrantRes, partnerRes] = await Promise.all([
+      const [registrantRes, partnerRes, staffRes] = await Promise.all([
         fetch('/api/admin/registrant-messages'),
         fetch('/api/admin/partner-messages'),
+        fetch('/api/admin/contacts'),
       ])
       const registrantJson = registrantRes.ok ? await registrantRes.json() : { data: [] }
       const partnerJson = partnerRes.ok ? await partnerRes.json() : { data: [] }
+      const staffJson = staffRes.ok ? await staffRes.json() : { data: { admins: [], chats: [] } }
 
       const memberContacts: Contact[] = ((registrantJson.data || []) as RegistrantChat[]).map((c) => ({
         chatId: c.id,
@@ -125,7 +151,22 @@ export default function AdminLiveChatPage() {
         profileId: c.partners?.profile_id || null,
       }))
 
-      const combined = [...memberContacts, ...partnerContacts].sort((a, b) => {
+      const staffAdmins: StaffProfile[] = staffJson.data?.admins || []
+      const staffChats: StaffChat[] = staffJson.data?.chats || []
+      const staffChatByUser = new Map(staffChats.map((c) => [c.other_user_id, c]))
+      const staffContacts: Contact[] = staffAdmins.map((a) => {
+        const chat = staffChatByUser.get(a.id)
+        return {
+          chatId: chat?.id || null,
+          kind: 'staff' as const,
+          name: a.full_name,
+          subLabel: a.role === 'super_admin' ? 'Super Admin' : 'Admin',
+          lastMessageAt: chat?.last_message_at || null,
+          profileId: a.id,
+        }
+      })
+
+      const combined = [...memberContacts, ...partnerContacts, ...staffContacts].sort((a, b) => {
         if (!a.lastMessageAt && !b.lastMessageAt) return 0
         if (!a.lastMessageAt) return 1
         if (!b.lastMessageAt) return -1
@@ -140,15 +181,30 @@ export default function AdminLiveChatPage() {
     }
   }
 
-  async function openChat(chatId: string, kind: ContactKind) {
-    setSelectedChatId(chatId)
-    setSelectedKind(kind)
+  async function openChat(contact: Contact) {
+    const key = contactKey(contact.kind, contact.profileId, contact.chatId)
+    setSelectedKey(key)
     setLoadingMessages(true)
     try {
-      const res = await fetch(`${endpointFor(kind)}?chat_id=${chatId}`)
+      let chatId = contact.chatId
+      if (contact.kind === 'staff' && !chatId) {
+        const res = await fetch('/api/admin/contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetId: contact.profileId }),
+        })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Failed to open chat')
+        chatId = json.data.id
+        setContacts((prev) => prev.map((c) => (contactKey(c.kind, c.profileId, c.chatId) === key ? { ...c, chatId } : c)))
+      }
+      setActiveChatId(chatId)
+      setActiveKind(contact.kind)
+
+      const res = await fetch(messagesUrl(contact.kind, chatId!))
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to load thread')
-      setMessages(json.data || [])
+      setMessages(contact.kind === 'staff' ? json.data.messages || [] : json.data || [])
       await loadContacts()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load thread')
@@ -158,13 +214,15 @@ export default function AdminLiveChatPage() {
   }
 
   async function sendReply() {
-    if (!reply.trim() || !selectedChatId || !selectedKind || sending) return
+    if (!reply.trim() || !activeChatId || !activeKind || sending) return
     setSending(true)
     try {
-      const res = await fetch(endpointFor(selectedKind), {
+      const url = activeKind === 'staff' ? `/api/admin/contacts/${activeChatId}/messages` : activeKind === 'partner' ? '/api/admin/partner-messages' : '/api/admin/registrant-messages'
+      const body = activeKind === 'staff' ? { content: reply.trim() } : { chatId: activeChatId, content: reply.trim() }
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatId: selectedChatId, content: reply.trim() }),
+        body: JSON.stringify(body),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to send')
@@ -178,11 +236,12 @@ export default function AdminLiveChatPage() {
   }
 
   async function clearHistory() {
-    if (!selectedChatId || !selectedKind) return
+    if (!activeChatId || !activeKind || activeKind === 'staff') return
     if (!window.confirm('Permanently delete this entire conversation history? This cannot be undone.')) return
     setClearingHistory(true)
     try {
-      const res = await fetch(`${endpointFor(selectedKind)}?chat_id=${selectedChatId}`, { method: 'DELETE' })
+      const url = activeKind === 'partner' ? '/api/admin/partner-messages' : '/api/admin/registrant-messages'
+      const res = await fetch(`${url}?chat_id=${activeChatId}`, { method: 'DELETE' })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to clear history')
       setMessages([])
@@ -195,9 +254,9 @@ export default function AdminLiveChatPage() {
   }
 
   function callSelected(type: 'voice' | 'video') {
-    if (!selectedContact || !selectedContact.profileId) return
-    const ctx = selectedContact.kind === 'partner' ? partnerCall : memberCall
-    ctx?.initiateCall(selectedContact.chatId, selectedContact.profileId, selectedContact.name, type)
+    if (!selectedContact || !selectedContact.profileId || !activeChatId) return
+    const ctx = selectedContact.kind === 'partner' ? partnerCall : selectedContact.kind === 'staff' ? staffCall : memberCall
+    ctx?.initiateCall(activeChatId, selectedContact.profileId, selectedContact.name, type)
   }
 
   if (loading) {
@@ -207,7 +266,7 @@ export default function AdminLiveChatPage() {
   return (
     <div>
       <h1 className="font-[family-name:var(--font-heading)] text-2xl text-on-surface mb-6">Live Chat</h1>
-      <p className="text-on-surface-variant/60 text-sm mb-6">One inbox for every contact — members and Partner Network partners.</p>
+      <p className="text-on-surface-variant/60 text-sm mb-6">One inbox for every contact — members, Partner Network partners, and fellow staff.</p>
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 px-4 py-3 mb-6">
@@ -222,28 +281,31 @@ export default function AdminLiveChatPage() {
               <p className="text-on-surface-variant text-sm">No conversations yet — they appear here as soon as a member or partner visits their dashboard.</p>
             </div>
           ) : (
-            contacts.map((c) => (
-              <button
-                key={`${c.kind}-${c.chatId}`}
-                onClick={() => openChat(c.chatId, c.kind)}
-                className={`w-full text-left px-4 py-3 border transition-colors ${
-                  selectedChatId === c.chatId ? 'bg-surface-container-low border-primary' : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/40'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium text-on-surface truncate">{c.name}</span>
-                  <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary shrink-0">{c.subLabel}</span>
-                </div>
-                <div className="text-xs text-on-surface-variant/50 mt-1">
-                  {c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleString() : 'No messages yet'}
-                </div>
-              </button>
-            ))
+            contacts.map((c) => {
+              const key = contactKey(c.kind, c.profileId, c.chatId)
+              return (
+                <button
+                  key={key}
+                  onClick={() => openChat(c)}
+                  className={`w-full text-left px-4 py-3 border transition-colors ${
+                    selectedKey === key ? 'bg-surface-container-low border-primary' : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/40'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium text-on-surface truncate">{c.name}</span>
+                    <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary shrink-0">{c.subLabel}</span>
+                  </div>
+                  <div className="text-xs text-on-surface-variant/50 mt-1">
+                    {c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleString() : 'No messages yet'}
+                  </div>
+                </button>
+              )
+            })
           )}
         </div>
 
         <div className="lg:col-span-2">
-          {!selectedChatId ? (
+          {!selectedKey ? (
             <div className="bg-surface-container-low border border-outline-variant/10 px-6 py-16 text-center h-full flex items-center justify-center">
               <p className="text-on-surface-variant">Select a conversation to view messages.</p>
             </div>
@@ -253,7 +315,7 @@ export default function AdminLiveChatPage() {
                 <div className="flex items-center justify-between gap-2 px-5 py-3 border-b border-outline-variant/10">
                   <span className="text-sm font-medium text-on-surface truncate">{selectedContact.name}</span>
                   <div className="flex items-center gap-2 shrink-0">
-                    {selectedContact.profileId && (
+                    {selectedContact.profileId && activeChatId && (
                       <>
                         <button
                           onClick={() => callSelected('voice')}
@@ -271,7 +333,7 @@ export default function AdminLiveChatPage() {
                         </button>
                       </>
                     )}
-                    {userRole === 'super_admin' && messages.length > 0 && (
+                    {userRole === 'super_admin' && selectedContact.kind !== 'staff' && messages.length > 0 && (
                       <button
                         onClick={clearHistory}
                         disabled={clearingHistory}

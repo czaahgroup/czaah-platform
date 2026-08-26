@@ -5,39 +5,13 @@ import { useEffect, useState, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { openFile } from '@/lib/utils/openFile'
 import { VoiceNotePlayer, isVoiceNote } from '@/components/chat/VoiceNotePlayer'
-import { useVoiceRecorder } from '@/lib/hooks/useVoiceRecorder'
-import { useCall } from '@/lib/hooks/useCall'
-import type { CallType } from '@/lib/hooks/useCall'
-
-import { CallUI } from '@/components/chat/CallUI'
+import { useStaffCall } from '@/lib/contexts/StaffCallContext'
 
 interface AdminProfile {
   id: string
   full_name: string
   role: string
   avatar_url: string | null
-}
-
-interface AdminChat {
-  id: string
-  user_a_id: string
-  user_b_id: string
-  other_user_id: string
-  last_message: string | null
-  last_message_at: string | null
-  last_message_sender_id: string | null
-  unread_count: number
-}
-
-interface Message {
-  id: string
-  chat_id: string
-  sender_id: string
-  content: string | null
-  file_url: string | null
-  file_name: string | null
-  is_read: boolean
-  created_at: string
 }
 
 interface CallLogEntry {
@@ -102,31 +76,19 @@ interface BroadcastDetail {
   readers: { id: string; full_name: string; role: string; read_at: string }[]
 }
 
-type Tab = 'contacts' | 'calls' | 'groups' | 'broadcasts'
+type Tab = 'calls' | 'groups' | 'broadcasts'
 
 export default function AdminContactsPage() {
-  const [tab, setTab] = useState<Tab>('contacts')
-  const [admins, setAdmins] = useState<AdminProfile[]>([])
-  const [chats, setChats] = useState<AdminChat[]>([])
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
-  const [selectedOtherUser, setSelectedOtherUser] = useState<AdminProfile | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [tab, setTab] = useState<Tab>('groups')
   const [callHistory, setCallHistory] = useState<CallLogEntry[]>([])
-  const [loading, setLoading] = useState(true)
-  const [chatLoading, setChatLoading] = useState(false)
   const [callsLoading, setCallsLoading] = useState(false)
-  const [messageText, setMessageText] = useState('')
-  const [sending, setSending] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
-  const [userName, setUserName] = useState<string>('Admin')
   const [userRole, setUserRole] = useState<string>('admin')
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
   const groupMessagesEndRef = useRef<HTMLDivElement>(null)
   const groupMessagesContainerRef = useRef<HTMLDivElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const groupFileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+  const staffCall = useStaffCall()
 
   // Group chat state
   const [groups, setGroups] = useState<GroupChat[]>([])
@@ -156,20 +118,6 @@ export default function AdminContactsPage() {
   const [selectedBroadcast, setSelectedBroadcast] = useState<BroadcastDetail | null>(null)
   const [broadcastDetailLoading, setBroadcastDetailLoading] = useState(false)
 
-  const {
-    isRecording,
-    recordingDuration,
-    startRecording,
-    stopRecording,
-    cancelRecording,
-  } = useVoiceRecorder()
-
-  function formatRecordingTime(seconds: number): string {
-    const m = Math.floor(seconds / 60)
-    const s = seconds % 60
-    return `${m}:${s.toString().padStart(2, '0')}`
-  }
-
   // Auth
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -178,34 +126,13 @@ export default function AdminContactsPage() {
       if (uid) {
         const { data: prof } = await supabase
           .from('profiles')
-          .select('full_name, role')
+          .select('role')
           .eq('id', uid)
           .single()
-        if (prof?.full_name) setUserName(prof.full_name)
         if (prof?.role) setUserRole(prof.role)
       }
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Load contacts and chats
-  const loadContacts = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/contacts')
-      if (res.ok) {
-        const json = await res.json()
-        setAdmins(json.data.admins || [])
-        setChats(json.data.chats || [])
-      }
-    } catch (err) {
-      console.error('Failed to load contacts:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    loadContacts()
-  }, [loadContacts])
 
   // Load call history
   const loadCallHistory = useCallback(async () => {
@@ -227,234 +154,6 @@ export default function AdminContactsPage() {
     if (tab === 'calls') loadCallHistory()
   }, [tab, loadCallHistory])
 
-  // Call hook
-  const handleCallEnded = useCallback(async (durationSeconds: number, type: CallType) => {
-    if (!selectedChatId) return
-    const m = Math.floor(durationSeconds / 60).toString().padStart(2, '0')
-    const s = (durationSeconds % 60).toString().padStart(2, '0')
-    const label = type === 'video' ? 'Video call' : 'Voice call'
-    try {
-      const res = await fetch(`/api/admin/contacts/${selectedChatId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: `${label} \u2014 ${m}:${s}` }),
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setMessages((prev) => {
-          if (prev.some((msg) => msg.id === json.data.id)) return prev
-          return [...prev, json.data]
-        })
-      }
-    } catch (err) {
-      console.error('Failed to log call message:', err)
-    }
-  }, [selectedChatId])
-
-  const call = useCall({
-    currentUserId: userId || '',
-    currentUserName: userName,
-    channelPrefix: 'admin-call',
-    chatId: selectedChatId || '',
-    chatContextType: 'admin',
-    chatContextId: selectedChatId || undefined,
-    onCallEnded: handleCallEnded,
-  })
-
-  // Load single chat
-  const loadChat = useCallback(async (chatId: string) => {
-    setChatLoading(true)
-    try {
-      const res = await fetch(`/api/admin/contacts/${chatId}`)
-      if (res.ok) {
-        const json = await res.json()
-        setMessages(json.data.messages || [])
-        setSelectedOtherUser(json.data.otherUser || null)
-        loadContacts()
-      }
-    } catch (err) {
-      console.error('Failed to load chat:', err)
-    } finally {
-      setChatLoading(false)
-    }
-  }, [loadContacts])
-
-  useEffect(() => {
-    if (selectedChatId) loadChat(selectedChatId)
-  }, [selectedChatId, loadChat])
-
-  useEffect(() => {
-    if (messagesContainerRef.current) { messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight }
-  }, [messages])
-
-  // Real-time subscription for current chat
-  useEffect(() => {
-    if (!selectedChatId) return
-
-    const channel = supabase
-      .channel(`admin-messages-${selectedChatId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'admin_messages',
-          filter: `chat_id=eq.${selectedChatId}`,
-        },
-        (payload) => {
-          const newMessage = payload.new as Message
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === newMessage.id)) return prev
-            return [...prev, newMessage]
-          })
-          if (newMessage.sender_id !== userId) {
-            fetch(`/api/admin/contacts/${selectedChatId}`).catch(() => {})
-          }
-          loadContacts()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [selectedChatId, userId, supabase, loadContacts])
-
-  // Global subscription for unread updates
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin-messages-global')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'admin_messages',
-        },
-        () => {
-          loadContacts()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [supabase, loadContacts])
-
-  // Start or open chat with an admin
-  async function startChat(targetId: string) {
-    // Check if chat already exists
-    const existing = chats.find((c) => c.other_user_id === targetId)
-    if (existing) {
-      setSelectedChatId(existing.id)
-      return
-    }
-
-    try {
-      const res = await fetch('/api/admin/contacts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetId }),
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setSelectedChatId(json.data.id)
-        await loadContacts()
-      }
-    } catch (err) {
-      console.error('Failed to start chat:', err)
-    }
-  }
-
-  async function handleSendMessage() {
-    if (!messageText.trim() || !selectedChatId || sending) return
-    setSending(true)
-    try {
-      const res = await fetch(`/api/admin/contacts/${selectedChatId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: messageText.trim() }),
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === json.data.id)) return prev
-          return [...prev, json.data]
-        })
-        setMessageText('')
-      }
-    } catch (err) {
-      console.error('Failed to send message:', err)
-    } finally {
-      setSending(false)
-    }
-  }
-
-  async function handleFileAttach(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !selectedChatId) return
-
-    setSending(true)
-    try {
-      const buffer = await file.arrayBuffer()
-      const base64 = btoa(
-        new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-      )
-
-      const res = await fetch(`/api/admin/contacts/${selectedChatId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileData: base64, fileName: file.name }),
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === json.data.id)) return prev
-          return [...prev, json.data]
-        })
-      }
-    } catch (err) {
-      console.error('Failed to upload file:', err)
-    } finally {
-      setSending(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
-    }
-  }
-
-  async function handleVoiceRecordToggle() {
-    if (isRecording) {
-      const file = await stopRecording()
-      if (file && selectedChatId) {
-        setSending(true)
-        try {
-          const buffer = await file.arrayBuffer()
-          const base64 = btoa(
-            new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-          )
-          const res = await fetch(`/api/admin/contacts/${selectedChatId}/messages`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileData: base64, fileName: file.name }),
-          })
-          if (res.ok) {
-            const json = await res.json()
-            setMessages((prev) => {
-              if (prev.some((m) => m.id === json.data.id)) return prev
-              return [...prev, json.data]
-            })
-          }
-        } catch (err) {
-          console.error('Failed to send voice note:', err)
-        } finally {
-          setSending(false)
-        }
-      }
-    } else {
-      await startRecording()
-    }
-  }
-
   function formatTime(dateStr: string) {
     const d = new Date(dateStr)
     const now = new Date()
@@ -475,44 +174,27 @@ export default function AdminContactsPage() {
     return name.charAt(0).toUpperCase()
   }
 
-  // Build the admin list with chat info merged
-  function getAdminWithChat(admin: AdminProfile) {
-    const chat = chats.find((c) => c.other_user_id === admin.id)
-    return { admin, chat }
-  }
-
-  // For call history: call back
-  function handleCallBack(entry: CallLogEntry) {
+  // For call history: call back — places the call through the global
+  // staff call context (see StaffCallContext) so it rings from anywhere
+  // in /admin, not just this page. admin_chats is find-or-create on the
+  // server, so this never needs its own local chat list.
+  async function handleCallBack(entry: CallLogEntry) {
     const otherId = entry.caller_id === userId ? entry.receiver_id : entry.caller_id
     const otherName = entry.caller_id === userId
       ? entry.receiver?.full_name || 'Unknown'
       : entry.caller?.full_name || 'Unknown'
 
-    // Find or create a chat, then initiate call
-    const existingChat = chats.find((c) => c.other_user_id === otherId)
-    if (existingChat) {
-      setSelectedChatId(existingChat.id)
-      setTab('contacts')
-      setTimeout(() => {
-        call.initiateCall(otherId, otherName, entry.call_type)
-      }, 500)
-    } else {
-      // Create chat first
-      fetch('/api/admin/contacts', {
+    try {
+      const res = await fetch('/api/admin/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetId: otherId }),
-      }).then(async (res) => {
-        if (res.ok) {
-          const json = await res.json()
-          setSelectedChatId(json.data.id)
-          setTab('contacts')
-          await loadContacts()
-          setTimeout(() => {
-            call.initiateCall(otherId, otherName, entry.call_type)
-          }, 500)
-        }
-      }).catch(console.error)
+      })
+      if (!res.ok) return
+      const json = await res.json()
+      staffCall?.initiateCall(json.data.id, otherId, otherName, entry.call_type)
+    } catch (err) {
+      console.error('Failed to call back:', err)
     }
   }
 
@@ -843,7 +525,7 @@ export default function AdminContactsPage() {
         margin: '0 0 24px 0',
         letterSpacing: '2px',
       }}>
-        Admin Contacts
+        Team Tools
       </h1>
 
       {/* Tabs */}
@@ -852,25 +534,6 @@ export default function AdminContactsPage() {
         gap: '0',
         marginBottom: '16px',
       }}>
-        <button
-          onClick={() => setTab('contacts')}
-          style={{
-            padding: '10px 24px',
-            background: tab === 'contacts' ? 'rgba(201,168,76,0.1)' : 'transparent',
-            border: '1px solid rgba(255,255,255,0.06)',
-            borderBottom: tab === 'contacts' ? '2px solid #C9A84C' : '1px solid rgba(255,255,255,0.06)',
-            borderRadius: 0,
-            cursor: 'pointer',
-            fontFamily: "'Raleway', sans-serif",
-            fontSize: '13px',
-            fontWeight: tab === 'contacts' ? 600 : 400,
-            color: tab === 'contacts' ? '#C9A84C' : 'rgba(255,255,255,0.5)',
-            letterSpacing: '1px',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          Contacts
-        </button>
         <button
           onClick={() => setTab('calls')}
           style={{
@@ -1490,7 +1153,7 @@ export default function AdminContactsPage() {
             </div>
           )}
         </div>
-      ) : tab === 'calls' ? (
+      ) : (
         /* ========== CALLS TAB ========== */
         <div style={{
           background: '#080808',
@@ -1701,728 +1364,6 @@ export default function AdminContactsPage() {
               )
             })
           )}
-        </div>
-      ) : (
-        /* ========== CONTACTS TAB ========== */
-        <div style={{
-          display: 'flex',
-          height: 'calc(100vh - 240px)',
-          background: '#080808',
-          borderRadius: 0,
-          border: '1px solid rgba(255,255,255,0.06)',
-          overflow: 'hidden',
-        }}>
-          {/* Left Panel - Admin List */}
-          <div style={{
-            width: '340px',
-            borderRight: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            flexDirection: 'column',
-            flexShrink: 0,
-          }}>
-            <div style={{
-              padding: '14px 16px',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
-            }}>
-              <p style={{
-                fontFamily: "'Cinzel', serif",
-                fontSize: '12px',
-                letterSpacing: '2px',
-                color: 'rgba(201,168,76,0.5)',
-                textTransform: 'uppercase',
-                margin: 0,
-              }}>
-                Team Members
-              </p>
-            </div>
-
-            <div style={{ flex: 1, overflowY: 'auto' }}>
-              {loading ? (
-                <div style={{
-                  padding: '40px 16px',
-                  textAlign: 'center',
-                  fontFamily: "'Raleway', sans-serif",
-                  fontSize: '13px',
-                  color: 'rgba(255,255,255,0.4)',
-                }}>
-                  Loading...
-                </div>
-              ) : admins.length === 0 ? (
-                <div style={{
-                  padding: '40px 16px',
-                  textAlign: 'center',
-                }}>
-                  <p style={{
-                    fontFamily: "'Cinzel', serif",
-                    fontSize: '14px',
-                    color: 'rgba(255,255,255,0.5)',
-                    marginBottom: '8px',
-                  }}>
-                    No other admins
-                  </p>
-                  <p style={{
-                    fontFamily: "'Raleway', sans-serif",
-                    fontSize: '12px',
-                    color: 'rgba(255,255,255,0.3)',
-                  }}>
-                    Other admin team members will appear here
-                  </p>
-                </div>
-              ) : (
-                admins.map((admin) => {
-                  const { chat } = getAdminWithChat(admin)
-                  const isSelected = chat && selectedChatId === chat.id
-
-                  return (
-                    <div
-                      key={admin.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px 16px',
-                        background: isSelected ? 'rgba(201,168,76,0.05)' : 'transparent',
-                        borderBottom: '1px solid rgba(255,255,255,0.04)',
-                        borderLeft: isSelected ? '2px solid rgba(201,168,76,0.6)' : '2px solid transparent',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                      onClick={() => startChat(admin.id)}
-                      onMouseEnter={(e) => {
-                        if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.02)'
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isSelected) e.currentTarget.style.background = 'transparent'
-                      }}
-                    >
-                      {/* Avatar */}
-                      <div style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        background: 'rgba(201,168,76,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}>
-                        <span style={{
-                          fontFamily: "'Cinzel', serif",
-                          fontSize: '16px',
-                          color: '#C9A84C',
-                        }}>
-                          {getInitial(admin.full_name)}
-                        </span>
-                      </div>
-
-                      {/* Name + info */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{
-                            fontFamily: "'Raleway', sans-serif",
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            color: '#fff',
-                          }}>
-                            {admin.full_name}
-                          </span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {chat && chat.unread_count > 0 && (
-                              <span style={{
-                                background: '#C9A84C',
-                                color: '#000',
-                                fontSize: '10px',
-                                fontWeight: 700,
-                                padding: '1px 6px',
-                                borderRadius: 0,
-                                fontFamily: "'Raleway', sans-serif",
-                              }}>
-                                {chat.unread_count}
-                              </span>
-                            )}
-                            {chat?.last_message_at && (
-                              <span style={{
-                                fontFamily: "'Raleway', sans-serif",
-                                fontSize: '10px',
-                                color: 'rgba(255,255,255,0.3)',
-                              }}>
-                                {formatTime(chat.last_message_at)}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                          <span style={{
-                            fontFamily: "'Raleway', sans-serif",
-                            fontSize: '10px',
-                            color: 'rgba(201,168,76,0.4)',
-                            textTransform: 'capitalize',
-                          }}>
-                            {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
-                          </span>
-                        </div>
-                        {chat?.last_message && (
-                          <p style={{
-                            fontFamily: "'Raleway', sans-serif",
-                            fontSize: '12px',
-                            color: 'rgba(255,255,255,0.4)',
-                            margin: '4px 0 0 0',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}>
-                            {chat.last_message}
-                          </p>
-                        )}
-                        {!chat && (
-                          <p style={{
-                            fontFamily: "'Raleway', sans-serif",
-                            fontSize: '11px',
-                            color: 'rgba(201,168,76,0.3)',
-                            margin: '4px 0 0 0',
-                            fontStyle: 'italic',
-                          }}>
-                            Start a conversation
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Call buttons */}
-                      <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            startChat(admin.id).then(() => {
-                              // Need to wait a tick for selectedChatId to update
-                            })
-                            // If chat exists, call directly
-                            if (chat) {
-                              setSelectedChatId(chat.id)
-                              setTimeout(() => {
-                                call.initiateCall(admin.id, admin.full_name, 'voice')
-                              }, 300)
-                            }
-                          }}
-                          disabled={call.callState !== 'idle'}
-                          style={{
-                            background: 'none',
-                            border: '1px solid rgba(201,168,76,0.2)',
-                            borderRadius: 0,
-                            padding: '4px 6px',
-                            cursor: call.callState === 'idle' ? 'pointer' : 'default',
-                            opacity: call.callState === 'idle' ? 1 : 0.3,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.2s ease',
-                          }}
-                          title="Voice call"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="#C9A84C">
-                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            if (chat) {
-                              setSelectedChatId(chat.id)
-                              setTimeout(() => {
-                                call.initiateCall(admin.id, admin.full_name, 'video')
-                              }, 300)
-                            }
-                          }}
-                          disabled={call.callState !== 'idle'}
-                          style={{
-                            background: 'none',
-                            border: '1px solid rgba(201,168,76,0.2)',
-                            borderRadius: 0,
-                            padding: '4px 6px',
-                            cursor: call.callState === 'idle' ? 'pointer' : 'default',
-                            opacity: call.callState === 'idle' ? 1 : 0.3,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'all 0.2s ease',
-                          }}
-                          title="Video call"
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="23 7 16 12 23 17 23 7" fill="#C9A84C" />
-                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  )
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Right Panel - Chat View */}
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            background: '#000',
-            position: 'relative',
-          }}>
-            {/* Call UI overlay */}
-            {selectedChatId && userId && (
-              <CallUI
-                callState={call.callState}
-                callType={call.callType}
-                callDuration={call.callDuration}
-                isMuted={call.isMuted}
-                isVideoOff={call.isVideoOff}
-                participants={call.participants}
-                localStream={call.localStream}
-                callerName={call.callerName}
-                callerType={call.callerType}
-                onAccept={call.acceptCall}
-                onDecline={call.declineCall}
-                onEndCall={call.endCall}
-                onToggleMute={call.toggleMute}
-                onToggleVideo={call.toggleVideo}
-                onRejoin={call.rejoinCall}
-                canRejoin={call.canRejoin}
-              />
-            )}
-
-            {!selectedChatId ? (
-              <div style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-              }}>
-                <p style={{
-                  fontFamily: "'Cinzel', serif",
-                  fontSize: '16px',
-                  color: 'rgba(255,255,255,0.3)',
-                  letterSpacing: '2px',
-                }}>
-                  Select a contact
-                </p>
-                <p style={{
-                  fontFamily: "'Raleway', sans-serif",
-                  fontSize: '12px',
-                  color: 'rgba(255,255,255,0.2)',
-                }}>
-                  Click on a team member to start a conversation
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Chat Header */}
-                <div style={{
-                  padding: '14px 20px',
-                  borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  background: '#080808',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {selectedOtherUser && (
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: 'rgba(201,168,76,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                        <span style={{
-                          fontFamily: "'Cinzel', serif",
-                          fontSize: '14px',
-                          color: '#C9A84C',
-                        }}>
-                          {getInitial(selectedOtherUser.full_name)}
-                        </span>
-                      </div>
-                    )}
-                    <div>
-                      <h2 style={{
-                        fontFamily: "'Cinzel', serif",
-                        fontSize: '14px',
-                        color: '#fff',
-                        margin: 0,
-                        letterSpacing: '1px',
-                      }}>
-                        {selectedOtherUser?.full_name || 'Chat'}
-                      </h2>
-                      {selectedOtherUser && (
-                        <span style={{
-                          fontFamily: "'Raleway', sans-serif",
-                          fontSize: '11px',
-                          color: 'rgba(201,168,76,0.5)',
-                          letterSpacing: '1px',
-                          textTransform: 'capitalize',
-                        }}>
-                          Admin
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {selectedOtherUser && userId && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <button
-                        onClick={() => {
-                          call.initiateCall(selectedOtherUser.id, selectedOtherUser.full_name, 'voice')
-                        }}
-                        disabled={call.callState !== 'idle'}
-                        style={{
-                          background: 'none',
-                          border: '1px solid rgba(201,168,76,0.3)',
-                          borderRadius: 0,
-                          padding: '4px 10px',
-                          cursor: call.callState === 'idle' ? 'pointer' : 'default',
-                          opacity: call.callState === 'idle' ? 1 : 0.4,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          transition: 'all 0.2s ease',
-                        }}
-                        title="Start voice call"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C">
-                          <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-                        </svg>
-                        <span style={{
-                          fontFamily: "'Raleway', sans-serif",
-                          fontSize: '11px',
-                          color: '#C9A84C',
-                          fontWeight: 600,
-                        }}>
-                          Call
-                        </span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          call.initiateCall(selectedOtherUser.id, selectedOtherUser.full_name, 'video')
-                        }}
-                        disabled={call.callState !== 'idle'}
-                        style={{
-                          background: 'none',
-                          border: '1px solid rgba(201,168,76,0.3)',
-                          borderRadius: 0,
-                          padding: '4px 10px',
-                          cursor: call.callState === 'idle' ? 'pointer' : 'default',
-                          opacity: call.callState === 'idle' ? 1 : 0.4,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          transition: 'all 0.2s ease',
-                        }}
-                        title="Start video call"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polygon points="23 7 16 12 23 17 23 7" fill="#C9A84C" />
-                          <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                        </svg>
-                        <span style={{
-                          fontFamily: "'Raleway', sans-serif",
-                          fontSize: '11px',
-                          color: '#C9A84C',
-                          fontWeight: 600,
-                        }}>
-                          Video
-                        </span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Messages */}
-                <div ref={messagesContainerRef} className="chat-watermark" style={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  padding: '20px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
-                }}>
-                  {chatLoading ? (
-                    <div style={{
-                      textAlign: 'center',
-                      fontFamily: "'Raleway', sans-serif",
-                      fontSize: '13px',
-                      color: 'rgba(255,255,255,0.4)',
-                      paddingTop: '40px',
-                    }}>
-                      Loading messages...
-                    </div>
-                  ) : messages.length === 0 ? (
-                    <div style={{
-                      textAlign: 'center',
-                      fontFamily: "'Raleway', sans-serif",
-                      fontSize: '13px',
-                      color: 'rgba(255,255,255,0.3)',
-                      paddingTop: '40px',
-                    }}>
-                      No messages yet. Send the first message!
-                    </div>
-                  ) : (
-                    messages.map((msg) => {
-                      const isOwn = msg.sender_id === userId
-                      return (
-                        <div
-                          key={msg.id}
-                          style={{
-                            display: 'flex',
-                            justifyContent: isOwn ? 'flex-end' : 'flex-start',
-                          }}
-                        >
-                          <div style={{
-                            maxWidth: '70%',
-                            padding: '10px 14px',
-                            borderRadius: isOwn ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-                            background: isOwn ? 'rgba(201,168,76,0.1)' : '#080808',
-                            border: isOwn ? '1px solid rgba(201,168,76,0.2)' : '1px solid rgba(255,255,255,0.06)',
-                          }}>
-                            {msg.content && (
-                              <p style={{
-                                fontFamily: "'Raleway', sans-serif",
-                                fontSize: '13px',
-                                color: '#fff',
-                                margin: 0,
-                                lineHeight: 1.5,
-                                wordBreak: 'break-word',
-                              }}>
-                                {msg.content}
-                              </p>
-                            )}
-                            {msg.file_url && (
-                              isVoiceNote(msg.file_name) ? (
-                                <div style={{ marginTop: msg.content ? '6px' : 0 }}>
-                                  <VoiceNotePlayer fileUrl={msg.file_url} fileName={msg.file_name || 'voice-note.webm'} />
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => openFile(msg.file_url!)}
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    fontFamily: "'Raleway', sans-serif",
-                                    fontSize: '12px',
-                                    color: '#C9A84C',
-                                    textDecoration: 'none',
-                                    marginTop: msg.content ? '6px' : 0,
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    padding: 0,
-                                  }}
-                                >
-                                  <span style={{ fontSize: '14px' }}>&#128206;</span>
-                                  {msg.file_name || 'Attachment'}
-                                </button>
-                              )
-                            )}
-                            <div style={{
-                              display: 'flex',
-                              justifyContent: 'flex-end',
-                              alignItems: 'center',
-                              gap: '6px',
-                              marginTop: '4px',
-                            }}>
-                              <span style={{
-                                fontFamily: "'Raleway', sans-serif",
-                                fontSize: '10px',
-                                color: 'rgba(255,255,255,0.25)',
-                              }}>
-                                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                              {isOwn && (
-                                <span style={{
-                                  fontSize: '10px',
-                                  color: msg.is_read ? '#C9A84C' : 'rgba(255,255,255,0.2)',
-                                }}>
-                                  {msg.is_read ? '\u2713\u2713' : '\u2713'}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                {/* Message Input */}
-                <div style={{
-                  padding: '12px 16px',
-                  borderTop: '1px solid rgba(255,255,255,0.06)',
-                  background: '#080808',
-                  display: 'flex',
-                  gap: '8px',
-                  alignItems: 'flex-end',
-                }}>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    onChange={handleFileAttach}
-                    style={{ display: 'none' }}
-                  />
-                  {!isRecording && (
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={sending}
-                      style={{
-                        background: 'transparent',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: 0,
-                        padding: '8px 10px',
-                        color: 'rgba(255,255,255,0.4)',
-                        cursor: 'pointer',
-                        fontSize: '16px',
-                        transition: 'all 0.2s ease',
-                        flexShrink: 0,
-                      }}
-                      title="Attach file"
-                    >
-                      &#128206;
-                    </button>
-                  )}
-                  {isRecording ? (
-                    <div style={{
-                      flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      background: '#000',
-                      border: '1px solid rgba(239,68,68,0.3)',
-                      borderRadius: 0,
-                      padding: '10px 14px',
-                    }}>
-                      <span style={{
-                        width: '10px',
-                        height: '10px',
-                        borderRadius: '50%',
-                        background: '#ef4444',
-                        animation: 'pulse 1.5s ease-in-out infinite',
-                        flexShrink: 0,
-                      }} />
-                      <span style={{
-                        fontFamily: "'Raleway', sans-serif",
-                        fontSize: '13px',
-                        color: '#fff',
-                        fontWeight: 500,
-                      }}>
-                        {formatRecordingTime(recordingDuration)}
-                      </span>
-                      <span style={{
-                        fontFamily: "'Raleway', sans-serif",
-                        fontSize: '12px',
-                        color: 'rgba(255,255,255,0.4)',
-                      }}>
-                        Recording...
-                      </span>
-                      <button
-                        onClick={cancelRecording}
-                        style={{
-                          marginLeft: 'auto',
-                          background: 'none',
-                          border: 'none',
-                          fontFamily: "'Raleway', sans-serif",
-                          fontSize: '12px',
-                          color: 'rgba(255,255,255,0.3)',
-                          cursor: 'pointer',
-                          padding: 0,
-                        }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <input
-                      type="text"
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault()
-                          handleSendMessage()
-                        }
-                      }}
-                      placeholder="Type a message..."
-                      disabled={sending}
-                      style={{
-                        flex: 1,
-                        background: '#000',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: 0,
-                        padding: '10px 14px',
-                        color: '#fff',
-                        fontFamily: "'Raleway', sans-serif",
-                        fontSize: '13px',
-                        outline: 'none',
-                        transition: 'border-color 0.2s ease',
-                      }}
-                    />
-                  )}
-                  {/* Voice note button */}
-                  <button
-                    onClick={handleVoiceRecordToggle}
-                    disabled={sending}
-                    style={{
-                      background: isRecording ? '#ef4444' : 'transparent',
-                      border: isRecording ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: 0,
-                      padding: '8px 10px',
-                      color: isRecording ? '#fff' : '#C9A84C',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                      transition: 'all 0.2s ease',
-                      flexShrink: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    title={isRecording ? 'Stop recording and send' : 'Record voice note'}
-                  >
-                    {isRecording ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <rect x="6" y="6" width="12" height="12" rx="2" />
-                      </svg>
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-                      </svg>
-                    )}
-                  </button>
-                  {!isRecording && (
-                    <button
-                      onClick={handleSendMessage}
-                      disabled={sending || !messageText.trim()}
-                      style={{
-                        background: messageText.trim() ? '#C9A84C' : 'rgba(201,168,76,0.2)',
-                        border: 'none',
-                        borderRadius: 0,
-                        padding: '10px 18px',
-                        color: messageText.trim() ? '#000' : 'rgba(0,0,0,0.4)',
-                        fontFamily: "'Raleway', sans-serif",
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        cursor: messageText.trim() ? 'pointer' : 'default',
-                        transition: 'all 0.2s ease',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {sending ? '...' : 'Send'}
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
         </div>
       )}
     </div>

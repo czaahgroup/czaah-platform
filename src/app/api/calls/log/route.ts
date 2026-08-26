@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
           type: 'missed_call',
           title: 'Missed Call',
           body: `You ${statusLabel} a ${typeLabel} call from ${callerName}`,
-          link: '/admin/contacts',
+          link: '/admin/registrant-messages',
         })
       } catch (notifErr) {
         // Notification is best-effort, don't fail the main request
