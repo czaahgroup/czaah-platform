@@ -6,11 +6,13 @@ import { createClient } from '@/lib/supabase/client'
 import { ChatPanel } from '@/components/chat/ChatPanel'
 
 // One inbox for everything that comes in through the site — enquiries
-// from logged-in members (which carry an assign/status pipeline and a
-// live chat thread) and anonymous website messages (a one-off contact
-// form / AI chat submission, no account, no pipeline) — instead of two
-// separate pages that happened to look identical.
-type ItemKind = 'enquiry' | 'message'
+// from logged-in members (assign/status pipeline + a live chat thread),
+// anonymous website messages (one-off contact form / AI chat, no
+// pipeline), and property chats (a read-only window into a conversation
+// between a member and the real estate partner who listed the
+// property — admin observes, doesn't participate) — instead of separate
+// pages for what's all "things coming in through the site".
+type ItemKind = 'enquiry' | 'message' | 'property_chat'
 
 interface Enquiry {
   id: string
@@ -53,12 +55,36 @@ interface Sector {
   name: string
 }
 
+interface PropertyChat {
+  id: string
+  property_id: string
+  enquirer_id: string
+  partner_id: string
+  last_message: string | null
+  last_message_at: string | null
+  property_listings: { title: string; images: string[] } | null
+  enquirer: { full_name: string } | null
+  partner: { full_name: string } | null
+}
+
+interface PropertyChatMessage {
+  id: string
+  chat_id: string
+  sender_id: string
+  content: string | null
+  file_url: string | null
+  file_name: string | null
+  is_read: boolean
+  created_at: string
+}
+
 interface CombinedItem {
   key: string
   kind: ItemKind
   createdAt: string
   enquiry?: Enquiry
   message?: PublicMessage
+  propertyChat?: PropertyChat
 }
 
 const ENQUIRY_STATUS_BADGES: Record<string, string> = {
@@ -84,6 +110,7 @@ const SOURCE_LABELS: Record<string, string> = {
 export default function AdminEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [messages, setMessages] = useState<PublicMessage[]>([])
+  const [propertyChats, setPropertyChats] = useState<PropertyChat[]>([])
   const [admins, setAdmins] = useState<AdminProfile[]>([])
   const [sectorAssignments, setSectorAssignments] = useState<SectorAssignment[]>([])
   const [sectors, setSectors] = useState<Sector[]>([])
@@ -94,7 +121,7 @@ export default function AdminEnquiriesPage() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [selectedAdminId, setSelectedAdminId] = useState<string>('')
   const [assigning, setAssigning] = useState(false)
-  const [typeFilter, setTypeFilter] = useState<'all' | 'enquiries' | 'messages'>('all')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'enquiries' | 'messages' | 'property_chats'>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [sectorFilter, setSectorFilter] = useState<string>('all')
   const [sourceFilter, setSourceFilter] = useState<string>('all')
@@ -104,6 +131,8 @@ export default function AdminEnquiriesPage() {
   const [replyText, setReplyText] = useState('')
   const [sendingReply, setSendingReply] = useState(false)
   const [replySentId, setReplySentId] = useState<string | null>(null)
+  const [propertyChatMessages, setPropertyChatMessages] = useState<PropertyChatMessage[]>([])
+  const [loadingPropertyChat, setLoadingPropertyChat] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -118,10 +147,11 @@ export default function AdminEnquiriesPage() {
 
   async function loadData() {
     try {
-      const [enquiriesRes, lookupRes, messagesRes] = await Promise.all([
+      const [enquiriesRes, lookupRes, messagesRes, propertyChatsRes] = await Promise.all([
         fetch('/api/enquiries'),
         fetch('/api/admin/lookup'),
         fetch('/api/admin/messages'),
+        fetch('/api/property-chat'),
       ])
 
       const enquiriesJson = await enquiriesRes.json()
@@ -149,6 +179,9 @@ export default function AdminEnquiriesPage() {
 
       const messagesJson = messagesRes.ok ? await messagesRes.json() : { data: [] }
       setMessages(messagesJson.data || [])
+
+      const propertyChatsJson = propertyChatsRes.ok ? await propertyChatsRes.json() : { data: [] }
+      setPropertyChats(propertyChatsJson.data || [])
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -239,6 +272,22 @@ export default function AdminEnquiriesPage() {
       setSelectedAdminId(item.enquiry!.assigned_admin_id || '')
     } else if (item.kind === 'message' && item.message!.status === 'new') {
       updateMessageStatus(item.message!.id, 'read')
+    } else if (item.kind === 'property_chat') {
+      loadPropertyChatMessages(item.propertyChat!.id)
+    }
+  }
+
+  async function loadPropertyChatMessages(chatId: string) {
+    setLoadingPropertyChat(true)
+    try {
+      const res = await fetch(`/api/property-chat/${chatId}`)
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to load property chat')
+      setPropertyChatMessages(json.messages || [])
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load property chat')
+    } finally {
+      setLoadingPropertyChat(false)
     }
   }
 
@@ -259,9 +308,14 @@ export default function AdminEnquiriesPage() {
     return item.kind === 'enquiry' && item.enquiry?.profiles?.role === 'elite_member'
   }
 
+  const showEnquiries = typeFilter === 'all' || typeFilter === 'enquiries'
+  const showMessages = typeFilter === 'all' || typeFilter === 'messages'
+  const showPropertyChats = typeFilter === 'all' || typeFilter === 'property_chats'
+
   const items: CombinedItem[] = [
-    ...(typeFilter !== 'messages' ? filteredEnquiries.map((e): CombinedItem => ({ key: `enquiry:${e.id}`, kind: 'enquiry', createdAt: e.created_at, enquiry: e })) : []),
-    ...(typeFilter !== 'enquiries' ? filteredMessages.map((m): CombinedItem => ({ key: `message:${m.id}`, kind: 'message', createdAt: m.created_at, message: m })) : []),
+    ...(showEnquiries ? filteredEnquiries.map((e): CombinedItem => ({ key: `enquiry:${e.id}`, kind: 'enquiry', createdAt: e.created_at, enquiry: e })) : []),
+    ...(showMessages ? filteredMessages.map((m): CombinedItem => ({ key: `message:${m.id}`, kind: 'message', createdAt: m.created_at, message: m })) : []),
+    ...(showPropertyChats ? propertyChats.map((pc): CombinedItem => ({ key: `property_chat:${pc.id}`, kind: 'property_chat', createdAt: pc.last_message_at || new Date(0).toISOString(), propertyChat: pc })) : []),
   ].sort((a, b) => {
     const aPriority = isPriorityItem(a)
     const bPriority = isPriorityItem(b)
@@ -312,8 +366,9 @@ export default function AdminEnquiriesPage() {
             <option value="all">All Types</option>
             <option value="enquiries">Member Enquiries</option>
             <option value="messages">Website Messages</option>
+            <option value="property_chats">Property Chats</option>
           </select>
-          {typeFilter !== 'messages' && (
+          {showEnquiries && (
             <>
               <select
                 value={statusFilter}
@@ -339,7 +394,7 @@ export default function AdminEnquiriesPage() {
               </select>
             </>
           )}
-          {typeFilter !== 'enquiries' && (
+          {showMessages && (
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value)}
@@ -410,6 +465,39 @@ export default function AdminEnquiriesPage() {
                           {enq.assigned_admin_id && adminMap[enq.assigned_admin_id] && (
                             <p className="text-xs text-on-surface-variant mt-0.5">Assigned: {adminMap[enq.assigned_admin_id]}</p>
                           )}
+                        </div>
+                      </div>
+                    </button>
+                  )
+                }
+
+                if (item.kind === 'property_chat') {
+                  const pc = item.propertyChat!
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => selectItem(item)}
+                      className={`w-full text-left px-5 py-4 border transition-colors ${
+                        selectedKey === item.key
+                          ? 'bg-surface-container-low border-primary'
+                          : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-3 mb-1 flex-wrap">
+                            <span className="text-sm font-medium text-on-surface truncate">{pc.property_listings?.title || 'Property'}</span>
+                            <span className="text-xs px-2 py-0.5 shrink-0 bg-primary/10 text-primary">Property Chat</span>
+                          </div>
+                          <div className="text-xs text-on-surface-variant truncate">
+                            {pc.enquirer?.full_name || 'Enquirer'} &harr; {pc.partner?.full_name || 'Partner'}
+                          </div>
+                          {pc.last_message && (
+                            <div className="text-xs text-on-surface-variant/50 mt-1 truncate">{pc.last_message}</div>
+                          )}
+                        </div>
+                        <div className="text-xs text-on-surface-variant/50 shrink-0">
+                          {pc.last_message_at ? new Date(pc.last_message_at).toLocaleDateString() : ''}
                         </div>
                       </div>
                     </button>
@@ -541,6 +629,43 @@ export default function AdminEnquiriesPage() {
                   currentUserId={currentUserId}
                   userRole={currentUserRole}
                 />
+              </div>
+            </div>
+          ) : selected.kind === 'property_chat' ? (
+            <div className="bg-surface-container-low border border-outline-variant/10 flex flex-col h-[600px]">
+              <div className="px-6 py-4 border-b border-outline-variant/10">
+                <h2 className="font-[family-name:var(--font-heading)] text-lg text-on-surface mb-1">
+                  {selected.propertyChat!.property_listings?.title || 'Property'}
+                </h2>
+                <p className="text-xs text-on-surface-variant">
+                  {selected.propertyChat!.enquirer?.full_name || 'Enquirer'} &harr; {selected.propertyChat!.partner?.full_name || 'Partner'}
+                </p>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-2">
+                {loadingPropertyChat ? (
+                  <p className="text-on-surface-variant text-sm">Loading…</p>
+                ) : propertyChatMessages.length === 0 ? (
+                  <p className="text-on-surface-variant text-sm">No messages yet.</p>
+                ) : (
+                  propertyChatMessages.map((msg) => {
+                    const isPartner = msg.sender_id !== selected.propertyChat!.enquirer_id
+                    return (
+                      <div key={msg.id} className={`flex ${isPartner ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[75%] px-4 py-2.5 ${isPartner ? 'bg-primary/15 border border-primary/20 rounded-2xl rounded-br-sm' : 'bg-surface-container-high border border-outline-variant/10 rounded-2xl rounded-bl-sm'}`}>
+                          <p className={`text-[11px] font-semibold mb-0.5 ${isPartner ? 'text-primary' : 'text-on-surface-variant'}`}>{isPartner ? 'Partner' : 'Enquirer'}</p>
+                          {msg.file_name && <p className="text-xs text-primary mb-1">[File: {msg.file_name}]</p>}
+                          {msg.content && <p className="text-sm text-on-surface whitespace-pre-wrap break-words">{msg.content}</p>}
+                          <div className="text-[11px] text-on-surface-variant/40 mt-1 text-right">{new Date(msg.created_at).toLocaleString()}</div>
+                        </div>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+
+              <div className="border-t border-outline-variant/10 p-3 text-center">
+                <p className="text-xs text-on-surface-variant/50">Read-only monitoring mode</p>
               </div>
             </div>
           ) : (
