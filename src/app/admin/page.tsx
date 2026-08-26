@@ -83,7 +83,7 @@ export default function AdminOverview() {
     { title: 'KYC Review', href: '/admin/kyc', count: stats.pendingKYC, icon: 'shield' },
     { title: 'Enquiries', href: '/admin/enquiries', count: stats.totalEnquiries, icon: 'message' },
     { title: 'Team Tools', href: '/admin/contacts', count: null, icon: 'users' },
-    { title: 'Investments', href: '/admin/investments', count: null, icon: 'briefcase' },
+    { title: 'Investments', href: '/admin/content/investments', count: null, icon: 'briefcase' },
     { title: 'Analytics', href: '/admin/analytics', count: null, icon: 'chart' },
   ]
 
