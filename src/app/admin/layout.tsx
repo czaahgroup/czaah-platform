@@ -121,6 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/workforce" label="Workforce" icon="engineering" />
         <NavLink href="/admin/employers" label="Employers" icon="apartment" />
         <NavLink href="/admin/oep" label="Employment Promoters" icon="flight_takeoff" />
+        <NavLink href="/admin/elite-members" label="Elite Members" icon="workspace_premium" />
         <NavLink href="/admin/users" label="Users" icon="group" />
 
         <SectionHeader label="Enquiries" />

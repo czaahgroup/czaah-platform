@@ -114,17 +114,24 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { role, status, sectorAssignments } = body
+    const { role, status, sectorAssignments, fullName, phone, companyName, country, industryInterests, companyWebsite, companyDescription } = body
 
     // Update profile fields
     const EDITABLE_ROLES = ['member', 'admin', 'investment_partner', 'elite_member', 'real_estate_partner', 'worker', 'employer', 'oep_partner']
-    const updates: Record<string, string> = {}
+    const updates: Record<string, unknown> = {}
     if (role && EDITABLE_ROLES.includes(role)) {
       updates.role = role
     }
     if (status) {
       updates.status = status
     }
+    if (fullName !== undefined) updates.full_name = fullName
+    if (phone !== undefined) updates.phone = phone
+    if (companyName !== undefined) updates.company_name = companyName
+    if (country !== undefined) updates.country = country
+    if (industryInterests !== undefined) updates.industry_interests = industryInterests
+    if (companyWebsite !== undefined) updates.company_website = companyWebsite
+    if (companyDescription !== undefined) updates.company_description = companyDescription
 
     if (Object.keys(updates).length > 0) {
       updates.updated_at = new Date().toISOString()
