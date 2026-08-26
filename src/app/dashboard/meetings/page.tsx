@@ -4,6 +4,16 @@
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+function todayDateStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function nowTimeStr() {
+  const d = new Date()
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+}
+
 interface Participant { id: string; user_id: string; response: string; profile: { id: string; full_name: string; email: string; avatar_url: string | null } | null }
 interface Meeting { id: string; title: string; organizer_id: string; scheduled_at: string; duration_minutes: number; meeting_type: string; notes: string | null; status: string; created_at: string; organizer: { id: string; full_name: string; email: string; avatar_url: string | null } | null; meeting_participants: Participant[] }
 interface MemberOption { id: string; full_name: string; email: string }
@@ -66,7 +76,16 @@ export default function MeetingsPage() {
     <>
       <div className="flex justify-between items-center mb-8">
         <h1 className="cinzel-text text-2xl text-on-surface m-0">Meetings</h1>
-        <button onClick={() => setShowModal(true)} className="liquid-gold-bg text-on-primary raleway-text font-semibold text-sm px-5 py-2.5 border-none cursor-pointer">Schedule Meeting</button>
+        <button
+          onClick={() => {
+            if (!scheduledDate) setScheduledDate(todayDateStr())
+            if (!scheduledTime) setScheduledTime(nowTimeStr())
+            setShowModal(true)
+          }}
+          className="liquid-gold-bg text-on-primary raleway-text font-semibold text-sm px-5 py-2.5 border-none cursor-pointer"
+        >
+          Schedule Meeting
+        </button>
       </div>
 
       <div className="mb-10">
@@ -168,6 +187,17 @@ function MeetingCard({ meeting, currentUserId, onRespond, onCancel, isPast }: { 
               <button onClick={() => onRespond(meeting.id, 'accepted')} className="raleway-text text-xs font-semibold px-4 py-1.5 border border-green-500/30 bg-green-500/10 text-green-400 cursor-pointer transition-all hover:bg-green-500/15">Accept</button>
               <button onClick={() => onRespond(meeting.id, 'declined')} className="raleway-text text-xs font-semibold px-4 py-1.5 border border-error/30 bg-error/10 text-error cursor-pointer transition-all hover:bg-error/15">Decline</button>
             </>
+          )}
+          {meeting.meeting_type === 'video_call' && !isPending && myParticipation?.response !== 'declined' && (
+            <a
+              href={`/meet/${meeting.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="raleway-text text-xs font-semibold px-4 py-1.5 border border-primary/30 bg-primary/10 text-primary cursor-pointer transition-all hover:bg-primary/15 no-underline inline-flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>videocam</span>
+              Join Meeting
+            </a>
           )}
           {isOrganizer && <button onClick={() => onCancel(meeting.id)} className="raleway-text text-xs px-4 py-1.5 border border-outline-variant/10 bg-transparent text-on-surface-variant/40 cursor-pointer transition-colors hover:text-on-surface-variant">Cancel Meeting</button>}
         </div>
