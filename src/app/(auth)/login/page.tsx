@@ -51,12 +51,28 @@ function LoginForm() {
     setError('')
     setLoading(true)
 
+    // Supabase's client-side auth calls serialize across browser tabs via the
+    // Web Locks API — with several czaah.com tabs open, that can stall for
+    // several seconds per call. This is a hard safety net so the button never
+    // stays stuck on "Signing in..." indefinitely; it doesn't cancel the
+    // underlying request, it just stops making the user wait on it.
+    const stallTimer = setTimeout(() => {
+      setError('This is taking longer than expected. If you have other CZAAH tabs open, try closing them, then try again.')
+      setLoading(false)
+    }, 12000)
+
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password })
 
       if (error) {
         setError(error.message)
+        return
+      }
+
+      const user = signInData.user
+      if (!user) {
+        setError('Signed in, but could not load your account. Please try again.')
         return
       }
 
@@ -67,12 +83,6 @@ function LoginForm() {
       if (verifiedFactors.length > 0) {
         setMfaFactorId(verifiedFactors[0].id)
         setMfaRequired(true)
-        return
-      }
-
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        setError('Signed in, but could not load your account. Please try again.')
         return
       }
 
@@ -92,6 +102,7 @@ function LoginForm() {
       console.error('[Login] Unexpected error during sign-in:', err)
       setError('Something went wrong signing you in. Please try again.')
     } finally {
+      clearTimeout(stallTimer)
       setLoading(false)
     }
   }
@@ -101,6 +112,11 @@ function LoginForm() {
     if (!mfaFactorId || !mfaCode) return
     setError('')
     setLoading(true)
+
+    const stallTimer = setTimeout(() => {
+      setError('This is taking longer than expected. If you have other CZAAH tabs open, try closing them, then try again.')
+      setLoading(false)
+    }, 12000)
 
     try {
       const supabase = createClient()
@@ -137,6 +153,7 @@ function LoginForm() {
       console.error('[Login] Unexpected error during MFA verify:', err)
       setError('Something went wrong verifying your code. Please try again.')
     } finally {
+      clearTimeout(stallTimer)
       setLoading(false)
     }
   }
