@@ -1,13 +1,19 @@
 'use client'
 // @ts-nocheck
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { EnquiryForm } from '@/components/forms/EnquiryForm'
 
 export default function NewEnquiryPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const sectorId = searchParams.get('sectorId') || undefined
+  const sectorName = searchParams.get('sectorName') || undefined
+  const serviceId = searchParams.get('serviceId') || undefined
+  const productId = searchParams.get('productId') || undefined
+  const productName = searchParams.get('productName') || undefined
 
   return (
     <>
@@ -23,6 +29,11 @@ export default function NewEnquiryPage() {
           New Enquiry
         </h1>
         <EnquiryForm
+          sectorId={sectorId}
+          sectorName={sectorName}
+          serviceId={serviceId}
+          productId={productId}
+          productName={productName}
           onSuccess={() => {
             setTimeout(() => router.push('/dashboard/enquiries'), 2000)
           }}
