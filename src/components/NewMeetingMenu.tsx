@@ -11,7 +11,13 @@ function VideoIcon() {
   return <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>videocam</span>
 }
 
-export function NewMeetingMenu() {
+export function NewMeetingMenu({
+  scheduleHref = '/admin/meetings?new=1',
+  navLinkClass = 'admin-nav-link',
+}: {
+  scheduleHref?: string
+  navLinkClass?: string
+}) {
   const [open, setOpen] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -46,14 +52,14 @@ export function NewMeetingMenu() {
 
   function scheduleInCalendar() {
     setOpen(false)
-    router.push('/admin/meetings?new=1')
+    router.push(scheduleHref)
   }
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="admin-nav-link"
+        className={navLinkClass}
         style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}
       >
         <VideoIcon />
@@ -74,7 +80,7 @@ export function NewMeetingMenu() {
         }}>
           <button
             onClick={startInstant}
-            className="admin-nav-link"
+            className={navLinkClass}
             style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', padding: '10px 16px' }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>play_circle</span>
@@ -82,7 +88,7 @@ export function NewMeetingMenu() {
           </button>
           <button
             onClick={createForLater}
-            className="admin-nav-link"
+            className={navLinkClass}
             style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', padding: '10px 16px' }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>link</span>
@@ -90,7 +96,7 @@ export function NewMeetingMenu() {
           </button>
           <button
             onClick={scheduleInCalendar}
-            className="admin-nav-link"
+            className={navLinkClass}
             style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', padding: '10px 16px' }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>calendar_month</span>

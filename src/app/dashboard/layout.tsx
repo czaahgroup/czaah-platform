@@ -7,6 +7,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { NotificationBell } from '@/components/NotificationBell'
 import { MemberOwnCallProvider } from '@/lib/contexts/MemberOwnCallContext'
+import { NewMeetingMenu } from '@/components/NewMeetingMenu'
 
 interface Profile {
   full_name: string
@@ -83,6 +84,7 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
   const isAdminRole = profile.role === 'admin' || profile.role === 'super_admin'
   const isRealEstatePartner = profile.role === 'real_estate_partner'
   const isRegistrant = ['worker', 'employer', 'oep_partner'].includes(profile.role)
+  const isElite = profile.role === 'elite_member'
 
   const portalLabels: Record<string, string> = {
     worker: 'Worker Portal',
@@ -223,6 +225,12 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
                 </div>
               )}
               {section.links.map((link) => {
+                // Elite members get the same "New Meeting" split button
+                // (instant meeting / shareable link / schedule) super_admin
+                // has in the admin shell, instead of a plain nav link.
+                if (isElite && link.href === '/dashboard/meetings') {
+                  return <NewMeetingMenu key={link.href} scheduleHref="/dashboard/meetings?new=1" navLinkClass="member-nav-link" />
+                }
                 const isActive = pathname === link.href
                 return (
                   <Link
