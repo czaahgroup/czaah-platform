@@ -32,7 +32,7 @@ export default function AdminMessagesPage() {
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [sourceFilter, setSourceFilter] = useState<string>('all')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState('')
   const [sendingReply, setSendingReply] = useState(false)
@@ -102,6 +102,14 @@ export default function AdminMessagesPage() {
     .filter((m) => (statusFilter === 'all' ? true : m.status === statusFilter))
     .filter((m) => (sourceFilter === 'all' ? true : m.source === sourceFilter))
 
+  const selected = filtered.find((m) => m.id === selectedId) || messages.find((m) => m.id === selectedId) || null
+
+  function selectMessage(m: PublicMessage) {
+    setSelectedId(m.id)
+    setReplyText('')
+    if (m.status === 'new') updateStatus(m.id, 'read')
+  }
+
   if (loading) {
     return <div className="text-on-surface-variant py-12 text-center">Loading messages...</div>
   }
@@ -139,28 +147,25 @@ export default function AdminMessagesPage() {
         </div>
       )}
 
-      {filtered.length === 0 ? (
-        <div className="bg-surface-container-low border border-outline-variant/10 px-6 py-16 text-center">
-          <p className="text-on-surface-variant">No messages found.</p>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map((m) => {
-            const isExpanded = expandedId === m.id
-            return (
-              <div
-                key={m.id}
-                className={`bg-surface-container-low border transition-colors ${
-                  m.status === 'new' ? 'border-primary/40' : 'border-outline-variant/10'
-                }`}
-              >
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+        <div className="xl:col-span-2 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {filtered.length === 0 ? (
+            <div className="bg-surface-container-low border border-outline-variant/10 px-6 py-16 text-center">
+              <p className="text-on-surface-variant">No messages found.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filtered.map((m) => (
                 <button
-                  onClick={() => {
-                    setExpandedId(isExpanded ? null : m.id)
-                    setReplyText('')
-                    if (m.status === 'new') updateStatus(m.id, 'read')
-                  }}
-                  className="w-full text-left px-5 py-4"
+                  key={m.id}
+                  onClick={() => selectMessage(m)}
+                  className={`w-full text-left px-5 py-4 border transition-colors ${
+                    selectedId === m.id
+                      ? 'bg-surface-container-low border-primary'
+                      : m.status === 'new'
+                      ? 'bg-surface-container-low border-primary/40 hover:border-primary'
+                      : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/50'
+                  }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="min-w-0">
@@ -169,63 +174,86 @@ export default function AdminMessagesPage() {
                         <span className={`text-xs px-2 py-0.5 shrink-0 ${STATUS_BADGES[m.status] || ''}`}>{m.status}</span>
                         <span className="text-xs px-2 py-0.5 shrink-0 bg-primary/10 text-primary">{SOURCE_LABELS[m.source] || m.source}</span>
                       </div>
-                      <div className="text-xs text-on-surface-variant space-x-2">
-                        <span>{m.email}</span>
-                        {m.phone && <span>· {m.phone}</span>}
-                      </div>
-                      <div className="text-xs text-on-surface-variant/50 mt-1">{m.interest}</div>
+                      <div className="text-xs text-on-surface-variant/60 truncate">{m.interest}</div>
                     </div>
                     <div className="text-xs text-on-surface-variant/50 shrink-0">
-                      {new Date(m.created_at).toLocaleString()}
+                      {new Date(m.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </button>
-
-                {isExpanded && (
-                  <div className="px-5 pb-5 border-t border-outline-variant/10 pt-4">
-                    <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-wrap mb-4">{m.message}</p>
-
-                    <div className="mb-3">
-                      <textarea
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        placeholder={`Type a reply to ${m.name}...`}
-                        rows={3}
-                        className="w-full bg-surface-container border border-outline-variant/20 px-3 py-2 text-sm text-on-surface resize-none"
-                      />
-                    </div>
-
-                    <div className="flex gap-2 flex-wrap items-center">
-                      <button
-                        onClick={() => sendReply(m.id)}
-                        disabled={sendingReply || !replyText.trim()}
-                        className="text-xs px-4 py-1.5 bg-primary text-on-primary font-semibold disabled:opacity-40 transition-opacity"
-                      >
-                        {sendingReply ? 'Sending...' : replySentId === m.id ? 'Sent ✓' : 'Send Reply'}
-                      </button>
-                      <a
-                        href={`mailto:${m.email}`}
-                        className="text-xs px-3 py-1.5 border border-primary/40 text-primary hover:border-primary transition-colors"
-                      >
-                        Reply by Email
-                      </a>
-                      {m.status !== 'replied' && (
-                        <button
-                          onClick={() => updateStatus(m.id, 'replied')}
-                          disabled={updatingId === m.id}
-                          className="text-xs px-3 py-1.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors disabled:opacity-40"
-                        >
-                          Mark as Replied
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="xl:col-span-3">
+          {!selected ? (
+            <div className="bg-surface-container-low border border-outline-variant/10 px-6 py-16 text-center h-full flex items-center justify-center">
+              <p className="text-on-surface-variant">Select a message to view and reply.</p>
+            </div>
+          ) : (
+            <div className="bg-surface-container-low border border-outline-variant/10">
+              <div className="px-6 py-4 border-b border-outline-variant/10">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <h2 className="font-[family-name:var(--font-heading)] text-lg text-on-surface">{selected.name}</h2>
+                  <span className={`text-xs px-2 py-0.5 shrink-0 ${STATUS_BADGES[selected.status] || ''}`}>{selected.status}</span>
+                </div>
+                <div className="text-xs text-on-surface-variant space-x-2">
+                  <span>{selected.email}</span>
+                  {selected.phone && <span>· {selected.phone}</span>}
+                  <span>· {new Date(selected.created_at).toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 space-y-3 border-b border-outline-variant/10">
+                <div>
+                  <p className="text-xs text-on-surface-variant">Interest</p>
+                  <p className="text-sm text-on-surface">{selected.interest}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-on-surface-variant">Message</p>
+                  <p className="text-sm text-on-surface whitespace-pre-wrap leading-relaxed">{selected.message}</p>
+                </div>
+              </div>
+
+              <div className="px-6 py-4">
+                <label className="block text-sm text-on-surface-variant mb-2">Reply</label>
+                <textarea
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder={`Type a reply to ${selected.name}...`}
+                  rows={4}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/10 px-4 py-2.5 text-sm text-on-surface mb-3 resize-none"
+                />
+                <div className="flex gap-2 flex-wrap items-center">
+                  <button
+                    onClick={() => sendReply(selected.id)}
+                    disabled={sendingReply || !replyText.trim()}
+                    className="text-sm px-5 py-2.5 bg-primary text-on-primary font-semibold disabled:opacity-50 transition-opacity"
+                  >
+                    {sendingReply ? 'Sending...' : replySentId === selected.id ? 'Sent ✓' : 'Send Reply'}
+                  </button>
+                  <a
+                    href={`mailto:${selected.email}`}
+                    className="text-sm px-4 py-2.5 border border-primary/40 text-primary hover:border-primary transition-colors"
+                  >
+                    Reply by Email
+                  </a>
+                  {selected.status !== 'replied' && (
+                    <button
+                      onClick={() => updateStatus(selected.id, 'replied')}
+                      disabled={updatingId === selected.id}
+                      className="text-sm px-4 py-2.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors disabled:opacity-40"
+                    >
+                      Mark as Replied
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
