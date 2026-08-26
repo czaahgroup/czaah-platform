@@ -130,7 +130,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/properties" label="Properties" icon="apartment" />
 
         <SectionHeader label="Communication" />
-        <NavLink href="/admin/elite-chats" label="Elite Chats" icon="chat" />
         <NavLink href="/admin/property-chats" label="Property Chats" icon="maps_home_work" />
         <NavLink href="/admin/registrant-messages" label="Registrant Messages" icon="support_agent" />
         <NavLink href="/admin/contacts" label="Contacts" icon="contacts" />

@@ -27,14 +27,14 @@ export async function GET(request: NextRequest) {
 
     const supabase = createAdminClient()
 
-    // Verify user is elite_member, partner, or super_admin
+    // Verify user is partner or super_admin
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single()
 
-    const allowedRoles = ['elite_member', 'partner', 'super_admin']
+    const allowedRoles = ['partner', 'super_admin']
     if (!profile || !allowedRoles.includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }

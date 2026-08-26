@@ -350,9 +350,6 @@ export function Navbar() {
                     {userRole === 'real_estate_partner' && (
                       <Link href="/dashboard/properties" onClick={() => setUserDropdownOpen(false)}>My Properties</Link>
                     )}
-                    {userRole === 'elite_member' && (
-                      <Link href="/dashboard/live-chat" onClick={() => setUserDropdownOpen(false)}>Live Chat</Link>
-                    )}
                     {(userRole === 'admin' || userRole === 'super_admin') && (
                       <Link href="/partner" onClick={() => setUserDropdownOpen(false)}>Submit Deal</Link>
                     )}
@@ -481,9 +478,6 @@ export function Navbar() {
               ) : (
                 <>
                   <Link href="/dashboard" className="mobile-nav-cta">My Dashboard</Link>
-                  {userRole === 'elite_member' && (
-                    <Link href="/dashboard/live-chat" className="mobile-nav-cta mobile-nav-cta-outline">Live Chat</Link>
-                  )}
                   {(userRole === 'admin' || userRole === 'super_admin') && (
                     <Link href="/partner" className="mobile-nav-cta mobile-nav-cta-outline">Submit Deal</Link>
                   )}

@@ -77,7 +77,6 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
 
   if (!profile) return null
 
-  const isElite = profile.role === 'elite_member' || profile.role === 'super_admin'
   const isAdminRole = profile.role === 'admin' || profile.role === 'super_admin'
   const isRealEstatePartner = profile.role === 'real_estate_partner'
   const isRegistrant = ['worker', 'employer', 'oep_partner'].includes(profile.role)
@@ -119,12 +118,6 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
         { href: '/dashboard/properties', label: 'My Listings', icon: 'apartment' },
         { href: '/dashboard/properties/new', label: 'Add Property', icon: 'add_home' },
         { href: '/dashboard/property-chats', label: 'Property Chats', icon: 'forum' },
-      ],
-    }] : []),
-    ...(isElite ? [{
-      label: 'Elite',
-      links: [
-        { href: '/dashboard/live-chat', label: 'Live Chat', icon: 'chat' },
       ],
     }] : []),
     {
