@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { RingtonePicker } from '@/components/RingtonePicker'
+import { PushNotificationToggle } from '@/components/PushNotificationToggle'
 
 
 interface AdminProfile {
@@ -203,6 +204,7 @@ export default function AdminSettingsPage() {
         </div>
         <div className="px-6 py-4">
           <RingtonePicker />
+          <PushNotificationToggle />
         </div>
       </div>
     </div>

@@ -94,6 +94,18 @@ async function logCallToApi(data: {
 
 // Notification for missed calls is handled server-side by the /api/calls/log endpoint
 
+// Best-effort push notification alongside the normal Realtime call-request
+// broadcast, so the callee is reached even without a focused/open tab. Never
+// blocks or fails the call itself — if push isn't configured or the target
+// has no subscription, the server just no-ops.
+function notifyPush(targetUserId: string, callerName: string, callType: CallType) {
+  fetch('/api/push/notify-call', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ targetUserId, callerName, callType }),
+  }).catch(() => {})
+}
+
 export function useCall({
   currentUserId,
   currentUserName,
@@ -877,6 +889,7 @@ export function useCall({
         callType: type,
       },
     })
+    notifyPush(targetUserId, currentUserName, type)
 
     // Auto-timeout after 30 seconds
     timeoutRef.current = setTimeout(() => {
@@ -1113,6 +1126,7 @@ export function useCall({
         callType: callTypeRef.current || 'voice',
       },
     })
+    notifyPush(userId, currentUserName, callTypeRef.current || 'voice')
   }, [currentUserId, currentUserName])
 
   // Invite someone who isn't already listening on this call's channel — a
@@ -1136,6 +1150,7 @@ export function useCall({
         setTimeout(() => supabase.removeChannel(inviteChannel), 2000)
       }
     })
+    notifyPush(targetProfileId, currentUserName, callTypeRef.current || 'voice')
     console.info('[useCall] Sent external call invite to', targetName)
   }, [chatId, currentUserId, currentUserName, supabase])
 
