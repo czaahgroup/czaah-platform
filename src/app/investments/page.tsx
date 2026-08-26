@@ -51,7 +51,7 @@ export default function InvestmentsPage() {
   const dealsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    fetch('/api/public/partner-opportunities')
+    fetch('/api/public/opportunities')
       .then(res => res.ok ? res.json() : [])
       .then(data => setPartnerOpportunities(Array.isArray(data) ? data : []))
       .catch(() => setPartnerOpportunities([]))
