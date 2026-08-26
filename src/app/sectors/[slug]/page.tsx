@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { BookmarkButton } from '@/components/BookmarkButton'
+import { ShareButton } from '@/components/ShareButton'
 
 export const runtime = 'edge';
 
@@ -28,12 +29,45 @@ interface Sector {
   products: Product[]
 }
 
+interface PartnerOpportunity {
+  id: string
+  reference_number: string
+  title: string
+  country: string | null
+  opportunity_type: string
+  summary: string | null
+  description: string | null
+  estimated_value: string | null
+  sectors: { name: string; slug: string } | null
+}
+
+const OPPORTUNITY_TYPE_LABELS: Record<string, string> = {
+  buyer_required: 'Buyer Required',
+  seller_supplier_available: 'Seller / Supplier Available',
+  investor_required: 'Investor Required',
+  investment_available: 'Investment Available',
+  project_available: 'Project Available',
+  joint_venture: 'Joint Venture',
+  property_opportunity: 'Property Opportunity',
+  other: 'Opportunity',
+}
+
 export default function SectorDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const [sector, setSector] = useState<Sector | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [opportunities, setOpportunities] = useState<PartnerOpportunity[]>([])
+
+  useEffect(() => {
+    fetch('/api/public/opportunities')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setOpportunities(Array.isArray(data) ? data : []))
+      .catch(() => setOpportunities([]))
+  }, [])
+
+  const sectorOpportunities = opportunities.filter(o => o.sectors?.slug === slug)
 
   useEffect(() => {
     async function checkAuth() {
@@ -138,6 +172,57 @@ export default function SectorDetailPage() {
           </p>
         </div>
       </section>
+
+      {/* Live Partner Opportunities */}
+      {sectorOpportunities.length > 0 && (
+        <section className="pb-24 px-6 border-t border-czaah-border">
+          <div className="max-w-7xl mx-auto pt-16">
+            <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl text-czaah-white tracking-wide mb-12">
+              Live Opportunities
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {sectorOpportunities.map((o) => (
+                <div
+                  key={o.id}
+                  className="bg-czaah-card border border-czaah-border rounded-lg p-8 flex flex-col"
+                >
+                  <div className="flex items-center justify-between mb-3 gap-3">
+                    <span className="font-[family-name:var(--font-body)] text-[11px] tracking-[0.1em] uppercase text-czaah-gold">
+                      {OPPORTUNITY_TYPE_LABELS[o.opportunity_type] || 'Opportunity'}
+                    </span>
+                    <span className="font-[family-name:var(--font-body)] text-[11px] text-czaah-muted">{o.reference_number}</span>
+                  </div>
+                  <h3 className="font-[family-name:var(--font-heading)] text-lg text-czaah-gold mb-4">
+                    {o.title}
+                  </h3>
+                  <p className="font-[family-name:var(--font-body)] text-czaah-muted text-sm leading-relaxed mb-4 flex-1">
+                    {o.summary || o.description}
+                  </p>
+                  {o.estimated_value && (
+                    <p className="font-[family-name:var(--font-body)] text-sm text-czaah-white mb-4">
+                      Estimated Value: <span className="text-czaah-gold">{o.estimated_value}</span>
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between gap-4 mt-auto">
+                    <Link
+                      href={`/contact?interest=${encodeURIComponent(`${o.title} (${o.reference_number})`)}#contact-form`}
+                      className="font-[family-name:var(--font-body)] text-sm font-semibold text-czaah-gold hover:underline"
+                    >
+                      Request Information &rarr;
+                    </Link>
+                    <ShareButton
+                      title={o.title}
+                      text={`${o.title} — an investment opportunity via CZAAH`}
+                      anchorId={`opp-${o.id}`}
+                      className="font-[family-name:var(--font-body)] text-sm text-czaah-muted hover:text-czaah-gold transition-colors inline-flex items-center gap-1.5"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Products */}
       {sector.products.length > 0 && (

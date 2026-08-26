@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Navbar } from '@/components/layouts/Navbar'
 import { Footer } from '@/components/layouts/Footer'
+import { ShareButton } from '@/components/ShareButton'
 
 interface PartnerOpportunity {
   id: string
@@ -158,6 +159,8 @@ export default function InvestmentsPage() {
               {partnerOpportunitiesWithFilter.map(o => (
                 <div
                   key={o.id}
+                  id={`opp-${o.id}`}
+                  style={{ scrollMarginTop: 100 }}
                   className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== o.filterKey ? 'hidden' : ''}`}
                   data-sector={o.filterKey || 'other'}
                 >
@@ -176,7 +179,10 @@ export default function InvestmentsPage() {
                         <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                       ))}
                     </div>
-                    <Link href={`/contact?interest=${encodeURIComponent(`${o.title} (${o.reference_number})`)}#contact-form`} className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <div className="flex gap-5 items-center flex-wrap">
+                      <Link href={`/contact?interest=${encodeURIComponent(`${o.title} (${o.reference_number})`)}#contact-form`} className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                      <ShareButton title={o.title} text={`${o.title} — an investment opportunity via CZAAH`} anchorId={`opp-${o.id}`} />
+                    </div>
                   </div>
                   <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                     <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Estimated Value</div><div className="raleway-text text-xl font-semibold text-primary">{o.estimated_value || 'On Request'}</div></div>
@@ -187,7 +193,7 @@ export default function InvestmentsPage() {
               ))}
 
               {/* PLACER GOLD */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'minerals' ? 'hidden' : ''}`} data-sector="minerals">
+              <div id="indus-k-placer-gold" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'minerals' ? 'hidden' : ''}`} data-sector="minerals">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">diamond</span>
@@ -203,9 +209,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <div className="flex gap-3 flex-wrap items-center">
+                  <div className="flex gap-5 flex-wrap items-center">
                     <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
                     <a href="/CZAAH-IndusK-Gold.pdf" download className="raleway-text text-sm font-medium text-primary px-4 py-2 border border-primary/40 hover:bg-primary/10 transition-colors inline-flex items-center gap-2">&#8681; Download Project PDF</a>
+                    <ShareButton title="Indus-K Placer Gold Project — Riverine Gold Extraction" text="Indus-K Placer Gold Project — Riverine Gold Extraction, an investment opportunity via CZAAH" anchorId="indus-k-placer-gold" />
                   </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
@@ -217,7 +224,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* MINERALS - Copper Gold */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'minerals' ? 'hidden' : ''}`} data-sector="minerals">
+              <div id="copper-gold-balochistan" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'minerals' ? 'hidden' : ''}`} data-sector="minerals">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">diamond</span>
@@ -233,7 +240,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="Copper-Gold Exploration Licenses — Balochistan" text="Copper-Gold Exploration Licenses — Balochistan, an investment opportunity via CZAAH" anchorId="copper-gold-balochistan" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$5M &ndash; $25M</div></div>
@@ -244,7 +254,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* REAL ESTATE */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'realestate' ? 'hidden' : ''}`} data-sector="realestate">
+              <div id="cpec-industrial-plots" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'realestate' ? 'hidden' : ''}`} data-sector="realestate">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">home_work</span>
@@ -260,7 +270,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="CPEC Industrial Plots — Rashakai & Allama Iqbal SEZ" text="CPEC Industrial Plots — Rashakai & Allama Iqbal SEZ, an investment opportunity via CZAAH" anchorId="cpec-industrial-plots" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$500K &ndash; $10M</div></div>
@@ -271,7 +284,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* TECHNOLOGY */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'technology' ? 'hidden' : ''}`} data-sector="technology">
+              <div id="it-export-acquisition" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'technology' ? 'hidden' : ''}`} data-sector="technology">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">memory</span>
@@ -287,7 +300,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="IT Export Company Acquisition — Staff Augmentation Platform" text="IT Export Company Acquisition — Staff Augmentation Platform, an investment opportunity via CZAAH" anchorId="it-export-acquisition" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$2M &ndash; $5M</div></div>
@@ -298,7 +314,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* AGRICULTURE */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'agriculture' ? 'hidden' : ''}`} data-sector="agriculture">
+              <div id="cold-chain-food-processing" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'agriculture' ? 'hidden' : ''}`} data-sector="agriculture">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">eco</span>
@@ -314,7 +330,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="Cold Chain & Food Processing — Punjab Agri Corridor" text="Cold Chain & Food Processing — Punjab Agri Corridor, an investment opportunity via CZAAH" anchorId="cold-chain-food-processing" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$3M &ndash; $15M</div></div>
@@ -325,7 +344,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* PHARMA */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'pharma' ? 'hidden' : ''}`} data-sector="pharma">
+              <div id="generic-drug-manufacturing" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'pharma' ? 'hidden' : ''}`} data-sector="pharma">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">medication</span>
@@ -341,7 +360,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="Generic Drug Manufacturing JV — WHO GMP Certified Facility" text="Generic Drug Manufacturing JV — WHO GMP Certified Facility, an investment opportunity via CZAAH" anchorId="generic-drug-manufacturing" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$5M &ndash; $12M</div></div>
@@ -352,7 +374,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* TEXTILES */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'textiles' ? 'hidden' : ''}`} data-sector="textiles">
+              <div id="denim-export-trading" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'textiles' ? 'hidden' : ''}`} data-sector="textiles">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">checkroom</span>
@@ -368,7 +390,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="Denim Export Trading House — GSP+ EU Market Access" text="Denim Export Trading House — GSP+ EU Market Access, an investment opportunity via CZAAH" anchorId="denim-export-trading" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$1M &ndash; $5M</div></div>
@@ -379,7 +404,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* CONSTRUCTION */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'construction' ? 'hidden' : ''}`} data-sector="construction">
+              <div id="commercial-tower-development" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'construction' ? 'hidden' : ''}`} data-sector="construction">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">apartment</span>
@@ -395,7 +420,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="Commercial Tower Development — Blue Area, Islamabad" text="Commercial Tower Development — Blue Area, Islamabad, an investment opportunity via CZAAH" anchorId="commercial-tower-development" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$10M &ndash; $30M</div></div>
@@ -406,7 +434,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* TOURISM */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'tourism' ? 'hidden' : ''}`} data-sector="tourism">
+              <div id="boutique-hotel-eco-lodge" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'tourism' ? 'hidden' : ''}`} data-sector="tourism">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">landscape</span>
@@ -422,7 +450,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Register Interest &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Register Interest &rarr;</Link>
+                    <ShareButton title="Boutique Hotel & Eco-Lodge — Hunza Valley" text="Boutique Hotel & Eco-Lodge — Hunza Valley, an investment opportunity via CZAAH" anchorId="boutique-hotel-eco-lodge" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$2M &ndash; $8M</div></div>
@@ -433,7 +464,7 @@ export default function InvestmentsPage() {
               </div>
 
               {/* MINERALS 2 - Marble */}
-              <div className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'minerals' ? 'hidden' : ''}`} data-sector="minerals">
+              <div id="marble-granite-quarry" style={{ scrollMarginTop: 100 }} className={`grid lg:grid-cols-[1fr_340px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 ${activeFilter !== 'all' && activeFilter !== 'minerals' ? 'hidden' : ''}`} data-sector="minerals">
                 <div className="p-8 lg:p-10 flex flex-col">
                   <div className="flex items-start gap-4 mb-4 flex-wrap">
                     <span className="material-symbols-outlined text-primary text-2xl w-12 h-12 flex items-center justify-center bg-primary/10 shrink-0">diamond</span>
@@ -449,7 +480,10 @@ export default function InvestmentsPage() {
                       <span key={t} className="raleway-text text-[10px] font-medium tracking-[0.05em] uppercase px-2.5 py-1 bg-on-surface/5 text-on-surface-variant">{t}</span>
                     ))}
                   </div>
-                  <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                  <div className="flex gap-5 items-center flex-wrap">
+                    <Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Request Information Memorandum &rarr;</Link>
+                    <ShareButton title="Marble & Granite Quarry — Export-Grade Processing" text="Marble & Granite Quarry — Export-Grade Processing, an investment opportunity via CZAAH" anchorId="marble-granite-quarry" />
+                  </div>
                 </div>
                 <div className="bg-surface-container-lowest p-8 lg:p-10 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-outline-variant/10">
                   <div className="mb-5"><div className="raleway-text text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant mb-1">Investment Range</div><div className="raleway-text text-xl font-semibold text-primary">$1M &ndash; $5M</div></div>
