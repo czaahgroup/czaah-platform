@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 
+export const runtime = 'edge';
+
 interface Profile { id: string; full_name: string; role: string }
 interface InvestmentImage { id: string; image_url: string; caption: string | null; display_order: number }
 interface InvestmentDetail {

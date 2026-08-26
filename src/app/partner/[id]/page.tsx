@@ -6,6 +6,8 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { openFile } from '@/lib/utils/openFile'
 
+export const runtime = 'edge';
+
 interface Deal {
   id: string
   title: string

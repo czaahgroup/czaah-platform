@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
+export const runtime = 'edge';
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = createServerClient(

@@ -3,6 +3,8 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushBatch } from '@mmmike/web-push/send'
 
+export const runtime = 'edge';
+
 function getAuthClient(request: NextRequest) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

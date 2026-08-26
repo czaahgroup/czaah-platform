@@ -4,6 +4,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
+export const runtime = 'edge';
+
 interface Property {
   id: string
   title: string

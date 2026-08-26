@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
 
+export const runtime = 'edge';
+
 function getAuthClient(request: NextRequest) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

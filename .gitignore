@@ -17,7 +17,6 @@
 /.next/
 /out/
 /.open-next/
-/.wrangler/
 
 # production
 /build
@@ -35,6 +34,9 @@ yarn-error.log*
 # env files
 .env*
 .dev.vars
+
+# wrangler
+/.wrangler/
 
 # vercel
 .vercel

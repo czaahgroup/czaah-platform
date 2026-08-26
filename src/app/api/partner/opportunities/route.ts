@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
 
+export const runtime = 'edge'
+
 const VALID_TYPES = [
   'buyer_required', 'seller_supplier_available', 'investor_required',
   'investment_available', 'project_available', 'joint_venture',

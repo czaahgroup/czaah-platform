@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { openFile } from '@/lib/utils/openFile'
 
+export const runtime = 'edge';
+
 interface Message {
   id: string
   chat_id: string

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner, hasWorkforceSectorAccess } from '@/lib/partnerAuth'
 
+export const runtime = 'edge'
+
 export async function GET(request: NextRequest) {
   try {
     const auth = await requirePartner(request)

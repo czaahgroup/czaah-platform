@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
 
+export const runtime = 'edge'
+
 const VALID_CONFIDENTIALITY = ['standard', 'confidential', 'highly_confidential']
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
