@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
       __dirname,
       "src/stubs/react-email-render.ts"
     );
+    // Avoid bundling resend's webhook-verification (svix, ~3MB unbundled) and
+    // inbound-email-parsing (postal-mime) dependencies — this app only ever
+    // sends mail via resend.emails.send(), see src/stubs/svix.ts and
+    // src/stubs/postal-mime.ts.
+    config.resolve.alias["svix"] = path.resolve(__dirname, "src/stubs/svix.ts");
+    config.resolve.alias["postal-mime"] = path.resolve(
+      __dirname,
+      "src/stubs/postal-mime.ts"
+    );
     return config;
   },
   async headers() {
