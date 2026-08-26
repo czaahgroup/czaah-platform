@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendPushToUser } from '@/lib/serverPush'
 
 export const runtime = 'edge'
 
@@ -97,6 +98,20 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     await supabase.from('partner_chats').update({ last_message_at: new Date().toISOString() }).eq('id', chatId)
+
+    // Notify the partner this chat belongs to.
+    const { data: chat } = await supabase
+      .from('partner_chats')
+      .select('partners(profile_id)')
+      .eq('id', chatId)
+      .single<{ partners: { profile_id: string } | null }>()
+    if (chat?.partners?.profile_id) {
+      await sendPushToUser(supabase, chat.partners.profile_id, {
+        title: 'New message from CZAAH',
+        body: content.slice(0, 120),
+        tag: 'czaah-new-message',
+      })
+    }
 
     return NextResponse.json({ success: true, data: message })
   } catch (err) {

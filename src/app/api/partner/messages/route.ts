@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
+import { sendPushToUser } from '@/lib/serverPush'
 
 export const runtime = 'edge'
 
@@ -82,6 +83,22 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     await supabase!.from('partner_chats').update({ last_message_at: new Date().toISOString() }).eq('id', chat.id)
+
+    // Notify every super admin -- whichever one has this chat open answers,
+    // so all of them should hear about a new message.
+    const { data: senderProfile } = await supabase!.from('profiles').select('full_name').eq('id', userId).single()
+    const { data: superAdmins } = await supabase!.from('profiles').select('id').eq('role', 'super_admin')
+    if (superAdmins) {
+      await Promise.allSettled(
+        superAdmins.map((a) =>
+          sendPushToUser(supabase!, a.id, {
+            title: `New message from ${senderProfile?.full_name || 'a partner'}`,
+            body: content.slice(0, 120),
+            tag: 'czaah-new-message',
+          })
+        )
+      )
+    }
 
     return NextResponse.json({ success: true, data: message })
   } catch (err) {

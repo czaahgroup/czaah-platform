@@ -36,13 +36,15 @@ self.addEventListener('push', (event) => {
     data = {}
   }
 
-  const title = data.title || 'Incoming call'
+  const tag = data.tag || 'czaah-notification'
+  const isCall = tag === 'czaah-incoming-call'
+  const title = data.title || (isCall ? 'Incoming call' : 'CZAAH')
   const options = {
-    body: data.body || 'You have an incoming call',
+    body: data.body || (isCall ? 'You have an incoming call' : 'You have a new notification'),
     icon: '/favicon/favicon-96x96.png',
     badge: '/favicon/favicon-96x96.png',
-    tag: 'czaah-incoming-call',
-    requireInteraction: true,
+    tag,
+    requireInteraction: isCall,
     data: { callType: data.callType || 'voice' },
   }
 
