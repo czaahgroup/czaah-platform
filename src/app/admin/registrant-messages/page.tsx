@@ -48,6 +48,9 @@ interface Contact {
   subLabel: string
   lastMessageAt: string | null
   profileId: string | null
+  // Elite Members get priority handling — flagged here so they can be
+  // surfaced above the general queue, same as their enquiries.
+  isPriority: boolean
 }
 
 interface Message {
@@ -140,6 +143,7 @@ export default function AdminLiveChatPage() {
         subLabel: roleLabels[c.profiles?.role || ''] || c.profiles?.role || 'Member',
         lastMessageAt: c.last_message_at,
         profileId: c.profile_id,
+        isPriority: c.profiles?.role === 'elite_member',
       }))
 
       const partnerContacts: Contact[] = ((partnerJson.data || []) as PartnerChat[]).map((c) => ({
@@ -149,6 +153,7 @@ export default function AdminLiveChatPage() {
         subLabel: 'Partner Network',
         lastMessageAt: c.last_message_at,
         profileId: c.partners?.profile_id || null,
+        isPriority: false,
       }))
 
       const staffAdmins: StaffProfile[] = staffJson.data?.admins || []
@@ -163,10 +168,13 @@ export default function AdminLiveChatPage() {
           subLabel: a.role === 'super_admin' ? 'Super Admin' : 'Admin',
           lastMessageAt: chat?.last_message_at || null,
           profileId: a.id,
+          isPriority: false,
         }
       })
 
       const combined = [...memberContacts, ...partnerContacts, ...staffContacts].sort((a, b) => {
+        if (a.isPriority && !b.isPriority) return -1
+        if (!a.isPriority && b.isPriority) return 1
         if (!a.lastMessageAt && !b.lastMessageAt) return 0
         if (!a.lastMessageAt) return 1
         if (!b.lastMessageAt) return -1
@@ -288,11 +296,18 @@ export default function AdminLiveChatPage() {
                   key={key}
                   onClick={() => openChat(c)}
                   className={`w-full text-left px-4 py-3 border transition-colors ${
-                    selectedKey === key ? 'bg-surface-container-low border-primary' : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/40'
+                    selectedKey === key
+                      ? 'bg-surface-container-low border-primary'
+                      : c.isPriority
+                      ? 'bg-surface-container-low border-amber-500/50 hover:border-amber-400'
+                      : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/40'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-on-surface truncate">{c.name}</span>
+                    <span className="text-sm font-medium text-on-surface truncate">
+                      {c.isPriority && <span className="text-amber-400 mr-1">⭐</span>}
+                      {c.name}
+                    </span>
                     <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary shrink-0">{c.subLabel}</span>
                   </div>
                   <div className="text-xs text-on-surface-variant/50 mt-1">
@@ -313,7 +328,10 @@ export default function AdminLiveChatPage() {
             <div className="bg-surface-container-low border border-outline-variant/10 flex flex-col h-[600px]">
               {selectedContact && (
                 <div className="flex items-center justify-between gap-2 px-5 py-3 border-b border-outline-variant/10">
-                  <span className="text-sm font-medium text-on-surface truncate">{selectedContact.name}</span>
+                  <span className="text-sm font-medium text-on-surface truncate">
+                    {selectedContact.isPriority && <span className="text-amber-400 mr-1">⭐</span>}
+                    {selectedContact.name}
+                  </span>
                   <div className="flex items-center gap-2 shrink-0">
                     {selectedContact.profileId && activeChatId && (
                       <>

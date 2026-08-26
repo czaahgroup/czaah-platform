@@ -143,6 +143,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const { data: memberProfile } = await supabase
+      .from('profiles')
+      .select('full_name, email, role')
+      .eq('id', user.id)
+      .single()
+
+    // Elite Members get priority handling: their enquiries are flagged so
+    // staff can spot and pick them up first, ahead of the general queue.
+    const isPriority = memberProfile?.role === 'elite_member'
+
     // Notify all super_admins
     const { data: superAdmins } = await supabase
       .from('profiles')
@@ -153,7 +163,7 @@ export async function POST(request: NextRequest) {
       const notifications = superAdmins.map((admin) => ({
         user_id: admin.id,
         type: 'enquiry_assigned' as const,
-        title: 'New Enquiry Submitted',
+        title: isPriority ? '⭐ Priority Enquiry — Elite Member' : 'New Enquiry Submitted',
         body: `New enquiry ${enquiry.reference_number} has been submitted and requires assignment.`,
         link: `/admin/enquiries/${enquiry.id}`,
         is_read: false,
@@ -163,16 +173,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email to info@czaah.com
-    const { data: memberProfile } = await supabase
-      .from('profiles')
-      .select('full_name, email')
-      .eq('id', user.id)
-      .single()
 
     await resend.emails.send({
       from: FROM_EMAIL,
       to: 'info@czaah.com',
-      subject: `New Enquiry — ${enquiry.reference_number}`,
+      subject: `${isPriority ? '⭐ Priority — ' : ''}New Enquiry — ${enquiry.reference_number}`,
       html: wrapEmail(`
         <h2 style="color: #C9A84C; font-size: 20px; margin: 0 0 16px 0;">New Enquiry Submitted</h2>
         <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 16px 0;">
@@ -236,7 +241,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('enquiries')
-      .select('*, profiles!enquiries_member_id_fkey(full_name, email)')
+      .select('*, profiles!enquiries_member_id_fkey(full_name, email, company_name, role)')
       .order('created_at', { ascending: false })
 
     // Filter by role

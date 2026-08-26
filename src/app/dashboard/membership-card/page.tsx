@@ -59,6 +59,7 @@ export default function MembershipCardPage() {
 
   async function downloadCard() {
     if (!card) return
+    const isElite = card.role === 'elite_member'
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(card.qrData)}&size=300x300&bgcolor=080808&color=C9A84C`
     const qrImg = await loadExternalImage(qrUrl).catch(() => null)
 
@@ -69,23 +70,23 @@ export default function MembershipCardPage() {
 
     // Draw background gradient
     const grad = ctx.createLinearGradient(0, 0, 680, 428)
-    grad.addColorStop(0, '#0a0a0a')
+    grad.addColorStop(0, isElite ? '#14120a' : '#0a0a0a')
     grad.addColorStop(1, '#111111')
     ctx.fillStyle = grad
     ctx.beginPath()
     ctx.roundRect(0, 0, 680, 428, 24)
     ctx.fill()
 
-    // Gold radial glow
+    // Gold radial glow — brighter for Elite
     const radGrad = ctx.createRadialGradient(340, 214, 50, 340, 214, 400)
-    radGrad.addColorStop(0, 'rgba(201,168,76,0.06)')
+    radGrad.addColorStop(0, isElite ? 'rgba(201,168,76,0.16)' : 'rgba(201,168,76,0.06)')
     radGrad.addColorStop(1, 'rgba(201,168,76,0)')
     ctx.fillStyle = radGrad
     ctx.fillRect(0, 0, 680, 428)
 
     // Draw gold border
-    ctx.strokeStyle = 'rgba(201,168,76,0.15)'
-    ctx.lineWidth = 2
+    ctx.strokeStyle = isElite ? 'rgba(201,168,76,0.45)' : 'rgba(201,168,76,0.15)'
+    ctx.lineWidth = isElite ? 3 : 2
     ctx.beginPath()
     ctx.roundRect(0, 0, 680, 428, 24)
     ctx.stroke()
@@ -145,18 +146,30 @@ export default function MembershipCardPage() {
     ctx.font = '400 14px Raleway, sans-serif'
     ctx.fillText(card.companyName || '', 40, 336)
 
-    // Tier badge
+    // Tier badge — filled/gold for Elite, outlined for everyone else
     const tier = getTierLabel(card.role)
-    ctx.font = '500 11px Raleway, sans-serif'
+    ctx.font = isElite ? '700 11px Raleway, sans-serif' : '500 11px Raleway, sans-serif'
     const tierWidth = ctx.measureText(tier).width
     const badgeX = 40
     const badgeY = 358
-    ctx.strokeStyle = 'rgba(201,168,76,0.5)'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.roundRect(badgeX, badgeY - 12, tierWidth + 20, 20, 10)
-    ctx.stroke()
-    ctx.fillStyle = '#C9A84C'
+    if (isElite) {
+      const badgeGrad = ctx.createLinearGradient(badgeX, badgeY, badgeX + tierWidth + 20, badgeY)
+      badgeGrad.addColorStop(0, '#8a6f2e')
+      badgeGrad.addColorStop(0.5, '#c9a84c')
+      badgeGrad.addColorStop(1, '#8a6f2e')
+      ctx.fillStyle = badgeGrad
+      ctx.beginPath()
+      ctx.roundRect(badgeX, badgeY - 12, tierWidth + 20, 20, 10)
+      ctx.fill()
+      ctx.fillStyle = '#000'
+    } else {
+      ctx.strokeStyle = 'rgba(201,168,76,0.5)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.roundRect(badgeX, badgeY - 12, tierWidth + 20, 20, 10)
+      ctx.stroke()
+      ctx.fillStyle = '#C9A84C'
+    }
     ctx.textAlign = 'left'
     ctx.fillText(tier, badgeX + 10, badgeY + 3)
 
@@ -213,6 +226,7 @@ export default function MembershipCardPage() {
   }
 
   const tier = getTierLabel(card.role)
+  const isElite = card.role === 'elite_member'
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(card.qrData)}&size=150x150&bgcolor=080808&color=C9A84C`
 
   return (
@@ -267,9 +281,13 @@ export default function MembershipCardPage() {
             WebkitBackfaceVisibility: 'hidden',
             borderRadius: '0px',
             overflow: 'hidden',
-            background: 'linear-gradient(160deg, #0a0a0a 0%, #111111 100%)',
-            border: '1px solid rgba(201,168,76,0.15)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(201,168,76,0.03)',
+            background: isElite
+              ? 'linear-gradient(160deg, #14120a 0%, #0a0a0a 55%, #111111 100%)'
+              : 'linear-gradient(160deg, #0a0a0a 0%, #111111 100%)',
+            border: isElite ? '1px solid rgba(201,168,76,0.4)' : '1px solid rgba(201,168,76,0.15)',
+            boxShadow: isElite
+              ? '0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(201,168,76,0.08)'
+              : '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(201,168,76,0.03)',
             padding: '24px 28px',
             display: 'flex',
             flexDirection: 'column',
@@ -277,14 +295,16 @@ export default function MembershipCardPage() {
           }}
           className="membership-card-face"
           >
-            {/* Gold radial glow overlay */}
+            {/* Gold radial glow overlay — brighter for Elite */}
             <div style={{
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.05) 0%, transparent 60%)',
+              background: isElite
+                ? 'radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.14) 0%, transparent 65%)'
+                : 'radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.05) 0%, transparent 60%)',
               pointerEvents: 'none',
             }} />
 
@@ -368,17 +388,18 @@ export default function MembershipCardPage() {
                 marginBottom: '12px',
               }}>{card.companyName}</div>
 
-              {/* Tier Badge */}
+              {/* Tier Badge — filled/gold for Elite, outlined for everyone else */}
               <div style={{
                 display: 'inline-block',
                 padding: '3px 14px',
-                border: '1px solid rgba(201,168,76,0.5)',
+                border: isElite ? 'none' : '1px solid rgba(201,168,76,0.5)',
                 borderRadius: '20px',
+                background: isElite ? 'linear-gradient(135deg, #8a6f2e 0%, #c9a84c 50%, #8a6f2e 100%)' : 'transparent',
                 fontFamily: "'Raleway', sans-serif",
                 fontSize: '9px',
-                fontWeight: 600,
+                fontWeight: isElite ? 700 : 600,
                 letterSpacing: '2px',
-                color: '#C9A84C',
+                color: isElite ? '#000' : '#C9A84C',
                 marginBottom: '14px',
               }}>{tier}</div>
 

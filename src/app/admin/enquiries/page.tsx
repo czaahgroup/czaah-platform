@@ -22,7 +22,7 @@ interface Enquiry {
   assigned_at: string | null
   created_at: string
   member_id: string
-  profiles?: { full_name: string; email: string; company_name: string | null }
+  profiles?: { full_name: string; email: string; company_name: string | null; role?: string }
 }
 
 interface PublicMessage {
@@ -253,10 +253,22 @@ export default function AdminEnquiriesPage() {
     return true
   })
 
+  // Elite Members get priority handling — their enquiries bubble to the
+  // top of the list so staff pick them up ahead of the general queue.
+  function isPriorityItem(item: CombinedItem) {
+    return item.kind === 'enquiry' && item.enquiry?.profiles?.role === 'elite_member'
+  }
+
   const items: CombinedItem[] = [
     ...(typeFilter !== 'messages' ? filteredEnquiries.map((e): CombinedItem => ({ key: `enquiry:${e.id}`, kind: 'enquiry', createdAt: e.created_at, enquiry: e })) : []),
     ...(typeFilter !== 'enquiries' ? filteredMessages.map((m): CombinedItem => ({ key: `message:${m.id}`, kind: 'message', createdAt: m.created_at, message: m })) : []),
-  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  ].sort((a, b) => {
+    const aPriority = isPriorityItem(a)
+    const bPriority = isPriorityItem(b)
+    if (aPriority && !bPriority) return -1
+    if (!aPriority && bPriority) return 1
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  })
 
   const selected = items.find((i) => i.key === selectedKey) || null
 
@@ -367,6 +379,8 @@ export default function AdminEnquiriesPage() {
                       className={`w-full text-left px-5 py-4 border transition-colors ${
                         selectedKey === item.key
                           ? 'bg-surface-container-low border-primary'
+                          : isPriorityItem(item)
+                          ? 'bg-surface-container-low border-amber-500/50 hover:border-amber-400'
                           : isUnassigned
                           ? 'bg-surface-container-low border-primary/40 hover:border-primary'
                           : 'bg-surface-container-low border-outline-variant/10 hover:border-primary/50'
@@ -375,6 +389,9 @@ export default function AdminEnquiriesPage() {
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="min-w-0">
                           <div className="flex items-center gap-3 mb-1 flex-wrap">
+                            {isPriorityItem(item) && (
+                              <span className="text-xs px-2 py-0.5 shrink-0 bg-amber-500/20 text-amber-400 font-semibold">⭐ Priority</span>
+                            )}
                             <span className="text-sm font-medium text-on-surface truncate">{enq.reference_number}</span>
                             <span className={`text-xs px-2 py-0.5 shrink-0 ${ENQUIRY_STATUS_BADGES[enq.status] || ''}`}>{enq.status}</span>
                             <span className="text-xs px-2 py-0.5 shrink-0 bg-primary/10 text-primary">Enquiry</span>
@@ -439,9 +456,14 @@ export default function AdminEnquiriesPage() {
           ) : selected.kind === 'enquiry' ? (
             <div className="bg-surface-container-low border border-outline-variant/10">
               <div className="px-6 py-4 border-b border-outline-variant/10">
-                <h2 className="font-[family-name:var(--font-heading)] text-lg text-on-surface mb-1">
-                  {selected.enquiry!.reference_number}
-                </h2>
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h2 className="font-[family-name:var(--font-heading)] text-lg text-on-surface">
+                    {selected.enquiry!.reference_number}
+                  </h2>
+                  {isPriorityItem(selected) && (
+                    <span className="text-xs px-2 py-0.5 shrink-0 bg-amber-500/20 text-amber-400 font-semibold">⭐ Priority — Elite Member</span>
+                  )}
+                </div>
                 <span className={`text-xs px-2 py-0.5 ${ENQUIRY_STATUS_BADGES[selected.enquiry!.status] || ''}`}>
                   {selected.enquiry!.status}
                 </span>
