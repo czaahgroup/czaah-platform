@@ -2,6 +2,8 @@
 // @ts-nocheck
 
 import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { ChatPanel } from '@/components/chat/ChatPanel'
 
 
 interface Enquiry {
@@ -56,9 +58,18 @@ export default function AdminEnquiriesPage() {
   const [assigning, setAssigning] = useState(false)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [sectorFilter, setSectorFilter] = useState<string>('all')
+  const [currentUserId, setCurrentUserId] = useState<string>('')
+  const [currentUserRole, setCurrentUserRole] = useState<string>('super_admin')
 
   useEffect(() => {
     loadData()
+    const supabase = createClient()
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session?.user) return
+      setCurrentUserId(session.user.id)
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
+      if (profile?.role) setCurrentUserRole(profile.role)
+    })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadData() {
@@ -210,9 +221,9 @@ export default function AdminEnquiriesPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
         {/* Enquiry list */}
-        <div className="xl:col-span-2">
+        <div className="xl:col-span-2 max-h-[calc(100vh-200px)] overflow-y-auto">
           {filtered.length === 0 ? (
             <div className="bg-surface-container-low border border-outline-variant/10 rounded-none px-6 py-16 text-center">
               <p className="text-on-surface-variant">No enquiries found.</p>
@@ -275,10 +286,10 @@ export default function AdminEnquiriesPage() {
           )}
         </div>
 
-        {/* Assignment panel */}
-        <div>
+        {/* Assignment + chat panel */}
+        <div className="xl:col-span-3">
           {selected ? (
-            <div className="bg-surface-container-low border border-outline-variant/10 rounded-none sticky top-8">
+            <div className="bg-surface-container-low border border-outline-variant/10 rounded-none">
               <div className="px-6 py-4 border-b border-outline-variant/10">
                 <h2 className="font-[family-name:var(--font-heading)] text-lg text-on-surface mb-1">
                   {selected.reference_number}
@@ -358,15 +369,14 @@ export default function AdminEnquiriesPage() {
                     ? 'Reassign'
                     : 'Assign'}
                 </button>
+              </div>
 
-                <a
-                  href={`/dashboard/enquiries/${selected.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-center text-sm text-primary hover:underline mt-3"
-                >
-                  Open Enquiry
-                </a>
+              <div className="h-[500px] border-t border-outline-variant/10">
+                <ChatPanel
+                  enquiryId={selected.id}
+                  currentUserId={currentUserId}
+                  userRole={currentUserRole}
+                />
               </div>
             </div>
           ) : (
