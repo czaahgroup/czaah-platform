@@ -54,6 +54,10 @@ export default function PropertyPortalPage() {
   const [market, setMarket] = useState(searchParams.get('market') || 'all');
 
   useEffect(() => {
+    setMarket(searchParams.get('market') || 'all');
+  }, [searchParams]);
+
+  useEffect(() => {
     async function load() {
       try {
         const res = await fetch('/api/public/properties?countries=' + encodeURIComponent('Pakistan,United Kingdom,United Arab Emirates'));
