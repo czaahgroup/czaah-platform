@@ -55,6 +55,7 @@ export default function MeetingRoomPage() {
   const [userName, setUserName] = useState<string>('')
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [needsGuestName, setNeedsGuestName] = useState(false)
+  const [isGuest, setIsGuest] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -76,6 +77,7 @@ export default function MeetingRoomPage() {
     const guestId = `guest-${crypto.randomUUID()}`
     setUserId(guestId)
     setUserName(name)
+    setIsGuest(true)
     setNeedsGuestName(false)
   }
 
@@ -83,6 +85,7 @@ export default function MeetingRoomPage() {
     roomId,
     currentUserId: userId || '',
     currentUserName: userName,
+    requiresApproval: isGuest,
   })
 
   function handleLeave() {
@@ -110,6 +113,34 @@ export default function MeetingRoomPage() {
     )
   }
 
+  if (room.denied) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: '14px', color: 'rgba(255,255,255,0.6)', textAlign: 'center' }}>
+          Your request to join was declined.
+        </p>
+      </div>
+    )
+  }
+
+  if (isGuest && !room.joined) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '48px', height: '48px', borderRadius: '50%', border: '2px solid rgba(201,168,76,0.3)',
+            borderTopColor: '#C9A84C', margin: '0 auto 20px', animation: 'spin 1s linear infinite',
+          }} />
+          <style>{'@keyframes spin { to { transform: rotate(360deg); } }'}</style>
+          <p style={{ fontFamily: "'Cinzel', serif", fontSize: '16px', color: '#fff', marginBottom: '8px' }}>Asking to join...</p>
+          <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+            Someone in the meeting needs to let you in.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <MeetingRoomUI
       roomId={roomId}
@@ -122,6 +153,9 @@ export default function MeetingRoomPage() {
       onToggleVideo={room.toggleVideo}
       onLeave={handleLeave}
       localName={userName}
+      pendingRequests={room.pendingRequests}
+      onAdmit={room.admitRequest}
+      onDeny={room.denyRequest}
     />
   )
 }

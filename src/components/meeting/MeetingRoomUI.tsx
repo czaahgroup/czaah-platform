@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import type { RoomParticipant } from '@/lib/hooks/useMeetingRoom'
+import type { RoomParticipant, JoinRequest } from '@/lib/hooks/useMeetingRoom'
 
 function VideoTile({
   stream,
@@ -69,6 +69,9 @@ export function MeetingRoomUI({
   onToggleVideo,
   onLeave,
   localName,
+  pendingRequests,
+  onAdmit,
+  onDeny,
 }: {
   roomId: string
   localStream: MediaStream | null
@@ -80,6 +83,9 @@ export function MeetingRoomUI({
   onToggleVideo: () => void
   onLeave: () => void
   localName: string
+  pendingRequests?: JoinRequest[]
+  onAdmit?: (requesterId: string) => void
+  onDeny?: (requesterId: string) => void
 }) {
   const [copied, setCopied] = useState(false)
 
@@ -111,6 +117,38 @@ export function MeetingRoomUI({
           {copied ? 'Link Copied' : 'Copy Invite Link'}
         </button>
       </div>
+
+      {pendingRequests && pendingRequests.length > 0 && (
+        <div style={{ padding: '0 24px 12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {pendingRequests.map((r) => (
+            <div
+              key={r.requesterId}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
+                padding: '10px 16px', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.25)',
+              }}
+            >
+              <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: '13px', color: '#fff' }}>
+                <strong style={{ color: '#C9A84C' }}>{r.requesterName}</strong> wants to join
+              </span>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => onDeny?.(r.requesterId)}
+                  style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.08)', border: 'none', color: 'rgba(255,255,255,0.7)', fontFamily: "'Raleway', sans-serif", fontSize: '12px', cursor: 'pointer' }}
+                >
+                  Deny
+                </button>
+                <button
+                  onClick={() => onAdmit?.(r.requesterId)}
+                  style={{ padding: '6px 14px', background: 'linear-gradient(135deg, #8a6f2e, #c9a84c)', border: 'none', color: '#000', fontFamily: "'Raleway', sans-serif", fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}
+                >
+                  Admit
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div style={{ flex: 1, display: 'grid', gap: '10px', padding: '0 24px 16px', ...gridStyle(tiles.length) }}>
         {tiles.map((t) => (

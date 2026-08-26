@@ -1,11 +1,17 @@
 'use client'
 
 // Google-Meet-style open room: unlike useCall (caller/callee ringing tied
-// to one chat), anyone who opens the room link just joins directly. Every
-// pair of participants connects automatically via presence — whichever
-// side has the lexicographically smaller user id sends the offer, so
-// exactly one side initiates per pair and there's no "glare" of both
-// sides offering at once.
+// to one chat), a recognized member/staff joins directly. Every pair of
+// participants connects automatically via presence — whichever side has
+// the lexicographically smaller user id sends the offer, so exactly one
+// side initiates per pair and there's no "glare" of both sides offering
+// at once.
+//
+// A guest (requiresApproval) instead "knocks": they subscribe to the
+// channel and broadcast a join request, but do NOT acquire media or track
+// presence until someone already in the room admits them — mirroring
+// Google Meet's "Someone wants to join" gate for people outside the
+// organization.
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -19,10 +25,16 @@ export interface RoomParticipant {
   isVideoOff: boolean
 }
 
+export interface JoinRequest {
+  requesterId: string
+  requesterName: string
+}
+
 export interface UseMeetingRoomOptions {
   roomId: string
   currentUserId: string
   currentUserName: string
+  requiresApproval?: boolean
 }
 
 export interface UseMeetingRoomReturn {
@@ -31,6 +43,11 @@ export interface UseMeetingRoomReturn {
   isMuted: boolean
   isVideoOff: boolean
   joined: boolean
+  awaitingApproval: boolean
+  denied: boolean
+  pendingRequests: JoinRequest[]
+  admitRequest: (requesterId: string) => void
+  denyRequest: (requesterId: string) => void
   toggleMute: () => void
   toggleVideo: () => void
   leave: () => void
@@ -41,12 +58,15 @@ const FALLBACK_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun1.l.google.com:19302' },
 ]
 
-export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMeetingRoomOptions): UseMeetingRoomReturn {
+export function useMeetingRoom({ roomId, currentUserId, currentUserName, requiresApproval }: UseMeetingRoomOptions): UseMeetingRoomReturn {
   const [participants, setParticipants] = useState<RoomParticipant[]>([])
   const [localStream, setLocalStream] = useState<MediaStream | null>(null)
   const [isMuted, setIsMuted] = useState(false)
   const [isVideoOff, setIsVideoOff] = useState(false)
   const [joined, setJoined] = useState(false)
+  const [awaitingApproval, setAwaitingApproval] = useState(false)
+  const [denied, setDenied] = useState(false)
+  const [pendingRequests, setPendingRequests] = useState<JoinRequest[]>([])
 
   const supabase = createClient()
   const channelRef = useRef<RealtimeChannel | null>(null)
@@ -56,6 +76,7 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMe
   const pendingCandidatesRef = useRef<Map<string, RTCIceCandidateInit[]>>(new Map())
   const iceServersRef = useRef<RTCIceServer[]>(FALLBACK_ICE_SERVERS)
   const namesRef = useRef<Map<string, string>>(new Map())
+  const admittedRef = useRef(false)
 
   // Fetch short-lived TURN credentials — same endpoint the Live Chat calls
   // use, so meetings connect across networks too, not just on the same LAN.
@@ -169,14 +190,24 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMe
     if (!roomId || !currentUserId) return
     let cancelled = false
 
-    async function setup() {
+    // Runs once this identity is cleared to actually be in the room —
+    // immediately for a recognized member/staff, or after an admit for a
+    // waiting guest.
+    async function admitSelf(channel: RealtimeChannel) {
+      if (admittedRef.current || cancelled) return
+      admittedRef.current = true
       try {
         await getLocalMedia()
       } catch (err) {
         console.error('[useMeetingRoom] Failed to get local media:', err)
       }
       if (cancelled) return
+      await channel.track({ user_name: currentUserName })
+      setAwaitingApproval(false)
+      setJoined(true)
+    }
 
+    async function setup() {
       const channel = supabase.channel(`meeting-room:${roomId}`, {
         config: { presence: { key: currentUserId } },
       })
@@ -249,10 +280,33 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMe
           if (payload.senderId === currentUserId) return
           setParticipants((prev) => prev.map((p) => (p.userId === payload.senderId ? { ...p, isMuted: payload.isMuted, isVideoOff: payload.isVideoOff } : p)))
         })
+        .on('broadcast', { event: 'join-request' }, ({ payload }) => {
+          if (payload.requesterId === currentUserId) return
+          // Only someone who's actually in the room can see and act on a
+          // knock — a fellow waiting guest doesn't get a say.
+          if (!admittedRef.current) return
+          setPendingRequests((prev) => (prev.some((r) => r.requesterId === payload.requesterId) ? prev : [...prev, { requesterId: payload.requesterId, requesterName: payload.requesterName || 'Guest' }]))
+        })
+        .on('broadcast', { event: 'join-approved' }, ({ payload }) => {
+          if (payload.targetId !== currentUserId) return
+          admitSelf(channel)
+        })
+        .on('broadcast', { event: 'join-denied' }, ({ payload }) => {
+          if (payload.targetId !== currentUserId) return
+          setAwaitingApproval(false)
+          setDenied(true)
+        })
         .subscribe(async (status) => {
-          if (status === 'SUBSCRIBED') {
-            await channel.track({ user_name: currentUserName })
-            setJoined(true)
+          if (status !== 'SUBSCRIBED' || cancelled) return
+          if (requiresApproval) {
+            setAwaitingApproval(true)
+            channel.send({
+              type: 'broadcast',
+              event: 'join-request',
+              payload: { requesterId: currentUserId, requesterName: currentUserName },
+            })
+          } else {
+            await admitSelf(channel)
           }
         })
 
@@ -263,7 +317,10 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMe
 
     return () => {
       cancelled = true
+      admittedRef.current = false
       setJoined(false)
+      setAwaitingApproval(false)
+      setPendingRequests([])
       if (localStreamRef.current) {
         localStreamRef.current.getTracks().forEach((t) => t.stop())
         localStreamRef.current = null
@@ -280,7 +337,25 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMe
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, currentUserId])
+  }, [roomId, currentUserId, requiresApproval])
+
+  const admitRequest = useCallback((requesterId: string) => {
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: 'join-approved',
+      payload: { targetId: requesterId },
+    })
+    setPendingRequests((prev) => prev.filter((r) => r.requesterId !== requesterId))
+  }, [])
+
+  const denyRequest = useCallback((requesterId: string) => {
+    channelRef.current?.send({
+      type: 'broadcast',
+      event: 'join-denied',
+      payload: { targetId: requesterId },
+    })
+    setPendingRequests((prev) => prev.filter((r) => r.requesterId !== requesterId))
+  }, [])
 
   const toggleMute = useCallback(() => {
     const stream = localStreamRef.current
@@ -313,6 +388,7 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMe
   }, [currentUserId, isMuted])
 
   const leave = useCallback(() => {
+    admittedRef.current = false
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((t) => t.stop())
       localStreamRef.current = null
@@ -326,8 +402,23 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName }: UseMe
       channelRef.current = null
     }
     setJoined(false)
+    setAwaitingApproval(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { participants, localStream, isMuted, isVideoOff, joined, toggleMute, toggleVideo, leave }
+  return {
+    participants,
+    localStream,
+    isMuted,
+    isVideoOff,
+    joined,
+    awaitingApproval,
+    denied,
+    pendingRequests,
+    admitRequest,
+    denyRequest,
+    toggleMute,
+    toggleVideo,
+    leave,
+  }
 }
