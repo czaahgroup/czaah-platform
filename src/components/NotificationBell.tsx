@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { updateAppBadge } from '@/lib/appBadge'
 
 interface Notification {
   id: string
@@ -62,6 +63,11 @@ export function NotificationBell() {
     const interval = setInterval(fetchCount, 30000)
     return () => clearInterval(interval)
   }, [fetchCount])
+
+  // Reflect unread count on the installed app's home screen icon
+  useEffect(() => {
+    updateAppBadge(unreadCount)
+  }, [unreadCount])
 
   // Close on outside click
   useEffect(() => {

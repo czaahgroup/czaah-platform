@@ -46,7 +46,12 @@ self.addEventListener('push', (event) => {
     data: { callType: data.callType || 'voice' },
   }
 
-  event.waitUntil(self.registration.showNotification(title, options))
+  event.waitUntil(
+    Promise.all([
+      self.registration.showNotification(title, options),
+      'setAppBadge' in navigator ? navigator.setAppBadge(1).catch(() => {}) : Promise.resolve(),
+    ])
+  )
 })
 
 // Notification click — focus an already-open tab if there is one, otherwise
