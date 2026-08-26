@@ -125,7 +125,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <SectionHeader label="Enquiries" />
         <NavLink href="/admin/enquiries" label="All Enquiries" icon="contact_mail" />
-        <NavLink href="/admin/messages" label="Website Messages" icon="mail" />
 
         <SectionHeader label="Partner Network" />
         <NavLink href="/admin/partners" label="Partners" icon="handshake" />
