@@ -162,7 +162,9 @@ export default function RealEstatePage() {
         body: JSON.stringify({ propertyId }),
       });
       const json = await res.json();
-      if (res.ok && json.data?.id) {
+      if (res.ok && json.redirect) {
+        router.push(json.redirect);
+      } else if (res.ok && json.data?.id) {
         router.push(`/dashboard/property-chats?id=${json.data.id}`);
       } else {
         alert(json.error || 'Failed to start enquiry. Please try again.');

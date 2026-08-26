@@ -133,6 +133,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot enquire on your own property' }, { status: 400 })
     }
 
+    // CZAAH's own showcase listings (added directly, not by a real_estate_partner)
+    // have no partner_id — there's no one to route a direct chat to, so send
+    // these enquiries through the general contact form instead.
+    if (!property.partner_id) {
+      return NextResponse.json({ redirect: `/contact?interest=${encodeURIComponent(property.title)}#contact-form` })
+    }
+
     // Check if chat already exists
     const { data: existingChat } = await supabase
       .from('property_chats')
