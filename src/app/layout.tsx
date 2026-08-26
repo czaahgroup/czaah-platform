@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { CookieConsent } from "@/components/CookieConsent"
 import { AiChatWidget } from "@/components/AiChatWidget"
+import { InstallAppBanner } from "@/components/InstallAppBanner"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -75,6 +76,7 @@ export default function RootLayout({
         {children}
         <CookieConsent />
         <AiChatWidget />
+        <InstallAppBanner />
         {/* Register service worker */}
         <script
           dangerouslySetInnerHTML={{
