@@ -60,8 +60,9 @@ export default function MeetingsPage() {
   useEffect(() => {
     async function init() {
       const { data: { user } } = await supabase.auth.getUser(); if (user) setCurrentUserId(user.id)
-      const { data: profiles } = await supabase.from('profiles').select('id, full_name, email').eq('status', 'approved').order('full_name')
-      if (profiles) setMembers(profiles.filter(p => p.id !== user?.id))
+      const membersRes = await fetch('/api/meetings/members')
+      const membersResult = await membersRes.json()
+      if (membersRes.ok && membersResult.data) setMembers(membersResult.data)
       await loadMeetings(); setLoading(false)
     }
     init()
