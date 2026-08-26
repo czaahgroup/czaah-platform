@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
-
 // Public autocomplete source — distinct cities and specific areas/locations
 // across all approved listings, so the search box can suggest real places
 // rather than a hardcoded list.

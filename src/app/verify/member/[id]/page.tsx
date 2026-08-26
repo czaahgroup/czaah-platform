@@ -2,8 +2,6 @@
 
 import { useEffect, useState, use } from 'react';
 
-export const runtime = 'edge';
-
 interface VerifyData {
   full_name: string;
   company_name: string | null;

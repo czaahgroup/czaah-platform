@@ -6,8 +6,6 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-export const runtime = 'edge';
-
 interface Product {
   id: string
   name: string

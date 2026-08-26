@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
-
 export async function GET(request: NextRequest) {
   try {
     // Auth check

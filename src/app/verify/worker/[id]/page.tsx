@@ -2,8 +2,6 @@
 
 import { useEffect, useState, use } from 'react';
 
-export const runtime = 'edge';
-
 interface VerifyData {
   id: string;
   full_name: string;

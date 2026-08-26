@@ -3,8 +3,6 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 
-export const runtime = 'edge';
-
 function createAuthClient(request: NextRequest) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
-
 // Public Employment Promoter verification lookup — deliberately returns only
 // non-sensitive fields (no email, phone, contact person, notes). License
 // number is intentionally included since verifying it is the whole point.

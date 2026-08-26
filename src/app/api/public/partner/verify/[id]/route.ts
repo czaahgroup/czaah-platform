@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
-
 // Public partner card verification lookup — deliberately returns only
 // non-sensitive fields. Anyone with the QR code / share link can confirm
 // someone holds a genuine CZAAH Partner Network membership.

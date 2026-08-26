@@ -3,8 +3,6 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 
-export const runtime = 'edge';
-
 export async function GET(request: NextRequest) {
   try {
     // Verify authenticated user

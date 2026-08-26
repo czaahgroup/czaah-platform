@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
-
 function escapeCSV(value: unknown): string {
   if (value === null || value === undefined) return ''
   const str = typeof value === 'object' ? JSON.stringify(value) : String(value)

@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
-import webpush from 'web-push'
-
-// web-push pulls in https-proxy-agent, which uses Node's raw net/http/https
-// modules -- Next.js's edge runtime bundler rejects those at build time
-// regardless of Cloudflare's nodejs_compat flag (that's a Next.js-level
-// restriction, not a Workers one). @opennextjs/cloudflare is built to run
-// standard Node-runtime routes on Workers via nodejs_compat, so this one
-// route uses the Node.js runtime instead of edge like the rest of the app.
+import { sendPushBatch } from '@mmmike/web-push/send'
 
 function getAuthClient(request: NextRequest) {
   return createServerClient(
@@ -47,12 +40,11 @@ export async function POST(request: NextRequest) {
       // Push isn't configured — not an error, just nothing to do.
       return NextResponse.json({ sent: 0 })
     }
-    webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey)
 
     const supabase = createAdminClient()
     const { data: subs } = await supabase
       .from('push_subscriptions')
-      .select('id, endpoint, p256dh, auth')
+      .select('endpoint, p256dh, auth')
       .eq('user_id', targetUserId)
 
     if (!subs || subs.length === 0) {
@@ -60,35 +52,22 @@ export async function POST(request: NextRequest) {
     }
 
     const label = callType === 'video' ? 'video call' : 'call'
-    const payload = JSON.stringify({
-      title: `Incoming ${label}`,
-      body: `${callerName} is calling you`,
-      callType: callType || 'voice',
-      callerName,
-    })
+    const subscriptions = subs.map((s) => ({
+      endpoint: s.endpoint,
+      keys: { p256dh: s.p256dh, auth: s.auth },
+    }))
 
-    let sent = 0
-    await Promise.all(
-      subs.map(async (sub) => {
-        try {
-          await webpush.sendNotification(
-            { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-            payload
-          )
-          sent += 1
-        } catch (err: unknown) {
-          const status = (err as { statusCode?: number })?.statusCode
-          if (status === 404 || status === 410) {
-            // Subscription is dead (unsubscribed, expired, browser data cleared) — clean it up.
-            await supabase.from('push_subscriptions').delete().eq('id', sub.id)
-          } else {
-            console.warn('[push] Failed to send to one subscription:', err)
-          }
-        }
-      })
+    const result = await sendPushBatch(
+      subscriptions,
+      { title: `Incoming ${label}`, body: `${callerName} is calling you`, tag: 'czaah-incoming-call' },
+      { publicKey: vapidPublicKey, privateKey: vapidPrivateKey, subject: vapidSubject }
     )
 
-    return NextResponse.json({ sent })
+    if (result.gone.length > 0) {
+      await supabase.from('push_subscriptions').delete().in('endpoint', result.gone)
+    }
+
+    return NextResponse.json({ sent: result.delivered })
   } catch (err) {
     console.error('POST /api/push/notify-call error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

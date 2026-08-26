@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 
-export const runtime = 'edge';
-
 export async function POST(request: Request) {
   // Rate limit: 5 per hour per IP
   const ip = request.headers.get('x-forwarded-for') || 'unknown'

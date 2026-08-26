@@ -8,8 +8,6 @@ import Link from 'next/link'
 import { ChatPanel } from '@/components/chat/ChatPanel'
 import { openFile } from '@/lib/utils/openFile'
 
-export const runtime = 'edge';
-
 interface Profile {
   id: string
   full_name: string

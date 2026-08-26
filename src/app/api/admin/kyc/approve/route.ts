@@ -3,8 +3,6 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 
-export const runtime = 'edge';
-
 export async function POST(request: NextRequest) {
   try {
     // Verify caller is super_admin

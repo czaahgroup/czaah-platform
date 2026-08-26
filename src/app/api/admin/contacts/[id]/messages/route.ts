@@ -3,8 +3,6 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 
-export const runtime = 'edge';
-
 function getAuthClient(request: NextRequest) {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
