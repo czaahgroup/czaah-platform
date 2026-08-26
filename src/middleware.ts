@@ -2,6 +2,23 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // property.czaah.com is a separate, publicly-browsable property portal
+  // (London/Dubai/Pakistan listings) backed by the same app — it lives
+  // internally under /property-portal. A handful of paths (auth, contact,
+  // APIs) are intentionally left un-rewritten so they keep hitting the
+  // main site's existing pages/routes, shared across both domains.
+  const host = request.headers.get('host') || ''
+  if (host === 'property.czaah.com') {
+    const { pathname } = request.nextUrl
+    const sharedPaths = ['/login', '/register', '/reset-password', '/contact']
+    const isShared = pathname.startsWith('/api/') || sharedPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))
+    if (!isShared && !pathname.startsWith('/property-portal')) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/property-portal${pathname === '/' ? '' : pathname}`
+      return NextResponse.rewrite(url)
+    }
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -36,6 +53,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/auth/') ||
     pathname.startsWith('/sectors') ||
     pathname.startsWith('/services') ||
+    pathname.startsWith('/property-portal') ||
     pathname.startsWith('/verify') ||
     pathname.startsWith('/api/public/') ||
     pathname === '/api/contact' ||

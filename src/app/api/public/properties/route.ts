@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const minPrice = searchParams.get('min_price')
     const maxPrice = searchParams.get('max_price')
     const search = searchParams.get('search')
+    const countries = searchParams.get('countries') // comma-separated, e.g. "Pakistan,United Kingdom"
 
     let query = supabase
       .from('property_listings')
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
     if (minPrice) query = query.gte('price', Number(minPrice))
     if (maxPrice) query = query.lte('price', Number(maxPrice))
     if (search) query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%,country.ilike.%${search}%`)
+    if (countries) query = query.in('country', countries.split(',').map((c) => c.trim()))
 
     const { data: properties, error } = await query
 
