@@ -342,6 +342,8 @@ export function Navbar() {
                 )}
                 {userRole === 'investment_partner' ? (
                   <Link href="/partner" onClick={() => setUserDropdownOpen(false)}>Partner Portal</Link>
+                ) : userRole === 'partner' ? (
+                  <Link href="/partner-network" onClick={() => setUserDropdownOpen(false)}>Partner Network</Link>
                 ) : (
                   <>
                     <Link href="/dashboard" onClick={() => setUserDropdownOpen(false)}>My Dashboard</Link>
@@ -474,6 +476,8 @@ export function Navbar() {
               </div>
               {userRole === 'investment_partner' ? (
                 <Link href="/partner" className="mobile-nav-cta">Partner Portal</Link>
+              ) : userRole === 'partner' ? (
+                <Link href="/partner-network" className="mobile-nav-cta">Partner Network</Link>
               ) : (
                 <>
                   <Link href="/dashboard" className="mobile-nav-cta">My Dashboard</Link>

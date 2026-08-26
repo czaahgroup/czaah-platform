@@ -105,6 +105,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
+  // Partners have no account area under /dashboard — send them to their
+  // actual portal instead of the generic member dashboard.
+  if (pathname.startsWith('/dashboard') && profile.role === 'partner') {
+    return NextResponse.redirect(new URL('/partner-network', request.url))
+  }
+
   // /dashboard — approved members, admins, and investment partners
   // /sectors, /services, /investments — approved users
   // These are all allowed for approved users, no extra check needed
