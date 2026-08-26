@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { AdminSidebarWrapper } from '@/components/AdminSidebarWrapper'
 import { PartnerCallProvider } from '@/lib/contexts/PartnerCallContext'
 import { MemberCallProvider } from '@/lib/contexts/MemberCallContext'
-import { generateMeetingCode } from '@/lib/utils/meetingCode'
+import { NewMeetingMenu } from '@/components/NewMeetingMenu'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
@@ -38,10 +38,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
     checkAuth()
   }, [])
-
-  function startMeeting() {
-    router.push(`/meet/${generateMeetingCode()}`)
-  }
 
   if (loading) {
     return (
@@ -114,13 +110,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div style={{ flex: 1, padding: '16px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1px' }}>
         <NavLink href="/admin" label="Overview" icon="dashboard" />
         <NavLink href="/admin/registrant-messages" label="Live Chat" icon="support_agent" />
-        <NavLink href="/admin/meetings" label="Meetings" icon="event" />
-        {isSuperAdmin && (
-          <button onClick={startMeeting} className="admin-nav-link" style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>videocam</span>
-            Start a Meeting
-          </button>
-        )}
+        {isSuperAdmin ? <NewMeetingMenu /> : <NavLink href="/admin/meetings" label="Meetings" icon="event" />}
         <NavLink href="/admin/analytics" label="Analytics" icon="analytics" />
         <NavLink href="/admin/notifications" label="Notifications" icon="notifications" />
         <NavLink href="/admin/membership-card" label="Membership Card" icon="card_membership" />

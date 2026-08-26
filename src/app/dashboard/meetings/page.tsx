@@ -2,6 +2,7 @@
 // @ts-nocheck
 
 import { useEffect, useState, useCallback } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 function todayDateStr() {
@@ -38,8 +39,23 @@ export default function MeetingsPage() {
   const [notes, setNotes] = useState('')
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([])
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
 
   const loadMeetings = useCallback(async () => { const res = await fetch('/api/meetings'); const result = await res.json(); if (res.ok && result.data) setMeetings(result.data) }, [])
+
+  // Landed here from the "Schedule a meeting" option elsewhere — open the
+  // create dialog straight away instead of making them click again.
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setScheduledDate(todayDateStr())
+      setScheduledTime(nowTimeStr())
+      setShowModal(true)
+      router.replace(pathname)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     async function init() {
