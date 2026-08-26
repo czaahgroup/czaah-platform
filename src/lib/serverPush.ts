@@ -5,6 +5,7 @@ interface PushPayload {
   title: string
   body: string
   tag: string
+  url?: string
 }
 
 // Sends a web push notification to every subscribed device for one user,

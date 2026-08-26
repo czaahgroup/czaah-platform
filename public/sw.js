@@ -45,7 +45,7 @@ self.addEventListener('push', (event) => {
     badge: '/favicon/favicon-96x96.png',
     tag,
     requireInteraction: isCall,
-    data: { callType: data.callType || 'voice' },
+    data: { callType: data.callType || 'voice', url: data.url || '/' },
   }
 
   event.waitUntil(
@@ -56,18 +56,21 @@ self.addEventListener('push', (event) => {
   )
 })
 
-// Notification click — focus an already-open tab if there is one, otherwise
-// open a new one, landing wherever calls actually ring (each app section
-// picks up the ring from its own persistent Realtime subscription once
-// loaded, so a generic landing page is enough here).
+// Notification click — navigate an already-open tab to where this
+// notification is about (e.g. the messages page for a new message),
+// or open a new one there if none is open. Calls keep landing on a
+// generic page since each app section picks up the ring from its own
+// persistent Realtime subscription once loaded.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
+  const url = event.notification.data?.url || '/'
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
+        if ('navigate' in client) return client.navigate(url).then((c) => c.focus())
         if ('focus' in client) return client.focus()
       }
-      if (self.clients.openWindow) return self.clients.openWindow('/')
+      if (self.clients.openWindow) return self.clients.openWindow(url)
     })
   )
 })

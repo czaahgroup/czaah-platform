@@ -10,13 +10,21 @@ interface Stats {
   newMessages: number
 }
 
-function StatCard({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="bg-surface-container border border-outline-variant/10 px-5 py-6">
+function StatCard({ label, value, href }: { label: string; value: number | string; href?: string }) {
+  const content = (
+    <>
       <div className="cinzel-text text-2xl text-on-surface mb-1">{value}</div>
       <div className="raleway-text text-xs text-on-surface-variant/60 uppercase tracking-wide">{label}</div>
-    </div>
+    </>
   )
+  if (href) {
+    return (
+      <Link href={href} className="block bg-surface-container border border-outline-variant/10 px-5 py-6 hover:border-primary/40 transition-colors">
+        {content}
+      </Link>
+    )
+  }
+  return <div className="bg-surface-container border border-outline-variant/10 px-5 py-6">{content}</div>
 }
 
 export default function PartnerDashboardPage() {
@@ -51,7 +59,7 @@ export default function PartnerDashboardPage() {
         <StatCard label="Approved" value={stats.counts.approved} />
         <StatCard label="In Progress" value={stats.counts.inProgress} />
         <StatCard label="Completed" value={stats.counts.completed} />
-        <StatCard label="New Messages" value={stats.newMessages} />
+        <StatCard label="New Messages" value={stats.newMessages} href="/partner-network/messages" />
       </div>
 
       <div className="flex gap-3 flex-wrap">
@@ -60,6 +68,10 @@ export default function PartnerDashboardPage() {
         </Link>
         <Link href="/partner-network/opportunities" className="text-sm px-5 py-2.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors raleway-text">
           View My Opportunities
+        </Link>
+        <Link href="/partner-network/messages" className="text-sm px-5 py-2.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors raleway-text inline-flex items-center gap-1.5">
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chat</span>
+          Live Chat & Calls
         </Link>
       </div>
     </div>

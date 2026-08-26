@@ -110,6 +110,7 @@ export async function POST(request: NextRequest) {
         title: 'New message from CZAAH',
         body: content.slice(0, 120),
         tag: 'czaah-new-message',
+        url: '/partner-network/messages',
       })
     }
 
