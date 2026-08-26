@@ -38,7 +38,11 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/services') ||
     pathname.startsWith('/verify') ||
     pathname.startsWith('/api/public/') ||
-    pathname === '/api/contact'
+    pathname === '/api/contact' ||
+    // Meeting rooms allow guest join with no account, same as a Google
+    // Meet link — the room page itself handles both a logged-in member
+    // and a name-only guest.
+    pathname.startsWith('/meet/')
 
   if (isPublicRoute) return supabaseResponse
 
