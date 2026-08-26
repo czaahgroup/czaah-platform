@@ -27,7 +27,7 @@ const directors = [
   { initials: 'JW', name: 'James Whitfield', title: 'Director, Technology & IT', scope: 'Government IT integration, software development partnerships, EdTech initiatives. UK tech sector liaison.' },
   { initials: 'NA', name: 'Nadia Al-Sayed', title: 'Director, Real Estate & Construction', scope: 'CPEC corridor development, commercial property, infrastructure projects. Gulf investor relations.' },
   { initials: 'IK', name: 'Imran Khawaja', title: 'Director, Textiles & Agriculture', scope: 'Export trading, mill aggregation, organic certification, cold chain logistics. TDAP coordination.' },
-  { initials: 'AK', name: 'Alam Khan', title: 'Director, Marketing', scope: 'Five years’ experience in real estate and minerals & mining marketing across Pakistan. Former field coordinator with the Red Cross, bringing grassroots community engagement and on-the-ground coordination experience to CZAAH’s Partner Network outreach.' },
+  { initials: 'MK', name: 'Mashhood Alam Khan', title: 'Director, Marketing', scope: 'Five years’ experience in real estate and minerals & mining marketing across Pakistan. Former field coordinator with the Red Cross, bringing grassroots community engagement and on-the-ground coordination experience to CZAAH’s Partner Network outreach.' },
 ]
 
 const divisionHeads = [
