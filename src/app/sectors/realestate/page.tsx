@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layouts/Navbar';
 import { Footer } from '@/components/layouts/Footer';
-import { createClient } from '@/lib/supabase/client';
 
 interface LocationOption {
   label: string;
@@ -42,7 +41,6 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 
 export default function RealEstatePage() {
   const router = useRouter();
-  const supabase = createClient();
   const [properties, setProperties] = useState<LiveProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -150,17 +148,16 @@ export default function RealEstatePage() {
   }
 
   async function handleEnquire(propertyId: string) {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      router.push('/register');
-      return;
-    }
     try {
       const res = await fetch('/api/property-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ propertyId }),
       });
+      if (res.status === 401) {
+        router.push('/register');
+        return;
+      }
       const json = await res.json();
       if (res.ok && json.redirect) {
         router.push(json.redirect);
