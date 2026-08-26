@@ -564,8 +564,13 @@ export default function RealEstatePage() {
         <section className="py-32 px-5 md:px-24 bg-surface fade-in">
           <div className="max-w-[1600px] mx-auto">
             <h2 className="cinzel-text text-3xl md:text-5xl font-semibold text-on-surface mb-4">International <span className="text-primary">markets.</span></h2>
-            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-12">Beyond Pakistan, CZAAH facilitates property investment across leading global real estate markets — structured access, local partnerships, and end-to-end transaction support.</p>
+            <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-12">CZAAH facilitates property investment across Pakistan and leading global real estate markets — structured access, local partnerships, and end-to-end transaction support.</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger">
+              <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-3xl mb-4">flag</span>
+                <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">Pakistan</h4>
+                <p className="raleway-text text-on-surface-variant text-sm leading-relaxed">Residential, commercial, and CPEC corridor property across Islamabad, Lahore, and Karachi — CZAAH's home market, with on-the-ground due diligence and direct developer relationships.</p>
+              </div>
               <div className="border border-outline-variant/10 bg-surface-container-low p-8 hover:border-primary/30 transition-all">
                 <span className="material-symbols-outlined text-primary text-3xl mb-4">location_city</span>
                 <h4 className="cinzel-text text-lg font-semibold text-on-surface mb-3">United Kingdom</h4>
