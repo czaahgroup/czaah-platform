@@ -34,6 +34,9 @@ export default function AdminMessagesPage() {
   const [sourceFilter, setSourceFilter] = useState<string>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [replyText, setReplyText] = useState('')
+  const [sendingReply, setSendingReply] = useState(false)
+  const [replySentId, setReplySentId] = useState<string | null>(null)
 
   useEffect(() => {
     loadData()
@@ -69,6 +72,29 @@ export default function AdminMessagesPage() {
       setError(err instanceof Error ? err.message : 'Update failed')
     } finally {
       setUpdatingId(null)
+    }
+  }
+
+  async function sendReply(id: string) {
+    if (!replyText.trim() || sendingReply) return
+    setSendingReply(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/admin/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, replyContent: replyText.trim() }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to send reply')
+      setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, status: 'replied' } : m)))
+      setReplyText('')
+      setReplySentId(id)
+      setTimeout(() => setReplySentId(null), 3000)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to send reply')
+    } finally {
+      setSendingReply(false)
     }
   }
 
@@ -131,6 +157,7 @@ export default function AdminMessagesPage() {
                 <button
                   onClick={() => {
                     setExpandedId(isExpanded ? null : m.id)
+                    setReplyText('')
                     if (m.status === 'new') updateStatus(m.id, 'read')
                   }}
                   className="w-full text-left px-5 py-4"
@@ -157,7 +184,25 @@ export default function AdminMessagesPage() {
                 {isExpanded && (
                   <div className="px-5 pb-5 border-t border-outline-variant/10 pt-4">
                     <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-wrap mb-4">{m.message}</p>
+
+                    <div className="mb-3">
+                      <textarea
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder={`Type a reply to ${m.name}...`}
+                        rows={3}
+                        className="w-full bg-surface-container border border-outline-variant/20 px-3 py-2 text-sm text-on-surface resize-none"
+                      />
+                    </div>
+
                     <div className="flex gap-2 flex-wrap items-center">
+                      <button
+                        onClick={() => sendReply(m.id)}
+                        disabled={sendingReply || !replyText.trim()}
+                        className="text-xs px-4 py-1.5 bg-primary text-on-primary font-semibold disabled:opacity-40 transition-opacity"
+                      >
+                        {sendingReply ? 'Sending...' : replySentId === m.id ? 'Sent ✓' : 'Send Reply'}
+                      </button>
                       <a
                         href={`mailto:${m.email}`}
                         className="text-xs px-3 py-1.5 border border-primary/40 text-primary hover:border-primary transition-colors"
