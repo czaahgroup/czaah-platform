@@ -169,7 +169,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         borderTop: '1px solid var(--color-outline-variant, #4d4637)',
         display: 'flex', flexDirection: 'column', gap: '10px',
       }}>
-        <Link href="/admin/my-enquiries/new" className="raleway-text" style={{ fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', color: '#e6c364', opacity: 0.5, textDecoration: 'none' }}>+ New Enquiry</Link>
+        <Link href="/dashboard/enquiries/new" className="raleway-text" style={{ fontSize: '11px', letterSpacing: '1px', textTransform: 'uppercase', color: '#e6c364', opacity: 0.5, textDecoration: 'none' }}>+ New Enquiry</Link>
         <p className="raleway-text" style={{ fontSize: '12px', color: '#e5e2e1', opacity: 0.4, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName}</p>
         <form action="/api/auth/signout" method="POST">
           <button type="submit" className="admin-signout-btn raleway-text" style={{

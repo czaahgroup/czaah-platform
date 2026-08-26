@@ -7,10 +7,11 @@
 // admin page they're on: this provider mounts once in the admin layout,
 // so every partner_chats channel stays subscribed in the background.
 //
-// /admin/partner-messages reads/starts calls through this context instead
-// of running its own useCall for the selected chat — running two useCall
-// instances against the same Realtime channel at once would let one
-// answer a call while the other is left stuck "ringing" forever.
+// /admin/registrant-messages (the unified Live Chat) reads/starts partner
+// calls through this context instead of running its own useCall for the
+// selected chat — running two useCall instances against the same Realtime
+// channel at once would let one answer a call while the other is left
+// stuck "ringing" forever.
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useCall } from '@/lib/hooks/useCall'

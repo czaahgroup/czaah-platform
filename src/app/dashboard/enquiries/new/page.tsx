@@ -2,22 +2,17 @@
 // @ts-nocheck
 
 import { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { EnquiryForm } from '@/components/forms/EnquiryForm'
 
 export default function NewEnquiryPage() {
   const router = useRouter()
-  const pathname = usePathname()
-  // This page also renders at /admin/my-enquiries/new via a re-export —
-  // keep the "back"/redirect links scoped to whichever portal shell it's
-  // viewed under.
-  const basePath = pathname?.startsWith('/admin') ? '/admin/my-enquiries' : '/dashboard/enquiries'
 
   return (
     <>
       <Link
-        href={basePath}
+        href="/dashboard/enquiries"
         className="text-sm text-on-surface-variant/50 hover:text-primary transition-colors mb-6 inline-block raleway-text no-underline"
       >
         &larr; Back to Enquiries
@@ -29,7 +24,7 @@ export default function NewEnquiryPage() {
         </h1>
         <EnquiryForm
           onSuccess={() => {
-            setTimeout(() => router.push(basePath), 2000)
+            setTimeout(() => router.push('/dashboard/enquiries'), 2000)
           }}
         />
       </div>

@@ -3,16 +3,8 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-
-// This page also renders at /admin/my-enquiries (staff's personal work
-// queue) via a re-export — keep every internal link scoped to whichever
-// portal shell it's actually being viewed under.
-function useEnquiriesBasePath() {
-  const pathname = usePathname()
-  return pathname?.startsWith('/admin') ? '/admin/my-enquiries' : '/dashboard/enquiries'
-}
 
 interface Enquiry {
   id: string
@@ -41,10 +33,9 @@ const STATUS_BADGES: Record<string, string> = {
 const FILTER_TABS = ['All', 'Active', 'Waiting', 'Resolved'] as const
 
 function EnquiryRow({ enq }: { enq: Enquiry }) {
-  const basePath = useEnquiriesBasePath()
   return (
     <Link
-      href={`${basePath}/${enq.id}`}
+      href={`/dashboard/enquiries/${enq.id}`}
       className="block px-6 py-4 hover:bg-surface-container transition-colors"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -89,7 +80,6 @@ export default function EnquiriesListPage() {
   const [activeTab, setActiveTab] = useState<(typeof FILTER_TABS)[number]>('All')
   const router = useRouter()
   const supabase = createClient()
-  const basePath = useEnquiriesBasePath()
 
   useEffect(() => {
     async function load() {
@@ -186,7 +176,7 @@ export default function EnquiriesListPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <h1 className="cinzel-text text-2xl text-on-surface">Enquiries</h1>
         <Link
-          href={`${basePath}/new`}
+          href="/dashboard/enquiries/new"
           className="liquid-gold-bg text-on-primary font-semibold px-5 py-2.5 text-sm no-underline raleway-text transition-colors hover:opacity-90"
         >
           New Enquiry
@@ -254,7 +244,7 @@ export default function EnquiriesListPage() {
             <div className="px-6 py-16 text-center">
               <p className="text-on-surface-variant/50 mb-4 raleway-text">No enquiries{activeTab !== 'All' ? ` (${activeTab})` : ''}.</p>
               <Link
-                href={`${basePath}/new`}
+                href="/dashboard/enquiries/new"
                 className="inline-block liquid-gold-bg text-on-primary font-semibold px-6 py-2.5 no-underline text-sm raleway-text"
               >
                 Submit an Enquiry
