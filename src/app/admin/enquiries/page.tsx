@@ -112,7 +112,9 @@ export default function AdminEnquiriesPage() {
   const [messages, setMessages] = useState<PublicMessage[]>([])
   const [propertyChats, setPropertyChats] = useState<PropertyChat[]>([])
   const [admins, setAdmins] = useState<AdminProfile[]>([])
+  const [partners, setPartners] = useState<AdminProfile[]>([])
   const [sectorAssignments, setSectorAssignments] = useState<SectorAssignment[]>([])
+  const [partnerSectorAssignments, setPartnerSectorAssignments] = useState<SectorAssignment[]>([])
   const [sectors, setSectors] = useState<Sector[]>([])
   const [adminMap, setAdminMap] = useState<Record<string, string>>({})
   const [sectorMap, setSectorMap] = useState<Record<string, string>>({})
@@ -162,15 +164,20 @@ export default function AdminEnquiriesPage() {
       if (!lookupRes.ok) throw new Error(lookupJson.error || 'Failed to load admin data')
 
       const adminData: AdminProfile[] = lookupJson.admins || []
+      const partnerData: AdminProfile[] = lookupJson.partners || []
       const sectorData: Sector[] = lookupJson.sectors || []
       const assignmentData: SectorAssignment[] = lookupJson.sectorAssignments || []
+      const partnerAssignmentData: SectorAssignment[] = lookupJson.partnerSectorAssignments || []
 
       setAdmins(adminData)
+      setPartners(partnerData)
       setSectorAssignments(assignmentData)
+      setPartnerSectorAssignments(partnerAssignmentData)
       setSectors(sectorData)
 
       const aMap: Record<string, string> = {}
       adminData.forEach((a) => { aMap[a.id] = a.full_name })
+      partnerData.forEach((p) => { aMap[p.id] = `${p.full_name} (Partner)` })
       setAdminMap(aMap)
 
       const sMap: Record<string, string> = {}
@@ -257,12 +264,18 @@ export default function AdminEnquiriesPage() {
   }
 
   function getAdminsForSector(sectorId: string | null): AdminProfile[] {
-    if (!sectorId) return admins
+    const sectorPartners = sectorId
+      ? partners.filter((p) => partnerSectorAssignments.some((a) => a.admin_id === p.id && a.sector_id === sectorId))
+      : partners
+
+    if (!sectorId) return [...admins, ...sectorPartners]
+
     const assignedAdminIds = sectorAssignments
       .filter((a) => a.sector_id === sectorId)
       .map((a) => a.admin_id)
-    if (assignedAdminIds.length === 0) return admins
-    return admins.filter((a) => assignedAdminIds.includes(a.id))
+    const matchedAdmins = assignedAdminIds.length === 0 ? admins : admins.filter((a) => assignedAdminIds.includes(a.id))
+
+    return [...matchedAdmins, ...sectorPartners]
   }
 
   function selectItem(item: CombinedItem) {
@@ -594,10 +607,10 @@ export default function AdminEnquiriesPage() {
                   onChange={(e) => setSelectedAdminId(e.target.value)}
                   className="w-full bg-surface-container-lowest border border-outline-variant/10 px-4 py-2.5 text-sm text-on-surface mb-3"
                 >
-                  <option value="">Select admin...</option>
+                  <option value="">Select admin or partner...</option>
                   {getAdminsForSector(selected.enquiry!.sector_id).map((admin) => (
                     <option key={admin.id} value={admin.id}>
-                      {admin.full_name} ({admin.email})
+                      {admin.full_name} ({admin.email}){partners.some((p) => p.id === admin.id) ? ' — Partner' : ''}
                     </option>
                   ))}
                   {selected.enquiry!.sector_id &&

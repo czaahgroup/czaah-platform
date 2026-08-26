@@ -250,6 +250,9 @@ export async function GET(request: NextRequest) {
     } else if (profile.role === 'admin') {
       // Admins see enquiries assigned to them OR created by them
       query = query.or(`assigned_admin_id.eq.${user.id},member_id.eq.${user.id}`)
+    } else if (profile.role === 'partner') {
+      // Partners only see enquiries handed to them
+      query = query.eq('assigned_admin_id', user.id)
     }
     // super_admin sees all
 

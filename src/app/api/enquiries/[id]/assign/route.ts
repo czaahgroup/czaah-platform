@@ -74,15 +74,16 @@ export async function POST(
       return NextResponse.json({ error: 'Enquiry not found' }, { status: 404 })
     }
 
-    // Verify the admin exists and has the right role
+    // Verify the assignee exists and has a role enquiries can be handed to —
+    // either internal staff, or a Partner Network partner with sector access.
     const { data: adminProfile } = await supabase
       .from('profiles')
       .select('id, full_name, email, role')
       .eq('id', adminId)
       .single()
 
-    if (!adminProfile || (adminProfile.role !== 'admin' && adminProfile.role !== 'super_admin')) {
-      return NextResponse.json({ error: 'Invalid admin user' }, { status: 400 })
+    if (!adminProfile || !['admin', 'super_admin', 'partner'].includes(adminProfile.role)) {
+      return NextResponse.json({ error: 'Invalid assignee' }, { status: 400 })
     }
 
     // Verify admin has sector assignment (skip for super_admin role)
@@ -97,6 +98,30 @@ export async function POST(
       if (!sectorAssignment) {
         return NextResponse.json(
           { error: 'Admin is not assigned to this sector' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Verify partner has sector access (partner_sector_access is keyed by
+    // partners.id, not profiles.id, so resolve the partner row first)
+    if (adminProfile.role === 'partner' && enquiry.sector_id) {
+      const { data: partnerRow } = await supabase
+        .from('partners')
+        .select('id')
+        .eq('profile_id', adminId)
+        .single()
+
+      const hasSectorAccess = partnerRow && await supabase
+        .from('partner_sector_access')
+        .select('id')
+        .eq('partner_id', partnerRow.id)
+        .eq('sector_id', enquiry.sector_id)
+        .single()
+
+      if (!partnerRow || !hasSectorAccess?.data) {
+        return NextResponse.json(
+          { error: 'Partner does not have access to this sector' },
           { status: 400 }
         )
       }
@@ -126,13 +151,15 @@ export async function POST(
       .eq('id', enquiry.member_id)
       .single()
 
-    // Notification for the admin
+    const assigneeLink = adminProfile.role === 'partner' ? `/partner-network/enquiries/${id}` : `/admin/enquiries/${id}`
+
+    // Notification for the assignee
     await supabase.from('notifications').insert({
       user_id: adminId,
       type: 'enquiry_assigned',
       title: 'Enquiry Assigned to You',
       body: `You have been assigned enquiry ${enquiry.reference_number}.`,
-      link: `/admin/enquiries/${id}`,
+      link: assigneeLink,
       is_read: false,
     })
 
@@ -156,7 +183,7 @@ export async function POST(
       is_read: false,
     })
 
-    // Email to admin
+    // Email to assignee
     await resend.emails.send({
       from: FROM_EMAIL,
       to: adminProfile.email,
@@ -180,7 +207,7 @@ export async function POST(
             <td style="color: #ffffff; padding: 8px 0; font-size: 13px;">${memberProfile?.full_name || 'N/A'}</td>
           </tr>
         </table>
-        <a href="https://czaah.com/admin/enquiries/${id}" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="https://czaah.com${assigneeLink}" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px;">
           View Enquiry &rarr;
         </a>
       `),

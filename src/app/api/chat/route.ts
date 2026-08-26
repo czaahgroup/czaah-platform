@@ -84,18 +84,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify access
-    if (profile.role === 'member' && enquiry.member_id !== user.id) {
+    if ((profile.role === 'member' || profile.role === 'elite_member' || profile.role === 'real_estate_partner') && enquiry.member_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
-    if (profile.role === 'admin' && enquiry.assigned_admin_id !== user.id) {
+    if ((profile.role === 'admin' || profile.role === 'partner') && enquiry.assigned_admin_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Only admin/super_admin can send internal notes
     const isInternalNote = messageType === 'internal_note'
-    if (isInternalNote && profile.role === 'member') {
+    if (isInternalNote && profile.role !== 'admin' && profile.role !== 'super_admin') {
       return NextResponse.json(
-        { error: 'Members cannot send internal notes' },
+        { error: 'Only staff can send internal notes' },
         { status: 403 }
       )
     }

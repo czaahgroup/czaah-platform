@@ -52,10 +52,10 @@ export async function GET(
     }
 
     // Verify access
-    if (profile.role === 'member' && enquiry.member_id !== user.id) {
+    if ((profile.role === 'member' || profile.role === 'elite_member' || profile.role === 'real_estate_partner') && enquiry.member_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
-    if (profile.role === 'admin' && enquiry.assigned_admin_id !== user.id) {
+    if ((profile.role === 'admin' || profile.role === 'partner') && enquiry.assigned_admin_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     // super_admin has full access
@@ -67,8 +67,8 @@ export async function GET(
       .eq('enquiry_id', id)
       .order('created_at', { ascending: true })
 
-    // Members should not see internal notes
-    if (profile.role === 'member') {
+    // Members and partners should not see internal admin notes
+    if (profile.role === 'member' || profile.role === 'elite_member' || profile.role === 'real_estate_partner' || profile.role === 'partner') {
       messagesQuery = messagesQuery.eq('is_internal_note', false)
     }
 
@@ -129,6 +129,71 @@ export async function GET(
     })
   } catch (err) {
     console.error('GET /api/enquiries/[id] error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+const ALLOWED_STATUSES = ['submitted', 'assigned', 'active', 'waiting', 'resolved', 'archived']
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+
+    const userClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll() {},
+        },
+      }
+    )
+    const { data: { user }, error: authError } = await userClient.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const supabase = createAdminClient()
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    if (!profile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+
+    const { data: enquiry } = await supabase.from('enquiries').select('*').eq('id', id).single()
+    if (!enquiry) return NextResponse.json({ error: 'Enquiry not found' }, { status: 404 })
+
+    const isOwner = enquiry.member_id === user.id
+    const isAssignee = enquiry.assigned_admin_id === user.id
+    if (!isOwner && !isAssignee && profile.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { status } = body
+    if (!status || !ALLOWED_STATUSES.includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+
+    const updates: Record<string, unknown> = { status, updated_at: new Date().toISOString() }
+    if (status === 'resolved') updates.resolved_at = new Date().toISOString()
+
+    const { data: updated, error: updateError } = await supabase
+      .from('enquiries')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ data: updated })
+  } catch (err) {
+    console.error('PATCH /api/enquiries/[id] error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all in parallel
-    const [adminsRes, sectorsRes, assignmentsRes] = await Promise.all([
+    const [adminsRes, sectorsRes, assignmentsRes, partnersRes] = await Promise.all([
       adminClient
         .from('profiles')
         .select('id, full_name, email')
@@ -48,12 +48,29 @@ export async function GET(request: NextRequest) {
       adminClient
         .from('admin_sector_assignments')
         .select('admin_id, sector_id'),
+      // Partner Network partners, so a sector specialist (e.g. Minerals &
+      // Mining) can be handed an enquiry the same way an admin can.
+      adminClient
+        .from('partners')
+        .select('profile_id, profiles!partners_profile_id_fkey(full_name, email), partner_sector_access(sector_id)')
+        .eq('status', 'active'),
     ])
+
+    const partners = (partnersRes.data || []).map((p) => ({
+      id: p.profile_id,
+      full_name: p.profiles?.full_name || 'Unknown',
+      email: p.profiles?.email || '',
+    }))
+    const partnerSectorAssignments = (partnersRes.data || []).flatMap((p) =>
+      (p.partner_sector_access || []).map((a: { sector_id: string }) => ({ admin_id: p.profile_id, sector_id: a.sector_id }))
+    )
 
     return NextResponse.json({
       admins: adminsRes.data || [],
       sectors: sectorsRes.data || [],
       sectorAssignments: assignmentsRes.data || [],
+      partners,
+      partnerSectorAssignments,
     })
   } catch (err) {
     console.error('Admin lookup error:', err)
