@@ -19,6 +19,7 @@ const BASE_NAV_LINKS = [
 const WORKFORCE_NAV_LINK = { href: '/partner-network/recruitment', label: 'Recruitment', icon: 'groups' }
 
 const TAIL_NAV_LINKS = [
+  { href: '/partner-network/mail', label: 'Mail', icon: 'forward_to_inbox' },
   { href: '/partner-network/messages', label: 'Live Chat', icon: 'chat' },
   { href: '/partner-network/profile', label: 'My Profile', icon: 'account_circle' },
 ]

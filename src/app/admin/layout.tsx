@@ -130,6 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <SectionHeader label="Partner Network" />
         <NavLink href="/admin/partners" label="Partners" icon="handshake" />
         <NavLink href="/admin/partner-opportunities" label="Opportunities" icon="work" />
+        <NavLink href="/admin/mail" label="Partner Mail" icon="forward_to_inbox" />
 
         <SectionHeader label="Real Estate" />
         <NavLink href="/admin/properties" label="Properties" icon="apartment" />

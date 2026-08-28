@@ -38,6 +38,9 @@ yarn-error.log*
 # wrangler
 /.wrangler/
 
+# supabase CLI local state
+/supabase/.temp/
+
 # vercel
 .vercel
 
