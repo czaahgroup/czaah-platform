@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge'
 
 const VALID_STATUSES = [
   'draft', 'submitted', 'more_info_required', 'approved',

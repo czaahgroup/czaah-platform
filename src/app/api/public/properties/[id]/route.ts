@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
 
 // Public single-listing endpoint — powers the property.czaah.com detail page.
 // Only ever returns an approved listing.

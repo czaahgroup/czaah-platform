@@ -3,7 +3,6 @@ import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
 
 const EMAIL_HEADER = `
   <div style="text-align: center; margin-bottom: 40px;">

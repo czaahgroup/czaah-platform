@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
 
 const REGISTRY_TABLE: Record<string, string> = {
   worker: 'workforce_registry',

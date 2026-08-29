@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,6 +15,9 @@ export async function GET(request: NextRequest) {
     const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&language=en&sortBy=publishedAt&page=${page}&pageSize=${pageSize}&apiKey=${apiKey}`
 
     const response = await fetch(url, {
+      // NewsAPI rejects requests with no User-Agent — the Workers runtime,
+      // unlike Node, does not set one by default.
+      headers: { 'User-Agent': 'czaah.com (+https://czaah.com)' },
       next: { revalidate: 300 }, // Cache for 5 minutes
     })
 

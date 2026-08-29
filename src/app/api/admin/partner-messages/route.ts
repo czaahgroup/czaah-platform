@@ -3,7 +3,6 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/serverPush'
 
-export const runtime = 'edge'
 
 function createAuthClient(request: NextRequest) {
   return createServerClient(

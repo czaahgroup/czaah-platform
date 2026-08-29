@@ -48,6 +48,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
-
-.vercel
+# local recovery artifacts (not for commit)
+/.git.broken-*/
+/src.aug-backup-*/

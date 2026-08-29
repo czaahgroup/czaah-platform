@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
 import { sendPushToUser } from '@/lib/serverPush'
 
-export const runtime = 'edge'
 
 export async function GET(request: NextRequest) {
   try {

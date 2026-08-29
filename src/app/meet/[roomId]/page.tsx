@@ -1,13 +1,12 @@
 'use client'
 // @ts-nocheck
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useMeetingRoom } from '@/lib/hooks/useMeetingRoom'
 import { MeetingRoomUI } from '@/components/meeting/MeetingRoomUI'
 
-export const runtime = 'edge'
 
 function GuestJoinScreen({ onJoin }: { onJoin: (name: string) => void }) {
   const [name, setName] = useState('')
@@ -40,8 +39,137 @@ function GuestJoinScreen({ onJoin }: { onJoin: (name: string) => void }) {
             cursor: name.trim() ? 'pointer' : 'default', opacity: name.trim() ? 1 : 0.5,
           }}
         >
-          Join Meeting
+          Continue
         </button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Google-Meet-style "green room": a camera + mic self-preview with toggles and
+ * a "Join now" button, shown before the participant actually enters the room.
+ */
+function PreJoin({
+  roomId,
+  userName,
+  isGuest,
+  onJoin,
+}: {
+  roomId: string
+  userName: string
+  isGuest: boolean
+  onJoin: (opts: { startMuted: boolean; startVideoOff: boolean }) => void
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const [micOn, setMicOn] = useState(true)
+  const [camOn, setCamOn] = useState(true)
+  const [mediaError, setMediaError] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: { width: { ideal: 1280 }, height: { ideal: 720 } } })
+      .then((stream) => {
+        if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return }
+        streamRef.current = stream
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+          videoRef.current.play().catch(() => {})
+        }
+      })
+      .catch(() => { if (!cancelled) setMediaError(true) })
+    return () => {
+      cancelled = true
+      streamRef.current?.getTracks().forEach((t) => t.stop())
+      streamRef.current = null
+    }
+  }, [])
+
+  function toggleMic() {
+    const next = !micOn
+    setMicOn(next)
+    streamRef.current?.getAudioTracks().forEach((t) => { t.enabled = next })
+  }
+  function toggleCam() {
+    const next = !camOn
+    setCamOn(next)
+    streamRef.current?.getVideoTracks().forEach((t) => { t.enabled = next })
+  }
+  function join() {
+    // Release the preview so the room's own getUserMedia acquires cleanly.
+    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current = null
+    onJoin({ startMuted: !micOn, startVideoOff: !camOn })
+  }
+
+  const roundBtn = (active: boolean): React.CSSProperties => ({
+    width: '52px', height: '52px', borderRadius: '50%', border: 'none', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: active ? 'rgba(255,255,255,0.10)' : '#ef4444',
+  })
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '16px 24px' }}>
+        <span style={{ fontFamily: "'Cinzel', serif", fontSize: '14px', letterSpacing: '2px', color: '#e6c364', textTransform: 'uppercase' }}>CZAAH Meeting</span>
+      </div>
+
+      <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '28px', padding: '20px 18px 48px' }}>
+        {/* preview */}
+        <div style={{ width: '100%', maxWidth: '560px' }}>
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', background: '#111', borderRadius: '14px', overflow: 'hidden' }}>
+            {camOn && !mediaError ? (
+              <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }} />
+            ) : (
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'rgba(201,168,76,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontFamily: "'Cinzel', serif", fontSize: '26px', color: '#C9A84C' }}>{(userName || '?').charAt(0).toUpperCase()}</span>
+                </div>
+                <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
+                  {mediaError ? 'Camera unavailable' : 'Camera is off'}
+                </span>
+              </div>
+            )}
+
+            <div style={{ position: 'absolute', bottom: '14px', left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: '16px' }}>
+              <button onClick={toggleMic} title={micOn ? 'Turn off microphone' : 'Turn on microphone'} style={roundBtn(micOn)} disabled={mediaError}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={micOn ? '#C9A84C' : '#fff'} strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                  {!micOn && <line x1="3" y1="3" x2="21" y2="21" strokeWidth={2} strokeLinecap="round" />}
+                </svg>
+              </button>
+              <button onClick={toggleCam} title={camOn ? 'Turn off camera' : 'Turn on camera'} style={roundBtn(camOn)} disabled={mediaError}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={camOn ? '#C9A84C' : '#fff'} strokeWidth={1.5}>
+                  <polygon points="23 7 16 12 23 17 23 7" fill={camOn ? '#C9A84C' : '#fff'} />
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                  {!camOn && <line x1="2" y1="2" x2="22" y2="22" strokeWidth={2} />}
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ready panel */}
+        <div style={{ textAlign: 'center', maxWidth: '320px' }}>
+          <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: '22px', color: '#fff', margin: '0 0 8px' }}>Ready to join?</h1>
+          <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: '13px', color: 'rgba(255,255,255,0.45)', margin: '0 0 6px' }}>
+            {isGuest ? 'Someone in the meeting will need to let you in.' : 'No one else is here yet — or they’re waiting for you.'}
+          </p>
+          <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: '12px', color: 'rgba(255,255,255,0.3)', margin: '0 0 24px' }}>
+            Room code: <span style={{ color: '#C9A84C', letterSpacing: '0.5px' }}>{roomId}</span>
+          </p>
+          <button
+            onClick={join}
+            style={{
+              width: '100%', padding: '13px 24px', background: 'linear-gradient(135deg, #8a6f2e, #c9a84c)',
+              border: 'none', color: '#000', fontFamily: "'Raleway', sans-serif", fontWeight: 600, fontSize: '14px', cursor: 'pointer',
+            }}
+          >
+            {isGuest ? 'Ask to join' : 'Join now'}
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -56,6 +184,8 @@ export default function MeetingRoomPage() {
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [needsGuestName, setNeedsGuestName] = useState(false)
   const [isGuest, setIsGuest] = useState(false)
+  const [readyToJoin, setReadyToJoin] = useState(false)
+  const [prefs, setPrefs] = useState<{ startMuted: boolean; startVideoOff: boolean }>({ startMuted: false, startVideoOff: false })
 
   useEffect(() => {
     const supabase = createClient()
@@ -83,9 +213,11 @@ export default function MeetingRoomPage() {
 
   const room = useMeetingRoom({
     roomId,
-    currentUserId: userId || '',
+    currentUserId: readyToJoin ? (userId || '') : '',
     currentUserName: userName,
     requiresApproval: isGuest,
+    startMuted: prefs.startMuted,
+    startVideoOff: prefs.startVideoOff,
   })
 
   function handleLeave() {
@@ -110,6 +242,17 @@ export default function MeetingRoomPage() {
       <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ fontFamily: "'Raleway', sans-serif", fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>Joining meeting...</span>
       </div>
+    )
+  }
+
+  if (!readyToJoin) {
+    return (
+      <PreJoin
+        roomId={roomId}
+        userName={userName}
+        isGuest={isGuest}
+        onJoin={(opts) => { setPrefs(opts); setReadyToJoin(true) }}
+      />
     )
   }
 

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { rateLimit } from '@/lib/rateLimit'
 
-export const runtime = 'edge';
 
 export async function POST(request: NextRequest) {
   // Rate limit: 10 per minute per IP

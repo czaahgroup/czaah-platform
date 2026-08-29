@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
 import { LiveProperty, MARKETS, matchesMarket, CURRENCIES } from '../_components/types';
 
-export const runtime = 'edge';
 
 const PAGE_SIZE = 9;
 

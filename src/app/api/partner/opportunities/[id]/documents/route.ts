@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
 
-export const runtime = 'edge'
 
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 

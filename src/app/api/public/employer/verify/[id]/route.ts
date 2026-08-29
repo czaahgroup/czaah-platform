@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
 
 // Public employer verification lookup — deliberately returns only
 // non-sensitive fields (no email, phone, contact person, roles needed, notes).

@@ -3,7 +3,6 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/serverPush'
 
-export const runtime = 'edge'
 
 // Staff (admin/super_admin) use their own back-office inbox instead, and
 // the Partner Network ('partner' role) has its own dedicated chat+call

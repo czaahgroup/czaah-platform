@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "czaah-platform",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-08-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "czaah.com", "custom_domain": true },
+    { "pattern": "www.czaah.com", "custom_domain": true },
+    { "pattern": "property.czaah.com", "custom_domain": true }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "MAIL_AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "VAPID_SUBJECT": "mailto:czaahgroup@gmail.com",
+    "CLOUDFLARE_ACCOUNT_ID": "ecf18c5413cb6cb2fe340c68b991197c"
+  }
+}

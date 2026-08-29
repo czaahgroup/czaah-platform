@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
 
-export const runtime = 'edge'
 
 const VALID_CONFIDENTIALITY = ['standard', 'confidential', 'highly_confidential']
 

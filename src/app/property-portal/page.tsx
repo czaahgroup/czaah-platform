@@ -8,7 +8,6 @@ import { PropertyCard } from './_components/PropertyCard';
 import { LiveProperty } from './_components/types';
 import { INSIGHTS } from './_components/insights-data';
 
-export const runtime = 'edge';
 
 const MARKETS = [
   {

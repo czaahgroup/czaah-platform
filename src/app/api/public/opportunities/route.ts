@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export const runtime = 'edge';
 
 // Public listing of partner-submitted opportunities for the /investments page.
 // visibility_scope is admin-only (partners can't set it, see

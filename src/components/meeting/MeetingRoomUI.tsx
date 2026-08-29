@@ -88,6 +88,15 @@ export function MeetingRoomUI({
   onDeny?: (requesterId: string) => void
 }) {
   const [copied, setCopied] = useState(false)
+  const [narrow, setNarrow] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)')
+    const apply = () => setNarrow(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
 
   const copyLink = useCallback(() => {
     const url = `${window.location.origin}/meet/${roomId}`
@@ -104,7 +113,7 @@ export function MeetingRoomUI({
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap', padding: '14px 18px' }}>
         <span style={{ fontFamily: "'Cinzel', serif", fontSize: '14px', letterSpacing: '2px', color: '#e6c364', textTransform: 'uppercase' }}>CZAAH Meeting</span>
         <button
           onClick={copyLink}
@@ -150,7 +159,7 @@ export function MeetingRoomUI({
         </div>
       )}
 
-      <div style={{ flex: 1, display: 'grid', gap: '10px', padding: '0 24px 16px', ...gridStyle(tiles.length) }}>
+      <div style={{ flex: 1, display: 'grid', gap: '10px', padding: narrow ? '0 12px 12px' : '0 24px 16px', ...(narrow ? { gridTemplateColumns: '1fr' } : gridStyle(tiles.length)) }}>
         {tiles.map((t) => (
           <VideoTile key={t.userId} stream={t.stream} name={t.userName} isVideoOff={t.isVideoOff} isLocal={t.isLocal} />
         ))}

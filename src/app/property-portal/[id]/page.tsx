@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { LiveProperty, LISTING_META, resolveImage, formatPrice, CURRENCIES } from '../_components/types';
 
-export const runtime = 'edge';
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();

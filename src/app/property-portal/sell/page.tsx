@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-export const runtime = 'edge';
 
 const POINTS = [
   {

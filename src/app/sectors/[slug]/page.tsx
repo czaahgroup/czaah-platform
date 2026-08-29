@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/client'
 import { BookmarkButton } from '@/components/BookmarkButton'
 import { ShareButton } from '@/components/ShareButton'
 
-export const runtime = 'edge';
 
 interface Product {
   id: string

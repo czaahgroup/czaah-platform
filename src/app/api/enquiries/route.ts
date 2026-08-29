@@ -4,7 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
 
-export const runtime = 'edge';
 
 function createAuthClient(request: NextRequest) {
   return createServerClient(

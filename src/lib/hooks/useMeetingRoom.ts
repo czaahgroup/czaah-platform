@@ -35,6 +35,9 @@ export interface UseMeetingRoomOptions {
   currentUserId: string
   currentUserName: string
   requiresApproval?: boolean
+  /** Green-room pre-join choices — applied to the local stream the moment we join. */
+  startMuted?: boolean
+  startVideoOff?: boolean
 }
 
 export interface UseMeetingRoomReturn {
@@ -58,11 +61,11 @@ const FALLBACK_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun1.l.google.com:19302' },
 ]
 
-export function useMeetingRoom({ roomId, currentUserId, currentUserName, requiresApproval }: UseMeetingRoomOptions): UseMeetingRoomReturn {
+export function useMeetingRoom({ roomId, currentUserId, currentUserName, requiresApproval, startMuted, startVideoOff }: UseMeetingRoomOptions): UseMeetingRoomReturn {
   const [participants, setParticipants] = useState<RoomParticipant[]>([])
   const [localStream, setLocalStream] = useState<MediaStream | null>(null)
-  const [isMuted, setIsMuted] = useState(false)
-  const [isVideoOff, setIsVideoOff] = useState(false)
+  const [isMuted, setIsMuted] = useState(!!startMuted)
+  const [isVideoOff, setIsVideoOff] = useState(!!startVideoOff)
   const [joined, setJoined] = useState(false)
   const [awaitingApproval, setAwaitingApproval] = useState(false)
   const [denied, setDenied] = useState(false)
@@ -197,7 +200,10 @@ export function useMeetingRoom({ roomId, currentUserId, currentUserName, require
       if (admittedRef.current || cancelled) return
       admittedRef.current = true
       try {
-        await getLocalMedia()
+        const stream = await getLocalMedia()
+        // Honour the green-room pre-join choices.
+        if (startMuted) stream.getAudioTracks().forEach((t) => { t.enabled = false })
+        if (startVideoOff) stream.getVideoTracks().forEach((t) => { t.enabled = false })
       } catch (err) {
         console.error('[useMeetingRoom] Failed to get local media:', err)
       }

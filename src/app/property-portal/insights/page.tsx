@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { INSIGHTS as ARTICLES } from '../_components/insights-data';
 
-export const runtime = 'edge';
 
 const CATEGORIES = ['All', 'Real Estate', 'Infrastructure'];
 
