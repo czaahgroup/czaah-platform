@@ -2,10 +2,37 @@
 // @ts-nocheck
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import MailWorkspace from '@/components/mail/MailWorkspace'
 
+function Markhor({ className }: { className?: string }) {
+  return (
+    <svg viewBox="-5 -12 100 80" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <defs>
+        <linearGradient id="wmHornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#8a6f2e" />
+          <stop offset="40%" stopColor="#c9a84c" />
+          <stop offset="60%" stopColor="#e8c97a" />
+          <stop offset="100%" stopColor="#8a6f2e" />
+        </linearGradient>
+        <linearGradient id="wmBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#c9a84c" />
+          <stop offset="100%" stopColor="#8a6f2e" />
+        </linearGradient>
+      </defs>
+      <path d="M 38 38 C 34 30, 24 22, 20 12 C 17 4, 22 -2, 28 2 C 34 6, 36 16, 32 24 C 28 32, 22 34, 18 28 C 15 22, 18 14, 24 12" stroke="url(#wmHornGrad)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M 35 36 C 30 28, 22 20, 22 12 C 22 7, 26 4, 29 6" stroke="url(#wmHornGrad)" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.6" />
+      <path d="M 52 36 C 56 28, 66 20, 70 10 C 73 2, 68 -4, 62 0 C 56 4, 54 14, 58 22 C 62 30, 68 32, 72 26 C 75 20, 72 12, 66 10" stroke="url(#wmHornGrad)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M 55 34 C 60 26, 68 18, 68 10 C 68 5, 64 2, 61 4" stroke="url(#wmHornGrad)" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.6" />
+      <path d="M 34 38 C 32 42, 32 48, 36 52 L 38 58 C 40 64, 50 64, 52 58 L 54 52 C 58 48, 58 42, 56 38 C 54 34, 50 32, 45 32 C 40 32, 36 34, 34 38 Z" fill="url(#wmBodyGrad)" opacity="0.9" />
+      <circle cx="41" cy="44" r="1.5" fill="#e8c97a" opacity="0.9" />
+      <circle cx="49" cy="44" r="1.5" fill="#e8c97a" opacity="0.9" />
+    </svg>
+  )
+}
+
 export default function WebmailPage() {
-  const [status, setStatus] = useState<'checking' | 'out' | 'in'>('checking')
+  const [phase, setPhase] = useState<'checking' | 'out' | 'in'>('checking')
   const [address, setAddress] = useState('')
   const [pw, setPw] = useState('')
   const [busy, setBusy] = useState(false)
@@ -14,8 +41,8 @@ export default function WebmailPage() {
   useEffect(() => {
     fetch('/api/mail/webmail')
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((j) => { setAddress(j.address); setStatus('in') })
-      .catch(() => setStatus('out'))
+      .then((j) => { setAddress(j.address); setPhase('in') })
+      .catch(() => setPhase('out'))
   }, [])
 
   async function signIn(e: React.FormEvent) {
@@ -31,7 +58,7 @@ export default function WebmailPage() {
       const j = await res.json()
       if (!res.ok) throw new Error(j.error || 'Sign in failed')
       setPw('')
-      setStatus('in')
+      setPhase('in')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Sign in failed')
     } finally {
@@ -41,75 +68,107 @@ export default function WebmailPage() {
 
   async function signOut() {
     await fetch('/api/mail/webmail', { method: 'DELETE' }).catch(() => {})
-    setStatus('out')
     setAddress('')
+    setPhase('out')
   }
 
-  if (status === 'checking') {
+  if (phase === 'checking') {
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0e0d0b', color: '#8a8577', fontFamily: 'system-ui, sans-serif', fontSize: 14 }}>
-        Loading…
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <span className="raleway-text text-sm text-on-surface-variant/50">Loading…</span>
       </div>
     )
   }
 
-  if (status === 'out') {
+  if (phase === 'out') {
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0e0d0b', fontFamily: 'system-ui, sans-serif', padding: 20 }}>
-        <form onSubmit={signIn} style={{ width: '100%', maxWidth: 360, background: '#17150f', border: '1px solid #33302a', borderRadius: 14, padding: '32px 28px' }}>
-          <div style={{ fontFamily: "'Cinzel', serif", fontSize: 18, letterSpacing: '0.18em', color: '#efe9dc', textAlign: 'center', marginBottom: 4 }}>
-            CZAAH <span style={{ color: '#c9a84c' }}>WEBMAIL</span>
+      <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-surface">
+        <div className="w-full max-w-md mx-auto">
+          <div className="text-center mb-9">
+            <Markhor className="h-20 w-auto mx-auto block" />
           </div>
-          <p style={{ color: '#8a8577', fontSize: 12.5, textAlign: 'center', margin: '0 0 24px' }}>Sign in to your @czaah.com mailbox</p>
 
-          {error && (
-            <div style={{ background: 'rgba(220,60,60,0.12)', border: '1px solid rgba(220,60,60,0.3)', color: '#e88', fontSize: 12.5, padding: '8px 12px', borderRadius: 8, marginBottom: 16 }}>
-              {error}
-            </div>
-          )}
+          <div className="bg-surface border border-outline-variant/30 p-10">
+            <h1 className="cinzel-text text-xl text-on-surface mb-1 text-center">CZAAH Webmail</h1>
+            <p className="raleway-text text-sm text-on-surface-variant text-center mb-8">
+              Sign in to your <span className="text-primary">@czaah.com</span> mailbox
+            </p>
 
-          <label style={{ display: 'block', fontSize: 11.5, color: '#8a8577', marginBottom: 6 }}>Email address</label>
-          <input
-            type="email" autoComplete="username" value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="you@czaah.com"
-            style={{ width: '100%', background: '#0e0d0b', border: '1px solid #33302a', color: '#efe9dc', padding: '10px 12px', borderRadius: 8, fontSize: 14, marginBottom: 16, outline: 'none' }}
-          />
+            <form onSubmit={signIn} className="flex flex-col gap-5">
+              <div>
+                <label className="text-on-surface-variant text-xs tracking-widest uppercase raleway-text block mb-2">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  autoComplete="username"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="you@czaah.com"
+                  className="w-full bg-transparent border-b border-outline-variant focus:border-primary text-on-surface py-3 outline-none transition-colors placeholder:text-on-surface-variant/40 raleway-text"
+                />
+              </div>
 
-          <label style={{ display: 'block', fontSize: 11.5, color: '#8a8577', marginBottom: 6 }}>Password</label>
-          <input
-            type="password" autoComplete="current-password" value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            style={{ width: '100%', background: '#0e0d0b', border: '1px solid #33302a', color: '#efe9dc', padding: '10px 12px', borderRadius: 8, fontSize: 14, marginBottom: 22, outline: 'none' }}
-          />
+              <div>
+                <label className="text-on-surface-variant text-xs tracking-widest uppercase raleway-text block mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  value={pw}
+                  onChange={(e) => setPw(e.target.value)}
+                  className="w-full bg-transparent border-b border-outline-variant focus:border-primary text-on-surface py-3 outline-none transition-colors placeholder:text-on-surface-variant/40 raleway-text"
+                />
+              </div>
 
-          <button
-            type="submit" disabled={busy}
-            style={{ width: '100%', background: '#c9a84c', color: '#1a1710', fontWeight: 700, fontSize: 13.5, padding: '11px', border: 0, borderRadius: 8, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1 }}
-          >
-            {busy ? 'Signing in…' : 'Sign in'}
-          </button>
+              {error && <p className="text-error raleway-text text-xs">{error}</p>}
 
-          <p style={{ color: '#5f5b52', fontSize: 11, textAlign: 'center', marginTop: 18 }}>
-            No password? Ask an administrator to set one in Admin → Mailboxes.
-          </p>
-        </form>
+              <button
+                type="submit"
+                disabled={busy}
+                className="liquid-gold-bg text-on-primary w-full py-4 font-bold tracking-[0.2em] uppercase text-sm raleway-text transition-opacity disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+              >
+                {busy ? 'Signing in…' : 'Sign In'}
+              </button>
+            </form>
+
+            <p className="raleway-text text-[11px] text-on-surface-variant/50 text-center mt-7 leading-relaxed">
+              No password yet? Ask an administrator to set one for your address.
+            </p>
+          </div>
+
+          <div className="text-center mt-6">
+            <Link href="/" className="raleway-text text-xs text-on-surface-variant/60 hover:text-primary transition-colors">
+              ← czaah.com
+            </Link>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div style={{ background: '#0e0d0b', minHeight: '100dvh' }}>
-      <button
-        onClick={signOut}
-        style={{ position: 'fixed', top: 10, right: 14, zIndex: 60, background: 'rgba(30,28,22,0.9)', border: '1px solid #45403636', color: '#c9a84c', fontSize: 11.5, padding: '6px 12px', borderRadius: 7, cursor: 'pointer', fontFamily: 'system-ui, sans-serif' }}
-        title={address}
-      >
-        Sign out
-      </button>
-      <div style={{ padding: '10px 12px 0' }}>
-        <MailWorkspace heading="Webmail" outboundLabel="You" />
-      </div>
+    <div className="webmail-shell bg-surface" style={{ minHeight: '100dvh' }}>
+      <style>{`.webmail-shell .czaah-mail { height: calc(100dvh - 57px) !important; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }`}</style>
+      <header className="h-14 px-4 sm:px-6 flex items-center justify-between border-b border-outline-variant/30 bg-surface">
+        <div className="flex items-center gap-2.5">
+          <Markhor className="h-6 w-auto" />
+          <span className="cinzel-text text-sm tracking-[0.16em] text-on-surface">
+            CZAAH <span className="text-primary">MAIL</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="raleway-text text-xs text-on-surface-variant/70 hidden sm:inline">{address}</span>
+          <button
+            onClick={signOut}
+            className="raleway-text text-xs tracking-wider uppercase text-on-surface-variant hover:text-primary border border-outline-variant/40 hover:border-primary/50 px-3 py-1.5 transition-colors"
+          >
+            Sign out
+          </button>
+        </div>
+      </header>
+      <MailWorkspace heading="Webmail" outboundLabel="You" />
     </div>
   )
 }
