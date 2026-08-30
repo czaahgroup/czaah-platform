@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireMailAccess } from '@/lib/mailAuth'
+import { hashPassword } from '@/lib/webmailAuth'
 
 const ADDRESS_RE = /^[a-z0-9._%+-]+@czaah\.com$/
 
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   let q = access.supabase
     .from('partner_mailboxes')
-    .select('id, address, display_name, signature_html, partner_id')
+    .select('id, address, display_name, signature_html, partner_id, webmail_password_hash')
     .order('display_name', { ascending: true })
 
   if (!access.isSuperAdmin) {
@@ -32,6 +33,7 @@ export async function GET(request: NextRequest) {
     signatureHtml: m.signature_html || '',
     kind: m.partner_id ? 'partner' : 'team',
     partnerId: m.partner_id || null,
+    webmailEnabled: !!m.webmail_password_hash,
   }))
 
   const wantPartners = new URL(request.url).searchParams.get('withPartners') === '1'
@@ -125,7 +127,7 @@ export async function PATCH(request: NextRequest) {
   if ('error' in access) return access.error
 
   const body = await request.json().catch(() => ({}))
-  const { mailboxId, signatureHtml, displayName, address } = body
+  const { mailboxId, signatureHtml, displayName, address, webmailPassword } = body
 
   const targetId = access.isSuperAdmin ? mailboxId : access.ownMailboxId
   if (!targetId) return NextResponse.json({ error: 'mailboxId is required' }, { status: 400 })
@@ -141,6 +143,17 @@ export async function PATCH(request: NextRequest) {
 
   if (access.isSuperAdmin && displayName !== undefined) {
     patch.display_name = String(displayName || '').trim() || null
+  }
+
+  if (access.isSuperAdmin && webmailPassword !== undefined) {
+    const pw = String(webmailPassword || '')
+    if (pw === '') {
+      patch.webmail_password_hash = null // disable webmail login
+    } else if (pw.length < 8) {
+      return NextResponse.json({ error: 'Password must be at least 8 characters.' }, { status: 400 })
+    } else {
+      patch.webmail_password_hash = await hashPassword(pw)
+    }
   }
 
   if (access.isSuperAdmin && address !== undefined) {

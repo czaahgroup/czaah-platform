@@ -10,6 +10,7 @@ interface Mailbox {
   displayName: string | null
   kind: 'partner' | 'team'
   partnerId: string | null
+  webmailEnabled: boolean
 }
 
 interface PartnerOpt {
@@ -36,6 +37,8 @@ export default function MailboxesPage() {
   const [editBox, setEditBox] = useState<Mailbox | null>(null)
   const [editLocal, setEditLocal] = useState('')
   const [editName, setEditName] = useState('')
+  const [editPw, setEditPw] = useState('')
+  const [editDisableWebmail, setEditDisableWebmail] = useState(false)
   const [savingEdit, setSavingEdit] = useState(false)
 
   const [deleteBox, setDeleteBox] = useState<Mailbox | null>(null)
@@ -90,6 +93,8 @@ export default function MailboxesPage() {
     setEditBox(mb)
     setEditLocal(mb.address.replace(/@czaah\.com$/, ''))
     setEditName(mb.displayName || '')
+    setEditPw('')
+    setEditDisableWebmail(false)
     setError(null)
   }
 
@@ -97,17 +102,22 @@ export default function MailboxesPage() {
     if (!editBox) return
     const clean = cleanLocal(editLocal)
     if (!clean) { setError('Address cannot be empty'); return }
+    if (editPw && editPw.length < 8) { setError('Webmail password must be at least 8 characters'); return }
     setSavingEdit(true)
     setError(null)
     try {
+      const payload: Record<string, unknown> = {
+        mailboxId: editBox.id,
+        address: `${clean}@czaah.com`,
+        displayName: editName.trim(),
+      }
+      if (editDisableWebmail) payload.webmailPassword = ''
+      else if (editPw) payload.webmailPassword = editPw
+
       const res = await fetch('/api/mail/mailboxes', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mailboxId: editBox.id,
-          address: `${clean}@czaah.com`,
-          displayName: editName.trim(),
-        }),
+        body: JSON.stringify(payload),
       })
       const j = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(j.error || 'Save failed')
@@ -154,7 +164,9 @@ export default function MailboxesPage() {
       <p className="text-sm text-on-surface-variant mb-8 max-w-2xl">
         Addresses on <span className="font-mono">@czaah.com</span>. Create a <strong>team</strong> address
         or assign one to a <strong>partner</strong>, then read and send from it in{' '}
-        <Link href="/admin/mail" className="text-primary">Mail</Link> via the mailbox picker.
+        <Link href="/admin/mail" className="text-primary">Mail</Link> via the mailbox picker. Give a
+        mailbox a <strong>webmail password</strong> (Edit) and its owner can sign in directly at{' '}
+        <span className="font-mono">czaah.com/webmail</span>.
       </p>
 
       {error && (
@@ -258,6 +270,31 @@ export default function MailboxesPage() {
                 <label className="block text-xs text-on-surface-variant mb-1.5">Display name</label>
                 <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className={inputCls} placeholder="(none)" />
               </div>
+
+              <div className="border-t border-outline-variant/10 pt-4">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs text-on-surface-variant">Webmail login</label>
+                  <span className={`text-[11px] px-1.5 py-0.5 ${editBox.webmailEnabled ? 'bg-green-500/20 text-green-400' : 'bg-neutral-500/20 text-neutral-400'}`}>
+                    {editBox.webmailEnabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+                <input
+                  type="text" value={editPw}
+                  onChange={(e) => { setEditPw(e.target.value); setEditDisableWebmail(false) }}
+                  className={inputCls}
+                  placeholder={editBox.webmailEnabled ? 'New password (leave blank to keep)' : 'Set a password (min 8 chars)'}
+                  disabled={editDisableWebmail}
+                />
+                <p className="text-[11px] text-on-surface-variant/50 mt-1">
+                  Lets this address sign in at <span className="font-mono">czaah.com/webmail</span> with just the address + this password.
+                </p>
+                {editBox.webmailEnabled && (
+                  <label className="flex items-center gap-2 mt-2 text-xs text-on-surface-variant cursor-pointer">
+                    <input type="checkbox" checked={editDisableWebmail} onChange={(e) => { setEditDisableWebmail(e.target.checked); if (e.target.checked) setEditPw('') }} className="accent-primary" />
+                    Turn off webmail login for this mailbox
+                  </label>
+                )}
+              </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
               <button onClick={() => setEditBox(null)} className="px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface border border-outline-variant/10 transition-colors">Cancel</button>
@@ -310,7 +347,12 @@ function MailboxTable({ title, rows, emptyText, onEdit, onDelete }: {
             <tbody>
               {rows.map((mb) => (
                 <tr key={mb.id} className="border-b border-outline-variant/10 last:border-0 hover:bg-surface-container-lowest/30 transition-colors">
-                  <td className="px-5 py-3 font-mono text-on-surface">{mb.address}</td>
+                  <td className="px-5 py-3 font-mono text-on-surface">
+                    {mb.address}
+                    {mb.webmailEnabled && (
+                      <span className="ml-2 text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 align-middle" title="Webmail login enabled">webmail</span>
+                    )}
+                  </td>
                   <td className="px-5 py-3 text-on-surface-variant">{mb.displayName || '--'}</td>
                   <td className="px-5 py-3 text-right whitespace-nowrap">
                     <button onClick={() => onEdit(mb)} className="text-xs text-primary hover:text-primary/80 transition-colors px-2 py-1">Edit</button>

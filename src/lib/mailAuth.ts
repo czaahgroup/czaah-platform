@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { WEBMAIL_COOKIE, verifyWebmailSession } from '@/lib/webmailAuth'
 
 function createAuthClient(request: NextRequest) {
   return createServerClient(
@@ -24,7 +25,29 @@ function createAuthClient(request: NextRequest) {
 export async function requireMailAccess(request: NextRequest) {
   const userClient = createAuthClient(request)
   const { data: { user } } = await userClient.auth.getUser()
+
   if (!user) {
+    // Webmail session — a per-mailbox password login, scoped to that one mailbox.
+    const webmail = await verifyWebmailSession(request.cookies.get(WEBMAIL_COOKIE)?.value)
+    if (webmail) {
+      const supabase = createAdminClient()
+      const { data: mailbox } = await supabase
+        .from('partner_mailboxes')
+        .select('id, address')
+        .eq('id', webmail.mailboxId)
+        .maybeSingle()
+      if (!mailbox) {
+        return { error: NextResponse.json({ error: 'Mailbox no longer exists' }, { status: 401 }) }
+      }
+      return {
+        supabase,
+        userId: null,
+        isSuperAdmin: false as const,
+        isWebmail: true as const,
+        ownMailboxId: mailbox.id,
+        ownMailboxAddress: mailbox.address,
+      }
+    }
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   }
 

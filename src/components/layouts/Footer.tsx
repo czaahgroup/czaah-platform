@@ -36,6 +36,7 @@ const COMPANY_LINKS = [
   { label: 'How It Works', href: '/process' },
   { label: 'Insights', href: '/insights' },
   { label: 'Contact', href: '/contact' },
+  { label: 'Webmail', href: '/webmail' },
 ] as const
 
 const LEGAL_LINKS = [

@@ -48,8 +48,13 @@ export async function middleware(request: NextRequest) {
 
 
   // Public routes — no auth required
-  const publicRoutes = ['/', '/about', '/contact', '/team', '/login', '/register', '/reset-password', '/process', '/insights', '/faq', '/privacy', '/terms', '/investments']
+  const publicRoutes = ['/', '/about', '/contact', '/team', '/login', '/register', '/reset-password', '/process', '/insights', '/faq', '/privacy', '/terms', '/investments', '/webmail']
   const isPublicRoute = publicRoutes.some(route => pathname === route) ||
+    // Webmail: the page authenticates itself via a per-mailbox password
+    // session (not Supabase). All /api/mail/* routes call requireMailAccess,
+    // which understands both the Supabase session and the webmail cookie.
+    pathname.startsWith('/webmail') ||
+    pathname.startsWith('/api/mail/') ||
     pathname.startsWith('/api/auth/') ||
     pathname.startsWith('/sectors') ||
     pathname.startsWith('/services') ||
