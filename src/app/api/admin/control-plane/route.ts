@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { aiConfigured, aiMessage } from '@/lib/mailAi'
+import { logAIAction } from '@/lib/ai/crm'
 import { logError } from '@/lib/logError'
 
 /**
@@ -29,6 +31,7 @@ export async function GET(request: NextRequest) {
     if (profile?.role !== 'super_admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
+    const wantNarrative = request.nextUrl.searchParams.get('narrative') === '1'
 
     const count = (q: any) => q.select('*', { count: 'exact', head: true })
     const now = new Date()
@@ -81,7 +84,7 @@ export async function GET(request: NextRequest) {
     const openTrades = trades.filter((t: any) => OPEN_TRADES.includes(t.status))
     const tradeNotional = Math.round(openTrades.reduce((s: number, t: any) => s + ((Number(t.quantity) || 0) * (Number(t.price_amount) || 0)), 0))
 
-    return NextResponse.json({
+    const payload: any = {
       crm: {
         contacts: contacts.count ?? 0,
         companies: companies.count ?? 0,
@@ -114,7 +117,30 @@ export async function GET(request: NextRequest) {
         id: r.id, action: r.action, targetType: r.target_type, targetId: r.target_id,
         actor: r.actor?.full_name || 'System', at: r.created_at,
       })),
-    })
+      aiAvailable: aiConfigured(),
+    }
+
+    if (wantNarrative && aiConfigured()) {
+      try {
+        const facts = [
+          `CRM: ${payload.crm.contacts} contacts, ${payload.crm.companies} companies, ${payload.crm.activeLeads} active leads`,
+          `Deals: ${payload.deals.open} open, weighted pipeline ${payload.deals.weightedPipeline}, ${payload.deals.wonThisQuarter} won this quarter`,
+          `Recruitment: ${payload.recruitment.openOrders} open orders, ${payload.recruitment.inPipeline} candidates in pipeline, ${payload.recruitment.deployedLast30d} deployed in 30d`,
+          `Construction: ${payload.construction.activeProjects} active projects, avg ${payload.construction.avgProgress}% complete, contract value ${payload.construction.contractValue}`,
+          `Trading: ${payload.trading.openTrades} open trades, open notional ${payload.trading.notionalOpen}, ${payload.trading.activeShipments} shipments moving`,
+        ].join('\n')
+        const r = await aiMessage({
+          system: 'You are the chief of staff for CZAAH. Given this snapshot, write 3-4 sentences for the leadership team: the overall state of the business, what is going well, and the one area that needs attention. Plain text, no markdown.',
+          user: facts, maxTokens: 300,
+        })
+        payload.narrative = r.text
+        await logAIAction({ actorId: user.id, actionType: 'exec_narrative', model: r.model, output: r.text, status: 'ok', tokensIn: r.inputTokens, tokensOut: r.outputTokens })
+      } catch (e) {
+        await logAIAction({ actorId: user.id, actionType: 'exec_narrative', status: 'error', error: e instanceof Error ? e.message : String(e) })
+      }
+    }
+
+    return NextResponse.json(payload)
   } catch (err) {
     logError('api.admin.control-plane', err)
     return NextResponse.json({ error: 'Could not load the control plane.' }, { status: 500 })

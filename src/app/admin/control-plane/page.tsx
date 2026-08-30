@@ -52,14 +52,17 @@ export default function ControlPlanePage() {
   const [d, setD] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [summarizing, setSummarizing] = useState(false)
 
-  useEffect(() => {
-    fetch('/api/admin/control-plane')
+  const load = (narrative = false) => {
+    if (narrative) setSummarizing(true); else setLoading(true)
+    fetch(`/api/admin/control-plane${narrative ? '?narrative=1' : ''}`)
       .then((r) => r.ok ? r.json() : r.json().then((j) => Promise.reject(new Error(j.error || 'Failed'))))
       .then(setD)
       .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => { setLoading(false); setSummarizing(false) })
+  }
+  useEffect(() => { load(false) }, [])
 
   if (loading) return <div className="text-on-surface-variant py-12 text-center text-sm">Loading…</div>
   if (error) return <div className="text-red-400 py-12 text-center text-sm">{error}</div>
@@ -67,8 +70,18 @@ export default function ControlPlanePage() {
 
   return (
     <div className="max-w-5xl">
-      <h1 className="font-[family-name:var(--font-heading)] text-2xl text-on-surface mb-1">Control Plane</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="font-[family-name:var(--font-heading)] text-2xl text-on-surface">Control Plane</h1>
+        {d.aiAvailable && <button onClick={() => load(true)} disabled={summarizing} className="text-xs text-primary border border-primary/30 px-3 py-1.5 disabled:opacity-40">{summarizing ? 'Summarising…' : '✦ AI summary'}</button>}
+      </div>
       <p className="text-sm text-on-surface-variant mb-6">One snapshot across the CRM and every business module.</p>
+
+      {d.narrative && (
+        <div className="bg-surface-container-low border border-primary/20 p-4 mb-5">
+          <p className="text-[10px] uppercase tracking-wide text-primary/70 mb-1">Chief-of-staff summary</p>
+          <p className="text-sm text-on-surface whitespace-pre-wrap">{d.narrative}</p>
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-4">
         <Section title="CRM & Directory" href="/admin/crm/dashboard">

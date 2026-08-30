@@ -24,11 +24,28 @@ export default function AiAdminPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [q, setQ] = useState('')
+  const [asking, setAsking] = useState(false)
+  const [ans, setAns] = useState<any>(null)
+
   useEffect(() => {
     fetch('/api/admin/ai-status')
       .then((r) => r.ok ? r.json() : r.json().then((j) => Promise.reject(new Error(j.error || 'Failed'))))
       .then(setD).catch((e) => setError(e.message)).finally(() => setLoading(false))
   }, [])
+
+  async function ask() {
+    if (q.trim().length < 3) return
+    setAsking(true); setAns(null)
+    try {
+      const res = await fetch('/api/ai/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: q }) })
+      const j = await res.json()
+      if (!res.ok) { setAns({ error: j.error || 'Failed' }); return }
+      setAns(j)
+    } catch {
+      setAns({ error: 'Request failed' })
+    } finally { setAsking(false) }
+  }
 
   if (loading) return <div className="text-on-surface-variant py-12 text-center text-sm">Loading…</div>
   if (error) return <div className="text-red-400 py-12 text-center text-sm">{error}</div>
@@ -50,6 +67,33 @@ export default function AiAdminPage() {
         )}
         {d.configured && <p className="text-xs text-on-surface-variant/60 mt-2 font-mono">{d.model}</p>}
       </div>
+
+      {d.configured && (
+        <div className="bg-surface-container-low border border-outline-variant/10 p-4 mb-6">
+          <h2 className="text-xs uppercase tracking-wider text-on-surface-variant/60 mb-2">Ask the knowledge assistant</h2>
+          <div className="flex gap-2">
+            <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') ask() }}
+              placeholder="e.g. which deals are closing this quarter?"
+              className="flex-1 bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm" />
+            <button onClick={ask} disabled={asking || q.trim().length < 3} className="text-xs text-primary border border-primary/30 px-4 py-2 hover:bg-primary/10 disabled:opacity-40">{asking ? 'Thinking…' : '✦ Ask'}</button>
+          </div>
+          {ans?.error && <p className="text-xs text-red-400 mt-2">{ans.error}</p>}
+          {ans?.answer && (
+            <div className="mt-3">
+              <p className="text-sm text-on-surface whitespace-pre-wrap">{ans.answer}</p>
+              {ans.sources?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {ans.sources.map((s: any) => (
+                    <Link key={`${s.type}-${s.id}`} href={s.href || '#'} className="text-[11px] bg-surface-container-lowest border border-outline-variant/10 px-2 py-0.5 text-on-surface-variant hover:text-primary">
+                      {s.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <Stat label="OK (30d)" value={d.stats.ok} />
