@@ -152,7 +152,14 @@ export async function PATCH(request: NextRequest) {
     } else if (pw.length < 8) {
       return NextResponse.json({ error: 'Password must be at least 8 characters.' }, { status: 400 })
     } else {
-      patch.webmail_password_hash = await hashPassword(pw)
+      try {
+        patch.webmail_password_hash = await hashPassword(pw)
+      } catch (e) {
+        return NextResponse.json(
+          { error: `Could not hash password: ${e instanceof Error ? e.message : 'unknown error'}` },
+          { status: 500 }
+        )
+      }
     }
   }
 

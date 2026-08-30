@@ -10,7 +10,8 @@
  * key already can). 7-day expiry.
  */
 
-const PBKDF2_ITERATIONS = 210_000
+// Cloudflare Workers' crypto.subtle caps PBKDF2 at 100k iterations.
+const PBKDF2_ITERATIONS = 100_000
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60
 export const WEBMAIL_COOKIE = 'czaah_webmail'
 
