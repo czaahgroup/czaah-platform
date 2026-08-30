@@ -1,0 +1,28 @@
+name: CRM task reminders
+
+# PARKED — rename to task-reminders.yml to enable. Needs:
+#   1. Worker secret CRON_SECRET  (npx wrangler secret put CRON_SECRET)
+#   2. GitHub repo secret CRON_SECRET with the same value
+# Runs every 15 minutes, tells the app to fire any due task reminders.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: task-reminders
+  cancel-in-progress: true
+
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger reminder run
+        run: |
+          code=$(curl -s -o /tmp/out -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://czaah.com/api/crm/tasks/reminders)
+          cat /tmp/out; echo
+          [ "$code" = "200" ] || { echo "HTTP $code"; exit 1; }

@@ -90,6 +90,17 @@ export async function POST(request: NextRequest) {
       targetType: relType || 'task', targetId: relId || data.id,
       metadata: { taskId: data.id, title, assignee_id: row.assignee_id },
     })
+
+    if (row.assignee_id && row.assignee_id !== access.userId) {
+      await access.supabase.from('notifications').insert({
+        user_id: row.assignee_id,
+        type: 'task_assigned',
+        title: 'Task assigned to you',
+        body: `"${title}"${row.due_at ? ` — due ${new Date(row.due_at).toLocaleDateString()}` : ''}.`,
+        link: '/admin/crm/tasks',
+        is_read: false,
+      })
+    }
     return NextResponse.json({ data: { id: data.id } })
   } catch (err) {
     logError('api.crm.tasks.post', err)

@@ -23,7 +23,10 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const [c, setC] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<'overview' | 'notes' | 'activity'>('overview')
+  const [tab, setTab] = useState<'overview' | 'notes' | 'tasks' | 'activity'>('overview')
+  const [tasks, setTasks] = useState<any[]>([])
+  const [taskTitle, setTaskTitle] = useState('')
+  const [taskDue, setTaskDue] = useState('')
   const [edit, setEdit] = useState(false)
   const [draft, setDraft] = useState<any>({})
   const [saving, setSaving] = useState(false)
@@ -60,9 +63,28 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
     if (res.ok) setFeed((await res.json()).data)
   }, [id])
 
+  const loadTasks = useCallback(async () => {
+    const res = await fetch(`/api/crm/tasks?type=contact&id=${id}`)
+    if (res.ok) setTasks((await res.json()).data)
+  }, [id])
+
   useEffect(() => { loadContact() }, [loadContact])
   useEffect(() => { if (tab === 'notes') loadNotes() }, [tab, loadNotes])
+  useEffect(() => { if (tab === 'tasks') loadTasks() }, [tab, loadTasks])
   useEffect(() => { if (tab === 'activity') loadFeed() }, [tab, loadFeed])
+
+  async function addTask() {
+    if (!taskTitle.trim()) return
+    const res = await fetch('/api/crm/tasks', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: taskTitle, dueAt: taskDue || null, relatedType: 'contact', relatedId: id }),
+    })
+    if (res.ok) { setTaskTitle(''); setTaskDue(''); await loadTasks() }
+  }
+  async function toggleTask(tid: string, status: string) {
+    await fetch(`/api/crm/tasks?taskId=${tid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
+    await loadTasks()
+  }
 
   async function save() {
     setSaving(true)
@@ -119,7 +141,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
       {error && <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 mb-4 text-sm text-red-400">{error}</div>}
 
       <div className="flex gap-1 border-b border-outline-variant/10 mb-5">
-        {(['overview', 'notes', 'activity'] as const).map((t) => (
+        {(['overview', 'notes', 'tasks', 'activity'] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2.5 text-sm capitalize border-b-2 transition-colors ${tab === t ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}>
             {t}
@@ -185,6 +207,34 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               <div key={n.id} className="bg-surface-container-low border border-outline-variant/10 p-4">
                 <p className="text-sm text-on-surface whitespace-pre-wrap">{n.body}</p>
                 <p className="text-[11px] text-on-surface-variant/50 mt-2">{n.author?.full_name} · {timeAgo(n.created_at)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab === 'tasks' && (
+        <div>
+          <div className="flex gap-2 mb-4">
+            <input value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') addTask() }}
+              placeholder="Add a task for this contact…" className="flex-1 bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm" />
+            <input type="date" value={taskDue} onChange={(e) => setTaskDue(e.target.value)} className="bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm" />
+            <button onClick={addTask} disabled={!taskTitle.trim()} className="bg-primary text-on-primary font-semibold px-4 py-2 text-sm disabled:opacity-40">Add</button>
+          </div>
+          <div className="bg-surface-container-low border border-outline-variant/10 divide-y divide-outline-variant/10">
+            {tasks.length === 0 && <p className="text-on-surface-variant/60 text-sm text-center py-8">No tasks.</p>}
+            {tasks.map((t) => (
+              <div key={t.id} className="flex items-start gap-3 px-4 py-3">
+                <button onClick={() => toggleTask(t.id, t.status === 'done' ? 'open' : 'done')}
+                  className={`mt-0.5 w-4 h-4 flex-none border ${t.status === 'done' ? 'bg-primary border-primary' : 'border-outline-variant/40 hover:border-primary'}`}>
+                  {t.status === 'done' && <span className="text-on-primary text-[10px] leading-none block">✓</span>}
+                </button>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-sm ${t.status === 'done' ? 'text-on-surface-variant/40 line-through' : 'text-on-surface'}`}>{t.title}</p>
+                  <p className="text-[11px] text-on-surface-variant/50 mt-0.5">
+                    {t.assignee?.full_name || 'Unassigned'}{t.due_at && ` · due ${new Date(t.due_at).toLocaleDateString()}`}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

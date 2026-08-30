@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
+import { logActivity } from '@/lib/activity'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
 
@@ -205,6 +206,14 @@ export async function POST(request: NextRequest) {
           View Enquiry &rarr;
         </a>
       `),
+    })
+
+    await logActivity({
+      actorId: user.id,
+      action: 'enquiry.created',
+      targetType: 'enquiry',
+      targetId: enquiry.id,
+      metadata: { reference: enquiry.reference_number, product: productName, sector_id: sectorId },
     })
 
     return NextResponse.json({ data: enquiry }, { status: 201 })
