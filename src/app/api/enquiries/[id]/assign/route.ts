@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
+import { logActivity } from '@/lib/activity'
+import { logError } from '@/lib/logError'
 
 
 function wrapEmail(inner: string) {
@@ -233,9 +235,17 @@ export async function POST(
       })
     }
 
+    await logActivity({
+      actorId: user.id,
+      action: 'enquiry.assigned',
+      targetType: 'enquiry',
+      targetId: id,
+      metadata: { reference: enquiry.reference_number, assignee_id: adminId, assignee_role: adminProfile.role },
+    })
+
     return NextResponse.json({ data: updatedEnquiry })
   } catch (err) {
-    console.error('POST /api/enquiries/[id]/assign error:', err)
+    logError('api.enquiries.assign', err, { enquiryId: (await params).id })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

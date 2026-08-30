@@ -130,3 +130,8 @@ These fall out of the audit and shape the CRM build:
 | registrant_chats / messages | own profile · SA | own / sender | participants · SA | — | |
 | call_log | caller · receiver · SA | (service) | — | — | |
 | negotiation_messages | ? | ? | `get_my_role()='admin'` | — | finding 3 |
+| crm_companies | staff · owner · creator | staff (service role) | staff | staff | P1B — authenticated has SELECT only, all writes service-role |
+| crm_contacts | staff · owner · creator · own profile | staff | staff | staff | P1B — same |
+| crm_tasks | staff · assignee · creator | staff | staff | staff | P1B — same |
+| crm_notes | staff · author | staff | staff | staff | P1B — same |
+| crm_links | staff · linker | staff | staff | staff | P1B — same |
