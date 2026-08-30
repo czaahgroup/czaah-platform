@@ -28,6 +28,10 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDue, setTaskDue] = useState('')
   const [emails, setEmails] = useState<any[]>([])
+  const [compose, setCompose] = useState(false)
+  const [mailboxes, setMailboxes] = useState<any[]>([])
+  const [mail, setMail] = useState({ mailboxId: '', subject: '', body: '' })
+  const [sending, setSending] = useState(false)
   const [edit, setEdit] = useState(false)
   const [draft, setDraft] = useState<any>({})
   const [saving, setSaving] = useState(false)
@@ -73,6 +77,39 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
     const res = await fetch(`/api/crm/contacts/${id}/emails`)
     if (res.ok) setEmails((await res.json()).data)
   }, [id])
+
+  async function openCompose() {
+    setCompose(true)
+    if (!mailboxes.length) {
+      const res = await fetch('/api/mail/mailboxes')
+      if (res.ok) {
+        const list = (await res.json()).data || []
+        setMailboxes(list)
+        if (list[0]) setMail((m) => ({ ...m, mailboxId: list[0].id }))
+      }
+    }
+  }
+  async function sendEmail() {
+    if (!c.email || !mail.mailboxId || !mail.subject.trim() || !mail.body.trim()) return
+    setSending(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/mail/threads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: c.email, subject: mail.subject, body: mail.body, mailboxId: mail.mailboxId }),
+      })
+      const j = await res.json()
+      if (!res.ok) throw new Error(j.error || 'Send failed')
+      setCompose(false)
+      setMail((m) => ({ ...m, subject: '', body: '' }))
+      await loadEmails()
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Send failed')
+    } finally {
+      setSending(false)
+    }
+  }
 
   useEffect(() => { loadContact() }, [loadContact])
   useEffect(() => { if (tab === 'emails') loadEmails() }, [tab, loadEmails])
@@ -201,7 +238,32 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
 
       {tab === 'emails' && (
         <div className="space-y-2">
-          {emails.length === 0 && (
+          {c.email && !compose && (
+            <button onClick={openCompose} className="mb-2 text-xs text-primary border border-outline-variant/30 hover:border-primary/50 px-3 py-1.5 transition-colors">
+              ✎ Compose email to {c.email}
+            </button>
+          )}
+          {compose && (
+            <div className="bg-surface-container-low border border-outline-variant/10 p-4 mb-3 space-y-2">
+              <div className="flex gap-2">
+                <select value={mail.mailboxId} onChange={(e) => setMail((m) => ({ ...m, mailboxId: e.target.value }))}
+                  className="bg-surface-container-lowest border border-outline-variant/10 px-2 py-1.5 text-xs text-on-surface">
+                  {mailboxes.map((mb) => <option key={mb.id} value={mb.id}>{mb.address}</option>)}
+                </select>
+                <span className="text-xs text-on-surface-variant/60 self-center">→ {c.email}</span>
+              </div>
+              <input value={mail.subject} onChange={(e) => setMail((m) => ({ ...m, subject: e.target.value }))} placeholder="Subject"
+                className="w-full bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm" />
+              <textarea value={mail.body} onChange={(e) => setMail((m) => ({ ...m, body: e.target.value }))} rows={5} placeholder="Message…"
+                className="w-full bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm resize-none" />
+              <div className="flex gap-2 justify-end">
+                <button onClick={() => setCompose(false)} className="px-3 py-1.5 text-xs text-on-surface-variant border border-outline-variant/10">Cancel</button>
+                <button onClick={sendEmail} disabled={sending || !mail.mailboxId || !mail.subject.trim() || !mail.body.trim()}
+                  className="bg-primary text-on-primary font-semibold px-4 py-1.5 text-xs disabled:opacity-40">{sending ? 'Sending…' : 'Send'}</button>
+              </div>
+            </div>
+          )}
+          {emails.length === 0 && !compose && (
             <p className="text-on-surface-variant/60 text-sm text-center py-8">
               No email threads linked. Threads are linked automatically when mail is received from {c.email ? <span className="font-mono">{c.email}</span> : 'this contact'}.
             </p>
