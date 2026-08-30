@@ -67,6 +67,7 @@ function hrefFor(type: string, id: string): string | null {
     case 'company': return `/admin/crm/companies/${id}`
     case 'enquiry': return `/admin/enquiries/${id}`
     case 'deal': return `/admin/crm/deals/${id}`
+    case 'construction_project': return `/admin/construction/projects/${id}`
     default: return null
   }
 }

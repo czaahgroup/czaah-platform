@@ -5,7 +5,7 @@ import { logError } from '@/lib/logError'
 
 const STATUS = ['open', 'done', 'cancelled']
 const PRIORITY = ['low', 'normal', 'high', 'urgent']
-const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread', 'deal']
+const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread', 'deal', 'construction_project']
 const PAGE = 100
 
 /**

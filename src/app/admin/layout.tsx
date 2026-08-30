@@ -152,6 +152,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <SectionHeader label="Real Estate" />
         <NavLink href="/admin/properties" label="Properties" icon="apartment" />
 
+        <SectionHeader label="Construction" />
+        <NavLink href="/admin/construction" label="Overview" icon="insights" />
+        <NavLink href="/admin/construction/projects" label="Projects" icon="engineering" />
+
         <SectionHeader label="Content" />
         <NavLink href="/admin/content/sectors" label="Sectors" icon="category" />
         <NavLink href="/admin/content/services" label="Services" icon="design_services" />

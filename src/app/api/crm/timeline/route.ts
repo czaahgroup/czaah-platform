@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireCrmAccess } from '@/lib/crmAuth'
 import { logError } from '@/lib/logError'
 
-const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread', 'deal']
+const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread', 'deal', 'construction_project']
 
 /**
  * GET /api/crm/timeline?type=contact&id=<uuid>
