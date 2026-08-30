@@ -30,6 +30,8 @@ export type ActivityTarget =
   | 'note'
   | 'profile'
   | 'partner'
+  | 'job_order'
+  | 'placement'
 
 export interface ActivityInput {
   actorId: string | null

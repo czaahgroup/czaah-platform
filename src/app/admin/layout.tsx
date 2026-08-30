@@ -124,6 +124,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/elite-members" label="Elite Members" icon="workspace_premium" />
         <NavLink href="/admin/users" label="Users" icon="group" />
 
+        <SectionHeader label="Recruitment" />
+        <NavLink href="/admin/recruitment" label="Overview" icon="insights" />
+        <NavLink href="/admin/recruitment/orders" label="Job Orders" icon="assignment" />
+
         <SectionHeader label="CRM" />
         <NavLink href="/admin/crm/dashboard" label="Overview" icon="dashboard" />
         <NavLink href="/admin/crm/search" label="Search" icon="search" />
