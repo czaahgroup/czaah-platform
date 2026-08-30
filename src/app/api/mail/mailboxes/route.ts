@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireMailAccess } from '@/lib/mailAuth'
 
+const ADDRESS_RE = /^[a-z0-9._%+-]+@czaah\.com$/
 
-/** super_admin: every mailbox. partner: just their own. */
+/**
+ * GET — super_admin: every mailbox; partner: just their own.
+ * `?withPartners=1` (super_admin) also returns the partner roster with a
+ * `hasMailbox` flag, for the "assign a partner mailbox" picker.
+ */
 export async function GET(request: NextRequest) {
   const access = await requireMailAccess(request)
   if ('error' in access) return access.error
@@ -20,18 +25,42 @@ export async function GET(request: NextRequest) {
   const { data, error } = await q
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  return NextResponse.json({
-    data: (data || []).map((m) => ({
-      id: m.id,
-      address: m.address,
-      displayName: m.display_name,
-      signatureHtml: m.signature_html || '',
-      kind: m.partner_id ? 'partner' : 'team',
-    })),
-  })
+  const mailboxes = (data || []).map((m) => ({
+    id: m.id,
+    address: m.address,
+    displayName: m.display_name,
+    signatureHtml: m.signature_html || '',
+    kind: m.partner_id ? 'partner' : 'team',
+    partnerId: m.partner_id || null,
+  }))
+
+  const wantPartners = new URL(request.url).searchParams.get('withPartners') === '1'
+  if (!wantPartners || !access.isSuperAdmin) {
+    return NextResponse.json({ data: mailboxes })
+  }
+
+  const { data: partners } = await access.supabase
+    .from('partners')
+    .select('id, partner_id, profiles!partners_profile_id_fkey(full_name, company_name, email)')
+    .order('created_at', { ascending: false })
+
+  const taken = new Set(mailboxes.filter((m) => m.partnerId).map((m) => m.partnerId))
+  const partnerList = (partners || []).map((p: any) => ({
+    id: p.id,
+    code: p.partner_id,
+    name: p.profiles?.full_name || p.profiles?.email || p.partner_id,
+    company: p.profiles?.company_name || null,
+    hasMailbox: taken.has(p.id),
+  }))
+
+  return NextResponse.json({ data: mailboxes, partners: partnerList })
 }
 
-/** Create a team mailbox (super_admin only). */
+/**
+ * POST — create a mailbox (super_admin only).
+ * Body: { address, displayName?, partnerId? }. With `partnerId` it's a
+ * partner mailbox (one per partner); without, a team mailbox.
+ */
 export async function POST(request: NextRequest) {
   const access = await requireMailAccess(request)
   if ('error' in access) return access.error
@@ -40,8 +69,9 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}))
   const address = String(body.address || '').trim().toLowerCase()
   const displayName = String(body.displayName || '').trim() || null
+  const partnerId = body.partnerId ? String(body.partnerId) : null
 
-  if (!/^[a-z0-9._%+-]+@czaah\.com$/.test(address)) {
+  if (!ADDRESS_RE.test(address)) {
     return NextResponse.json({ error: 'Address must look like name@czaah.com.' }, { status: 400 })
   }
 
@@ -52,41 +82,98 @@ export async function POST(request: NextRequest) {
     .maybeSingle()
   if (existing) return NextResponse.json({ error: 'That address already exists.' }, { status: 409 })
 
+  if (partnerId) {
+    const { data: partner } = await access.supabase
+      .from('partners')
+      .select('id')
+      .eq('id', partnerId)
+      .maybeSingle()
+    if (!partner) return NextResponse.json({ error: 'Partner not found.' }, { status: 404 })
+
+    const { data: partnerBox } = await access.supabase
+      .from('partner_mailboxes')
+      .select('id')
+      .eq('partner_id', partnerId)
+      .maybeSingle()
+    if (partnerBox) return NextResponse.json({ error: 'That partner already has a mailbox.' }, { status: 409 })
+  }
+
   const { data, error } = await access.supabase
     .from('partner_mailboxes')
-    .insert({ address, display_name: displayName, partner_id: null })
-    .select('id, address, display_name')
+    .insert({ address, display_name: displayName, partner_id: partnerId })
+    .select('id, address, display_name, partner_id')
     .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   return NextResponse.json({
-    data: { id: data.id, address: data.address, displayName: data.display_name, kind: 'team' },
+    data: {
+      id: data.id,
+      address: data.address,
+      displayName: data.display_name,
+      kind: data.partner_id ? 'partner' : 'team',
+      partnerId: data.partner_id || null,
+    },
   })
 }
 
-/** Update the signature for a mailbox (own mailbox, or any for super_admin). */
+/**
+ * PATCH — super_admin: edit any mailbox's address / display name / signature.
+ * partner: only their own mailbox's signature.
+ */
 export async function PATCH(request: NextRequest) {
   const access = await requireMailAccess(request)
   if ('error' in access) return access.error
 
-  const { mailboxId, signatureHtml } = await request.json()
+  const body = await request.json().catch(() => ({}))
+  const { mailboxId, signatureHtml, displayName, address } = body
+
   const targetId = access.isSuperAdmin ? mailboxId : access.ownMailboxId
   if (!targetId) return NextResponse.json({ error: 'mailboxId is required' }, { status: 400 })
   if (!access.isSuperAdmin && mailboxId && mailboxId !== access.ownMailboxId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const value = typeof signatureHtml === 'string' ? signatureHtml.slice(0, 20000) : null
+  const patch: Record<string, unknown> = {}
+
+  if (signatureHtml !== undefined) {
+    patch.signature_html = typeof signatureHtml === 'string' ? signatureHtml.slice(0, 20000) : null
+  }
+
+  if (access.isSuperAdmin && displayName !== undefined) {
+    patch.display_name = String(displayName || '').trim() || null
+  }
+
+  if (access.isSuperAdmin && address !== undefined) {
+    const next = String(address || '').trim().toLowerCase()
+    if (!ADDRESS_RE.test(next)) {
+      return NextResponse.json({ error: 'Address must look like name@czaah.com.' }, { status: 400 })
+    }
+    const { data: clash } = await access.supabase
+      .from('partner_mailboxes')
+      .select('id')
+      .eq('address', next)
+      .neq('id', targetId)
+      .maybeSingle()
+    if (clash) return NextResponse.json({ error: 'That address is already in use.' }, { status: 409 })
+    patch.address = next
+  }
+
+  if (Object.keys(patch).length === 0) {
+    return NextResponse.json({ error: 'Nothing to update.' }, { status: 400 })
+  }
 
   const { error } = await access.supabase
     .from('partner_mailboxes')
-    .update({ signature_html: value })
+    .update(patch)
     .eq('id', targetId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }
 
-/** Delete a team mailbox (super_admin only). Partner mailboxes are refused. */
+/**
+ * DELETE — remove a mailbox and all its threads/messages (super_admin only).
+ * `?mailboxId=…`. Deleting a partner mailbox also requires `&confirmPartner=1`.
+ */
 export async function DELETE(request: NextRequest) {
   const access = await requireMailAccess(request)
   if ('error' in access) return access.error
@@ -102,10 +189,11 @@ export async function DELETE(request: NextRequest) {
     .eq('id', mailboxId)
     .maybeSingle()
   if (!mb) return NextResponse.json({ error: 'Mailbox not found.' }, { status: 404 })
-  if (mb.partner_id) {
+
+  if (mb.partner_id && searchParams.get('confirmPartner') !== '1') {
     return NextResponse.json(
-      { error: 'This mailbox belongs to a partner — manage it from the Partners area.' },
-      { status: 400 }
+      { error: 'This is a partner mailbox. Deleting it also removes the partner’s mail history — resend with confirmation.' },
+      { status: 409 }
     )
   }
 
