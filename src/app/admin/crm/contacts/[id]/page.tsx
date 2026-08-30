@@ -23,10 +23,11 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const [c, setC] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<'overview' | 'notes' | 'tasks' | 'activity'>('overview')
+  const [tab, setTab] = useState<'overview' | 'emails' | 'notes' | 'tasks' | 'activity'>('overview')
   const [tasks, setTasks] = useState<any[]>([])
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDue, setTaskDue] = useState('')
+  const [emails, setEmails] = useState<any[]>([])
   const [edit, setEdit] = useState(false)
   const [draft, setDraft] = useState<any>({})
   const [saving, setSaving] = useState(false)
@@ -68,7 +69,13 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
     if (res.ok) setTasks((await res.json()).data)
   }, [id])
 
+  const loadEmails = useCallback(async () => {
+    const res = await fetch(`/api/crm/contacts/${id}/emails`)
+    if (res.ok) setEmails((await res.json()).data)
+  }, [id])
+
   useEffect(() => { loadContact() }, [loadContact])
+  useEffect(() => { if (tab === 'emails') loadEmails() }, [tab, loadEmails])
   useEffect(() => { if (tab === 'notes') loadNotes() }, [tab, loadNotes])
   useEffect(() => { if (tab === 'tasks') loadTasks() }, [tab, loadTasks])
   useEffect(() => { if (tab === 'activity') loadFeed() }, [tab, loadFeed])
@@ -141,7 +148,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
       {error && <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 mb-4 text-sm text-red-400">{error}</div>}
 
       <div className="flex gap-1 border-b border-outline-variant/10 mb-5">
-        {(['overview', 'notes', 'tasks', 'activity'] as const).map((t) => (
+        {(['overview', 'emails', 'notes', 'tasks', 'activity'] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2.5 text-sm capitalize border-b-2 transition-colors ${tab === t ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}>
             {t}
@@ -189,6 +196,29 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               {c.profile_id && <><dt className="text-on-surface-variant/60">Platform user</dt><dd><Link href={`/admin/users/${c.profile_id}`} className="text-primary text-xs">View account →</Link></dd></>}
             </dl>
           )}
+        </div>
+      )}
+
+      {tab === 'emails' && (
+        <div className="space-y-2">
+          {emails.length === 0 && (
+            <p className="text-on-surface-variant/60 text-sm text-center py-8">
+              No email threads linked. Threads are linked automatically when mail is received from {c.email ? <span className="font-mono">{c.email}</span> : 'this contact'}.
+            </p>
+          )}
+          {emails.map((t) => (
+            <a key={t.id} href={`/admin/mail?thread=${t.id}`} className="block bg-surface-container-low border border-outline-variant/10 hover:border-primary/40 transition-colors p-4">
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="text-sm text-on-surface font-medium truncate">{t.subject || '(no subject)'}</span>
+                <span className="text-[11px] text-on-surface-variant/50 flex-none">{new Date(t.lastAt).toLocaleDateString()}</span>
+              </div>
+              <p className="text-[11px] text-on-surface-variant/60 mt-0.5">
+                {t.messageCount} message{t.messageCount === 1 ? '' : 's'} · {t.mailbox || 'mailbox'}
+                {t.lastDirection && ` · last ${t.lastDirection}`}
+              </p>
+              {t.preview && <p className="text-xs text-on-surface-variant/70 mt-1.5 line-clamp-2">{t.preview}</p>}
+            </a>
+          ))}
         </div>
       )}
 
