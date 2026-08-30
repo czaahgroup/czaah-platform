@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
 
@@ -208,7 +209,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: enquiry }, { status: 201 })
   } catch (err) {
-    console.error('POST /api/enquiries error:', err)
+    logError('api.enquiries.post', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -271,7 +272,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: enquiries })
   } catch (err) {
-    console.error('GET /api/enquiries error:', err)
+    logError('api.enquiries.get', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

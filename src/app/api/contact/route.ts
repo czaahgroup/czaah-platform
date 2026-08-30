@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
+import { logError } from '@/lib/logError'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 
@@ -139,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('POST /api/contact error:', err)
+    logError('api.contact.post', err)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

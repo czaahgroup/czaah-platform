@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
       totalAdmins: totalAdmins ?? 0,
     })
   } catch (err) {
-    console.error('Admin overview error:', err)
+    logError('api.admin.overview', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
