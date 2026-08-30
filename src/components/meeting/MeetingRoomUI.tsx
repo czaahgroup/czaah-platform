@@ -28,17 +28,17 @@ function VideoTile({
   }, [stream])
 
   return (
-    <div style={{ position: 'relative', background: '#111', overflow: 'hidden', borderRadius: '8px' }}>
+    <div style={{ position: 'relative', background: '#111', overflow: 'hidden', borderRadius: '8px', minHeight: 0, minWidth: 0 }}>
       {stream && !isVideoOff ? (
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted={!!isLocal || muted}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transform: isLocal ? 'scaleX(-1)' : undefined }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: isLocal ? 'scaleX(-1)' : undefined }}
         />
       ) : (
-        <div style={{ width: '100%', height: '100%', minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(201,168,76,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontFamily: "'Cinzel', serif", fontSize: '20px', color: '#C9A84C' }}>{name.charAt(0).toUpperCase()}</span>
           </div>
@@ -51,11 +51,15 @@ function VideoTile({
   )
 }
 
-function gridStyle(count: number): React.CSSProperties {
-  if (count <= 1) return { gridTemplateColumns: '1fr' }
-  if (count === 2) return { gridTemplateColumns: '1fr 1fr' }
-  if (count <= 4) return { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' }
-  return { gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: '1fr 1fr' }
+// Column count that keeps every tile on screen (no scrolling) for a given
+// participant count. Rows fall out of `grid-auto-rows: minmax(0,1fr)` on the
+// container, so N tiles always tile the available box evenly.
+function columnsFor(count: number, narrow: boolean): number {
+  if (narrow) return count <= 1 ? 1 : count <= 6 ? 2 : 3
+  if (count <= 1) return 1
+  if (count <= 4) return 2
+  if (count <= 9) return 3
+  return 4
 }
 
 export function MeetingRoomUI({
@@ -159,7 +163,17 @@ export function MeetingRoomUI({
         </div>
       )}
 
-      <div style={{ flex: 1, display: 'grid', gap: '10px', padding: narrow ? '0 12px 12px' : '0 24px 16px', ...(narrow ? { gridTemplateColumns: '1fr' } : gridStyle(tiles.length)) }}>
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: 'grid',
+          gap: '10px',
+          padding: narrow ? '0 12px 12px' : '0 24px 16px',
+          gridTemplateColumns: `repeat(${columnsFor(tiles.length, narrow)}, minmax(0, 1fr))`,
+          gridAutoRows: 'minmax(0, 1fr)',
+        }}
+      >
         {tiles.map((t) => (
           <VideoTile key={t.userId} stream={t.stream} name={t.userName} isVideoOff={t.isVideoOff} isLocal={t.isLocal} />
         ))}
