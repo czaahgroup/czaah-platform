@@ -4,6 +4,7 @@
 import { useEffect, useState, useCallback, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import AiBriefing from '@/components/AiBriefing'
 
 const KINDS = ['property_sale', 'property_rental', 'investment', 'advisory', 'other']
 const KIND_LABEL: Record<string, string> = {
@@ -258,6 +259,7 @@ export default function DealDetailPage({ params }: { params: Promise<{ id: strin
               {d.description && <><dt className="text-on-surface-variant/60">Notes</dt><dd className="text-on-surface whitespace-pre-wrap">{d.description}</dd></>}
             </dl>
           )}
+          {!edit && <AiBriefing type="deal" id={id} />}
         </div>
       )}
 

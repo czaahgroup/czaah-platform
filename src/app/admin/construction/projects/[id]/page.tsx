@@ -4,6 +4,7 @@
 import { useEffect, useState, useCallback, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import AiBriefing from '@/components/AiBriefing'
 
 const TYPES = ['residential', 'commercial', 'industrial', 'infrastructure', 'mixed_use', 'fit_out', 'other']
 const TYPE_LABEL: Record<string, string> = {
@@ -263,6 +264,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               {p.description && <><dt className="text-on-surface-variant/60">Description</dt><dd className="text-on-surface whitespace-pre-wrap">{p.description}</dd></>}
             </dl>
           )}
+          {!edit && <AiBriefing type="construction_project" id={id} />}
         </div>
       )}
 

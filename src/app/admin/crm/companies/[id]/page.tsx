@@ -3,6 +3,7 @@
 
 import { useEffect, useState, useCallback, use } from 'react'
 import Link from 'next/link'
+import AiBriefing from '@/components/AiBriefing'
 
 const STAGES = ['new', 'engaged', 'qualified', 'active', 'dormant', 'lost']
 const ORG_TYPES = ['company', 'investor', 'partner_firm', 'government', 'fund', 'counterparty', 'other']
@@ -194,6 +195,7 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               {co.description && <><dt className="text-on-surface-variant/60">About</dt><dd className="text-on-surface whitespace-pre-wrap">{co.description}</dd></>}
             </dl>
           )}
+          {!edit && <AiBriefing type="company" id={id} />}
         </div>
       )}
 

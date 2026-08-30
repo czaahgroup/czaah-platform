@@ -4,6 +4,7 @@
 import { useEffect, useState, useCallback, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import AiBriefing from '@/components/AiBriefing'
 
 const DESK = ['oil_gas', 'minerals', 'agri', 'other']
 const DESK_LABEL: Record<string, string> = { oil_gas: 'Oil & Gas', minerals: 'Minerals', agri: 'Agri', other: 'Other' }
@@ -266,6 +267,7 @@ export default function TradeDetailPage({ params }: { params: Promise<{ id: stri
               {t.notes && <><dt className="text-on-surface-variant/60">Notes</dt><dd className="text-on-surface whitespace-pre-wrap">{t.notes}</dd></>}
             </dl>
           )}
+          {!edit && <AiBriefing type="commodity_trade" id={id} />}
         </div>
       )}
 
