@@ -112,6 +112,7 @@ export default function MemberDashboardLayout({ children }: { children: React.Re
       label: 'Business',
       links: [
         { href: '/dashboard/enquiries', label: 'Enquiries', icon: 'mail' },
+        { href: '/dashboard/portfolio', label: 'My Portfolio', icon: 'work' },
         { href: '/dashboard/investments', label: 'Investments', icon: 'trending_up' },
         { href: '/dashboard/meetings', label: 'Meetings', icon: 'event' },
       ],
