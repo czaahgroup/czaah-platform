@@ -184,7 +184,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
 
       {error && <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 mb-4 text-sm text-red-400">{error}</div>}
 
-      <div className="flex gap-1 border-b border-outline-variant/10 mb-5">
+      <div className="flex gap-1 border-b border-outline-variant/10 mb-5 overflow-x-auto">
         {(['overview', 'emails', 'notes', 'tasks', 'activity'] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2.5 text-sm capitalize border-b-2 transition-colors ${tab === t ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}>
