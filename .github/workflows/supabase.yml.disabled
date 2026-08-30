@@ -1,0 +1,46 @@
+name: Deploy Supabase
+
+# Runs on every push to master that touches the supabase/ folder.
+# - applies any NEW migration files to the production database (supabase db push)
+# - redeploys the mail-inbound edge function
+#
+# One-time setup before this can work (see supabase/README.md):
+#   1. GitHub repo secrets: SUPABASE_ACCESS_TOKEN, SUPABASE_DB_PASSWORD
+#   2. Baseline the remote so existing migrations are marked applied:
+#        npx supabase link --project-ref rwmiegcwxkffkxuokesc
+#        npx supabase migration repair --status applied 20260828000001 ... 20260828000024
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/supabase.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: supabase-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: rwmiegcwxkffkxuokesc
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Push database migrations
+        run: supabase db push
+
+      - name: Deploy edge functions
+        run: supabase functions deploy mail-inbound --project-ref "$SUPABASE_PROJECT_ID"

@@ -52,3 +52,6 @@ next-env.d.ts
 # local recovery artifacts (not for commit)
 /.git.broken-*/
 /src.aug-backup-*/
+
+# local deploy logs
+/redeploy.log
