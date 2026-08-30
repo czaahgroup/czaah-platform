@@ -35,3 +35,5 @@ Local: `npx supabase migration new <name>`.
 Secrets, or `npx supabase secrets set`): `RESEND_API_KEY`,
 `RESEND_WEBHOOK_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
 Deploying does not change them.
+
+<!-- ci: retrigger -->
