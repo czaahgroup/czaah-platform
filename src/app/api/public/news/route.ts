@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data)
   } catch (err) {
-    console.error('News API proxy error:', err)
+    logError("api.public.news", err)
     return NextResponse.json({ error: 'Failed to fetch news' }, { status: 500 })
   }
 }

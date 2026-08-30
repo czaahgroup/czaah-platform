@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
 import { sendPushToUser } from '@/lib/serverPush'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: messages, chatId: chat.id, admin })
   } catch (err) {
-    console.error('GET /api/partner/messages error:', err)
+    logError("api.partner.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: message })
   } catch (err) {
-    console.error('POST /api/partner/messages error:', err)
+    logError("api.partner.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

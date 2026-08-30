@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
       referralCount: referralCount || 0,
     })
   } catch (err) {
-    console.error('GET /api/partner/profile error:', err)
+    logError("api.partner.profile", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -50,7 +51,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('PATCH /api/partner/profile error:', err)
+    logError("api.partner.profile", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

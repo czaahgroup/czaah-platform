@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -179,7 +180,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (err) {
-    console.error('GET /api/admin/analytics error:', err)
+    logError("api.admin.analytics", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

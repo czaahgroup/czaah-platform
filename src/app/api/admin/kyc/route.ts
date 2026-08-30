@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -60,13 +61,13 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('KYC fetch error:', error)
+      logError("api.admin.kyc", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json(data || [])
   } catch (err) {
-    console.error('KYC API error:', err)
+    logError("api.admin.kyc", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

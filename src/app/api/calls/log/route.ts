@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Failed to log call:', error)
+      logError("api.calls.log", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('POST /api/calls/log error:', err)
+    logError("api.calls.log", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 async function verifyAdmin(request: NextRequest) {
@@ -86,7 +87,7 @@ export async function POST(
 
     return NextResponse.json(data, { status: 201 })
   } catch (err) {
-    console.error('Investment document upload error:', err)
+    logError("api.admin.investments.id.documents", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -131,7 +132,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Investment document delete error:', err)
+    logError("api.admin.investments.id.documents", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

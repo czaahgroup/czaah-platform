@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -44,13 +45,13 @@ export async function GET(request: NextRequest) {
       .createSignedUrl(path, 3600)
 
     if (error) {
-      console.error('Signed URL error:', error)
+      logError("api.admin.registration-documents", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ url: data.signedUrl })
   } catch (err) {
-    console.error('Registration document API error:', err)
+    logError("api.admin.registration-documents", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
+import { logError } from '@/lib/logError'
 
 
 export async function POST(request: NextRequest) {
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('POST /api/public/employer/register error:', err)
+    logError("api.public.employer.register", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function PATCH(
@@ -101,7 +102,7 @@ export async function PATCH(
       .single()
 
     if (error) {
-      console.error('OEP update error:', error)
+      logError("api.admin.oep.id", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -111,7 +112,7 @@ export async function PATCH(
 
     return NextResponse.json(data)
   } catch (err) {
-    console.error('PATCH /api/admin/oep/[id] error:', err)
+    logError("api.admin.oep.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -180,13 +181,13 @@ export async function DELETE(
     const { error } = await adminClient.from('oep_registry').delete().eq('id', id)
 
     if (error) {
-      console.error('OEP delete error:', error)
+      logError("api.admin.oep.id", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('DELETE /api/admin/oep/[id] error:', err)
+    logError("api.admin.oep.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

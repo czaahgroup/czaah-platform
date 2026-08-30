@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/serverPush'
+import { logError } from '@/lib/logError'
 
 
 function createAuthClient(request: NextRequest) {
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: chats })
   } catch (err) {
-    console.error('GET /api/admin/partner-messages error:', err)
+    logError("api.admin.partner-messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: message })
   } catch (err) {
-    console.error('POST /api/admin/partner-messages error:', err)
+    logError("api.admin.partner-messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -153,7 +154,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ data: { success: true } })
   } catch (err) {
-    console.error('DELETE /api/admin/partner-messages error:', err)
+    logError("api.admin.partner-messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

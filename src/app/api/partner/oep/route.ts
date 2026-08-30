@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner, hasWorkforceSectorAccess } from '@/lib/partnerAuth'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('GET /api/partner/oep error:', err)
+    logError("api.partner.oep", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ success: true, data: oep })
   } catch (err) {
-    console.error('POST /api/partner/oep error:', err)
+    logError("api.partner.oep", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

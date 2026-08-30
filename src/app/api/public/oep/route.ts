@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -22,13 +23,13 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Public OEP fetch error:', error)
+      logError("api.public.oep", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ data: data || [] })
   } catch (err) {
-    console.error('GET /api/public/oep error:', err)
+    logError("api.public.oep", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

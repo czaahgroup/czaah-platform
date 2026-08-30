@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 // Public listing of partner-submitted opportunities for the /investments page.
@@ -34,7 +35,7 @@ export async function GET() {
 
     return NextResponse.json(data || [])
   } catch (err) {
-    console.error('GET /api/public/partner-opportunities error:', err)
+    logError("api.public.opportunities", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

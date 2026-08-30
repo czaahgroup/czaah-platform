@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
     const { data, error, count } = await query
 
     if (error) {
-      console.error('Employer fetch error:', error)
+      logError("api.admin.employers", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
       totalPages: Math.ceil((count || 0) / limit),
     })
   } catch (err) {
-    console.error('GET /api/admin/employers error:', err)
+    logError("api.admin.employers", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -56,7 +57,7 @@ export async function GET(
 
     return NextResponse.json({ deal, documents: documents || [] })
   } catch (err) {
-    console.error('Partner deal GET error:', err)
+    logError("api.partner.deals.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -124,13 +125,13 @@ export async function PATCH(
       .eq('id', id)
 
     if (error) {
-      console.error('Partner deal update error:', error)
+      logError("api.partner.deals.id", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Partner deal PATCH error:', err)
+    logError("api.partner.deals.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -188,13 +189,13 @@ export async function DELETE(
       .eq('id', id)
 
     if (error) {
-      console.error('Partner deal delete error:', error)
+      logError("api.partner.deals.id", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Partner deal DELETE error:', err)
+    logError("api.partner.deals.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

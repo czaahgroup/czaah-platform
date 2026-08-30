@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 // Public Employment Promoter verification lookup — deliberately returns only
@@ -33,7 +34,7 @@ export async function GET(
       },
     })
   } catch (err) {
-    console.error('GET /api/public/oep/verify/[id] error:', err)
+    logError("api.public.oep.verify.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

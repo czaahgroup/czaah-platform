@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
     const sectors = (data || []).map((row: { sectors: { id: string; name: string } }) => row.sectors).filter(Boolean)
     return NextResponse.json({ data: sectors })
   } catch (err) {
-    console.error('GET /api/partner/sectors error:', err)
+    logError("api.partner.sectors", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

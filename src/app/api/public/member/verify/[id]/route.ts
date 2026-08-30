@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getTierLabel(role: string): string {
@@ -45,7 +46,7 @@ export async function GET(
       },
     })
   } catch (err) {
-    console.error('GET /api/public/member/verify/[id] error:', err)
+    logError("api.public.member.verify.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function createAuthClient(request: NextRequest) {
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: partners, sectors: sectors || [] })
   } catch (err) {
-    console.error('GET /api/admin/partners error:', err)
+    logError("api.admin.partners", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, partner })
   } catch (err) {
-    console.error('POST /api/admin/partners error:', err)
+    logError("api.admin.partners", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
+import { logError } from '@/lib/logError'
 
 
 const MAX_SIZE = 10 * 1024 * 1024 // 10MB
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     return NextResponse.json({ success: true, data: doc })
   } catch (err) {
-    console.error('POST /api/partner/opportunities/[id]/documents error:', err)
+    logError("api.partner.opportunities.id.documents", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

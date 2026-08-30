@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { logError } from '@/lib/logError'
 
 
 function createAuthClient(request: NextRequest) {
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     const data = await res.json()
     return NextResponse.json({ iceServers: data.iceServers })
   } catch (err) {
-    console.error('GET /api/calls/turn-credentials error:', err)
+    logError("api.calls.turn-credentials", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

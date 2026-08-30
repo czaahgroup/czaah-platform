@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 const REGISTRY_TABLE: Record<string, string> = {
@@ -136,7 +137,7 @@ export async function POST(
       message: 'This account has linked activity (messages, reviews, audit history) that cannot be safely cascaded, so it was fully anonymized and permanently locked out instead of removed outright.',
     })
   } catch (err) {
-    console.error('User purge error:', err)
+    logError("api.admin.users.id.purge", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

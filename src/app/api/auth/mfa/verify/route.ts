@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { logError } from '@/lib/logError'
 
 
 export async function POST(request: NextRequest) {
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: { verified: true, session: data } })
   } catch (err) {
-    console.error('POST /api/auth/mfa/verify error:', err)
+    logError("api.auth.mfa.verify", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

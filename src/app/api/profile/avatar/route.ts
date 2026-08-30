@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
+import { logError } from '@/lib/logError'
 
 
 export async function POST(request: NextRequest) {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: { avatar_url: filePath } })
   } catch (err) {
-    console.error('POST /api/profile/avatar error:', err)
+    logError("api.profile.avatar", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

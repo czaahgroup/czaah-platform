@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -98,7 +99,7 @@ export async function POST(
 
     return NextResponse.json(doc, { status: 201 })
   } catch (err) {
-    console.error('Partner document upload error:', err)
+    logError("api.partner.deals.id.documents", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -170,13 +171,13 @@ export async function DELETE(
       .eq('id', docId)
 
     if (error) {
-      console.error('Document delete error:', error)
+      logError("api.partner.deals.id.documents", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Partner document delete error:', err)
+    logError("api.partner.deals.id.documents", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

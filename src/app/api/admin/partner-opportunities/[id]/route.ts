@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 const VALID_STATUSES = [
@@ -79,7 +80,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('PATCH /api/admin/partner-opportunities/[id] error:', err)
+    logError("api.admin.partner-opportunities.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

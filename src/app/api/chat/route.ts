@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
+import { logError } from '@/lib/logError'
 
 
 export async function POST(request: NextRequest) {
@@ -293,7 +294,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: flatMessage }, { status: 201 })
   } catch (err) {
-    console.error('POST /api/chat error:', err)
+    logError("api.chat", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -116,7 +117,7 @@ export async function POST(
 
     return NextResponse.json({ data: message })
   } catch (err) {
-    console.error('POST /api/admin/contacts/[id]/messages error:', err)
+    logError("api.admin.contacts.id.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

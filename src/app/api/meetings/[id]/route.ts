@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -64,7 +65,7 @@ export async function GET(
 
     return NextResponse.json({ data: meeting })
   } catch (err) {
-    console.error('GET /api/meetings/[id] error:', err)
+    logError("api.meetings.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -141,7 +142,7 @@ export async function PATCH(
 
     return NextResponse.json({ data: updated })
   } catch (err) {
-    console.error('PATCH /api/meetings/[id] error:', err)
+    logError("api.meetings.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -192,7 +193,7 @@ export async function DELETE(
 
     return NextResponse.json({ data: { cancelled: true } })
   } catch (err) {
-    console.error('DELETE /api/meetings/[id] error:', err)
+    logError("api.meetings.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

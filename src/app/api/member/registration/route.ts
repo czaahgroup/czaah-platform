@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 const REGISTRY_TABLE: Record<string, string> = {
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
       registration: registration || null,
     })
   } catch (err) {
-    console.error('GET /api/member/registration error:', err)
+    logError("api.member.registration", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

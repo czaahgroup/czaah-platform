@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function createAuthClient(request: NextRequest) {
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('POST /api/admin/partners/[id]/resend-invite error:', err)
+    logError("api.admin.partners.id.resend-invite", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

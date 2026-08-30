@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/serverPush'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sent: result.sent })
   } catch (err) {
-    console.error('POST /api/push/notify-call error:', err)
+    logError("api.push.notify-call", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

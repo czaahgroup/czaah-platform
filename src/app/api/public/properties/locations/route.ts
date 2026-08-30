@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 // Public autocomplete source — distinct cities and specific areas/locations
@@ -41,7 +42,7 @@ export async function GET() {
 
     return NextResponse.json({ cities, areas })
   } catch (err) {
-    console.error('GET /api/public/properties/locations error:', err)
+    logError("api.public.properties.locations", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

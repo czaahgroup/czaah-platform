@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(
@@ -61,7 +62,7 @@ export async function GET(
 
     return NextResponse.json({ profile, sectorAssignments })
   } catch (err) {
-    console.error('User detail API error:', err)
+    logError("api.admin.users.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -140,7 +141,7 @@ export async function PATCH(
         .eq('id', id)
 
       if (error) {
-        console.error('User update error:', error)
+        logError("api.admin.users.id", error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     }
@@ -174,7 +175,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('User PATCH error:', err)
+    logError("api.admin.users.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -232,13 +233,13 @@ export async function DELETE(
       .eq('id', id)
 
     if (error) {
-      console.error('User deactivate error:', error)
+      logError("api.admin.users.id", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('User DELETE error:', err)
+    logError("api.admin.users.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

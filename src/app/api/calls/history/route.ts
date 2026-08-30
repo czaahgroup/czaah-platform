@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -47,13 +48,13 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Failed to fetch call history:', error)
+      logError("api.calls.history", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ data: data || [] })
   } catch (err) {
-    console.error('GET /api/calls/history error:', err)
+    logError("api.calls.history", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

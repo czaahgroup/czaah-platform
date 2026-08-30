@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
       qrData,
     })
   } catch (err) {
-    console.error('Partner card API error:', err)
+    logError("api.partner.card", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

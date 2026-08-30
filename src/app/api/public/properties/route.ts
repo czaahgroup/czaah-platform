@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: properties })
   } catch (err) {
-    console.error('GET /api/public/properties error:', err)
+    logError("api.public.properties", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

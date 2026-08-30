@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 // Public single-listing endpoint — powers the property.czaah.com detail page.
@@ -25,7 +26,7 @@ export async function GET(
 
     return NextResponse.json({ data: property })
   } catch (err) {
-    console.error('GET /api/public/properties/[id] error:', err)
+    logError("api.public.properties.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

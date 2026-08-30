@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/serverPush'
+import { logError } from '@/lib/logError'
 
 
 // Staff (admin/super_admin) use their own back-office inbox instead, and
@@ -95,7 +96,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: messages, chatId, admin })
   } catch (err) {
-    console.error('GET /api/registrant/messages error:', err)
+    logError("api.registrant.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -140,7 +141,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: message })
   } catch (err) {
-    console.error('POST /api/registrant/messages error:', err)
+    logError("api.registrant.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

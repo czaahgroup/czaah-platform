@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 export async function GET(request: NextRequest) {
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
     const { data: entries, count, error } = await query
 
     if (error) {
-      console.error('Audit log fetch error:', error)
+      logError("api.admin.audit-log", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
       total: count || 0,
     })
   } catch (err) {
-    console.error('Audit log API error:', err)
+    logError("api.admin.audit-log", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

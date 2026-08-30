@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -104,7 +105,7 @@ export async function GET(
       },
     })
   } catch (err) {
-    console.error('GET /api/admin/broadcasts/[id] error:', err)
+    logError("api.admin.broadcasts.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -135,13 +136,13 @@ export async function POST(
       )
 
     if (error) {
-      console.error('Failed to mark broadcast as read:', error)
+      logError("api.admin.broadcasts.id", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ data: { success: true } })
   } catch (err) {
-    console.error('POST /api/admin/broadcasts/[id] error:', err)
+    logError("api.admin.broadcasts.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

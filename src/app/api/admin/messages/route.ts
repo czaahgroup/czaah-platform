@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
+import { logError } from '@/lib/logError'
 
 
 function escapeHtml(str: string) {
@@ -77,7 +78,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('GET /api/admin/messages error:', err)
+    logError("api.admin.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -100,7 +101,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('PATCH /api/admin/messages error:', err)
+    logError("api.admin.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -144,7 +145,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('POST /api/admin/messages error:', err)
+    logError("api.admin.messages", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

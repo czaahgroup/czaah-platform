@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function createAuthClient(request: NextRequest) {
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data: properties })
   } catch (err) {
-    console.error('GET /api/admin/properties error:', err)
+    logError("api.admin.properties", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: property }, { status: 201 })
   } catch (err) {
-    console.error('POST /api/admin/properties error:', err)
+    logError("api.admin.properties", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

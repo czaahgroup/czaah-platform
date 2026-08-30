@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -71,7 +72,7 @@ export async function POST(
         .eq('id', id)
 
       if (error) {
-        console.error('Approve error:', error)
+        logError("api.admin.investments.id.approve", error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     } else {
@@ -86,7 +87,7 @@ export async function POST(
         .eq('id', id)
 
       if (error) {
-        console.error('Reject error:', error)
+        logError("api.admin.investments.id.approve", error)
         return NextResponse.json({ error: error.message }, { status: 500 })
       }
     }
@@ -115,7 +116,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, action })
   } catch (err) {
-    console.error('Approve/reject API error:', err)
+    logError("api.admin.investments.id.approve", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

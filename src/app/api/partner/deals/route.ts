@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -40,13 +41,13 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Partner deals fetch error:', error)
+      logError("api.partner.deals", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json(data || [])
   } catch (err) {
-    console.error('Partner deals API error:', err)
+    logError("api.partner.deals", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -110,13 +111,13 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error('Partner deal create error:', error)
+      logError("api.partner.deals", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json(data, { status: 201 })
   } catch (err) {
-    console.error('Partner deals POST error:', err)
+    logError("api.partner.deals", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePartner } from '@/lib/partnerAuth'
+import { logError } from '@/lib/logError'
 
 
 const VALID_CONFIDENTIALITY = ['standard', 'confidential', 'highly_confidential']
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (error || !data) return NextResponse.json({ error: 'Opportunity not found' }, { status: 404 })
     return NextResponse.json({ data })
   } catch (err) {
-    console.error('GET /api/partner/opportunities/[id] error:', err)
+    logError("api.partner.opportunities.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -78,7 +79,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('PATCH /api/partner/opportunities/[id] error:', err)
+    logError("api.partner.opportunities.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

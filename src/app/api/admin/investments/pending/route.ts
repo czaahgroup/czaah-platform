@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logError } from '@/lib/logError'
 
 
 function getAuthClient(request: NextRequest) {
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Pending deals fetch error:', error)
+      logError("api.admin.investments.pending", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(enrichedDeals)
   } catch (err) {
-    console.error('Pending deals API error:', err)
+    logError("api.admin.investments.pending", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

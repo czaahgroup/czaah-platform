@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
+import { logError } from '@/lib/logError'
 
 
 export async function POST(request: NextRequest) {
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('KYC reject error:', err)
+    logError("api.admin.kyc.reject", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

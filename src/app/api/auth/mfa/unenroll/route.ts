@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { logError } from '@/lib/logError'
 
 
 export async function POST(request: NextRequest) {
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: { unenrolled: true } })
   } catch (err) {
-    console.error('POST /api/auth/mfa/unenroll error:', err)
+    logError("api.auth.mfa.unenroll", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
