@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
+import { logActivity } from '@/lib/activity'
 
 
 export async function GET(
@@ -190,6 +191,14 @@ export async function PATCH(
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 })
     }
+
+    await logActivity({
+      actorId: user.id,
+      action: 'enquiry.status_changed',
+      targetType: 'enquiry',
+      targetId: id,
+      metadata: { to: status, reference: updated?.reference_number },
+    })
 
     return NextResponse.json({ data: updated })
   } catch (err) {
