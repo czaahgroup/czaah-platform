@@ -4,6 +4,7 @@ import { logActivity } from '@/lib/activity'
 import { logError } from '@/lib/logError'
 
 const STAGES = ['new', 'engaged', 'qualified', 'active', 'dormant', 'lost']
+const ORG_TYPES = ['company', 'investor', 'partner_firm', 'government', 'fund', 'counterparty', 'other']
 const PAGE = 50
 
 export async function GET(request: NextRequest) {
@@ -13,18 +14,22 @@ export async function GET(request: NextRequest) {
     const p = request.nextUrl.searchParams
     const stage = p.get('stage')
     const sectorId = p.get('sectorId')
+    const orgType = p.get('orgType')
+    const jurisdiction = p.get('jurisdiction')
     const q = safeTerm(p.get('q'))
     const page = Math.max(0, parseInt(p.get('page') || '0', 10))
 
     let query = access.supabase
       .from('crm_companies')
-      .select('id, name, domain, website, country, company_size, stage, created_at, sector:sectors(id, name), contacts:crm_contacts(count)', { count: 'exact' })
+      .select('id, name, domain, website, country, company_size, stage, org_type, jurisdiction, kyc_status, created_at, sector:sectors(id, name), contacts:crm_contacts(count)', { count: 'exact' })
       .order('name', { ascending: true })
       .range(page * PAGE, page * PAGE + PAGE - 1)
 
     query = scopeQuery(query, access)
     if (stage && STAGES.includes(stage)) query = query.eq('stage', stage)
     if (sectorId) query = query.eq('sector_id', sectorId)
+    if (orgType) query = query.eq('org_type', orgType)
+    if (jurisdiction) query = query.eq('jurisdiction', jurisdiction.toUpperCase())
     if (q) query = query.or(`name.ilike.%${q}%,domain.ilike.%${q}%`)
 
     const { data, error, count } = await query
@@ -58,6 +63,9 @@ export async function POST(request: NextRequest) {
       country: b.country ? String(b.country).trim() : null,
       company_size: b.companySize ? String(b.companySize).slice(0, 20) : null,
       stage: STAGES.includes(b.stage) ? b.stage : 'new',
+      org_type: ORG_TYPES.includes(b.orgType) ? b.orgType : 'company',
+      registration_number: b.registrationNumber ? String(b.registrationNumber).slice(0, 100) : null,
+      jurisdiction: b.jurisdiction ? String(b.jurisdiction).toUpperCase().slice(0, 2) : null,
       owner_id: b.ownerId || access.userId,
       description: b.description ? String(b.description).slice(0, 5000) : null,
       created_by: access.userId,

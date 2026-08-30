@@ -5,6 +5,8 @@ import { useEffect, useState, useCallback, use } from 'react'
 import Link from 'next/link'
 
 const STAGES = ['new', 'engaged', 'qualified', 'active', 'dormant', 'lost']
+const ORG_TYPES = ['company', 'investor', 'partner_firm', 'government', 'fund', 'counterparty', 'other']
+const KYC = ['none', 'pending', 'cleared', 'flagged']
 
 function timeAgo(iso: string) {
   const d = (Date.now() - new Date(iso).getTime()) / 1000
@@ -43,7 +45,9 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
       setDraft({
         name: j.data.name, domain: j.data.domain || '', website: j.data.website || '',
         country: j.data.country || '', companySize: j.data.company_size || '', stage: j.data.stage,
-        description: j.data.description || '',
+        description: j.data.description || '', orgType: j.data.org_type || 'company',
+        registrationNumber: j.data.registration_number || '', regulator: j.data.regulator || '',
+        jurisdiction: j.data.jurisdiction || '', kycStatus: j.data.kyc_status || 'none',
       })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Load failed')
@@ -141,17 +145,31 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
         <div className="bg-surface-container-low border border-outline-variant/10 p-5">
           {edit ? (
             <div className="space-y-3">
-              {[['name', 'Name'], ['domain', 'Domain'], ['website', 'Website'], ['country', 'Country'], ['companySize', 'Size']].map(([k, label]) => (
+              {[['name', 'Name'], ['domain', 'Domain'], ['website', 'Website'], ['country', 'Country'], ['companySize', 'Size'], ['registrationNumber', 'Registration no.'], ['regulator', 'Regulator'], ['jurisdiction', 'Jurisdiction (ISO2)']].map(([k, label]) => (
                 <div key={k}>
                   <label className="block text-xs text-on-surface-variant mb-1">{label}</label>
                   <input value={draft[k]} onChange={(e) => setDraft((d: any) => ({ ...d, [k]: e.target.value }))} className={field} />
                 </div>
               ))}
-              <div>
-                <label className="block text-xs text-on-surface-variant mb-1">Stage</label>
-                <select value={draft.stage} onChange={(e) => setDraft((d: any) => ({ ...d, stage: e.target.value }))} className={field}>
-                  {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs text-on-surface-variant mb-1">Type</label>
+                  <select value={draft.orgType} onChange={(e) => setDraft((d: any) => ({ ...d, orgType: e.target.value }))} className={field}>
+                    {ORG_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-on-surface-variant mb-1">Stage</label>
+                  <select value={draft.stage} onChange={(e) => setDraft((d: any) => ({ ...d, stage: e.target.value }))} className={field}>
+                    {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-on-surface-variant mb-1">KYC</label>
+                  <select value={draft.kycStatus} onChange={(e) => setDraft((d: any) => ({ ...d, kycStatus: e.target.value }))} className={field}>
+                    {KYC.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
               </div>
               <div>
                 <label className="block text-xs text-on-surface-variant mb-1">Description</label>
@@ -164,8 +182,13 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
             </div>
           ) : (
             <dl className="grid grid-cols-[120px_1fr] gap-y-3 gap-x-4 text-sm">
+              <dt className="text-on-surface-variant/60">Type</dt><dd className="text-on-surface capitalize">{(co.org_type || 'company').replace('_', ' ')}</dd>
               <dt className="text-on-surface-variant/60">Website</dt><dd className="text-on-surface">{co.website || '—'}</dd>
               <dt className="text-on-surface-variant/60">Country</dt><dd className="text-on-surface">{co.country || '—'}</dd>
+              <dt className="text-on-surface-variant/60">Jurisdiction</dt><dd className="text-on-surface">{co.jurisdiction || '—'}</dd>
+              <dt className="text-on-surface-variant/60">Reg. no.</dt><dd className="text-on-surface">{co.registration_number || '—'}</dd>
+              <dt className="text-on-surface-variant/60">Regulator</dt><dd className="text-on-surface">{co.regulator || '—'}</dd>
+              <dt className="text-on-surface-variant/60">KYC</dt><dd className="text-on-surface capitalize">{co.kyc_status || 'none'}</dd>
               <dt className="text-on-surface-variant/60">Size</dt><dd className="text-on-surface">{co.company_size || '—'}</dd>
               <dt className="text-on-surface-variant/60">Owner</dt><dd className="text-on-surface">{co.owner?.full_name || '—'}</dd>
               {co.description && <><dt className="text-on-surface-variant/60">About</dt><dd className="text-on-surface whitespace-pre-wrap">{co.description}</dd></>}

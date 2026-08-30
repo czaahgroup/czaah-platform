@@ -5,6 +5,8 @@ import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 
 const STAGES = ['new', 'engaged', 'qualified', 'active', 'dormant', 'lost']
+const ORG_TYPES = ['company', 'investor', 'partner_firm', 'government', 'fund', 'counterparty', 'other']
+const ORG_LABEL: Record<string, string> = { company: 'Company', investor: 'Investor', partner_firm: 'Partner firm', government: 'Government', fund: 'Fund', counterparty: 'Counterparty', other: 'Other' }
 
 export default function CrmCompaniesPage() {
   const [rows, setRows] = useState<any[]>([])
@@ -14,10 +16,11 @@ export default function CrmCompaniesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [stage, setStage] = useState('')
+  const [orgType, setOrgType] = useState('')
   const [q, setQ] = useState('')
   const [qd, setQd] = useState('')
   const [showNew, setShowNew] = useState(false)
-  const [form, setForm] = useState({ name: '', domain: '', country: '' })
+  const [form, setForm] = useState({ name: '', domain: '', country: '', orgType: 'company' })
   const [saving, setSaving] = useState(false)
 
   useEffect(() => { const t = setTimeout(() => setQd(q.trim()), 300); return () => clearTimeout(t) }, [q])
@@ -27,6 +30,7 @@ export default function CrmCompaniesPage() {
     try {
       const params = new URLSearchParams({ page: String(page) })
       if (stage) params.set('stage', stage)
+      if (orgType) params.set('orgType', orgType)
       if (qd) params.set('q', qd)
       const res = await fetch(`/api/crm/companies?${params}`)
       const j = await res.json()
@@ -35,10 +39,10 @@ export default function CrmCompaniesPage() {
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Load failed')
     } finally { setLoading(false) }
-  }, [page, stage, qd])
+  }, [page, stage, orgType, qd])
 
   useEffect(() => { load() }, [load])
-  useEffect(() => { setPage(0) }, [stage, qd])
+  useEffect(() => { setPage(0) }, [stage, orgType, qd])
 
   async function create() {
     if (!form.name.trim()) { setError('Name is required'); return }
@@ -49,7 +53,7 @@ export default function CrmCompaniesPage() {
       })
       const j = await res.json()
       if (!res.ok) throw new Error(j.error || 'Could not create')
-      setShowNew(false); setForm({ name: '', domain: '', country: '' }); await load()
+      setShowNew(false); setForm({ name: '', domain: '', country: '', orgType: 'company' }); await load()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Create failed')
     } finally { setSaving(false) }
@@ -69,6 +73,10 @@ export default function CrmCompaniesPage() {
 
       <div className="flex flex-wrap gap-3 mb-5">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name or domain…" className={`${inputCls} max-w-xs`} />
+        <select value={orgType} onChange={(e) => setOrgType(e.target.value)} className="bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm">
+          <option value="">All types</option>
+          {ORG_TYPES.map((t) => <option key={t} value={t}>{ORG_LABEL[t]}</option>)}
+        </select>
         <select value={stage} onChange={(e) => setStage(e.target.value)} className="bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm">
           <option value="">All stages</option>
           {STAGES.map((s) => <option key={s} value={s}>{s[0].toUpperCase() + s.slice(1)}</option>)}
@@ -85,7 +93,7 @@ export default function CrmCompaniesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-outline-variant/10">
-                  {['Name', 'Sector', 'Country', 'Contacts', 'Stage'].map((h) => (
+                  {['Name', 'Type', 'Sector', 'Country', 'Contacts', 'Stage'].map((h) => (
                     <th key={h} className="text-left px-5 py-3 text-on-surface-variant font-medium text-xs uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -97,6 +105,7 @@ export default function CrmCompaniesPage() {
                       <Link href={`/admin/crm/companies/${co.id}`} className="text-on-surface font-medium hover:text-primary transition-colors">{co.name}</Link>
                       {co.domain && <div className="text-on-surface-variant/60 text-xs font-mono">{co.domain}</div>}
                     </td>
+                    <td className="px-5 py-3"><span className="text-[10px] uppercase tracking-wide text-on-surface-variant bg-surface-container-lowest px-1.5 py-0.5">{ORG_LABEL[co.org_type] || co.org_type}</span></td>
                     <td className="px-5 py-3 text-on-surface-variant">{co.sector?.name || '—'}</td>
                     <td className="px-5 py-3 text-on-surface-variant">{co.country || '—'}</td>
                     <td className="px-5 py-3 text-on-surface-variant tabular-nums">{co.contactCount}</td>
@@ -125,11 +134,15 @@ export default function CrmCompaniesPage() {
               <div><label className="block text-xs text-on-surface-variant mb-1.5">Name *</label>
                 <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className={inputCls} autoFocus /></div>
               <div className="grid grid-cols-2 gap-3">
+                <div><label className="block text-xs text-on-surface-variant mb-1.5">Type</label>
+                  <select value={form.orgType} onChange={(e) => setForm((f) => ({ ...f, orgType: e.target.value }))} className={inputCls}>
+                    {ORG_TYPES.map((t) => <option key={t} value={t}>{ORG_LABEL[t]}</option>)}
+                  </select></div>
                 <div><label className="block text-xs text-on-surface-variant mb-1.5">Domain</label>
                   <input value={form.domain} onChange={(e) => setForm((f) => ({ ...f, domain: e.target.value }))} placeholder="acme.com" className={inputCls} /></div>
-                <div><label className="block text-xs text-on-surface-variant mb-1.5">Country</label>
-                  <input value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} className={inputCls} /></div>
               </div>
+              <div><label className="block text-xs text-on-surface-variant mb-1.5">Country</label>
+                <input value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} className={inputCls} /></div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
               <button onClick={() => setShowNew(false)} className="px-4 py-2 text-sm text-on-surface-variant border border-outline-variant/10">Cancel</button>

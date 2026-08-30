@@ -47,6 +47,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (STAGES.includes(b.stage)) patch.stage = b.stage
     if ('sectorId' in b) patch.sector_id = b.sectorId || null
     if ('ownerId' in b && access.scope === 'all') patch.owner_id = b.ownerId || null
+    if (['company', 'investor', 'partner_firm', 'government', 'fund', 'counterparty', 'other'].includes(b.orgType)) patch.org_type = b.orgType
+    if ('registrationNumber' in b) patch.registration_number = b.registrationNumber ? String(b.registrationNumber).slice(0, 100) : null
+    if ('regulator' in b) patch.regulator = b.regulator ? String(b.regulator).slice(0, 200) : null
+    if ('jurisdiction' in b) patch.jurisdiction = b.jurisdiction ? String(b.jurisdiction).toUpperCase().slice(0, 2) : null
+    if (['none', 'pending', 'cleared', 'flagged'].includes(b.kycStatus)) patch.kyc_status = b.kycStatus
     if (Object.keys(patch).length === 0) return NextResponse.json({ error: 'Nothing to update.' }, { status: 400 })
 
     const { error } = await access.supabase.from('crm_companies').update(patch).eq('id', id)
