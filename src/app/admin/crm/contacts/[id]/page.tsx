@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import AiBriefing from '@/components/AiBriefing'
+import AiAssist from '@/components/AiAssist'
 
 const TYPES = ['lead', 'prospect', 'client', 'partner', 'vendor', 'other']
 const STAGES = ['new', 'engaged', 'qualified', 'active', 'dormant', 'lost']
@@ -291,7 +291,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
               {c.profile_id && <><dt className="text-on-surface-variant/60">Platform user</dt><dd><Link href={`/admin/users/${c.profile_id}`} className="text-primary text-xs">View account →</Link></dd></>}
             </dl>
           )}
-          {!edit && <AiBriefing type="contact" id={id} />}
+          {!edit && <AiAssist type="contact" id={id} />}
         </div>
       )}
 
