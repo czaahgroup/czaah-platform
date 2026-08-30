@@ -55,6 +55,7 @@ export async function middleware(request: NextRequest) {
     // which understands both the Supabase session and the webmail cookie.
     pathname.startsWith('/webmail') ||
     pathname.startsWith('/api/mail/') ||
+    pathname === '/api/reference' ||
     pathname.startsWith('/api/auth/') ||
     pathname.startsWith('/sectors') ||
     pathname.startsWith('/services') ||

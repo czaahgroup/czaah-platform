@@ -4,6 +4,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { RegionalPreferences } from '@/components/RegionalPreferences'
 
 interface Profile { id: string; full_name: string; email: string; phone: string | null; company_name: string | null; country: string | null; company_website: string | null; company_description: string | null; role: string; avatar_url: string | null }
 interface NotificationPreferences { id: string; email_new_message: boolean; email_enquiry_status: boolean; email_new_investment: boolean; in_app_new_message: boolean; in_app_enquiry_status: boolean }
@@ -188,6 +189,8 @@ export default function SettingsPage() {
           )}
           <div className="px-6 py-4 border-t border-outline-variant/10"><button onClick={saveNotifications} disabled={savingNotifications} className="liquid-gold-bg text-on-primary font-semibold px-6 py-2.5 text-sm disabled:opacity-50 border-none cursor-pointer raleway-text">{savingNotifications ? 'Saving...' : 'Save Preferences'}</button></div>
         </div>
+
+        <RegionalPreferences />
 
         {/* Password */}
         <form onSubmit={changePassword} className="bg-surface-container-low border border-outline-variant/10">

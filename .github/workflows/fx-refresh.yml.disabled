@@ -1,0 +1,24 @@
+name: FX rate refresh
+
+# PARKED — rename to fx-refresh.yml to enable. Needs:
+#   - Worker secret CRON_SECRET (shared with task-reminders)
+#   - Worker var/secret FX_API_URL — a USD-base rates endpoint, e.g.
+#     https://open.er-api.com/v6/latest/USD  (free, no key)
+#   - GitHub repo secret CRON_SECRET
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # daily 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: |
+          code=$(curl -s -o /tmp/o -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://czaah.com/api/reference/fx)
+          cat /tmp/o; echo
+          [ "$code" = "200" ] || { echo "HTTP $code"; exit 1; }
