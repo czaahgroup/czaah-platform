@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireCrmAccess, scopeQuery } from '@/lib/crmAuth'
+import { requireCrmAccess, scopeQuery, safeTerm } from '@/lib/crmAuth'
 import { logActivity } from '@/lib/activity'
 import { logError } from '@/lib/logError'
 
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const p = request.nextUrl.searchParams
     const stage = p.get('stage')
     const sectorId = p.get('sectorId')
-    const q = p.get('q')?.trim()
+    const q = safeTerm(p.get('q'))
     const page = Math.max(0, parseInt(p.get('page') || '0', 10))
 
     let query = access.supabase

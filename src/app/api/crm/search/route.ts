@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireCrmAccess, scopeQuery } from '@/lib/crmAuth'
+import { requireCrmAccess, scopeQuery, safeTerm } from '@/lib/crmAuth'
 import { logError } from '@/lib/logError'
 
 /**
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const access = await requireCrmAccess(request)
   if ('error' in access) return access.error
   try {
-    const q = (request.nextUrl.searchParams.get('q') || '').trim()
+    const q = safeTerm(request.nextUrl.searchParams.get('q'))
     if (q.length < 2) return NextResponse.json({ data: [] })
     const like = `%${q}%`
     const sb = access.supabase

@@ -36,6 +36,16 @@ export async function requireCrmAccess(request: NextRequest) {
 
 export type CrmAccess = Exclude<Awaited<ReturnType<typeof requireCrmAccess>>, { error: NextResponse }>
 
+/**
+ * Sanitize a user search term before it goes into a PostgREST `.or()` filter
+ * string. Commas and parentheses are filter syntax; a stray one breaks the
+ * whole query. Leaves letters, digits, spaces, @ . _ - + which cover names,
+ * emails and phone numbers.
+ */
+export function safeTerm(raw: string | null | undefined): string {
+  return String(raw || '').replace(/[^\p{L}\p{N}\s@._+-]/gu, '').trim().slice(0, 80)
+}
+
 /** Apply the caller's scope to a PostgREST query builder. `ownerCols` are the
  *  columns that count as "mine" for a partner (default owner_id + created_by). */
 export function scopeQuery<T>(q: T, access: CrmAccess, ownerCols: string[] = ['owner_id', 'created_by']): T {
