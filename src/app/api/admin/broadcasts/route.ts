@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (bcError) {
-      console.error('Failed to create broadcast:', bcError)
+      logError('api.admin.broadcasts', bcError, { step: 'create-broadcast' })
       return NextResponse.json({ error: bcError.message }, { status: 500 })
     }
 

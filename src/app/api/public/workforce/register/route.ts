@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (profileError) {
-      console.error('Profile insert error:', JSON.stringify(profileError))
+      logError('api.public.workforce.register', profileError, { step: 'profile-insert' })
       await adminClient.auth.admin.deleteUser(userId)
       return NextResponse.json({ error: 'Failed to create profile. Please try again.' }, { status: 500 })
     }
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         if (!uploadError) {
           photoUrl = filePath
         } else {
-          console.error('Failed to upload worker photo:', uploadError.message)
+          logError('api.public.workforce.register', uploadError, { step: 'upload-worker-photo' })
         }
       }
     }
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       .upload(docPath, docBuffer, { contentType: docContentType, upsert: true })
 
     if (docUploadError) {
-      console.error('Failed to upload identity document:', docUploadError.message)
+      logError('api.public.workforce.register', docUploadError, { step: 'upload-identity-document' })
       return NextResponse.json({ error: 'Failed to upload identity document. Please try again.' }, { status: 500 })
     }
 
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (kycDocError) {
-      console.error('KYC document record error:', kycDocError)
+      logError('api.public.workforce.register', kycDocError, { step: 'kyc-document-record' })
       return NextResponse.json({ error: 'Failed to record identity document. Please try again.' }, { status: 500 })
     }
 
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (registryError) {
-      console.error('Workforce registry insert error:', registryError)
+      logError('api.public.workforce.register', registryError, { step: 'workforce-registry-insert' })
       return NextResponse.json({ error: 'Registration failed. Please try again.' }, { status: 500 })
     }
 

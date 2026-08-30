@@ -79,7 +79,7 @@ export async function POST(
         })
 
       if (uploadError) {
-        console.error('Upload error:', uploadError)
+        logError('api.admin.contacts.messages', uploadError, { step: 'upload' })
         return NextResponse.json({ error: 'File upload failed' }, { status: 500 })
       }
 
@@ -105,7 +105,7 @@ export async function POST(
       .single()
 
     if (msgError) {
-      console.error('Failed to send message:', msgError)
+      logError('api.admin.contacts.messages', msgError, { step: 'send-message' })
       return NextResponse.json({ error: msgError.message }, { status: 500 })
     }
 

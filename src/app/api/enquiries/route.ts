@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
           })
 
         if (uploadError) {
-          console.error(`Failed to upload attachment ${fileName}:`, uploadError.message)
+          logError('api.enquiries', uploadError, { step: 'attachment-upload', fileName })
           continue
         }
 

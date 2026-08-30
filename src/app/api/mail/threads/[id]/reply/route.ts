@@ -3,6 +3,7 @@ import { requireMailAccess } from '@/lib/mailAuth'
 import { resend } from '@/lib/resend/client'
 import { htmlToText, appendSignature } from '@/lib/mailFormat'
 import { parseAttachmentRefs, resendAttachmentsFromRefs, persistOutboundAttachments } from '@/lib/mailAttachments'
+import { logError } from '@/lib/logError'
 
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const { data: sent, error: sendError } = await resend.emails.send(sendPayload as never)
 
   if (sendError) {
-    console.error('[mail reply] resend send failed', JSON.stringify(sendError), 'attachments:', parsedAtt.refs.map((a) => `${a.filename} ${a.size}b`))
+    logError('api.mail.threads.reply', sendError, { step: 'reply-resend-send', attachments: parsedAtt.refs.map((a) => `${a.filename} ${a.size}b`).join(', ') })
     return NextResponse.json({ error: sendError.message || 'Failed to send email.' }, { status: 502 })
   }
 

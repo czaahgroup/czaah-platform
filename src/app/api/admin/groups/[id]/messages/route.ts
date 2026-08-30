@@ -63,7 +63,7 @@ export async function POST(
         })
 
       if (uploadError) {
-        console.error('Upload error:', uploadError)
+        logError('api.admin.groups.messages', uploadError, { step: 'upload' })
         return NextResponse.json({ error: 'File upload failed' }, { status: 500 })
       }
 
@@ -90,7 +90,7 @@ export async function POST(
       .single()
 
     if (msgError) {
-      console.error('Failed to send group message:', msgError)
+      logError('api.admin.groups.messages', msgError, { step: 'send-group-message' })
       return NextResponse.json({ error: msgError.message }, { status: 500 })
     }
 

@@ -82,7 +82,7 @@ export async function POST(
         })
 
       if (uploadError) {
-        console.error('File upload error:', uploadError.message)
+        logError('api.property-chat.messages', uploadError, { step: 'file-upload' })
         return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 })
       }
 

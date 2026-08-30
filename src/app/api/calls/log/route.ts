@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         })
       } catch (notifErr) {
         // Notification is best-effort, don't fail the main request
-        console.warn('Failed to create missed call notification:', notifErr)
+        logError('api.calls.log', notifErr, { step: 'create-missed-call-notification' })
       }
     }
 

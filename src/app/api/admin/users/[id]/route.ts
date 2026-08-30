@@ -167,7 +167,7 @@ export async function PATCH(
           .insert(rows)
 
         if (insertError) {
-          console.error('Sector assignment error:', insertError)
+          logError('api.admin.users.id', insertError, { step: 'sector-assignment' })
           return NextResponse.json({ error: insertError.message }, { status: 500 })
         }
       }

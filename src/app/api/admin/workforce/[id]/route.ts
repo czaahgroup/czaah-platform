@@ -108,7 +108,7 @@ export async function PATCH(
         if (!uploadError) {
           updates.photo_url = filePath
         } else {
-          console.error('Failed to upload worker photo:', uploadError.message)
+          logError('api.admin.workforce.id', uploadError, { step: 'upload-worker-photo' })
         }
       }
     }

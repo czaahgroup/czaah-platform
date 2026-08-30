@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
           })
         }
       } catch (emailErr) {
-        console.error('Failed to send chat email notification:', emailErr)
+        logError('api.chat', emailErr, { step: 'send-chat-email-notification' })
       }
     }
 

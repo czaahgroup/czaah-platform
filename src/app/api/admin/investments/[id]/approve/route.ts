@@ -110,7 +110,7 @@ export async function POST(
           })
       } catch {
         // Notification insert may fail if table doesn't exist yet — non-blocking
-        console.warn('Could not send notification to partner')
+        logError('api.admin.investments.approve', new Error('Could not send notification to partner'), { step: 'could-not-send-notification-to-partner' })
       }
     }
 

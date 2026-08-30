@@ -190,7 +190,7 @@ export async function PATCH(
           ),
         })
       } catch (emailErr) {
-        console.error('Failed to send property notification email:', emailErr)
+        logError('api.admin.properties.id', emailErr, { step: 'send-property-notification-email' })
       }
     }
 

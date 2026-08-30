@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
         if (!uploadError) {
           imageUrls.push(filePath)
         } else {
-          console.error(`Failed to upload image ${i}:`, uploadError.message)
+          logError('api.partner.properties', uploadError, { step: 'image-upload', index: i })
         }
       }
     }

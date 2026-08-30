@@ -74,7 +74,7 @@ export async function POST(
       })
 
     if (uploadError) {
-      console.error('File upload error:', uploadError)
+      logError('api.partner.deals.documents', uploadError, { step: 'file-upload' })
       return NextResponse.json({ error: uploadError.message }, { status: 500 })
     }
 
@@ -93,7 +93,7 @@ export async function POST(
       .single()
 
     if (docError) {
-      console.error('Document record error:', docError)
+      logError('api.partner.deals.documents', docError, { step: 'document-record' })
       return NextResponse.json({ error: docError.message }, { status: 500 })
     }
 

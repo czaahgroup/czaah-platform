@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         source: source === 'ai_chat' ? 'ai_chat' : 'contact_form',
       })
     } catch (dbErr) {
-      console.error('Failed to store public_messages row:', dbErr)
+      logError('api.contact', dbErr, { step: 'store-public-messages-row' })
     }
 
     // Send notification email to info@czaah.com

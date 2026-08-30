@@ -104,8 +104,7 @@ export async function POST(
 
     // Fall back to anonymizing the profile in place — the account is deactivated and
     // stripped of personal data, but the row survives because other tables reference it
-    console.error('Full delete failed, falling back to anonymization:', deleteError.message)
-
+    logError('api.admin.users.purge', deleteError, { step: 'full-delete-failed-falling-back-to-anony' })
     const { error: anonymizeError } = await adminClient
       .from('profiles')
       .update({

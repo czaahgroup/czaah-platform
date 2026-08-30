@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (profileError) {
-      console.error('Profile insert error:', JSON.stringify(profileError))
+      logError('api.public.oep.register', profileError, { step: 'profile-insert' })
       await adminClient.auth.admin.deleteUser(userId)
       return NextResponse.json({ error: 'Failed to create profile. Please try again.' }, { status: 500 })
     }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       .upload(docPath, docBuffer, { contentType: docContentType, upsert: true })
 
     if (docUploadError) {
-      console.error('Failed to upload identity document:', docUploadError.message)
+      logError('api.public.oep.register', docUploadError, { step: 'upload-identity-document' })
       return NextResponse.json({ error: 'Failed to upload identity document. Please try again.' }, { status: 500 })
     }
 
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (kycDocError) {
-      console.error('KYC document record error:', kycDocError)
+      logError('api.public.oep.register', kycDocError, { step: 'kyc-document-record' })
       return NextResponse.json({ error: 'Failed to record identity document. Please try again.' }, { status: 500 })
     }
 
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (registryError) {
-      console.error('OEP registry insert error:', registryError)
+      logError('api.public.oep.register', registryError, { step: 'oep-registry-insert' })
       return NextResponse.json({ error: 'Registration failed. Please try again.' }, { status: 500 })
     }
 

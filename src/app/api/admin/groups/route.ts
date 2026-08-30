@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (groupError) {
-      console.error('Failed to create group:', groupError)
+      logError('api.admin.groups', groupError, { step: 'create-group' })
       return NextResponse.json({ error: groupError.message }, { status: 500 })
     }
 
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
       .insert(memberInserts)
 
     if (membersError) {
-      console.error('Failed to add group members:', membersError)
+      logError('api.admin.groups', membersError, { step: 'add-group-members' })
     }
 
     return NextResponse.json({ data: group })

@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     )
 
     if (!res.ok) {
-      console.error('Cloudflare TURN credential request failed:', res.status, await res.text())
+      logError('api.calls.turn-credentials', res.status, { step: 'cloudflare-turn-credential-request' })
       return NextResponse.json({ error: 'Failed to obtain TURN credentials' }, { status: 502 })
     }
 

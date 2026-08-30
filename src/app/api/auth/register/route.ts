@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
+import { logError } from '@/lib/logError'
 
 
 export async function POST(request: Request) {
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
   })
 
   if (profileError) {
-    console.error('Profile insert error:', JSON.stringify(profileError))
+    logError('api.auth.register', profileError, { step: 'profile-insert' })
     // Clean up: delete the auth user if profile insert fails
     await supabase.auth.admin.deleteUser(userId)
     return NextResponse.json({ error: 'Failed to create profile. Please try again.' }, { status: 500 })
@@ -125,7 +126,7 @@ export async function POST(request: Request) {
         })
       }
     } catch (referralErr) {
-      console.error('Partner referral link failed (non-blocking):', referralErr)
+      logError('api.auth.register', referralErr, { step: 'partner-referral-link-failed' })
     }
   }
 
