@@ -35,6 +35,9 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const [mailboxes, setMailboxes] = useState<any[]>([])
   const [mail, setMail] = useState({ mailboxId: '', subject: '', body: '' })
   const [sending, setSending] = useState(false)
+  const [aiIntent, setAiIntent] = useState('')
+  const [aiDrafting, setAiDrafting] = useState(false)
+  const [aiMsg, setAiMsg] = useState<string | null>(null)
   const [edit, setEdit] = useState(false)
   const [draft, setDraft] = useState<any>({})
   const [saving, setSaving] = useState(false)
@@ -92,6 +95,24 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
       }
     }
   }
+  async function draftWithAI() {
+    if (!aiIntent.trim()) return
+    setAiDrafting(true); setAiMsg(null)
+    try {
+      const res = await fetch('/api/ai/draft-email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactId: id, intent: aiIntent }),
+      })
+      const j = await res.json()
+      if (!res.ok) { setAiMsg(j.error || 'Draft failed'); return }
+      if (j.configured === false) { setAiMsg(j.message); return }
+      setMail((m) => ({ ...m, subject: j.subject || m.subject, body: j.body || m.body }))
+      setAiIntent('')
+    } catch {
+      setAiMsg('Request failed')
+    } finally { setAiDrafting(false) }
+  }
+
   async function sendEmail() {
     if (!c.email || !mail.mailboxId || !mail.subject.trim() || !mail.body.trim()) return
     setSending(true)
@@ -290,6 +311,16 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                 </select>
                 <span className="text-xs text-on-surface-variant/60 self-center">→ {c.email}</span>
               </div>
+              <div className="flex gap-2">
+                <input value={aiIntent} onChange={(e) => setAiIntent(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); draftWithAI() } }}
+                  placeholder="Tell AI what to say, e.g. follow up on last week's proposal…"
+                  className="flex-1 bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm" />
+                <button onClick={draftWithAI} disabled={aiDrafting || !aiIntent.trim()}
+                  className="px-3 py-2 text-xs text-primary border border-primary/30 hover:bg-primary/10 disabled:opacity-40 flex-none whitespace-nowrap">
+                  {aiDrafting ? 'Drafting…' : '✦ Draft with AI'}
+                </button>
+              </div>
+              {aiMsg && <p className="text-[11px] text-on-surface-variant/60">{aiMsg}</p>}
               <input value={mail.subject} onChange={(e) => setMail((m) => ({ ...m, subject: e.target.value }))} placeholder="Subject"
                 className="w-full bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-on-surface text-sm" />
               <textarea value={mail.body} onChange={(e) => setMail((m) => ({ ...m, body: e.target.value }))} rows={5} placeholder="Message…"
