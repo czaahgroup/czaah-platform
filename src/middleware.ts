@@ -117,7 +117,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Super admin only pages within /admin
-  const superAdminOnlyPaths = ['/admin/users', '/admin/settings', '/admin/audit-log', '/admin/content/sectors', '/admin/content/services', '/admin/content/products', '/admin/control-plane']
+  const superAdminOnlyPaths = ['/admin/users', '/admin/settings', '/admin/audit-log', '/admin/content/sectors', '/admin/content/services', '/admin/content/products', '/admin/control-plane', '/admin/crm/duplicates']
   if (profile.role === 'admin' && superAdminOnlyPaths.some(p => pathname.startsWith(p))) {
     return NextResponse.redirect(new URL('/admin', request.url))
   }

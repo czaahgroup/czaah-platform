@@ -71,14 +71,14 @@ test('webmail page shows the sign-in form', async ({ page }) => {
 })
 
 test.describe('auth wall', () => {
-  for (const path of ['/admin', '/dashboard', '/partner-network', '/admin/mail/mailboxes', '/admin/crm/contacts', '/admin/recruitment/orders', '/admin/crm/deals', '/admin/construction/projects', '/admin/trading/trades', '/admin/control-plane', '/admin/portal', '/dashboard/portfolio']) {
+  for (const path of ['/admin', '/dashboard', '/partner-network', '/admin/mail/mailboxes', '/admin/crm/contacts', '/admin/recruitment/orders', '/admin/crm/deals', '/admin/construction/projects', '/admin/trading/trades', '/admin/control-plane', '/admin/portal', '/admin/crm/duplicates', '/dashboard/portfolio']) {
     test(`${path} redirects to login when signed out`, async ({ page }) => {
       await page.goto(path)
       await expect(page).toHaveURL(/\/login/)
     })
   }
 
-  for (const api of ['/api/mail/threads', '/api/crm/contacts', '/api/crm/companies', '/api/crm/timeline?type=contact&id=x', '/api/recruitment/orders', '/api/recruitment/overview', '/api/recruitment/candidates', '/api/deals', '/api/deals/lookup', '/api/construction/projects', '/api/construction/overview', '/api/trading/trades', '/api/trading/overview', '/api/admin/control-plane', '/api/portal/items', '/api/admin/portal-shares']) {
+  for (const api of ['/api/mail/threads', '/api/crm/contacts', '/api/crm/companies', '/api/crm/timeline?type=contact&id=x', '/api/recruitment/orders', '/api/recruitment/overview', '/api/recruitment/candidates', '/api/deals', '/api/deals/lookup', '/api/construction/projects', '/api/construction/overview', '/api/trading/trades', '/api/trading/overview', '/api/admin/control-plane', '/api/portal/items', '/api/admin/portal-shares', '/api/crm/duplicates']) {
     test(`${api} returns 401 when signed out`, async ({ request }) => {
       const res = await request.get(api)
       expect(res.status()).toBe(401)
