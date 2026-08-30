@@ -23,7 +23,9 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
   const [c, setC] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<'overview' | 'emails' | 'notes' | 'tasks' | 'activity'>('overview')
+  const [tab, setTab] = useState<'overview' | 'emails' | 'notes' | 'tasks' | 'files' | 'activity'>('overview')
+  const [docs, setDocs] = useState<any[]>([])
+  const [uploading, setUploading] = useState(false)
   const [tasks, setTasks] = useState<any[]>([])
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDue, setTaskDue] = useState('')
@@ -111,11 +113,45 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
     }
   }
 
+  const loadDocs = useCallback(async () => {
+    const res = await fetch(`/api/crm/documents?type=contact&id=${id}`)
+    if (res.ok) setDocs((await res.json()).data)
+  }, [id])
+
   useEffect(() => { loadContact() }, [loadContact])
   useEffect(() => { if (tab === 'emails') loadEmails() }, [tab, loadEmails])
   useEffect(() => { if (tab === 'notes') loadNotes() }, [tab, loadNotes])
   useEffect(() => { if (tab === 'tasks') loadTasks() }, [tab, loadTasks])
+  useEffect(() => { if (tab === 'files') loadDocs() }, [tab, loadDocs])
   useEffect(() => { if (tab === 'activity') loadFeed() }, [tab, loadFeed])
+
+  async function uploadFile(file: File) {
+    setUploading(true)
+    setError(null)
+    try {
+      const u = await fetch('/api/crm/documents', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'upload-url', type: 'contact', id, filename: file.name }),
+      }).then((r) => r.json())
+      if (u.error) throw new Error(u.error)
+      const put = await fetch(u.signedUrl, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file })
+      if (!put.ok) throw new Error('Upload failed')
+      const rec = await fetch('/api/crm/documents', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'contact', id, path: u.path, filename: u.filename, contentType: file.type, sizeBytes: file.size }),
+      }).then((r) => r.json())
+      if (rec.error) throw new Error(rec.error)
+      await loadDocs()
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
+  async function deleteDoc(docId: string) {
+    await fetch(`/api/crm/documents?docId=${docId}`, { method: 'DELETE' })
+    await loadDocs()
+  }
 
   async function addTask() {
     if (!taskTitle.trim()) return
@@ -185,7 +221,7 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
       {error && <div className="bg-red-500/10 border border-red-500/20 px-4 py-2 mb-4 text-sm text-red-400">{error}</div>}
 
       <div className="flex gap-1 border-b border-outline-variant/10 mb-5 overflow-x-auto">
-        {(['overview', 'emails', 'notes', 'tasks', 'activity'] as const).map((t) => (
+        {(['overview', 'emails', 'notes', 'tasks', 'files', 'activity'] as const).map((t) => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2.5 text-sm capitalize border-b-2 transition-colors ${tab === t ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}>
             {t}
@@ -327,6 +363,29 @@ export default function ContactDetailPage({ params }: { params: Promise<{ id: st
                     {t.assignee?.full_name || 'Unassigned'}{t.due_at && ` · due ${new Date(t.due_at).toLocaleDateString()}`}
                   </p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab === 'files' && (
+        <div>
+          <label className="mb-4 flex items-center gap-3 bg-surface-container-low border border-dashed border-outline-variant/30 hover:border-primary/50 transition-colors px-4 py-5 cursor-pointer text-sm text-on-surface-variant">
+            <input type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadFile(f); e.target.value = '' }} disabled={uploading} />
+            {uploading ? 'Uploading…' : '＋ Upload a file for this contact'}
+          </label>
+          <div className="bg-surface-container-low border border-outline-variant/10 divide-y divide-outline-variant/10">
+            {docs.length === 0 && <p className="text-on-surface-variant/60 text-sm text-center py-8">No files.</p>}
+            {docs.map((d) => (
+              <div key={d.id} className="flex items-center gap-3 px-4 py-3">
+                <div className="min-w-0 flex-1">
+                  <a href={d.url || '#'} target="_blank" rel="noopener" className="text-sm text-on-surface hover:text-primary truncate block">{d.filename}</a>
+                  <p className="text-[11px] text-on-surface-variant/50">
+                    {d.sizeBytes ? `${(d.sizeBytes / 1024).toFixed(0)} KB · ` : ''}{d.uploadedBy || 'Unknown'} · {new Date(d.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <button onClick={() => deleteDoc(d.id)} className="text-[11px] text-error/60 hover:text-error flex-none">delete</button>
               </div>
             ))}
           </div>

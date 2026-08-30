@@ -126,6 +126,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <SectionHeader label="CRM" />
         <NavLink href="/admin/crm/dashboard" label="Overview" icon="dashboard" />
+        <NavLink href="/admin/crm/search" label="Search" icon="search" />
         <NavLink href="/admin/crm/contacts" label="Contacts" icon="badge" />
         <NavLink href="/admin/crm/companies" label="Companies" icon="domain" />
         <NavLink href="/admin/crm/leads" label="Lead Board" icon="filter_alt" />
