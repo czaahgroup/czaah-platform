@@ -32,6 +32,7 @@ export type ActivityTarget =
   | 'partner'
   | 'job_order'
   | 'placement'
+  | 'deal'
 
 export interface ActivityInput {
   actorId: string | null

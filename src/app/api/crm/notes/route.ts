@@ -3,7 +3,7 @@ import { requireCrmAccess } from '@/lib/crmAuth'
 import { logActivity } from '@/lib/activity'
 import { logError } from '@/lib/logError'
 
-const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread']
+const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread', 'deal']
 
 /** GET /api/crm/notes?type=contact&id=<uuid> */
 export async function GET(request: NextRequest) {

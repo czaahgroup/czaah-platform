@@ -24,6 +24,13 @@ const STAGE_LABEL: Record<string, string> = {
   approved: 'Approved', in_progress: 'In progress',
 }
 
+function fmtValue(n: number) {
+  if (!n) return '—'
+  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`
+  if (n >= 1e3) return `${(n / 1e3).toFixed(0)}k`
+  return String(n)
+}
+
 export default function CrmDashboardPage() {
   const [d, setD] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -42,6 +49,9 @@ export default function CrmDashboardPage() {
     { label: 'Open opportunities', value: d.openOpportunities, href: '/admin/crm/pipeline' },
     { label: 'Tasks due today', value: d.tasksDueToday, href: '/admin/crm/tasks', alert: d.tasksDueToday > 0 },
     { label: 'Overdue tasks', value: d.tasksOverdue, href: '/admin/crm/tasks', alert: d.tasksOverdue > 0 },
+    { label: 'Open deals', value: d.openDeals, href: '/admin/crm/deals' },
+    { label: 'Weighted pipeline', value: fmtValue(d.weightedPipelineValue), href: '/admin/crm/deals' },
+    { label: 'Deals won (qtr)', value: d.dealsWonThisQuarter, href: '/admin/crm/deals?stage=closed_won' },
     { label: 'New leads (7d)', value: d.newLeads7d, href: '/admin/crm/leads' },
     { label: 'Conversion', value: `${d.conversionRate}%`, href: '/admin/enquiries' },
   ]

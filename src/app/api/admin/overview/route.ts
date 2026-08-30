@@ -28,10 +28,13 @@ export async function GET(request: NextRequest) {
     const eod = new Date(); eod.setHours(23, 59, 59, 999)
     const count = (q: any) => q.select('*', { count: 'exact', head: true })
 
+    const quarterStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1).toISOString().slice(0, 10)
+
     const [
       totalMembers, pendingKYC, totalEnquiries, unassignedEnquiries, activeEnquiries, totalAdmins,
       clients, companies, newLeads7d, openOpps,
       tasksToday, tasksOverdue, mailIn30, mailOut30, resolvedEnq,
+      openDealsRows, wonDealsQtr,
     ] = await Promise.all([
       count(db.from('profiles')).eq('role', 'member'),
       count(db.from('profiles')).eq('status', 'pending_kyc_review').eq('role', 'member'),
@@ -48,6 +51,8 @@ export async function GET(request: NextRequest) {
       count(db.from('mailbox_messages')).eq('direction', 'inbound').gte('created_at', thirtyAgo),
       count(db.from('mailbox_messages')).eq('direction', 'outbound').gte('created_at', thirtyAgo),
       count(db.from('enquiries')).eq('status', 'resolved'),
+      db.from('deals').select('value_amount, probability').not('stage', 'in', '(closed_won,closed_lost)'),
+      count(db.from('deals')).eq('stage', 'closed_won').gte('closed_at', quarterStart),
     ])
 
     const { data: recentEnq } = await db
@@ -64,6 +69,10 @@ export async function GET(request: NextRequest) {
     for (const o of opps || []) pipelineByStage[o.status] = (pipelineByStage[o.status] || 0) + 1
 
     const total = totalEnquiries.count ?? 0
+    const openDeals = openDealsRows.data || []
+    const weightedPipelineValue = Math.round(
+      openDeals.reduce((s: number, d: any) => s + ((Number(d.value_amount) || 0) * (d.probability || 0)) / 100, 0)
+    )
     return NextResponse.json({
       // legacy fields (existing /admin page)
       totalMembers: totalMembers.count ?? 0,
@@ -83,6 +92,9 @@ export async function GET(request: NextRequest) {
       mailInbound30d: mailIn30.count ?? 0,
       mailOutbound30d: mailOut30.count ?? 0,
       conversionRate: total ? Math.round(((resolvedEnq.count ?? 0) / total) * 100) : 0,
+      openDeals: openDeals.length,
+      weightedPipelineValue,
+      dealsWonThisQuarter: wonDealsQtr.count ?? 0,
       leadsSeries,
       pipelineByStage,
     })
