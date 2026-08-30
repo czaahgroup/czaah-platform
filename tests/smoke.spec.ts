@@ -71,17 +71,19 @@ test('webmail page shows the sign-in form', async ({ page }) => {
 })
 
 test.describe('auth wall', () => {
-  for (const path of ['/admin', '/dashboard', '/partner-network', '/admin/mail/mailboxes']) {
+  for (const path of ['/admin', '/dashboard', '/partner-network', '/admin/mail/mailboxes', '/admin/crm/contacts']) {
     test(`${path} redirects to login when signed out`, async ({ page }) => {
       await page.goto(path)
       await expect(page).toHaveURL(/\/login/)
     })
   }
 
-  test('protected API returns 401 when signed out', async ({ request }) => {
-    const res = await request.get('/api/mail/threads')
-    expect(res.status()).toBe(401)
-  })
+  for (const api of ['/api/mail/threads', '/api/crm/contacts', '/api/crm/companies', '/api/crm/timeline?type=contact&id=x']) {
+    test(`${api} returns 401 when signed out`, async ({ request }) => {
+      const res = await request.get(api)
+      expect(res.status()).toBe(401)
+    })
+  }
 })
 
 test('sitemap.xml is served as XML', async ({ request }) => {
