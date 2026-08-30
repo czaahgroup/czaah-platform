@@ -26,10 +26,11 @@ for (const c of cases) {
     const errors: string[] = []
     page.on('pageerror', (e) => errors.push(String(e)))
 
-    await page.goto(c.path)
-    await page.waitForTimeout(600)
+    await page.goto(c.path, { waitUntil: 'domcontentloaded' })
 
     const cards = page.locator(c.cardSel)
+    await cards.first().waitFor({ state: 'attached', timeout: 15_000 })
+    await page.waitForTimeout(400)
     const total = await cards.count()
     expect(total).toBeGreaterThan(2)
 
