@@ -4,7 +4,9 @@
  * looks for to decide whether a stored signature is branded or custom — keep it.
  */
 
-const LOGO_URL = 'https://czaah.com/favicon/czaah-shared.png'
+// Square 192×192 app icon — the markhor mark fills the frame. (The old
+// czaah-shared.png is the 1200×630 social banner and rendered squished at 42px.)
+const LOGO_URL = 'https://czaah.com/favicon/web-app-manifest-192x192.png'
 
 function esc(s: string): string {
   return String(s || '')
@@ -39,7 +41,7 @@ export function buildCzaahSignature({
     `<table cellpadding="0" cellspacing="0" style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;border-collapse:collapse">` +
     `<tr>` +
     `<td style="padding-right:14px;border-right:2px solid #c9a84c;vertical-align:middle">` +
-    `<img src="${LOGO_URL}" alt="CZAAH" width="42" height="42" style="display:block">` +
+    `<img src="${LOGO_URL}" alt="CZAAH" width="44" height="44" style="display:block;border:0;border-radius:8px">` +
     `</td>` +
     `<td style="padding-left:14px;vertical-align:middle">${rows.join('')}</td>` +
     `</tr>` +
