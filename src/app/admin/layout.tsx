@@ -132,6 +132,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/crm/leads" label="Lead Board" icon="filter_alt" />
         <NavLink href="/admin/crm/pipeline" label="Pipeline" icon="view_kanban" />
         <NavLink href="/admin/crm/tasks" label="Tasks" icon="checklist" />
+        <NavLink href="/admin/crm/documents" label="Documents" icon="folder" />
 
         <SectionHeader label="Enquiries" />
         <NavLink href="/admin/enquiries" label="All Enquiries" icon="contact_mail" />
