@@ -11,6 +11,7 @@ import { PartnerOwnCallProvider } from '@/lib/contexts/PartnerOwnCallContext'
 const BASE_NAV_LINKS = [
   { href: '/partner-network', label: 'Dashboard', icon: 'dashboard' },
   { href: '/partner-network/membership-card', label: 'Membership Card', icon: 'badge' },
+  { href: '/partner-network/crm', label: 'My CRM', icon: 'contacts' },
   { href: '/partner-network/enquiries', label: 'Enquiries', icon: 'mail' },
   { href: '/partner-network/add-opportunity', label: 'Add Opportunity', icon: 'add_business' },
   { href: '/partner-network/opportunities', label: 'My Opportunities', icon: 'work' },
