@@ -27,7 +27,13 @@ Admin **CRM** section: Overview · Contacts · Companies · Lead Board · Pipeli
 `/admin/crm/dashboard` — KPI grid, 14-day leads sparkline (inline SVG), pipeline-by-stage bars, 30-day email volume, needs-attention list. `/api/admin/overview` expanded (superset — legacy `/admin` page untouched).
 
 ### P1E — Email ↔ records (`20260830000009`)
-Trigger on `mailbox_threads` insert auto-links a thread to a contact by sender address (both inbound paths) + backfill. "Emails" tab on the contact.
+Trigger on `mailbox_threads` insert auto-links a thread to a contact by sender address (both inbound paths) + backfill. "Emails" tab on the contact, incl. **compose email from the record** (picks a mailbox, sends via `/api/mail/threads`, auto-links).
+
+### Documents & search (`20260830000010`)
+`crm_documents` table + private `crm-documents` storage bucket. `/api/crm/documents` — signed upload URL, metadata record (activity-logged), list with signed download URLs, delete. **Files tab** on the contact. `/admin/crm/search` — cross-entity search page.
+
+### New-email notifications (`20260830000011`)
+Trigger on inbound `mailbox_messages` notifies the mailbox's owning partner (or all super_admins for a team mailbox).
 
 ### P1F — Notifications & reminders
 - New-lead admin notification (pre-existing) + `enquiry.created` activity event.
@@ -45,14 +51,13 @@ Trigger on `mailbox_threads` insert auto-links a thread to a contact by sender a
 | **Sentry DSN** (optional) | Error alerts. |
 | Delete inactive Supabase project `uzkpritwklqdxxhmcarp` | Leftover. |
 
-## Not done (P1G tail)
+## Not done — needs a human, not code
 
-- Mobile pass verified by eye/device on every CRM screen (built responsive: `overflow-x-auto` tables/boards, responsive grids, `mx-4` modals — but not device-tested).
-- Cross-browser QA matrix (Chrome/Safari/Firefox/Edge/iOS).
-- Load test of the dashboard + list endpoints.
-- Compose-email-from-contact (the Emails tab links out to `/admin/mail`; no in-context composer).
-- Migrating the remaining ~110 API routes from bare `console.error` to `logError` (incremental; new routes already use it).
-- `mail_contacts` still exists alongside `crm_contacts` — retire once the mail UI reads from `crm_contacts`.
+- **Mobile:** built responsive (`overflow-x-auto` tables/boards + tab rows, responsive grids, `mx-4` modals) but not tested on real devices.
+- **Cross-browser QA** on real Chrome / Safari / Firefox / Edge / iOS.
+- **Load test** of the dashboard + list endpoints under production traffic.
+- `mail_contacts` still exists alongside `crm_contacts` (both maintained by the backfill/trigger) — retire when the mail ContactPanel reads from `crm_contacts`. Low value.
+- ~21 route files with non-standard `console.error` shapes (`console.log`, `err.message` args) — the codemod handled the other 186.
 
 ## Then
 
