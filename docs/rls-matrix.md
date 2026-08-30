@@ -3,6 +3,18 @@
 Reviewed 2026-08-30. Covers every table created by the migrations in
 `supabase/migrations/`.
 
+**Phase 2/3 re-review (2026-08-30, migrations `…012`–`…024`):** the 17
+new tables all follow the P1B pattern established below — RLS on,
+`REVOKE ALL … FROM anon, authenticated`, `GRANT SELECT … TO authenticated`,
+`GRANT ALL … TO service_role`, every write through an API route behind
+`requireCrmAccess` / `requireRecruitAccess` / `requirePortalUser`. No new
+`authenticated`-write grants, so the column-escalation class (finding 1)
+does not recur. Reference tables (`countries` / `currencies` / `fx_rates`)
+are deliberately world-readable and hold no private data. `crm_merge_*`
+functions are `SECURITY DEFINER` but `EXECUTE`-granted to `service_role`
+only and validate their inputs. Index sweep for the new FK / RLS columns:
+`20260830000024_fk_indexes_p3.sql`. New rows appended to the matrix below.
+
 ## Method
 
 1. Confirmed `ENABLE ROW LEVEL SECURITY` on every created table.
@@ -135,3 +147,17 @@ These fall out of the audit and shape the CRM build:
 | crm_tasks | staff · assignee · creator | staff | staff | staff | P1B — same |
 | crm_notes | staff · author | staff | staff | staff | P1B — same |
 | crm_links | staff · linker | staff | staff | staff | P1B — same |
+| crm_documents | staff · uploader | staff | — | staff (own upload / SA) | P1 |
+| countries / currencies / fx_rates | **TRUE** (public reference) + anon SELECT | SA | SA | SA | P3-0 — no `authenticated` write grant; served via public `/api/reference` |
+| crm_org_relationships | staff · creator | staff | staff | staff | P3-A — service-role writes |
+| recruitment_job_orders | staff · owner · creator | staff | staff | staff (SA only) | P3-B — `requireCrmAccess` gate, service-role writes |
+| recruitment_placements | staff · creator | staff | staff | staff | P3-B — same |
+| deals | staff · owner · creator | staff | staff | staff (SA only) | P3-C — `requireCrmAccess`, service-role writes |
+| deal_parties | staff · creator · (own deal) | staff | staff | staff | P3-C — same |
+| construction_projects | staff · owner · creator | staff | staff | staff (SA only) | P3-D — same |
+| construction_milestones / _updates | staff · (own project) | staff | staff | staff | P3-D — same; milestone trigger recalcs project % |
+| commodity_trades | staff · owner · creator | staff | staff | staff (SA only) | P3-E — same |
+| trade_steps / trade_shipments | staff · (own trade) | staff | staff | staff | P3-E — same |
+| portal_shares | own (profile_id) · staff | staff | staff | staff | P3-F — client sees only their grants; `/api/portal/*` filters every query by `profile_id` |
+| crm_duplicate_dismissals | staff | staff | staff | staff | P2-A — merge RPCs are `service_role`-EXECUTE only, called after the admin gate |
+| ai_actions | staff · actor | staff | staff | staff | P2-B — `logAIAction` uses service role; SELECT lets a user see their own AI calls |

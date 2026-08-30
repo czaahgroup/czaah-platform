@@ -62,3 +62,20 @@ Trigger on inbound `mailbox_messages` notifies the mailbox's owning partner (or 
 ## Then
 
 AI features — only after Phase 1 is signed off.
+
+---
+
+## Update 2026-08-30 — Phases 2 & 3 built ahead of sign-off
+
+The user directed continuous build-out. Phase 3 (P3-0..P3-G: international
+foundation, business directory, recruitment pipeline, deal room,
+construction, commodity trading, client portal, control plane) and
+Phase 2 (P2-A..P2-G: dedup + merge, AI foundation, briefings, email
+drafting, risk radar, doc drafting, exec narrative, knowledge assistant)
+are all built, deployed and migrated (`…012`–`…024`). AI runs on
+Cloudflare Workers AI; `CLOUDFLARE_AI_API_TOKEN` is set as a Worker
+secret. Security re-review appended to `docs/rls-matrix.md`.
+
+**The "Needs you" table above still stands unchanged** — backups in
+particular. The extra modules increase the amount of data that has no
+backup; they do not change the priority.
