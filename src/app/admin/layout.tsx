@@ -140,6 +140,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/crm/deals" label="Deals" icon="handshake" />
         <NavLink href="/admin/crm/tasks" label="Tasks" icon="checklist" />
         <NavLink href="/admin/crm/documents" label="Documents" icon="folder" />
+        <NavLink href="/admin/risk" label="Risk Radar" icon="crisis_alert" />
         {isSuperAdmin && <NavLink href="/admin/crm/duplicates" label="Duplicates" icon="join_inner" />}
         <NavLink href="/admin/portal" label="Client Portal" icon="share" />
 
