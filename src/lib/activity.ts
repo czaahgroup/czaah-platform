@@ -34,6 +34,7 @@ export type ActivityTarget =
   | 'placement'
   | 'deal'
   | 'construction_project'
+  | 'commodity_trade'
 
 export interface ActivityInput {
   actorId: string | null

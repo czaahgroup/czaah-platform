@@ -3,7 +3,7 @@ import { requireCrmAccess } from '@/lib/crmAuth'
 import { logActivity } from '@/lib/activity'
 import { logError } from '@/lib/logError'
 
-const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread', 'deal', 'construction_project']
+const OBJECTS = ['contact', 'company', 'enquiry', 'partner_opportunity', 'investment_opportunity', 'mail_thread', 'deal', 'construction_project', 'commodity_trade']
 const BUCKET = 'crm-documents'
 const BLOCKED = /\.(exe|bat|cmd|com|scr|pif|msi|dll|vbs|js|jar|ps1|sh|apk|dmg)$/i
 
