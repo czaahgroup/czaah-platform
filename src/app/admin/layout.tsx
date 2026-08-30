@@ -110,6 +110,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Navigation */}
       <div style={{ flex: 1, padding: '16px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1px' }}>
         <NavLink href="/admin" label="Overview" icon="dashboard" />
+        {isSuperAdmin && <NavLink href="/admin/control-plane" label="Control Plane" icon="hub" />}
         <NavLink href="/admin/registrant-messages" label="Live Chat" icon="support_agent" />
         {isSuperAdmin ? <NewMeetingMenu /> : <NavLink href="/admin/meetings" label="Meetings" icon="event" />}
         <NavLink href="/admin/analytics" label="Analytics" icon="analytics" />
