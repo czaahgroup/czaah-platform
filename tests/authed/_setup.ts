@@ -9,6 +9,7 @@ const CREDS = {
   superAdmin: { email: process.env.E2E_SUPER_ADMIN_EMAIL, password: process.env.E2E_SUPER_ADMIN_PASSWORD },
   partnerA: { email: process.env.E2E_PARTNER_A_EMAIL, password: process.env.E2E_PARTNER_A_PASSWORD },
   partnerB: { email: process.env.E2E_PARTNER_B_EMAIL, password: process.env.E2E_PARTNER_B_PASSWORD },
+  member: { email: process.env.E2E_MEMBER_EMAIL, password: process.env.E2E_MEMBER_PASSWORD },
 }
 
 export const haveCreds = (role: keyof typeof CREDS) => !!(CREDS[role].email && CREDS[role].password)
