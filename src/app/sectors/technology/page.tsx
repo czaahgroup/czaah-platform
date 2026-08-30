@@ -216,16 +216,16 @@ export default function TechnologyPage() {
             <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-2">Explore Pakistan's IT capabilities — from software engineering and call centers to AI, cybersecurity, and cloud infrastructure. Vetted providers, proven delivery.</p>
 
             <div className="it-filters">
-              <button className="it-filter active" data-filter="all" onClick={() => { filterIT(this) }}>All Services</button>
-              <button className="it-filter" data-filter="software" onClick={() => { filterIT(this) }}>Software Dev</button>
-              <button className="it-filter" data-filter="callcenter" onClick={() => { filterIT(this) }}>Call Centers</button>
-              <button className="it-filter" data-filter="cloud" onClick={() => { filterIT(this) }}>Cloud & Infra</button>
-              <button className="it-filter" data-filter="ai" onClick={() => { filterIT(this) }}>AI & Data</button>
-              <button className="it-filter" data-filter="cyber" onClick={() => { filterIT(this) }}>Cybersecurity</button>
-              <button className="it-filter" data-filter="govtech" onClick={() => { filterIT(this) }}>Gov Tech</button>
+              <button className="it-filter active" data-filter="all" onClick={(e) => { window.filterIT(e.currentTarget) }}>All Services</button>
+              <button className="it-filter" data-filter="software" onClick={(e) => { window.filterIT(e.currentTarget) }}>Software Dev</button>
+              <button className="it-filter" data-filter="callcenter" onClick={(e) => { window.filterIT(e.currentTarget) }}>Call Centers</button>
+              <button className="it-filter" data-filter="cloud" onClick={(e) => { window.filterIT(e.currentTarget) }}>Cloud & Infra</button>
+              <button className="it-filter" data-filter="ai" onClick={(e) => { window.filterIT(e.currentTarget) }}>AI & Data</button>
+              <button className="it-filter" data-filter="cyber" onClick={(e) => { window.filterIT(e.currentTarget) }}>Cybersecurity</button>
+              <button className="it-filter" data-filter="govtech" onClick={(e) => { window.filterIT(e.currentTarget) }}>Gov Tech</button>
               <div className="it-search-wrap">
                 <svg className="it-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" className="it-search-input" id="itSearchInput" placeholder="Search services, technologies..." onInput={(e) => { searchIT(e.target.value) }} />
+                <input type="text" className="it-search-input" id="itSearchInput" placeholder="Search services, technologies..." onInput={(e) => { window.searchIT((e.target as HTMLInputElement).value) }} />
               </div>
             </div>
 

@@ -86,7 +86,7 @@ export default function TextilesPage() {
           const body = card.querySelector('.textile-card-body');
           if (body && !body.querySelector('.textile-enquire')) {
             const link = document.createElement('a');
-            link.href = 'contact.html#contact-form';
+            link.href = '/contact#contact-form';
             link.className = 'textile-enquire';
             link.innerHTML = 'Enquire &rarr;';
             body.appendChild(link);
@@ -332,16 +332,16 @@ export default function TextilesPage() {
             <p className="raleway-text text-on-surface-variant text-base leading-relaxed max-w-3xl mb-2">Explore Pakistan's textile manufacturing landscape — vetted mills, certified facilities, and export-ready products across the country's major production hubs.</p>
 
             <div className="textile-filters">
-              <button className="textile-filter active" data-filter="all" onClick={() => { filterTextiles(this) }}>All Products</button>
-              <button className="textile-filter" data-filter="denim" onClick={() => { filterTextiles(this) }}>Denim</button>
-              <button className="textile-filter" data-filter="home" onClick={() => { filterTextiles(this) }}>Home Textiles</button>
-              <button className="textile-filter" data-filter="knitwear" onClick={() => { filterTextiles(this) }}>Knitwear</button>
-              <button className="textile-filter" data-filter="woven" onClick={() => { filterTextiles(this) }}>Woven Garments</button>
-              <button className="textile-filter" data-filter="yarn" onClick={() => { filterTextiles(this) }}>Yarn & Fabric</button>
-              <button className="textile-filter" data-filter="sustainable" onClick={() => { filterTextiles(this) }}>Sustainable</button>
+              <button className="textile-filter active" data-filter="all" onClick={(e) => { window.filterTextiles(e.currentTarget) }}>All Products</button>
+              <button className="textile-filter" data-filter="denim" onClick={(e) => { window.filterTextiles(e.currentTarget) }}>Denim</button>
+              <button className="textile-filter" data-filter="home" onClick={(e) => { window.filterTextiles(e.currentTarget) }}>Home Textiles</button>
+              <button className="textile-filter" data-filter="knitwear" onClick={(e) => { window.filterTextiles(e.currentTarget) }}>Knitwear</button>
+              <button className="textile-filter" data-filter="woven" onClick={(e) => { window.filterTextiles(e.currentTarget) }}>Woven Garments</button>
+              <button className="textile-filter" data-filter="yarn" onClick={(e) => { window.filterTextiles(e.currentTarget) }}>Yarn & Fabric</button>
+              <button className="textile-filter" data-filter="sustainable" onClick={(e) => { window.filterTextiles(e.currentTarget) }}>Sustainable</button>
               <div className="textile-search-wrap">
                 <svg className="textile-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" className="textile-search-input" id="textileSearchInput" placeholder="Search products, regions, certifications..." onInput={(e) => { searchTextiles(e.target.value) }} />
+                <input type="text" className="textile-search-input" id="textileSearchInput" placeholder="Search products, regions, certifications..." onInput={(e) => { window.searchTextiles((e.target as HTMLInputElement).value) }} />
               </div>
             </div>
 

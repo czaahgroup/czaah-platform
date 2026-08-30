@@ -283,17 +283,17 @@ export default function AgriculturePage() {
             <p className="raleway-text text-on-surface-variant text-base mb-10 leading-relaxed">Explore Pakistan's agricultural commodities — from premium Basmati rice and world-class mangoes to organic produce and dairy. Click any card for full export details.</p>
 
             <div className="crop-filters">
-              <button className="crop-filter active" data-filter="all" onClick={() => { filterCrops(this) }}>All Products</button>
-              <button className="crop-filter" data-filter="grain" onClick={() => { filterCrops(this) }}>Grains</button>
-              <button className="crop-filter" data-filter="rice" onClick={() => { filterCrops(this) }}>Rice</button>
-              <button className="crop-filter" data-filter="cotton" onClick={() => { filterCrops(this) }}>Cotton</button>
-              <button className="crop-filter" data-filter="fruit" onClick={() => { filterCrops(this) }}>Fruits</button>
-              <button className="crop-filter" data-filter="vegetable" onClick={() => { filterCrops(this) }}>Vegetables</button>
-              <button className="crop-filter" data-filter="dairy" onClick={() => { filterCrops(this) }}>Dairy &amp; Livestock</button>
-              <button className="crop-filter" data-filter="organic" onClick={() => { filterCrops(this) }}>Organic</button>
+              <button className="crop-filter active" data-filter="all" onClick={(e) => { window.filterCrops(e.currentTarget) }}>All Products</button>
+              <button className="crop-filter" data-filter="grain" onClick={(e) => { window.filterCrops(e.currentTarget) }}>Grains</button>
+              <button className="crop-filter" data-filter="rice" onClick={(e) => { window.filterCrops(e.currentTarget) }}>Rice</button>
+              <button className="crop-filter" data-filter="cotton" onClick={(e) => { window.filterCrops(e.currentTarget) }}>Cotton</button>
+              <button className="crop-filter" data-filter="fruit" onClick={(e) => { window.filterCrops(e.currentTarget) }}>Fruits</button>
+              <button className="crop-filter" data-filter="vegetable" onClick={(e) => { window.filterCrops(e.currentTarget) }}>Vegetables</button>
+              <button className="crop-filter" data-filter="dairy" onClick={(e) => { window.filterCrops(e.currentTarget) }}>Dairy &amp; Livestock</button>
+              <button className="crop-filter" data-filter="organic" onClick={(e) => { window.filterCrops(e.currentTarget) }}>Organic</button>
               <div className="crop-search-wrap">
                 <svg className="crop-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" className="crop-search-input" id="cropSearchInput" placeholder="Search crops, regions..." onInput={(e) => { searchCrops(e.target.value) }} />
+                <input type="text" className="crop-search-input" id="cropSearchInput" placeholder="Search crops, regions..." onInput={(e) => { window.searchCrops((e.target as HTMLInputElement).value) }} />
               </div>
             </div>
 
@@ -311,7 +311,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Annual Export</span><span className="crop-meta-value">$2.5B+</span></div>
                     <div><span className="crop-meta-label">Harvest</span><span className="crop-meta-value">Oct &ndash; Nov</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -341,7 +341,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Volume</span><span className="crop-meta-value">4M+ tonnes</span></div>
                     <div><span className="crop-meta-label">Harvest</span><span className="crop-meta-value">Sep &ndash; Nov</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -370,7 +370,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Annual Export</span><span className="crop-meta-value">$90M+</span></div>
                     <div><span className="crop-meta-label">Season</span><span className="crop-meta-value">May &ndash; Aug</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -399,7 +399,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Annual Export</span><span className="crop-meta-value">$200M+</span></div>
                     <div><span className="crop-meta-label">Season</span><span className="crop-meta-value">Dec &ndash; Mar</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -427,7 +427,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Production</span><span className="crop-meta-value">540K tonnes</span></div>
                     <div><span className="crop-meta-label">Season</span><span className="crop-meta-value">Jun &ndash; Oct</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -457,7 +457,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Production</span><span className="crop-meta-value">27M+ tonnes</span></div>
                     <div><span className="crop-meta-label">Harvest</span><span className="crop-meta-value">Mar &ndash; May</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -481,7 +481,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Production</span><span className="crop-meta-value">10.6M tonnes</span></div>
                     <div><span className="crop-meta-label">Harvest</span><span className="crop-meta-value">Jun &amp; Nov</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -506,7 +506,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Production</span><span className="crop-meta-value">7.7M bales</span></div>
                     <div><span className="crop-meta-label">Harvest</span><span className="crop-meta-value">Sep &ndash; Dec</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -531,7 +531,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Potato Output</span><span className="crop-meta-value">7.8M tonnes</span></div>
                     <div><span className="crop-meta-label">Availability</span><span className="crop-meta-value">Year-round</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -556,7 +556,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Annual Output</span><span className="crop-meta-value">62B litres</span></div>
                     <div><span className="crop-meta-label">Processed</span><span className="crop-meta-value">~5% only</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -580,7 +580,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Meat Export</span><span className="crop-meta-value">$350M+</span></div>
                     <div><span className="crop-meta-label">Growth</span><span className="crop-meta-value">15% YoY</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -610,7 +610,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Premium Over</span><span className="crop-meta-value">30–50%</span></div>
                     <div><span className="crop-meta-label">Certification</span><span className="crop-meta-value">EU / USDA</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -640,7 +640,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Growth</span><span className="crop-meta-value">25%+ YoY</span></div>
                     <div><span className="crop-meta-label">Markets</span><span className="crop-meta-value">EU &middot; USA &middot; Gulf</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
@@ -670,7 +670,7 @@ export default function AgriculturePage() {
                     <div><span className="crop-meta-label">Production</span><span className="crop-meta-value">88M tonnes</span></div>
                     <div><span className="crop-meta-label">Harvest</span><span className="crop-meta-value">Nov &ndash; Mar</span></div>
                   </div>
-                  <div className="crop-expand-btn" onClick={() => { toggleCrop(this) }}>View export details <span className="arrow">&#9660;</span></div>
+                  <div className="crop-expand-btn" onClick={(e) => { window.toggleCrop(e.currentTarget) }}>View export details <span className="arrow">&#9660;</span></div>
                 </div>
                 <div className="crop-details">
                   <div className="crop-details-inner">
