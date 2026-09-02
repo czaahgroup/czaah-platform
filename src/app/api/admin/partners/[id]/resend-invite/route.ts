@@ -49,13 +49,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Partner not found' }, { status: 404 })
     }
 
+    // Implicit-flow link — tokens land in the URL hash, /reset-password reads
+    // them there. Point straight at it, not through /api/auth/callback.
     const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${new URL(request.url).origin}/api/auth/callback?redirect=${encodeURIComponent('/reset-password')}`,
+      redirectTo: `${new URL(request.url).origin}/reset-password`,
     })
 
     if (inviteError) {
-      // @ts-expect-error — AuthApiError carries a `code` beyond the base Error type
-      if (inviteError.code === 'email_exists' || inviteError.status === 422) {
+      const err = inviteError as { code?: string; status?: number }
+      if (err.code === 'email_exists' || err.status === 422) {
         return NextResponse.json(
           { error: 'This partner has already confirmed their account and set a password — there’s no invite left to resend. If they’ve forgotten their password, tell them to use "Forgot Password" on the login page.' },
           { status: 409 }

@@ -128,10 +128,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the auth user and email them an invite to set their own password.
-    // Without redirectTo, Supabase falls back to the project's default Site
-    // URL (the homepage) instead of the password-setup page.
+    // inviteUserByEmail is an implicit-flow link — the session tokens come back
+    // in the URL hash, which /reset-password consumes directly (not via
+    // /api/auth/callback: the hash never reaches the server). Without
+    // redirectTo, Supabase falls back to the Site URL (the homepage).
     const { data: invited, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${new URL(request.url).origin}/api/auth/callback?redirect=${encodeURIComponent('/reset-password')}`,
+      redirectTo: `${new URL(request.url).origin}/reset-password`,
     })
 
     if (inviteError || !invited?.user) {

@@ -19,16 +19,77 @@ export default function ResetPasswordPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // The normal path is /api/auth/callback exchanging the emailed code for
-    // a session server-side (setting proper cookies) before redirecting
-    // here, so getSession() below just finds it already established. This
-    // fallback also handles a ?code= landing directly on this page (e.g. an
-    // invite link sent before that redirect was wired up) by exchanging it
-    // client-side instead of leaving the user stuck on "Link Invalid".
+    // Three ways a user can land here:
+    //
+    //  1. Forgot-password: /api/auth/callback exchanges the emailed ?code=
+    //     server-side (PKCE, sets cookies) then redirects here — getSession()
+    //     below just finds it.
+    //  2. A ?code= landing directly on this page — exchange it client-side.
+    //  3. Partner/member invites: Supabase's inviteUserByEmail sends an
+    //     *implicit-flow* link, so the tokens arrive in the URL hash
+    //     (#access_token=…&refresh_token=…). auth-js won't touch an implicit
+    //     hash while the SSR client is in PKCE mode ("Not a valid PKCE flow
+    //     url."), so detectSessionInUrl silently no-ops and the old code sat
+    //     here until the 5s "Link Invalid" timeout. We consume the hash
+    //     ourselves via setSession(). These tokens always win over any stale
+    //     session already in the browser — otherwise the invitee would end up
+    //     setting a password on whoever was logged in before.
     const supabase = createClient()
     let resolved = false
 
     async function init() {
+      const hash = new URLSearchParams(
+        window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
+      )
+      const hashAccessToken = hash.get('access_token')
+      const hashRefreshToken = hash.get('refresh_token')
+      const hashError = hash.get('error') || hash.get('error_code')
+
+      // Get any tokens/errors out of the address bar and history immediately —
+      // before any await — so they can't leak via a shared screen or the
+      // browser back button.
+      if (hashAccessToken || hashError) {
+        window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search)
+      }
+
+      if (hashError) {
+        setLinkInvalid(true)
+        resolved = true
+        return
+      }
+
+      if (hashAccessToken && hashRefreshToken) {
+        // Invite / implicit-flow link. setSession() writes the invitee's
+        // session, overriding whoever was logged in on this browser before.
+        // A NavigatorLock "steal" AbortError can surface here when another
+        // Supabase client instance (e.g. the navbar) races the same lock —
+        // the write still lands, so fall through to the getUser() check
+        // rather than treating it as a bad link.
+        try {
+          const { error } = await supabase.auth.setSession({
+            access_token: hashAccessToken,
+            refresh_token: hashRefreshToken,
+          })
+          if (!error) {
+            resolved = true
+            setReady(true)
+            return
+          }
+        } catch {
+          /* fall through to the getUser() confirmation below */
+        }
+
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          resolved = true
+          setReady(true)
+        } else {
+          setLinkInvalid(true)
+          resolved = true
+        }
+        return
+      }
+
       const code = new URLSearchParams(window.location.search).get('code')
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)

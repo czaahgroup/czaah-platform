@@ -71,6 +71,47 @@ const FALLBACK_ICE_SERVERS: RTCIceServer[] = [
 
 const CALL_TIMEOUT_MS = 30000
 
+// One shared TURN-credential fetch across every useCall instance and every
+// mount. Kicked off lazily the first time a call actually needs a relay path —
+// NOT on mount. The admin/partner layouts each stack ~3 call-provider
+// instances, so an on-mount fetch meant 3+ requests (each hitting getUser()
+// then Cloudflare's RTC API, with retries) piling onto the already heavy
+// post-login request storm on every authenticated page load.
+let sharedTurnServers: RTCIceServer[] | null = null
+let sharedTurnPromise: Promise<void> | null = null
+
+function loadSharedTurnCredentials(): Promise<void> {
+  if (sharedTurnPromise) return sharedTurnPromise
+  sharedTurnPromise = (async () => {
+    const maxAttempts = 3
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const res = await fetch('/api/calls/turn-credentials')
+        if (res.ok) {
+          const data = await res.json()
+          if (data?.iceServers?.length) {
+            sharedTurnServers = data.iceServers
+            console.info('[useCall] Using TURN-backed ICE servers:', data.iceServers.map((s: RTCIceServer) => s.urls))
+            return
+          }
+          console.warn('[useCall] No iceServers in TURN response (attempt', attempt, 'of', maxAttempts, ')')
+        } else {
+          console.warn('[useCall] TURN credentials request failed (attempt', attempt, 'of', maxAttempts, '):', res.status, await res.text().catch(() => ''))
+        }
+      } catch (err) {
+        console.warn('[useCall] TURN credentials fetch errored (attempt', attempt, 'of', maxAttempts, '):', err)
+      }
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, 500 * attempt))
+      }
+    }
+    console.warn('[useCall] Giving up on TURN credentials — staying on STUN-only fallback')
+    // Let a later call retry rather than caching the failure forever.
+    sharedTurnPromise = null
+  })()
+  return sharedTurnPromise
+}
+
 // Helper to log calls to the API
 async function logCallToApi(data: {
   callerId: string
@@ -158,62 +199,18 @@ export function useCall({
   const lastTargetNameRef = useRef<string | null>(null)
   const activeCallRef = useRef(false)
   const iceServersRef = useRef<RTCIceServer[]>(FALLBACK_ICE_SERVERS)
-  // Resolved once TURN credentials have loaded (or definitively failed after
-  // retries) — awaited just before creating a peer connection so a call
-  // placed/accepted moments after page load doesn't silently get stuck on
-  // the STUN-only fallback, which can't relay media across different
-  // networks. A random-seeming "sometimes we can't hear each other" is
-  // exactly what that race condition looks like from the outside.
-  const turnReadyRef = useRef<Promise<void>>(Promise.resolve())
 
-  // Fetch short-lived Cloudflare TURN credentials once on mount, with a
-  // couple of retries, so a real relay path is ready before any call is
-  // actually placed or accepted.
-  useEffect(() => {
-    let cancelled = false
-
-    async function loadTurnCredentials() {
-      const maxAttempts = 3
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        try {
-          const res = await fetch('/api/calls/turn-credentials')
-          if (res.ok) {
-            const data = await res.json()
-            if (data?.iceServers?.length) {
-              if (!cancelled) {
-                iceServersRef.current = data.iceServers
-                console.info('[useCall] Using TURN-backed ICE servers:', data.iceServers.map((s: RTCIceServer) => s.urls))
-              }
-              return
-            }
-            console.warn('[useCall] No iceServers in TURN response (attempt', attempt, 'of', maxAttempts, ')')
-          } else {
-            console.warn('[useCall] TURN credentials request failed (attempt', attempt, 'of', maxAttempts, '):', res.status, await res.text().catch(() => ''))
-          }
-        } catch (err) {
-          console.warn('[useCall] TURN credentials fetch errored (attempt', attempt, 'of', maxAttempts, '):', err)
-        }
-        if (attempt < maxAttempts) {
-          await new Promise((resolve) => setTimeout(resolve, 500 * attempt))
-        }
-      }
-      console.warn('[useCall] Giving up on TURN credentials — staying on STUN-only fallback')
-    }
-
-    turnReadyRef.current = loadTurnCredentials()
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  // Never blocks longer than this even if TURN is genuinely unreachable —
-  // a slow call beats one that hangs waiting on a dead credentials service.
-  const waitForTurnReady = useCallback(() => {
-    return Promise.race([
-      turnReadyRef.current,
+  // Called just before every peer-connection create. Triggers the shared TURN
+  // fetch on first use (nothing runs on mount) and never blocks longer than
+  // 4s even if the credentials service is dead — a slow call beats a hung one.
+  // A real relay path still lands before media negotiation for all but the
+  // very first call placed in the seconds right after load.
+  const waitForTurnReady = useCallback(async () => {
+    await Promise.race([
+      loadSharedTurnCredentials(),
       new Promise<void>((resolve) => setTimeout(resolve, 4000)),
     ])
+    if (sharedTurnServers) iceServersRef.current = sharedTurnServers
   }, [])
 
   // Keep refs in sync
