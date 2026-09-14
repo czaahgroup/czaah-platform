@@ -150,7 +150,7 @@ export default function WebmailPage() {
 
   return (
     <div className="webmail-shell bg-surface" style={{ minHeight: '100dvh' }}>
-      <style>{`.webmail-shell .czaah-mail { height: calc(100dvh - 57px) !important; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }`}</style>
+      <style>{`.webmail-shell > .czaah-mail { height: calc(100dvh - 57px) !important; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }`}</style>
       <header className="h-14 px-4 sm:px-6 flex items-center justify-between border-b border-outline-variant/30 bg-surface">
         <div className="flex items-center gap-2.5">
           <Markhor className="h-6 w-auto" />
@@ -168,7 +168,7 @@ export default function WebmailPage() {
           </button>
         </div>
       </header>
-      <MailWorkspace heading="Webmail" outboundLabel="You" />
+      <MailWorkspace heading="Webmail" outboundLabel="You" onSignOut={signOut} />
     </div>
   )
 }

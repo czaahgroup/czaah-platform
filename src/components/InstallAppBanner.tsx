@@ -90,6 +90,7 @@ export function InstallAppBanner() {
   // Full-screen meeting rooms should stay distraction-free.
   if (pathname?.startsWith('/meet/')) return null
   if (!visible || !platform) return null
+  const appName = pathname?.startsWith('/webmail') ? 'CZAAH Mail' : 'CZAAH'
 
   return (
     <div
@@ -134,9 +135,9 @@ export function InstallAppBanner() {
           }}
         >
           {platform === 'ios' ? (
-            <>Add CZAAH to your Home Screen — tap <strong style={{ color: '#C9A84C' }}>Share</strong>, then <strong style={{ color: '#C9A84C' }}>&quot;Add to Home Screen&quot;</strong>.</>
+            <>Add {appName} to your Home Screen — tap <strong style={{ color: '#C9A84C' }}>Share</strong>, then <strong style={{ color: '#C9A84C' }}>&quot;Add to Home Screen&quot;</strong>.</>
           ) : (
-            'Install the CZAAH app for quick access from your home screen.'
+            `Install the ${appName} app for quick access from your home screen.`
           )}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>

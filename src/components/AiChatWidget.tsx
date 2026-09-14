@@ -16,7 +16,12 @@ const HANDOFF_PROMPT =
 
 export function AiChatWidget() {
   const pathname = usePathname() || ''
-  const hidden = pathname.startsWith('/dashboard') || pathname.startsWith('/admin')
+  const hidden =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/admin') ||
+    // Mail is a full-screen app on phones; the bubble would sit on its Compose button.
+    pathname.startsWith('/webmail') ||
+    pathname.startsWith('/partner-network/mail')
 
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING])

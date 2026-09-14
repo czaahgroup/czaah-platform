@@ -75,10 +75,10 @@ export default function MailComposeModal({
 
   return (
     <div
-      className="czaah-mail"
+      className="czaah-mail mi-sheet"
       style={{ position: 'fixed', right: '24px', bottom: '0', width: '540px', maxWidth: 'calc(100vw - 32px)', zIndex: 1100, background: 'var(--mail-panel)', border: '1px solid var(--mail-border-strong)', borderBottom: 'none', borderRadius: '12px 12px 0 0', boxShadow: '0 -8px 40px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', maxHeight: '82vh' }}
     >
-      <div style={{ background: 'var(--mail-panel-2)', padding: '10px 16px', borderRadius: '11px 11px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="mi-desktop-only" style={{ background: 'var(--mail-panel-2)', padding: '10px 16px', borderRadius: '11px 11px 0 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: '13px', color: 'var(--mail-text)', fontWeight: 600 }}>
           {initial?.bodyHtml ? 'Forward message' : 'New message'}
           {fromLabel && <span style={{ color: 'var(--mail-text-faint)', fontWeight: 400 }}> — {fromLabel}</span>}
@@ -86,17 +86,31 @@ export default function MailComposeModal({
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--mail-text-dim)', fontSize: '18px', cursor: 'pointer', lineHeight: 1 }}>×</button>
       </div>
 
-      <div style={{ padding: '4px 16px', overflowY: 'auto' }}>
+      {/* phone: app-style header — close, title, Send (stays above the keyboard) */}
+      <div className="mi-mobile-only" style={{ alignItems: 'center', gap: '6px', padding: '8px 12px 8px 6px', borderBottom: '1px solid var(--mail-border)' }}>
+        <button className="mi-icon" onClick={onClose} aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--mail-text)' }}>{initial?.bodyHtml ? 'Forward' : 'New message'}</div>
+          {fromEmail && <div style={{ fontSize: '12px', color: 'var(--mail-text-faint)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>from {fromEmail}</div>}
+        </div>
+        <button className="mi-primary" onClick={send} disabled={sending || !ready}>
+          {sending ? 'Sending…' : uploading ? 'Uploading…' : 'Send'}
+        </button>
+      </div>
+
+      <div className="mi-sheet-body" style={{ padding: '4px 16px', overflowY: 'auto' }}>
         <Row>
-          <input className="ci" type="email" placeholder="To" value={to} onChange={(e) => setTo(e.target.value)} />
+          <input className="ci" type="email" inputMode="email" autoCapitalize="off" autoCorrect="off" spellCheck={false} placeholder="To" value={to} onChange={(e) => setTo(e.target.value)} />
           {!showCc && (
             <button onClick={() => setShowCc(true)} style={{ background: 'none', border: 'none', color: 'var(--mail-text-faint)', fontSize: '12px', cursor: 'pointer' }}>Cc/Bcc</button>
           )}
         </Row>
         {showCc && (
           <>
-            <Row><input className="ci" placeholder="Cc" value={cc} onChange={(e) => setCc(e.target.value)} /></Row>
-            <Row><input className="ci" placeholder="Bcc" value={bcc} onChange={(e) => setBcc(e.target.value)} /></Row>
+            <Row><input className="ci" inputMode="email" autoCapitalize="off" autoCorrect="off" spellCheck={false} placeholder="Cc" value={cc} onChange={(e) => setCc(e.target.value)} /></Row>
+            <Row><input className="ci" inputMode="email" autoCapitalize="off" autoCorrect="off" spellCheck={false} placeholder="Bcc" value={bcc} onChange={(e) => setBcc(e.target.value)} /></Row>
           </>
         )}
         <Row><input className="ci" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} /></Row>
@@ -120,10 +134,15 @@ export default function MailComposeModal({
             <AttachmentPicker files={files} setFiles={setFiles} mailboxId={mailboxId} compact />
           </div>
         )}
-        {error && <p style={{ color: 'var(--mail-danger)', fontSize: '12px', margin: '0 0 10px' }}>{error}</p>}
+        {files.length === 0 && (
+          <div className="mi-mobile-only" style={{ paddingBottom: '10px' }}>
+            <AttachmentPicker files={files} setFiles={setFiles} mailboxId={mailboxId} compact />
+          </div>
+        )}
+        {error && <p style={{ color: 'var(--mail-danger)', fontSize: '13px', margin: '0 0 10px' }}>{error}</p>}
       </div>
 
-      <div style={{ padding: '12px 16px', borderTop: '1px solid var(--mail-border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="mi-desktop-only" style={{ padding: '12px 16px', borderTop: '1px solid var(--mail-border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button className="mi-primary" onClick={send} disabled={sending || !ready}>
           {sending ? 'Sending…' : uploading ? 'Uploading…' : 'Send'}
         </button>
@@ -132,6 +151,7 @@ export default function MailComposeModal({
 
       <style>{`
         .czaah-mail .ci { flex: 1; background: transparent; border: none; outline: none; color: var(--mail-text); font-size: 13px; font-family: inherit; padding: 10px 0; }
+        @media (max-width: 820px) { .czaah-mail .ci { padding: 13px 0; } }
         .czaah-mail .ci::placeholder { color: var(--mail-text-faint); }
       `}</style>
     </div>

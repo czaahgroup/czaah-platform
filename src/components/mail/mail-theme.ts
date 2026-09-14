@@ -100,8 +100,52 @@ export const MAIL_THEME_CSS = `
 
 .czaah-mail .mi-backdrop { display: none; }
 .czaah-mail .mi-menu-btn { display: none; }
+.czaah-mail .mi-mobile-only { display: none !important; }
+.czaah-mail .mi-fab { display: none; }
+.czaah-mail .mi-grid { grid-template-rows: minmax(0, 1fr); }
 
+@keyframes mi-sheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---- phone: full-screen app ---- */
 @media (max-width: 820px) {
+  .czaah-mail.mi-app {
+    position: fixed !important; inset: 0 !important; z-index: 45;
+    height: 100dvh !important; border-radius: 0 !important; border: 0 !important;
+    padding-top: env(safe-area-inset-top);
+  }
+  .czaah-mail .mi-desktop-only { display: none !important; }
+  .czaah-mail .mi-mobile-only { display: flex !important; }
+  /* 16px stops iOS Safari zooming the page when a field gets focus */
+  .czaah-mail input, .czaah-mail textarea, .czaah-mail select, .czaah-mail [contenteditable] { font-size: 16px !important; }
+  .czaah-mail .mi-icon { width: 40px; height: 40px; border-radius: 10px; }
+  .czaah-mail .mi-nav { padding: 12px 14px; font-size: 15px; }
+  .czaah-mail .mi-btn { padding: 9px 14px; font-size: 14px; }
+  .czaah-mail .mi-primary { padding: 11px 20px; font-size: 15px; }
+  .czaah-mail .mi-row-star { opacity: .45; }
+  .czaah-mail .mi-row:active { background: var(--mail-hover); }
+
+  .czaah-mail .mi-fab {
+    display: inline-flex; align-items: center; gap: 9px;
+    position: absolute; right: 18px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 20;
+    background: var(--mail-gold); color: #241c04; border: none; border-radius: 18px;
+    padding: 15px 20px; font-size: 15px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 6px 20px rgba(60,45,10,0.28), 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .czaah-mail .mi-fab:active { transform: scale(.97); }
+
+  .czaah-mail .mi-bottombar { padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; }
+
+  /* reply + compose open as full-screen sheets */
+  .czaah-mail .mi-sheet {
+    position: fixed !important; inset: 0 !important; z-index: 70 !important;
+    width: 100% !important; max-width: none !important; max-height: none !important; height: 100dvh !important;
+    border-radius: 0 !important; border: 0 !important; margin: 0 !important;
+    padding-top: env(safe-area-inset-top) !important;
+    display: flex !important; flex-direction: column !important; background: var(--mail-panel) !important;
+    animation: mi-sheet-up .18s ease-out;
+  }
+  .czaah-mail .mi-sheet-body { flex: 1; overflow-y: auto; padding: 8px 16px calc(16px + env(safe-area-inset-bottom)) !important; }
+
   .czaah-mail .mi-grid { grid-template-columns: 1fr !important; }
   .czaah-mail .mi-menu-btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -112,12 +156,14 @@ export const MAIL_THEME_CSS = `
   .czaah-mail .mi-navrail {
     position: fixed !important; top: 0 !important; left: 0 !important; bottom: 0 !important;
     width: 250px !important; z-index: 60 !important;
-    transform: translateX(-100%); transition: transform .22s ease;
-    box-shadow: 0 0 40px rgba(0,0,0,0.25);
+    transform: translateX(-100%); transition: transform .22s ease, visibility .22s;
+    visibility: hidden;
   }
-  .czaah-mail .mi-navrail.is-open { transform: translateX(0); }
+  .czaah-mail .mi-navrail.is-open { transform: translateX(0); visibility: visible; box-shadow: 0 0 40px rgba(0,0,0,0.25); }
   .czaah-mail .mi-backdrop { display: block; position: fixed; inset: 0; z-index: 55; background: rgba(0,0,0,0.42); }
-  .czaah-mail .mi-topbar { flex-wrap: wrap; height: auto !important; padding: 10px 14px !important; gap: 10px !important; }
-  .czaah-mail .mi-search { order: 3; flex-basis: 100% !important; max-width: none !important; }
+  .czaah-mail .mi-navrail { padding-top: calc(16px + env(safe-area-inset-top)) !important; padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important; }
+  .czaah-mail .mi-topbar { height: 60px !important; padding: 0 12px !important; gap: 10px !important; }
+  .czaah-mail .mi-menu-btn { width: 42px; height: 42px; border-radius: 12px; }
+  .czaah-mail .mi-search { max-width: none !important; }
 }
 `

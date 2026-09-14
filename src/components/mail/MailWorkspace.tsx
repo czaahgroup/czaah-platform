@@ -30,10 +30,17 @@ export default function MailWorkspace({
   heading,
   outboundLabel,
   monitorNote,
+  exitHref,
+  exitLabel,
+  onSignOut,
 }: {
   heading: string
   outboundLabel: string
   monitorNote?: string
+  /** Phone layout is full-screen, so the drawer offers the way back out. */
+  exitHref?: string
+  exitLabel?: string
+  onSignOut?: () => void
 }) {
   const supabase = createClient()
 
@@ -87,6 +94,37 @@ export default function MailWorkspace({
   }, [])
   const closeNav = () => setNavOpen(false)
 
+  // Phone: opening a conversation adds a history entry, so the device back
+  // button (or swipe-back) returns to the inbox instead of leaving the page.
+  const pushedThreadRef = useRef(false)
+  const openThread = (id: string) => {
+    if (isNarrow && !pushedThreadRef.current) {
+      const url = new URL(window.location.href)
+      url.searchParams.set('thread', id)
+      window.history.pushState(null, '', url)
+      pushedThreadRef.current = true
+    }
+    setSelectedId(id)
+  }
+  const closeThread = () => setSelectedId(null)
+  // However the conversation was closed (back arrow, archive, delete, nav),
+  // drop the history entry we added so the back stack stays clean.
+  useEffect(() => {
+    if (!selectedId && pushedThreadRef.current) {
+      pushedThreadRef.current = false
+      window.history.back()
+    }
+  }, [selectedId])
+  useEffect(() => {
+    const onPop = () => {
+      if (new URL(window.location.href).searchParams.has('thread')) return
+      pushedThreadRef.current = false
+      setSelectedId(null)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
   const activeMailbox = useMemo(() => mailboxes.find((m) => m.id === mailboxId) || null, [mailboxes, mailboxId])
 
   // ---- bootstrap --------------------------------------------------------
@@ -128,6 +166,55 @@ export default function MailWorkspace({
     const t = setTimeout(() => setQuery(search), 300)
     return () => clearTimeout(t)
   }, [search])
+
+  // ---- new mail --------------------------------------------------------
+  // Webmail sessions get no realtime push, and phones sleep sockets, so poll
+  // while the page is visible and refresh as soon as it comes back to front.
+  const [refreshing, setRefreshing] = useState(false)
+  const refreshNow = useCallback(async () => {
+    setRefreshing(true)
+    try {
+      await loadThreads()
+      if (selectedId && !threadLoading) {
+        const j = await fetch(`/api/mail/threads/${selectedId}`).then((r) => r.json()).catch(() => null)
+        if (j?.messages) {
+          setMessages((prev) => {
+            const known = new Set(prev.map((m) => m.id))
+            const fresh = j.messages.filter((m: any) => !known.has(m.id))
+            return fresh.length ? [...prev, ...fresh] : prev
+          })
+        }
+      }
+    } finally {
+      setRefreshing(false)
+    }
+  }, [loadThreads, selectedId, threadLoading])
+
+  useEffect(() => {
+    if (!mailboxId) return
+    const tick = () => { if (document.visibilityState === 'visible') refreshNow() }
+    const iv = setInterval(tick, 30000)
+    document.addEventListener('visibilitychange', tick)
+    window.addEventListener('focus', tick)
+    return () => {
+      clearInterval(iv)
+      document.removeEventListener('visibilitychange', tick)
+      window.removeEventListener('focus', tick)
+    }
+  }, [mailboxId, refreshNow])
+
+  // Unread count on the installed app icon + tab title.
+  const unreadTotal = useMemo(() => (filter === 'inbox' && !labelFilter && !query ? threads.filter((t) => t.unreadCount > 0).length : null), [threads, filter, labelFilter, query])
+  useEffect(() => {
+    if (unreadTotal === null) return
+    try {
+      const nav: any = navigator
+      if (unreadTotal > 0) nav.setAppBadge?.(unreadTotal)?.catch?.(() => {})
+      else nav.clearAppBadge?.()?.catch?.(() => {})
+    } catch { /* unsupported */ }
+    const base = document.title.replace(/^\(\d+\)\s*/, '')
+    document.title = unreadTotal > 0 ? `(${unreadTotal}) ${base}` : base
+  }, [unreadTotal])
 
   // ---- open thread --------------------------------------------------
   useEffect(() => {
@@ -290,9 +377,11 @@ export default function MailWorkspace({
   }
 
   const replyPlain = replyHtml.replace(/<[^>]+>/g, '').trim()
+  const canSendReply = !sending && !replyFiles.some((f: any) => f.uploading) && (!!replyPlain || replyFiles.some((f: any) => f.path && !f.failed))
+  const cancelReply = () => { setReplyOpen(false); setReplyHtml(''); setReplyFiles([]) }
 
   return (
-    <div className="czaah-mail" style={{ height: 'calc(100dvh - 92px)', display: 'flex', flexDirection: 'column', background: 'var(--mail-panel)', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--mail-border)', boxShadow: 'var(--mail-shadow)' }}>
+    <div className="czaah-mail mi-app" style={{ height: 'calc(100dvh - 92px)', display: 'flex', flexDirection: 'column', background: 'var(--mail-panel)', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--mail-border)', boxShadow: 'var(--mail-shadow)' }}>
       <style>{MAIL_THEME_CSS}</style>
 
       {/* ---- top bar ---- */}
@@ -317,7 +406,7 @@ export default function MailWorkspace({
             style={{ paddingLeft: '34px', background: 'var(--mail-panel-2)' }}
           />
         </div>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="mi-desktop-only" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
           {mailboxes.length > 1 ? (
             <select
               value={mailboxId}
@@ -337,10 +426,29 @@ export default function MailWorkspace({
         {isNarrow && navOpen && <div className="mi-backdrop" onClick={closeNav} />}
         {/* nav rail */}
         <div className={`mi-navrail ${navOpen ? 'is-open' : ''}`} style={{ position: 'relative', borderRight: '1px solid var(--mail-border)', padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '3px', background: 'var(--mail-sidebar)', overflowY: 'auto' }}>
+          {/* phone: brand + mailbox picker live in the drawer */}
+          <div className="mi-mobile-only" style={{ flexDirection: 'column', gap: '10px', padding: '0 4px 14px', marginBottom: '10px', borderBottom: '1px solid var(--mail-border)' }}>
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: '15px', letterSpacing: '0.18em', color: 'var(--mail-text)' }}>
+              CZAAH <span style={{ color: 'var(--mail-gold)' }}>MAIL</span>
+            </div>
+            {mailboxes.length > 1 ? (
+              <select
+                value={mailboxId}
+                onChange={(e) => { setMailboxId(e.target.value); closeNav() }}
+                aria-label="Mailbox"
+                style={{ width: '100%', background: 'var(--mail-panel)', border: '1px solid var(--mail-border-strong)', color: 'var(--mail-text)', padding: '10px', borderRadius: '10px', fontFamily: 'inherit' }}
+              >
+                {mailboxes.map((m) => <option key={m.id} value={m.id}>{(m.displayName || m.address)} — {m.address}</option>)}
+              </select>
+            ) : activeMailbox ? (
+              <span style={{ fontSize: '13px', color: 'var(--mail-text-dim)', wordBreak: 'break-all' }}>{activeMailbox.address}</span>
+            ) : null}
+          </div>
+
           <button
             onClick={() => { closeNav(); setComposeInitial(null); setComposeOpen(true) }}
             disabled={!mailboxId}
-            className="mi-primary"
+            className="mi-primary mi-desktop-only"
             style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginBottom: '12px' }}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
@@ -374,6 +482,18 @@ export default function MailWorkspace({
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" /><path d="M14.06 6.19l3.75 3.75" /></svg>
             Signature
           </button>
+          {exitHref && (
+            <a href={exitHref} className="mi-nav mi-mobile-only" style={{ textDecoration: 'none' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+              {exitLabel || 'Back'}
+            </a>
+          )}
+          {onSignOut && (
+            <button className="mi-nav mi-mobile-only" onClick={() => { closeNav(); onSignOut() }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+              Sign out
+            </button>
+          )}
         </div>
 
         {view === 'contacts' && (
@@ -387,12 +507,20 @@ export default function MailWorkspace({
         <>
         {/* thread list */}
         {(!isNarrow || !selectedId) && (
-        <div style={{ borderRight: '1px solid var(--mail-border)', display: 'flex', flexDirection: 'column', background: 'var(--mail-bg)', minWidth: 0 }}>
-          <div style={{ padding: '13px 18px 11px', borderBottom: '1px solid var(--mail-border)', fontSize: '15px', color: 'var(--mail-text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', letterSpacing: '-0.01em', textTransform: 'capitalize' }}>
-            <span>{labelFilter ? (labels.find((l) => l.id === labelFilter)?.name || 'Label') : filter}</span>
-            <span style={{ fontSize: '12px', color: 'var(--mail-text-faint)', fontWeight: 400 }}>{threads.length}</span>
+        <div style={{ borderRight: '1px solid var(--mail-border)', display: 'flex', flexDirection: 'column', background: 'var(--mail-bg)', minWidth: 0, minHeight: 0, position: 'relative' }}>
+          <div style={{ padding: isNarrow ? '12px 12px 10px 18px' : '13px 18px 11px', borderBottom: '1px solid var(--mail-border)', fontSize: isNarrow ? '20px' : '15px', color: 'var(--mail-text)', fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', letterSpacing: '-0.01em' }}>
+            <span style={{ textTransform: 'capitalize' }}>{labelFilter ? (labels.find((l) => l.id === labelFilter)?.name || 'Label') : filter}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', color: 'var(--mail-text-faint)', fontWeight: 400 }}>
+              {unreadTotal ? <span style={{ color: 'var(--mail-accent)', fontWeight: 600 }}>{unreadTotal} unread</span> : <span>{threads.length}</span>}
+              <button className="mi-icon" onClick={refreshNow} title="Check for new mail" aria-label="Check for new mail" disabled={refreshing}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ animation: refreshing ? 'mi-spin .8s linear infinite' : undefined }}>
+                  <path d="M21 12a9 9 0 11-2.64-6.36M21 3v6h-6" />
+                </svg>
+              </button>
+            </span>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <style>{'@keyframes mi-spin { to { transform: rotate(360deg) } }'}</style>
+          <div style={{ flex: 1, overflowY: 'auto', paddingBottom: isNarrow ? '96px' : undefined }}>
             {loading ? (
               <Empty>Loading…</Empty>
             ) : threads.length === 0 ? (
@@ -404,11 +532,11 @@ export default function MailWorkspace({
                 return (
                   <div
                     key={t.id}
-                    onClick={() => setSelectedId(t.id)}
+                    onClick={() => openThread(t.id)}
                     className="mi-row"
                     data-sel={sel ? '1' : undefined}
                     style={{
-                      display: 'grid', gridTemplateColumns: '14px 1fr', gap: '8px', padding: '10px 16px 11px', cursor: 'pointer',
+                      display: 'grid', gridTemplateColumns: '14px 1fr', gap: '8px', padding: isNarrow ? '14px 16px 14px 12px' : '10px 16px 11px', cursor: 'pointer',
                       borderBottom: '1px solid var(--mail-border)',
                     }}
                   >
@@ -419,7 +547,7 @@ export default function MailWorkspace({
                     </span>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: '13px', color: 'var(--mail-text)', fontWeight: unread ? 700 : 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: isNarrow ? '15px' : '13px', color: 'var(--mail-text)', fontWeight: unread ? 700 : 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {t.lastFrom && t.lastFrom !== t.externalAddress ? t.lastFrom : t.externalAddress}
                           {t.messageCount > 1 && <span style={{ fontWeight: 500, color: 'var(--mail-text-faint)', marginLeft: '5px' }}>{t.messageCount}</span>}
                         </span>
@@ -436,8 +564,8 @@ export default function MailWorkspace({
                           </span>
                         </span>
                       </div>
-                      <div style={{ fontSize: '12.5px', color: unread ? 'var(--mail-text)' : 'var(--mail-text-dim)', fontWeight: unread ? 600 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>{t.subject}</div>
-                      <div style={{ fontSize: '12px', color: 'var(--mail-text-faint)', marginTop: '2px', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.preview}</div>
+                      <div style={{ fontSize: isNarrow ? '14.5px' : '12.5px', color: unread ? 'var(--mail-text)' : 'var(--mail-text-dim)', fontWeight: unread ? 600 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '2px' }}>{t.subject}</div>
+                      <div style={{ fontSize: isNarrow ? '13.5px' : '12px', color: 'var(--mail-text-faint)', marginTop: '2px', lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.preview}</div>
                       {(t.labels || []).length > 0 && (
                         <div style={{ display: 'flex', gap: '4px', marginTop: '6px', flexWrap: 'wrap' }}>
                           {t.labels.map((l: any) => (
@@ -451,6 +579,10 @@ export default function MailWorkspace({
               })
             )}
           </div>
+          <button className="mi-fab" onClick={() => { setComposeInitial(null); setComposeOpen(true) }} disabled={!mailboxId}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
+            Compose
+          </button>
         </div>
         )}
 
@@ -470,18 +602,29 @@ export default function MailWorkspace({
               <p style={{ fontSize: '13px' }}>Select a conversation</p>
             </div>
           ) : threadLoading ? (
-            <Empty>Loading…</Empty>
+            <>
+              {isNarrow && (
+                <div style={{ padding: '8px 6px', borderBottom: '1px solid var(--mail-border)' }}>
+                  <button className="mi-icon" onClick={closeThread} aria-label="Back to inbox">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+                  </button>
+                </div>
+              )}
+              <Empty>Loading…</Empty>
+            </>
           ) : (
             <>
               {threadInfo && (
-                <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--mail-border)', background: 'var(--mail-panel)', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <div style={{ padding: isNarrow ? '8px 12px 6px 6px' : '14px 24px', borderBottom: '1px solid var(--mail-border)', background: 'var(--mail-panel)', display: 'flex', flexWrap: isNarrow ? 'wrap' : undefined, alignItems: 'flex-start', gap: isNarrow ? '4px' : '10px' }}>
                   {isNarrow && (
-                    <button className="mi-icon" onClick={() => setSelectedId(null)} aria-label="Back" style={{ flexShrink: 0, marginTop: '-2px' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
+                    <button className="mi-icon" onClick={closeThread} aria-label="Back to inbox" style={{ flexShrink: 0 }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6" /></svg>
                     </button>
                   )}
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <h2 style={{ fontSize: '17px', color: 'var(--mail-text)', margin: 0, fontWeight: 600, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{threadInfo.subject}</h2>
+                  <div style={{ minWidth: 0, flex: 1, paddingTop: isNarrow ? '8px' : undefined }}>
+                    <h2 style={isNarrow
+                      ? { fontSize: '18px', color: 'var(--mail-text)', margin: 0, fontWeight: 600, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }
+                      : { fontSize: '17px', color: 'var(--mail-text)', margin: 0, fontWeight: 600, letterSpacing: '-0.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{threadInfo.subject}</h2>
                     <p style={{ fontSize: '12px', color: 'var(--mail-text-faint)', margin: '3px 0 0' }}>{threadInfo.externalAddress}</p>
                     {(threadInfo.labels || []).length > 0 && (
                       <div style={{ display: 'flex', gap: '5px', marginTop: '8px', flexWrap: 'wrap' }}>
@@ -491,12 +634,14 @@ export default function MailWorkspace({
                       </div>
                     )}
                   </div>
-                  <div style={{ display: 'flex', gap: '2px', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: isNarrow ? '116px' : undefined }}>
+                  <div style={isNarrow
+                    ? { display: 'flex', width: '100%', justifyContent: 'space-between', margin: '6px -6px -6px', paddingTop: '6px', borderTop: '1px solid var(--mail-border)' }
+                    : { display: 'flex', gap: '2px', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     <TB title={threadInfo.starred ? 'Unflag' : 'Flag'} active={threadInfo.starred} onClick={() => threadAction(threadInfo.starred ? 'unstar' : 'star')} d="M4 21V4h11l-1 4h6v9H9l1-4H4" style={threadInfo.starred ? { color: 'var(--mail-gold)' } : undefined} />
                     <div style={{ position: 'relative' }}>
                       <TB title="Labels" active={labelMenuOpen} onClick={() => setLabelMenuOpen((v) => !v)} d="M20.6 13.4L13.4 20.6a2 2 0 01-2.8 0l-7.2-7.2a2 2 0 01-.6-1.4V4a2 2 0 012-2h7.6a2 2 0 011.4.6l6.4 6.4a2 2 0 010 2.8zM7 8h.01" />
                       {labelMenuOpen && (
-                        <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', background: 'var(--mail-panel)', border: '1px solid var(--mail-border-strong)', borderRadius: '10px', padding: '8px', zIndex: 30, minWidth: '190px', boxShadow: 'var(--mail-shadow)' }}>
+                        <div style={{ position: 'absolute', ...(isNarrow ? { left: 0 } : { right: 0 }), top: 'calc(100% + 4px)', background: 'var(--mail-panel)', border: '1px solid var(--mail-border-strong)', borderRadius: '10px', padding: '8px', zIndex: 30, minWidth: '190px', boxShadow: 'var(--mail-shadow)' }}>
                           {labels.length === 0 && <p style={{ fontSize: '11px', color: 'var(--mail-text-faint)', margin: '0 0 6px' }}>No labels yet.</p>}
                           {labels.map((l) => {
                             const on = (threadInfo.labels || []).some((x: any) => x.id === l.id)
@@ -523,7 +668,7 @@ export default function MailWorkspace({
 
               <div ref={scrollerRef} style={{ flex: 1, overflowY: 'auto', padding: '8px 0', display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 {messages.length > 1 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 26px 8px', fontSize: '11px', color: 'var(--mail-text-faint)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: isNarrow ? '4px 14px 8px' : '4px 26px 8px', fontSize: isNarrow ? '12px' : '11px', color: 'var(--mail-text-faint)' }}>
                     <span>{messages.length} messages in this conversation</span>
                     <button
                       className="mi-btn"
@@ -553,7 +698,7 @@ export default function MailWorkspace({
                         className="mi-row"
                         onClick={() => toggleCollapsed(m.id)}
                         title="Show message"
-                        style={{ display: 'flex', gap: '13px', alignItems: 'center', padding: '10px 26px', borderTop: mi ? '1px solid var(--mail-border)' : 'none', cursor: 'pointer' }}
+                        style={{ display: 'flex', gap: isNarrow ? '10px' : '13px', alignItems: 'center', padding: isNarrow ? '12px 14px' : '10px 26px', borderTop: mi ? '1px solid var(--mail-border)' : 'none', cursor: 'pointer' }}
                       >
                         {avatar}
                         <div style={{ minWidth: 0, flex: 1 }}>
@@ -571,7 +716,7 @@ export default function MailWorkspace({
                     )
                   }
                   return (
-                    <div key={m.id} ref={isLast ? lastMsgRef : undefined} style={{ display: 'flex', gap: '13px', padding: '16px 26px', borderTop: mi ? '1px solid var(--mail-border)' : 'none' }}>
+                    <div key={m.id} ref={isLast ? lastMsgRef : undefined} style={{ display: 'flex', gap: isNarrow ? '10px' : '13px', padding: isNarrow ? '14px 12px 14px 14px' : '16px 26px', borderTop: mi ? '1px solid var(--mail-border)' : 'none' }}>
                       {avatar}
                       <div style={{ minWidth: 0, flex: 1 }}>
                         <div
@@ -605,13 +750,44 @@ export default function MailWorkspace({
               </div>
 
               {/* reply */}
-              <div style={{ borderTop: '1px solid var(--mail-border)', background: 'var(--mail-panel)', padding: '14px 22px' }}>
+              <div
+                className={`mi-bottombar ${replyOpen ? 'mi-sheet' : ''}`}
+                style={{ borderTop: '1px solid var(--mail-border)', background: 'var(--mail-panel)', padding: replyOpen && isNarrow ? 0 : isNarrow ? '10px 14px' : '14px 22px' }}
+              >
+                {replyOpen && (
+                  <div className="mi-mobile-only" style={{ alignItems: 'center', gap: '6px', padding: '8px 12px 8px 6px', borderBottom: '1px solid var(--mail-border)' }}>
+                    <button className="mi-icon" onClick={cancelReply} aria-label="Discard reply">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                    </button>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--mail-text)' }}>Reply</div>
+                      <div style={{ fontSize: '12px', color: 'var(--mail-text-faint)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>to {threadInfo?.externalAddress}</div>
+                    </div>
+                    <button className="mi-primary" onClick={sendReply} disabled={!canSendReply}>
+                      {sending ? 'Sending…' : replyFiles.some((f: any) => f.uploading) ? 'Uploading…' : 'Send'}
+                    </button>
+                  </div>
+                )}
+                <div className={replyOpen ? 'mi-sheet-body' : undefined}>
                 {monitorNote && <p style={{ fontSize: '11px', color: 'var(--mail-text-faint)', margin: '0 0 8px' }}>{monitorNote}</p>}
                 {error && <p style={{ color: 'var(--mail-danger)', fontSize: '12px', margin: '0 0 8px' }}>{error}</p>}
                 {!replyOpen ? (
-                  <button className="mi-btn" onClick={() => setReplyOpen(true)} style={{ padding: '9px 16px' }}>
-                    Reply{threadInfo ? ` to ${threadInfo.externalAddress}` : ''}
-                  </button>
+                  isNarrow ? (
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button className="mi-primary" onClick={() => setReplyOpen(true)} style={{ flex: 1 }}>
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 17l-5-5 5-5M4 12h11a5 5 0 015 5v2" /></svg>
+                        Reply
+                      </button>
+                      <button className="mi-btn" onClick={openForward} style={{ flex: 1, justifyContent: 'center' }}>
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 17l5-5-5-5M20 12H9a5 5 0 00-5 5v2" /></svg>
+                        Forward
+                      </button>
+                    </div>
+                  ) : (
+                    <button className="mi-btn" onClick={() => setReplyOpen(true)} style={{ padding: '9px 16px' }}>
+                      Reply{threadInfo ? ` to ${threadInfo.externalAddress}` : ''}
+                    </button>
+                  )
                 ) : (
                   <div>
                     <div style={{ marginBottom: '8px' }}>
@@ -630,23 +806,24 @@ export default function MailWorkspace({
                         onInsert={setReplyHtml}
                       />
                     </div>
-                    <RichTextEditor value={replyHtml} onChange={setReplyHtml} placeholder="Write a reply…" minHeight={90} />
+                    <RichTextEditor value={replyHtml} onChange={setReplyHtml} placeholder="Write a reply…" minHeight={isNarrow ? 220 : 90} />
                     <div style={{ margin: '8px 0' }}>
                       <AttachmentPicker files={replyFiles} setFiles={setReplyFiles} mailboxId={mailboxId} compact />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label style={{ display: 'flex', gap: '6px', alignItems: 'center', fontSize: '11px', color: 'var(--mail-text-dim)' }}>
+                      <label style={{ display: 'flex', gap: '6px', alignItems: 'center', fontSize: isNarrow ? '14px' : '11px', color: 'var(--mail-text-dim)' }}>
                         <input type="checkbox" checked={replyAll} onChange={(e) => setReplyAll(e.target.checked)} /> Reply all
                       </label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button className="mi-btn" onClick={() => { setReplyOpen(false); setReplyHtml(''); setReplyFiles([]) }}>Cancel</button>
-                        <button className="mi-primary" onClick={sendReply} disabled={sending || replyFiles.some((f: any) => f.uploading) || (!replyPlain && !replyFiles.some((f: any) => f.path && !f.failed))}>
+                      <div className="mi-desktop-only" style={{ display: 'flex', gap: '8px' }}>
+                        <button className="mi-btn" onClick={cancelReply}>Cancel</button>
+                        <button className="mi-primary" onClick={sendReply} disabled={!canSendReply}>
                           {sending ? 'Sending…' : replyFiles.some((f: any) => f.uploading) ? 'Uploading…' : 'Send'}
                         </button>
                       </div>
                     </div>
                   </div>
                 )}
+                </div>
               </div>
             </>
           )}

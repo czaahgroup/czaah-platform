@@ -8,6 +8,8 @@ export default function AdminMailPage() {
       heading="Partner Mail"
       outboundLabel="Partner"
       monitorNote="Replying as this partner's mailbox — monitor view."
+      exitHref="/admin"
+      exitLabel="Back to admin"
     />
   )
 }
