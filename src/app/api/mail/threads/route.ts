@@ -93,6 +93,8 @@ export async function GET(request: NextRequest) {
       externalAddress: t.external_address,
       lastMessageAt: t.last_message_at,
       preview: last?.body_text?.slice(0, 140) || '',
+      lastFrom: last?.direction === 'inbound' ? last.from_address : null,
+      messageCount: threadMessages.length,
       unreadCount,
       archived: !!t.archived_at,
       starred: !!t.starred_at,

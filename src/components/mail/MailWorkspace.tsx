@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import MailComposeModal from './MailComposeModal'
-import MailMessageBody from './MailMessageBody'
+import MailMessageBody, { stripQuotedText } from './MailMessageBody'
 import RichTextEditor from './RichTextEditor'
 import AttachmentPicker from './AttachmentPicker'
 import MailAssist from './MailAssist'
@@ -69,7 +69,11 @@ export default function MailWorkspace({
   const [view, setView] = useState<'mail' | 'contacts'>('mail')
   const [contactOpen, setContactOpen] = useState(false)
 
-  const endRef = useRef<HTMLDivElement>(null)
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const lastMsgRef = useRef<HTMLDivElement>(null)
+  // Older messages in a thread start collapsed to a one-line summary (like
+  // Gmail) so every message in the conversation is visible at a glance.
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set())
 
   // Mobile: single-pane layout with a slide-in nav drawer.
   const [isNarrow, setIsNarrow] = useState(false)
@@ -135,7 +139,12 @@ export default function MailWorkspace({
       .then((r) => r.json())
       .then((j) => {
         if (cancelled) return
-        setMessages(j.messages || [])
+        const msgs = j.messages || []
+        // Keep the newest message and anything unread open; collapse the rest.
+        setCollapsedIds(new Set(
+          msgs.slice(0, -1).filter((m: any) => !(m.direction === 'inbound' && !m.is_read)).map((m: any) => m.id)
+        ))
+        setMessages(msgs)
         setThreadInfo(j.thread || null)
         loadThreads()
       })
@@ -143,12 +152,27 @@ export default function MailWorkspace({
     return () => { cancelled = true }
   }, [selectedId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Scroll the message list to the bottom WITHOUT scrolling outer ancestors
-  // (scrollIntoView would push the app chrome off-screen).
+  // Bring the newest message's top into view WITHOUT scrolling outer ancestors
+  // (scrollIntoView would push the app chrome off-screen). Re-run shortly after,
+  // once message iframes have measured their height.
   useEffect(() => {
-    const el = endRef.current?.parentElement
-    if (el) el.scrollTop = el.scrollHeight
-  }, [messages, replyOpen])
+    const jump = () => {
+      const scroller = scrollerRef.current
+      const last = lastMsgRef.current
+      if (scroller && last) scroller.scrollTop = Math.max(0, last.offsetTop - 8)
+    }
+    jump()
+    const t = setTimeout(jump, 350)
+    return () => clearTimeout(t)
+  }, [messages.length, selectedId, threadLoading])
+
+  const toggleCollapsed = (id: string) =>
+    setCollapsedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
 
   useEffect(() => {
     if (!selectedId) return
@@ -395,7 +419,10 @@ export default function MailWorkspace({
                     </span>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: '13px', color: 'var(--mail-text)', fontWeight: unread ? 700 : 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.externalAddress}</span>
+                        <span style={{ fontSize: '13px', color: 'var(--mail-text)', fontWeight: unread ? 700 : 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {t.lastFrom && t.lastFrom !== t.externalAddress ? t.lastFrom : t.externalAddress}
+                          {t.messageCount > 1 && <span style={{ fontWeight: 500, color: 'var(--mail-text-faint)', marginLeft: '5px' }}>{t.messageCount}</span>}
+                        </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                           {t.starred && <span style={{ color: 'var(--mail-gold)', fontSize: '11px' }}>★</span>}
                           <span style={{ fontSize: '11px', color: 'var(--mail-text-faint)' }}>{fmt(t.lastMessageAt)}</span>
@@ -494,17 +521,64 @@ export default function MailWorkspace({
                 </div>
               )}
 
-              <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0', display: 'flex', flexDirection: 'column' }}>
+              <div ref={scrollerRef} style={{ flex: 1, overflowY: 'auto', padding: '8px 0', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                {messages.length > 1 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 26px 8px', fontSize: '11px', color: 'var(--mail-text-faint)' }}>
+                    <span>{messages.length} messages in this conversation</span>
+                    <button
+                      className="mi-btn"
+                      style={{ padding: '3px 10px', fontSize: '11px' }}
+                      onClick={() => setCollapsedIds(collapsedIds.size ? new Set() : new Set(messages.slice(0, -1).map((m) => m.id)))}
+                    >
+                      {collapsedIds.size ? 'Expand all' : 'Collapse all'}
+                    </button>
+                  </div>
+                )}
                 {messages.map((m, mi) => {
                   const mine = m.direction === 'outbound'
                   const who = mine ? outboundLabel : m.from_address
+                  const isLast = mi === messages.length - 1
+                  const collapsed = collapsedIds.has(m.id)
+                  const avatar = (
+                    <span style={{ width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0, background: mine ? 'var(--mail-gold)' : avatarColor(m.from_address || 'x'), color: mine ? '#241c04' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700 }}>
+                      {(who || '?').trim().charAt(0).toUpperCase()}
+                    </span>
+                  )
+                  if (collapsed) {
+                    const snippet = stripQuotedText(m.body_text).replace(/\s+/g, ' ').trim()
+                    return (
+                      <div
+                        key={m.id}
+                        ref={isLast ? lastMsgRef : undefined}
+                        className="mi-row"
+                        onClick={() => toggleCollapsed(m.id)}
+                        title="Show message"
+                        style={{ display: 'flex', gap: '13px', alignItems: 'center', padding: '10px 26px', borderTop: mi ? '1px solid var(--mail-border)' : 'none', cursor: 'pointer' }}
+                      >
+                        {avatar}
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'baseline' }}>
+                            <span style={{ fontSize: '13px', color: 'var(--mail-text)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{who}</span>
+                            <span style={{ fontSize: '11px', color: 'var(--mail-text-faint)', flexShrink: 0 }}>
+                              {m.mailbox_attachments?.length > 0 ? '📎 ' : ''}{fmt(m.created_at, true)}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--mail-text-faint)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {snippet || '(no text)'}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  }
                   return (
-                    <div key={m.id} style={{ display: 'flex', gap: '13px', padding: '16px 26px', borderTop: mi ? '1px solid var(--mail-border)' : 'none' }}>
-                      <span style={{ width: '34px', height: '34px', borderRadius: '50%', flexShrink: 0, background: mine ? 'var(--mail-gold)' : avatarColor(m.from_address || 'x'), color: mine ? '#241c04' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700 }}>
-                        {(who || '?').trim().charAt(0).toUpperCase()}
-                      </span>
+                    <div key={m.id} ref={isLast ? lastMsgRef : undefined} style={{ display: 'flex', gap: '13px', padding: '16px 26px', borderTop: mi ? '1px solid var(--mail-border)' : 'none' }}>
+                      {avatar}
                       <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'baseline' }}>
+                        <div
+                          onClick={messages.length > 1 ? () => toggleCollapsed(m.id) : undefined}
+                          title={messages.length > 1 ? 'Collapse message' : undefined}
+                          style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'baseline', cursor: messages.length > 1 ? 'pointer' : undefined }}
+                        >
                           <span style={{ fontSize: '13.5px', color: 'var(--mail-text)', fontWeight: 600 }}>{who}</span>
                           <span style={{ fontSize: '11px', color: 'var(--mail-text-faint)', flexShrink: 0 }}>{fmt(m.created_at, true)}</span>
                         </div>
@@ -528,7 +602,6 @@ export default function MailWorkspace({
                     </div>
                   )
                 })}
-                <div ref={endRef} />
               </div>
 
               {/* reply */}
