@@ -4,10 +4,30 @@ import { MarkhorMark } from '@/components/MarkhorMark'
 import { PortalNav } from './_components/PortalNav'
 import './_components/portal.css'
 
+const PORTAL_TITLE = 'CZAAH Property — Investment Real Estate in London, Dubai & Pakistan'
+const PORTAL_DESCRIPTION =
+  'CZAAH Property — pre-vetted, title-verified real estate investment opportunities across London, Dubai and Pakistan, with end-to-end transaction support from a single institutional counterparty.'
+
+// The portal's public home is property.czaah.com, so relative share images and
+// canonical URLs resolve there — and links shared from the portal get a
+// property preview rather than the group site's "Capital · Ventures" card.
 export const metadata: Metadata = {
-  title: 'CZAAH Property — Investment Real Estate in London, Dubai & Pakistan',
-  description:
-    'CZAAH Property — pre-vetted, title-verified real estate investment opportunities across London, Dubai and Pakistan, with end-to-end transaction support from a single institutional counterparty.',
+  metadataBase: new URL('https://property.czaah.com'),
+  title: PORTAL_TITLE,
+  description: PORTAL_DESCRIPTION,
+  openGraph: {
+    title: PORTAL_TITLE,
+    description: PORTAL_DESCRIPTION,
+    siteName: 'CZAAH Property',
+    type: 'website',
+    images: [{ url: '/videos/dubai.jpg', alt: 'CZAAH Property' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: PORTAL_TITLE,
+    description: PORTAL_DESCRIPTION,
+    images: ['/videos/dubai.jpg'],
+  },
 }
 
 const FOOTER_LINKS = [

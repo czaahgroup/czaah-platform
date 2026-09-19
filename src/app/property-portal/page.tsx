@@ -258,6 +258,9 @@ export default function PropertyPortalHome() {
   return (
     <main>      {/* ── HERO ───────────────────────────────────────────── */}
       <section className="pp-hero pp-hero--slides">
+        {/* The hero is visual (slides + search); this names the page for
+            search engines and screen readers without changing the design. */}
+        <h1 className="pp-sr-only">CZAAH Property — real estate to buy and rent in London, Dubai and Pakistan</h1>
         <div className="pp-hero-media" aria-hidden="true">
           {heroProjects.map((p, i) => {
             // A project's own clip wins over its market's. That is the whole
