@@ -86,18 +86,19 @@ const inputStyle: React.CSSProperties = {
 }
 
 const labelStyle: React.CSSProperties = {
-const hintStyle: React.CSSProperties = {
-  margin: '6px 0 0',
-  fontSize: '11.5px',
-  lineHeight: 1.5,
-  color: 'rgba(228,224,218,0.5)',
-}
   display: 'block',
   fontSize: '11px',
   textTransform: 'uppercase',
   letterSpacing: '0.5px',
   opacity: 0.6,
   marginBottom: '5px',
+}
+
+const hintStyle: React.CSSProperties = {
+  margin: '6px 0 0',
+  fontSize: '11.5px',
+  lineHeight: 1.5,
+  color: 'rgba(228,224,218,0.5)',
 }
 
 function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm: (fn: (f: typeof emptyForm) => typeof emptyForm) => void }) {
@@ -203,6 +204,7 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
         <label style={labelStyle}>Video poster image (optional)</label>
         <input type="text" value={form.videoPosterUrl} onChange={(e) => update('videoPosterUrl', e.target.value)} placeholder="https://…/project-still.jpg" style={inputStyle} />
         <p style={hintStyle}>Shown while the video loads, and instead of it under reduced-motion. Defaults to the main picture.</p>
+      </div>
     </div>
   )
 }
