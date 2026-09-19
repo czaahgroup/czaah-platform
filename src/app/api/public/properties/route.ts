@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('property_listings')
-      .select('id, title, property_type, listing_type, price, currency, location, city, country, area_sqft, bedrooms, bathrooms, description, features, images, video_url, video_poster_url, yield_percentage, created_at')
+      .select('id, title, property_type, listing_type, price, currency, location, city, country, area_sqft, bedrooms, bathrooms, description, features, images, video_url, video_poster_url, rent_period, furnishing, available_from, deposit, min_term_months, yield_percentage, created_at')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
 

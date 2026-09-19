@@ -17,7 +17,6 @@ const TYPES = [
   { v: 'commercial', l: 'Commercial' },
   { v: 'industrial', l: 'Industrial' },
   { v: 'mixed_use', l: 'Mixed Use' },
-  { v: 'land', l: 'Land' },
 ];
 
 const BEDS = [
@@ -29,24 +28,29 @@ const BEDS = [
   { v: '4', l: '4+' },
 ];
 
-const PRICES = [
-  { v: '', l: 'Any price' },
-  { v: '0-250000', l: 'Up to 250k' },
-  { v: '250000-500000', l: '250k – 500k' },
-  { v: '500000-1000000', l: '500k – 1M' },
-  { v: '1000000-3000000', l: '1M – 3M' },
-  { v: '3000000-', l: '3M +' },
-];
-
-// Rent bands are per MONTH; annual rents are divided by 12 before comparing,
-// so a UAE listing quoted per year sits alongside a London one quoted monthly.
-const RENT_PRICES = [
+// Bands are per MONTH in USD; annual rents (the UAE convention) are divided by
+// 12 and every rent converted, so all three markets share one filter.
+const RENTS = [
   { v: '', l: 'Any rent' },
   { v: '0-1500', l: 'Up to $1.5k / mo' },
   { v: '1500-3000', l: '$1.5k – 3k / mo' },
   { v: '3000-6000', l: '$3k – 6k / mo' },
   { v: '6000-12000', l: '$6k – 12k / mo' },
   { v: '12000-', l: '$12k+ / mo' },
+];
+
+const FURNISHING = [
+  { v: '', l: 'Any furnishing' },
+  { v: 'furnished', l: 'Furnished' },
+  { v: 'part_furnished', l: 'Part furnished' },
+  { v: 'unfurnished', l: 'Unfurnished' },
+];
+
+const SORTS = [
+  { v: 'newest', l: 'Newest' },
+  { v: 'rent-asc', l: 'Rent: low to high' },
+  { v: 'rent-desc', l: 'Rent: high to low' },
+  { v: 'available', l: 'Available soonest' },
 ];
 
 // Rents are listed in local currency (PKR, AED, GBP), so bands and sorting use
@@ -56,21 +60,7 @@ const monthlyRent = (p) => {
   return convertPrice(perMonth, p.currency, 'USD') ?? perMonth;
 };
 
-const LISTING_TYPES = [
-  { v: '', l: 'All' },
-  { v: 'sale', l: 'For Sale' },
-  { v: 'rent', l: 'For Rent' },
-  { v: 'off_plan', l: 'Off-Plan' },
-];
-
-const SORTS = [
-  { v: 'newest', l: 'Newest' },
-  { v: 'price-asc', l: 'Price: low to high' },
-  { v: 'price-desc', l: 'Price: high to low' },
-  { v: 'yield-desc', l: 'Yield: high to low' },
-];
-
-function ListingsInner() {
+function RentInner() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -81,8 +71,7 @@ function ListingsInner() {
   const type = params.get('type') || '';
   const beds = params.get('beds') || '';
   const price = params.get('price') || '';
-  const listingType = params.get('listing_type') || '';
-  const rentView = listingType === 'rent' || listingType === 'lease';
+  const furnishing = params.get('furnishing') || '';
   const sort = params.get('sort') || 'newest';
   const ccy = params.get('ccy') || '';
   const page = Math.max(1, Number(params.get('page')) || 1);
@@ -96,29 +85,21 @@ function ListingsInner() {
       if (v) next.set(k, v);
       else next.delete(k);
     });
-    // Any filter/sort change resets to the first page.
     if (!('page' in patch)) next.delete('page');
-    router.push(`/property-portal/listings?${next.toString()}`);
+    router.push(`/property-portal/rent?${next.toString()}`);
   }
 
   const visible = useMemo(() => {
-    let list = all.filter((p) => matchesMarket(p, market));
+    // Rent and lease are both tenancies — residential lets and commercial leases.
+    let list = all.filter(isRental);
+    list = list.filter((p) => matchesMarket(p, market));
     if (type) list = list.filter((p) => p.property_type === type);
-    // "For Rent" covers commercial leases too — both are tenancies.
-    if (listingType) list = list.filter((p) => (rentView ? isRental(p) : p.listing_type === listingType));
     if (beds) list = list.filter((p) => (p.bedrooms ?? -1) >= Number(beds));
+    if (furnishing) list = list.filter((p) => p.furnishing === furnishing);
     if (price) {
       const [min, max] = price.split('-');
-      if (rentView) {
-        // Rent bands compare the monthly equivalent.
-        if (min) list = list.filter((p) => monthlyRent(p) >= Number(min));
-        if (max) list = list.filter((p) => monthlyRent(p) <= Number(max));
-      } else {
-        // Sale bands are capital prices; a monthly rent is not comparable.
-        list = list.filter((p) => !isRental(p));
-        if (min) list = list.filter((p) => (p.price ?? 0) >= Number(min));
-        if (max) list = list.filter((p) => (p.price ?? 0) <= Number(max));
-      }
+      if (min) list = list.filter((p) => monthlyRent(p) >= Number(min));
+      if (max) list = list.filter((p) => monthlyRent(p) <= Number(max));
     }
     if (search) {
       const s = search.toLowerCase();
@@ -132,59 +113,61 @@ function ListingsInner() {
       );
     }
     const sorted = [...list];
-    // Rents and purchase prices can't share one scale: sort each on its own
-    // (rent by monthly equivalent) and keep sales ahead of rentals.
-    const key = (p) => (isRental(p) ? monthlyRent(p) : p.price);
-    const byPrice = (dir) => (a, b) => {
-      const ra = isRental(a), rb = isRental(b);
-      if (ra !== rb) return ra ? 1 : -1;
-      const va = key(a), vb = key(b);
-      if (va == null) return 1;
-      if (vb == null) return -1;
-      return dir * (va - vb);
+    // "Price on request" rentals sink to the bottom either way.
+    const byRent = (dir) => (a, b) => {
+      if (!a.price) return 1;
+      if (!b.price) return -1;
+      return dir * (monthlyRent(a) - monthlyRent(b));
     };
-    if (sort === 'price-asc') sorted.sort(byPrice(1));
-    if (sort === 'price-desc') sorted.sort(byPrice(-1));
-    if (sort === 'yield-desc') sorted.sort((a, b) => (b.yield_percentage ?? -1) - (a.yield_percentage ?? -1));
+    if (sort === 'rent-asc') sorted.sort(byRent(1));
+    if (sort === 'rent-desc') sorted.sort(byRent(-1));
+    if (sort === 'available') {
+      // No date = ask; treat as after anything with a date.
+      const t = (p) => (p.available_from ? new Date(p.available_from).getTime() : Infinity);
+      sorted.sort((a, b) => t(a) - t(b));
+    }
     return sorted;
-  }, [all, market, type, beds, price, listingType, search, sort, rentView]);
+  }, [all, market, type, beds, furnishing, price, search, sort]);
 
-  const marketLabel = MARKETS.find((m) => m.key === market)?.label;
-  const hasFilters = !!(search || type || beds || price || listingType || (market && market !== 'all'));
-
+  const hasFilters = !!(search || type || beds || furnishing || price || (market && market !== 'all'));
   const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paged = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <main>
+      {/* Intro */}
+      <section className="pp-hero pp-hero--compact">
+        <div className="pp-container">
+          <div className="pp-eyebrow">CZAAH Property</div>
+          <h1>Homes &amp; spaces <span className="pp-gold">to rent.</span></h1>
+          <p className="pp-hero-lede">
+            Residential lets and commercial leases across London, Dubai and Pakistan — vetted
+            by CZAAH, with the terms stated up front: rent, deposit, minimum term and when
+            you can move in.
+          </p>
+        </div>
+      </section>
+
       <div className="pp-container">
         <div className="pp-crumbs">
-          <Link href="/property-portal">Home</Link> / Listings
+          <Link href="/property-portal">Home</Link> / Rent
         </div>
 
-        <div className="pp-listpage-head">
-          <h1>
-            Property <span className="pp-gold">Listings</span>
-            {marketLabel && market !== 'all' ? ` — ${marketLabel}` : ''}
-          </h1>
+        <div className="pp-listpage-head" style={{ paddingTop: 18 }}>
           <div className="pp-listpage-meta">
-            <span>{loading ? 'Loading…' : error ? 'Unavailable' : `${visible.length} ${visible.length === 1 ? 'listing' : 'listings'}`}</span>
+            <span>{loading ? 'Loading…' : error ? 'Unavailable' : `${visible.length} ${visible.length === 1 ? 'rental' : 'rentals'}`}</span>
             <label>
               Sort:{' '}
               <select value={sort} onChange={(e) => setParam({ sort: e.target.value })}>
-                {SORTS.map((s) => (
-                  <option key={s.v} value={s.v}>{s.l}</option>
-                ))}
+                {SORTS.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
               </select>
             </label>
             <label>
               Currency:{' '}
               <select value={ccy} onChange={(e) => setParam({ ccy: e.target.value })}>
                 <option value="">As listed</option>
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
+                {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </label>
           </div>
@@ -211,7 +194,7 @@ function ListingsInner() {
         >
           <input
             type="text"
-            placeholder="Search city, area or project…"
+            placeholder="Search city, area or building…"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -222,17 +205,17 @@ function ListingsInner() {
             {BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
           </select>
           <select value={price} onChange={(e) => setParam({ price: e.target.value })}>
-            {(rentView ? RENT_PRICES : PRICES).map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
+            {RENTS.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
           </select>
-          <select value={listingType} onChange={(e) => setParam({ listing_type: e.target.value, price: '' })}>
-            {LISTING_TYPES.map((l) => <option key={l.v} value={l.v}>{l.l}</option>)}
+          <select value={furnishing} onChange={(e) => setParam({ furnishing: e.target.value })}>
+            {FURNISHING.map((f) => <option key={f.v} value={f.v}>{f.l}</option>)}
           </select>
           <button type="submit">Search</button>
           {hasFilters && (
             <button
               type="button"
               className="pp-filters-reset"
-              onClick={() => router.push('/property-portal/listings')}
+              onClick={() => router.push('/property-portal/rent')}
             >
               Reset
             </button>
@@ -244,16 +227,24 @@ function ListingsInner() {
             {loading && Array.from({ length: 6 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
             {!loading && error && (
               <div className="pp-empty">
-                We couldn&apos;t load the listings just now.{' '}
+                We couldn&apos;t load the rentals just now.{' '}
                 <button type="button" className="pp-retry" onClick={reload}>Try again</button>
                 <span className="pp-empty-detail">{error}</span>
               </div>
             )}
             {!loading && !error && visible.length === 0 && (
-              <div className="pp-empty">
-                No listings match these filters.{' '}
-                <Link href="/property-portal/listings" className="pp-gold">Clear filters</Link>
-              </div>
+              hasFilters ? (
+                <div className="pp-empty">
+                  No rentals match these filters.{' '}
+                  <Link href="/property-portal/rent" className="pp-gold">Clear filters</Link>
+                </div>
+              ) : (
+                <div className="pp-empty">
+                  New rentals are being added. Tell us what you&apos;re looking for and we&apos;ll
+                  match you before it lists.{' '}
+                  <Link href="/property-portal/contact" className="pp-gold">Get in touch</Link>
+                </div>
+              )
             )}
             {!loading && !error && paged.map((prop) => (
               <PropertyCard key={prop.id} prop={prop} displayCurrency={ccy || undefined} />
@@ -262,12 +253,7 @@ function ListingsInner() {
 
           {!loading && !error && totalPages > 1 && (
             <div className="pp-pager">
-              <button
-                disabled={currentPage <= 1}
-                onClick={() => setParam({ page: String(currentPage - 1) })}
-              >
-                ← Prev
-              </button>
+              <button disabled={currentPage <= 1} onClick={() => setParam({ page: String(currentPage - 1) })}>← Prev</button>
               {Array.from({ length: totalPages }).map((_, i) => (
                 <button
                   key={i}
@@ -277,12 +263,7 @@ function ListingsInner() {
                   {i + 1}
                 </button>
               ))}
-              <button
-                disabled={currentPage >= totalPages}
-                onClick={() => setParam({ page: String(currentPage + 1) })}
-              >
-                Next →
-              </button>
+              <button disabled={currentPage >= totalPages} onClick={() => setParam({ page: String(currentPage + 1) })}>Next →</button>
             </div>
           )}
         </div>
@@ -291,10 +272,10 @@ function ListingsInner() {
   );
 }
 
-export default function ListingsPage() {
+export default function RentPage() {
   return (
     <Suspense fallback={<main><div className="pp-container"><div className="pp-listpage-grid"><div className="pp-grid">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="pp-skeleton" />)}</div></div></div></main>}>
-      <ListingsInner />
+      <RentInner />
     </Suspense>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { LiveProperty, convertPrice } from './types';
+import { LiveProperty, convertPrice, isRental } from './types';
 import { estimateAcquisitionCost, ACQUISITION_COST_ENABLED } from './acquisitionCosts';
 
 // Shows what a listing actually costs to acquire, not just its asking price.
@@ -30,7 +30,7 @@ export function AcquisitionCost({
     [prop.price, prop.country, prop.property_type, filer]
   );
 
-  if (!ACQUISITION_COST_ENABLED || !prop.price || est.unknown) return null;
+  if (!ACQUISITION_COST_ENABLED || isRental(prop) || !prop.price || est.unknown) return null;
 
   const fmt = (n: number) => {
     const v = ccy === prop.currency ? n : convertPrice(n, prop.currency, ccy);

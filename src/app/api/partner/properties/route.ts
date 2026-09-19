@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
+import { rentalTermsForInsert } from '@/lib/rentalTerms'
 
 
 function createAuthClient(request: NextRequest) {
@@ -166,6 +167,7 @@ export async function POST(request: NextRequest) {
         images: imageUrls,
         video_url: videoUrl || null,
         video_poster_url: videoPosterUrl || null,
+        ...rentalTermsForInsert(listingType, body),
         status: 'pending',
       })
       .select()

@@ -22,6 +22,11 @@ interface Property {
   images: string[]
   video_url?: string | null
   video_poster_url?: string | null
+  rent_period?: string | null
+  furnishing?: string | null
+  available_from?: string | null
+  deposit?: number | null
+  min_term_months?: number | null
   yield_percentage: number | null
   status: string
   rejection_notes: string | null
@@ -73,6 +78,11 @@ const emptyForm = {
   videoUrl: '',
   videoPosterUrl: '',
   yieldPercentage: '',
+  rentPeriod: 'month',
+  furnishing: '',
+  availableFrom: '',
+  deposit: '',
+  minTermMonths: '',
 }
 
 const inputStyle: React.CSSProperties = {
@@ -144,6 +154,42 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
           <input type="number" step="0.1" value={form.yieldPercentage} onChange={(e) => update('yieldPercentage', e.target.value)} placeholder="e.g. 7.5" style={inputStyle} />
         </div>
       </div>
+
+      {(form.listingType === 'rent' || form.listingType === 'lease') && (
+        <div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label style={labelStyle}>Rent Is Per</label>
+              <select value={form.rentPeriod} onChange={(e) => update('rentPeriod', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Deposit</label>
+              <input type="number" value={form.deposit} onChange={(e) => update('deposit', e.target.value)} placeholder="Same currency" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Min. Term (months)</label>
+              <input type="number" min={1} value={form.minTermMonths} onChange={(e) => update('minTermMonths', e.target.value)} placeholder="e.g. 12" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Furnishing</label>
+              <select value={form.furnishing} onChange={(e) => update('furnishing', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">Not stated</option>
+                <option value="furnished">Furnished</option>
+                <option value="part_furnished">Part furnished</option>
+                <option value="unfurnished">Unfurnished</option>
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Available From</label>
+              <input type="date" value={form.availableFrom} onChange={(e) => update('availableFrom', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+          <p style={hintStyle}>For rentals, Price is the rent for the period chosen here — UAE lets are usually quoted per year, UK and Pakistan per month.</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-4">
         <div>
@@ -318,6 +364,11 @@ export default function AdminPropertiesPage() {
       videoUrl: selected.video_url || '',
       videoPosterUrl: selected.video_poster_url || '',
       yieldPercentage: selected.yield_percentage != null ? String(selected.yield_percentage) : '',
+      rentPeriod: selected.rent_period || 'month',
+      furnishing: selected.furnishing || '',
+      availableFrom: selected.available_from || '',
+      deposit: selected.deposit != null ? String(selected.deposit) : '',
+      minTermMonths: selected.min_term_months != null ? String(selected.min_term_months) : '',
     })
     setEditError(null)
     setEditMode(true)

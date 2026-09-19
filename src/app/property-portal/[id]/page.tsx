@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { LiveProperty, LISTING_META, resolveImage, formatPrice, CURRENCIES, isNewListing, listedAgo } from '../_components/types';
+import { LiveProperty, LISTING_META, resolveImage, formatPrice, CURRENCIES, isNewListing, listedAgo, isRental, FURNISHING_LABEL } from '../_components/types';
 import { Lightbox } from '../_components/Lightbox';
 import { AcquisitionCost } from '../_components/AcquisitionCost';
 import { PropertyCard } from '../_components/PropertyCard';
@@ -56,6 +56,7 @@ export default function PropertyDetailPage() {
         if (!res.ok || cancelled) return;
         const others = (json?.data || []).filter((p) => p.id !== prop.id);
         const score = (p) =>
+          (isRental(p) === isRental(prop) ? 0 : 3) +
           (p.city === prop.city ? 0 : p.country === prop.country ? 1 : 2) +
           (p.property_type === prop.property_type ? 0 : 0.5);
         setSimilar(others.sort((a, b) => score(a) - score(b)).slice(0, 3));
@@ -142,12 +143,38 @@ export default function PropertyDetailPage() {
     prop.country && { k: 'Country', v: prop.country },
   ].filter(Boolean) as { k: string; v: string }[];
 
+  // Tenancy terms — only for rent/lease listings, and only the ones provided.
+  const rental = isRental(prop);
+  const money = (n: number) => `${prop.currency} ${Number(n).toLocaleString()}`;
+  const availableLabel = prop.available_from
+    ? new Date(prop.available_from) <= new Date()
+      ? 'Now'
+      : new Date(prop.available_from).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
+    : null;
+  const rentTerms = rental
+    ? ([
+        prop.price && { k: prop.rent_period === 'year' ? 'Annual rent' : 'Monthly rent', v: money(prop.price) },
+        prop.price && prop.rent_period === 'year' && { k: 'Monthly equivalent', v: `≈ ${money(Math.round(prop.price / 12))}` },
+        prop.deposit != null && { k: 'Deposit', v: money(prop.deposit) },
+        availableLabel && { k: 'Available', v: availableLabel },
+        prop.min_term_months != null && {
+          k: 'Minimum term',
+          v: prop.min_term_months % 12 === 0
+            ? `${prop.min_term_months / 12} year${prop.min_term_months === 12 ? '' : 's'}`
+            : `${prop.min_term_months} month${prop.min_term_months === 1 ? '' : 's'}`,
+        },
+        prop.furnishing && { k: 'Furnishing', v: FURNISHING_LABEL[prop.furnishing] || prop.furnishing },
+      ].filter(Boolean) as { k: string; v: string }[])
+    : [];
+
   return (
     <main>
       <div className="pp-container">
         <div className="pp-crumbs">
           <Link href="/property-portal">Home</Link> /{' '}
-          <Link href="/property-portal/listings">Listings</Link> / {prop.title}
+          {rental
+            ? <Link href="/property-portal/rent">Rent</Link>
+            : <Link href="/property-portal/listings">Listings</Link>} / {prop.title}
         </div>
 
         <div className="pp-detail">
@@ -238,6 +265,20 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
 
+              {rentTerms.length > 0 && (
+                <div className="pp-detail-section">
+                  <h2>Tenancy Terms</h2>
+                  <div className="pp-spec-grid">
+                    {rentTerms.map((s) => (
+                      <div className="pp-spec" key={s.k}>
+                        <span>{s.k}</span>
+                        <b>{s.v}</b>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <AcquisitionCost prop={prop} displayCurrency={ccy || prefCcy || undefined} />
 
               {prop.features && prop.features.length > 0 && (
@@ -284,13 +325,16 @@ export default function PropertyDetailPage() {
                 {prop.yield_percentage != null && (
                   <div><span>Est. yield</span><b>{prop.yield_percentage}%</b></div>
                 )}
+                {availableLabel && (
+                  <div><span>Available</span><b>{availableLabel}</b></div>
+                )}
               </div>
               <button
                 className="pp-btn pp-btn--gold"
                 onClick={handleEnquire}
                 disabled={enquiring}
               >
-                {enquiring ? 'Starting…' : 'Enquire About This Property'}
+                {enquiring ? 'Starting…' : rental ? 'Enquire About This Rental' : 'Enquire About This Property'}
               </button>
               {enquireError && <p className="pp-sell-err">{enquireError}</p>}
               <Link

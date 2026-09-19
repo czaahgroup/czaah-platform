@@ -17,6 +17,12 @@ export interface LiveProperty {
   /** Optional per-project clip; falls back to the market video. */
   video_url?: string | null;
   video_poster_url?: string | null;
+  /** Rental terms — only meaningful when listing_type is rent or lease. */
+  rent_period?: 'month' | 'year' | null;
+  furnishing?: 'furnished' | 'part_furnished' | 'unfurnished' | null;
+  available_from?: string | null;
+  deposit?: number | null;
+  min_term_months?: number | null;
   yield_percentage: number | null;
   partner_id?: string | null;
   created_at?: string | null;
@@ -112,18 +118,39 @@ export function convertPrice(price: number, from: string, to: string): number | 
   return (price / fromRate) * toRate;
 }
 
+// ── Rentals ──────────────────────────────────────────────────────────────
+// For rent/lease listings `price` is the periodic rent, not a capital value.
+// Anything that treats price as a purchase price — price/ft², yield averages,
+// acquisition cost, "From" labels, sale price bands — must skip rentals, or a
+// USD 4,500/month flat is read as a USD 4,500 property.
+export function isRental(p: Pick<LiveProperty, 'listing_type'>): boolean {
+  return p.listing_type === 'rent' || p.listing_type === 'lease';
+}
+export const isForSale = (p: Pick<LiveProperty, 'listing_type'>) => !isRental(p);
+
+export const FURNISHING_LABEL: Record<string, string> = {
+  furnished: 'Furnished',
+  part_furnished: 'Part furnished',
+  unfurnished: 'Unfurnished',
+};
+
 // `display` — optional target currency. When set and a rate is known, the price
 // is converted and shown with a "~" to flag it as approximate.
 export function formatPrice(
-  prop: Pick<LiveProperty, 'price' | 'currency'>,
+  prop: Pick<LiveProperty, 'price' | 'currency'> &
+    Partial<Pick<LiveProperty, 'listing_type' | 'rent_period'>>,
   display?: string
 ): string {
   if (!prop.price) return 'Price on request';
+  // A rental's price is per period; say which, or it reads as a sale price.
+  const per = prop.listing_type && isRental(prop as LiveProperty)
+    ? ` / ${prop.rent_period === 'year' ? 'year' : 'month'}`
+    : '';
   if (display && display !== prop.currency) {
     const converted = convertPrice(prop.price, prop.currency, display);
     if (converted != null) {
-      return `~ ${display} ${Math.round(converted).toLocaleString()}`;
+      return `~ ${display} ${Math.round(converted).toLocaleString()}${per}`;
     }
   }
-  return `${prop.currency} ${prop.price.toLocaleString()}`;
+  return `${prop.currency} ${prop.price.toLocaleString()}${per}`;
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
+import { rentalTermsForInsert } from '@/lib/rentalTerms'
 
 
 function createAuthClient(request: NextRequest) {
@@ -139,6 +140,7 @@ export async function POST(request: NextRequest) {
         video_url: videoUrl || null,
         video_poster_url: videoPosterUrl || null,
         yield_percentage: yieldPercentage || null,
+        ...rentalTermsForInsert(listingType, body),
         status: 'approved',
         approved_by: user.id,
         approved_at: new Date().toISOString(),

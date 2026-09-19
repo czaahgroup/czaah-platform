@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { PropertyCard } from './_components/PropertyCard';
 import { INSIGHTS } from './_components/insights-data';
 import { useListings } from './_components/useListings';
-import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice } from './_components/types';
+import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice, isRental } from './_components/types';
 import { useCurrencyPref } from './_components/usePortalPrefs';
 import { WHY_INVEST } from './_components/portal-content';
 import { destinationFor, slugForCity } from './_components/destinations';
@@ -133,14 +133,15 @@ export default function PropertyPortalHome() {
   const heroProjects = useMemo(() => {
     const picked: typeof properties = [];
     MARKET_MEDIA.forEach((m) => {
+      // Hero and showcase present projects; lettings live on /rent.
       const hit = properties.find(
-        (p) => p.country === m.country && (p.video_url || resolveImage(p.images?.[0]))
+        (p) => !isRental(p) && p.country === m.country && (p.video_url || resolveImage(p.images?.[0]))
       );
       if (hit) picked.push(hit);
     });
     // If a market has nothing live, backfill so the hero is never empty.
     if (picked.length === 0) {
-      return properties.filter((p) => resolveImage(p.images?.[0])).slice(0, 3);
+      return properties.filter((p) => !isRental(p) && resolveImage(p.images?.[0])).slice(0, 3);
     }
     return picked;
   }, [properties]);
@@ -181,7 +182,7 @@ export default function PropertyPortalHome() {
   const allocPreview = useMemo(() => {
     const by = new Map<string, { psf: number[]; y: number[] }>();
     properties.forEach((p) => {
-      if (!p.country || !p.price || !p.area_sqft) return;
+      if (isRental(p) || !p.country || !p.price || !p.area_sqft) return;
       const usd = p.currency === 'USD' ? p.price : convertPrice(p.price, p.currency, 'USD');
       if (usd == null || usd <= 0) return;
       if (!by.has(p.country)) by.set(p.country, { psf: [], y: [] });
@@ -210,6 +211,8 @@ export default function PropertyPortalHome() {
       if (hType && p.property_type !== hType) return false;
       if (hBeds && (p.bedrooms ?? -1) < Number(hBeds)) return false;
       if (hPrice) {
+        // The hero's bands are purchase prices; a monthly rent never matches.
+        if (isRental(p)) return false;
         const [min, max] = hPrice.split('-');
         if (min && (p.price ?? 0) < Number(min)) return false;
         if (max && (p.price ?? 0) > Number(max)) return false;
@@ -246,7 +249,7 @@ export default function PropertyPortalHome() {
   // The API returns newest-first, so the head of the list IS the latest intake.
   // Featured skips those so the two sections don't show the same properties.
   const heroIds = new Set(heroProjects.map((p) => p.id));
-  const showcase = properties.filter((p) => !heroIds.has(p.id) && resolveImage(p.images?.[0])).slice(0, 4);
+  const showcase = properties.filter((p) => !isRental(p) && !heroIds.has(p.id) && resolveImage(p.images?.[0])).slice(0, 4);
   const showcaseIds = new Set(showcase.map((p) => p.id));
   const featured = properties.filter((p) => !heroIds.has(p.id) && !showcaseIds.has(p.id));
   const newCount = properties.filter(isNewListing).length;

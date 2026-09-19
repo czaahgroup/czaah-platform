@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LiveProperty, LISTING_META, resolveImage, formatPrice, isNewListing } from './types';
+import { LiveProperty, LISTING_META, resolveImage, formatPrice, isNewListing, isRental } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 
 // Image-led portrait card: the photograph IS the card, with the detail laid
@@ -57,7 +57,7 @@ export function PropertyCard({
             {prop.country ? `, ${prop.country}` : ''}
           </p>
           <p className="pp-card-price">
-            {prop.price ? 'From ' : ''}
+            {prop.price && !isRental(prop) ? 'From ' : ''}
             {formatPrice(prop, shownCurrency)}
           </p>
           {summary && <p className="pp-card-summary">{summary}</p>}

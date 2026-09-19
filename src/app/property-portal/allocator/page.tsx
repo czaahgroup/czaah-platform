@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { PropertyCard } from '../_components/PropertyCard';
 import { useListings } from '../_components/useListings';
-import { CURRENCIES, convertPrice } from '../_components/types';
+import { CURRENCIES, convertPrice, isRental } from '../_components/types';
 import { slugForCity } from '../_components/destinations';
 
 // Jurisdiction notes shown alongside the numbers. These are positioning
@@ -36,7 +36,8 @@ export default function AllocatorPage() {
   const markets = useMemo(() => {
     const by = new Map<string, any[]>();
     all.forEach((p) => {
-      if (!p.country || !p.price || !p.area_sqft) return;
+      // A rental's price is rent, not value — it would wreck price/ft².
+      if (isRental(p) || !p.country || !p.price || !p.area_sqft) return;
       const usd = p.currency === 'USD' ? p.price : convertPrice(p.price, p.currency, 'USD');
       if (usd == null || usd <= 0) return;
       if (!by.has(p.country)) by.set(p.country, []);

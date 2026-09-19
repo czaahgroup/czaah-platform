@@ -39,7 +39,13 @@ export default function AddPropertyPage() {
     bathrooms: '',
     description: '',
     features: '',
+    rentPeriod: 'month',
+    furnishing: '',
+    availableFrom: '',
+    deposit: '',
+    minTermMonths: '',
   })
+  const isRentalListing = form.listingType === 'rent' || form.listingType === 'lease'
   const [imageFiles, setImageFiles] = useState<{ name: string; preview: string; data: string }[]>([])
 
   function updateField(key: string, value: string) {
@@ -85,6 +91,8 @@ export default function AddPropertyPage() {
           areaSqft: form.areaSqft ? Number(form.areaSqft) : null,
           bedrooms: form.bedrooms ? Number(form.bedrooms) : null,
           bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
+          deposit: form.deposit ? Number(form.deposit) : null,
+          minTermMonths: form.minTermMonths ? Number(form.minTermMonths) : null,
           images: imageFiles.map((img) => img.data),
         }),
       })
@@ -186,12 +194,12 @@ export default function AddPropertyPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '20px' }}>
             <div>
-              <label style={labelStyle}>Price</label>
+              <label style={labelStyle}>{isRentalListing ? 'Rent' : 'Price'}</label>
               <input
                 type="number"
                 value={form.price}
                 onChange={(e) => updateField('price', e.target.value)}
-                placeholder="e.g. 5000000"
+                placeholder={isRentalListing ? 'e.g. 150000' : 'e.g. 5000000'}
                 style={inputStyle}
               />
             </div>
@@ -210,6 +218,65 @@ export default function AddPropertyPage() {
               </select>
             </div>
           </div>
+
+          {isRentalListing && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>Rent Is Per</label>
+                <select
+                  value={form.rentPeriod}
+                  onChange={(e) => updateField('rentPeriod', e.target.value)}
+                  style={{ ...inputStyle, cursor: 'pointer' }}
+                >
+                  <option value="month">Month</option>
+                  <option value="year">Year</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Deposit</label>
+                <input
+                  type="number"
+                  value={form.deposit}
+                  onChange={(e) => updateField('deposit', e.target.value)}
+                  placeholder="Same currency as rent"
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Min. Term (months)</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={form.minTermMonths}
+                  onChange={(e) => updateField('minTermMonths', e.target.value)}
+                  placeholder="e.g. 12"
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Furnishing</label>
+                <select
+                  value={form.furnishing}
+                  onChange={(e) => updateField('furnishing', e.target.value)}
+                  style={{ ...inputStyle, cursor: 'pointer' }}
+                >
+                  <option value="">Not stated</option>
+                  <option value="furnished">Furnished</option>
+                  <option value="part_furnished">Part furnished</option>
+                  <option value="unfurnished">Unfurnished</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Available From</label>
+                <input
+                  type="date"
+                  value={form.availableFrom}
+                  onChange={(e) => updateField('availableFrom', e.target.value)}
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <div style={{ background: '#0e0e0e', border: '1px solid rgba(77,70,55,0.25)', borderRadius: '0px', padding: '32px', marginBottom: '24px' }}>

@@ -10,6 +10,7 @@ import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 const LINKS = [
   { label: 'Destinations', href: '/property-portal/destinations' },
   { label: 'Off-Plan', href: '/property-portal/off-plan' },
+  { label: 'Rent', href: '/property-portal/rent' },
   { label: 'Allocate Capital', href: '/property-portal/allocator' },
   { label: 'Insights', href: '/property-portal/insights' },
   { label: 'Sell With Us', href: '/property-portal/sell' },
