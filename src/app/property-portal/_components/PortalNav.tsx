@@ -32,7 +32,13 @@ function hasHero(pathname: string) {
 export function PortalNav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
+  // On property.czaah.com the address bar shows clean paths (/buy) while the
+  // links and checks below use the internal ones (/property-portal/buy).
+  // Map back so the active link and the over-hero state work on both hosts.
+  const rawPath = usePathname() || '/';
+  const pathname = rawPath.startsWith('/property-portal')
+    ? rawPath
+    : `/property-portal${rawPath === '/' ? '' : rawPath}`;
   const { currency, setCurrency } = useCurrencyPref();
   const { count } = useWishlist();
 
