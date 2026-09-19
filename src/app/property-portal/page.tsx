@@ -39,6 +39,10 @@ const MARKETS = [
 // London → Dubai → Pakistan and back. Masters live in "Home Hero/" (not
 // committed); these are 1600×900, 10 s, silent web encodes in /public/videos.
 const HERO_REEL = [
+  // Night-city footage added 2026-09-19 (stock clips; not location-specific).
+  { key: 'night-skyline', label: 'City at night', video: '/videos/night-skyline.mp4', poster: '/videos/night-skyline.jpg' },
+  { key: 'night-river', label: 'City at night', video: '/videos/night-river.mp4', poster: '/videos/night-river.jpg' },
+  { key: 'night-towers', label: 'City at night', video: '/videos/night-towers.mp4', poster: '/videos/night-towers.jpg' },
   { key: 'london-thames', label: 'London', video: '/videos/london-thames.mp4', poster: '/videos/london-thames.jpg' },
   { key: 'dubai-marina', label: 'Dubai', video: '/videos/dubai-marina.mp4', poster: '/videos/dubai-marina.jpg' },
   { key: 'pakistan-night', label: 'Pakistan', video: '/videos/pakistan-night.mp4', poster: '/videos/pakistan-night.jpg' },
