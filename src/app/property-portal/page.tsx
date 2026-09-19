@@ -37,8 +37,11 @@ const MARKETS = [
 // is all that shows on slow connections or under prefers-reduced-motion.
 const HERO_REEL = [
   { key: 'night-skyline', label: 'City at night', video: '/videos/night-skyline.mp4', poster: '/videos/night-skyline.jpg' },
+  { key: 'dubai-villa-daynight', label: 'Dubai', video: '/videos/dubai-villa-daynight.mp4', poster: '/videos/dubai-villa-daynight.jpg' },
   { key: 'night-river', label: 'City at night', video: '/videos/night-river.mp4', poster: '/videos/night-river.jpg' },
+  { key: 'dubai-villa', label: 'Dubai', video: '/videos/dubai-villa.mp4', poster: '/videos/dubai-villa.jpg' },
   { key: 'night-towers', label: 'City at night', video: '/videos/night-towers.mp4', poster: '/videos/night-towers.jpg' },
+  { key: 'dubai-playground', label: 'Dubai', video: '/videos/dubai-playground.mp4', poster: '/videos/dubai-playground.jpg' },
 ];
 
 // Listings uploaded with their own clip join the front of the reel, newest
