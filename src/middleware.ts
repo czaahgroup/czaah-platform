@@ -27,8 +27,21 @@ export async function middleware(request: NextRequest) {
       '/investments',
       '/process',
     ]
+    // Portal pages link to their internal /property-portal/... paths (so the
+    // same components work on czaah.com/property-portal). On this host that
+    // would expose the folder name and give every page two URLs, so send the
+    // visitor to the clean address. Client-side navigation follows the
+    // redirect and shows the clean URL too.
+    if (pathname === '/property-portal' || pathname.startsWith('/property-portal/')) {
+      const url = request.nextUrl.clone()
+      url.pathname = pathname.slice('/property-portal'.length) || '/'
+      url.protocol = 'https:'
+      url.host = host
+      url.port = ''
+      return NextResponse.redirect(url, 308)
+    }
     const isShared = pathname.startsWith('/api/') || sharedPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))
-    if (!isShared && !pathname.startsWith('/property-portal')) {
+    if (!isShared) {
       const url = request.nextUrl.clone()
       url.pathname = `/property-portal${pathname === '/' ? '' : pathname}`
       return NextResponse.rewrite(url)
