@@ -14,6 +14,11 @@
 // professional can check and correct them without reading any other code.
 // ============================================================================
 
+// Master switch. OFF until every rate below has been verified by a qualified
+// adviser in its jurisdiction — the block renders nothing while this is false.
+// Flip to true once signed off; no other change is needed.
+export const ACQUISITION_COST_ENABLED = false;
+
 export interface CostLine {
   label: string;
   amount: number;

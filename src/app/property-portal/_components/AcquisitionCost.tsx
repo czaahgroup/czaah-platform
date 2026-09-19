@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { LiveProperty, convertPrice } from './types';
-import { estimateAcquisitionCost } from './acquisitionCosts';
+import { estimateAcquisitionCost, ACQUISITION_COST_ENABLED } from './acquisitionCosts';
 
 // Shows what a listing actually costs to acquire, not just its asking price.
 // Cross-border buyers routinely underestimate this by 5–20% depending on
@@ -30,7 +30,7 @@ export function AcquisitionCost({
     [prop.price, prop.country, prop.property_type, filer]
   );
 
-  if (!prop.price || est.unknown) return null;
+  if (!ACQUISITION_COST_ENABLED || !prop.price || est.unknown) return null;
 
   const fmt = (n: number) => {
     const v = ccy === prop.currency ? n : convertPrice(n, prop.currency, ccy);
