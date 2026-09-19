@@ -153,7 +153,7 @@ export default function ContactPage() {
               </div>
               <div className="flex flex-col gap-4">
                 {[
-                  { icon: 'location_city', title: 'London Office', desc: 'CZAAH International\nBerkeley Square, Mayfair\nLondon, W1J 6BD' },
+                  { icon: 'location_city', title: 'London Office', desc: 'CZAAH International\n124 City Road\nLondon, EC1V 2NX' },
                   { icon: 'apartment', title: 'Islamabad Office', desc: 'CZAAH Capital & Ventures\nEmirates Tower, F-7 Markaz\nIslamabad, Pakistan' },
                   { icon: 'euro', title: 'Brussels Office', desc: 'Rue de la Tour Japonaise, 14\n1120 Bruxelles\nBelgium' },
                   { icon: 'domain', title: 'Hong Kong Office', desc: 'RM 1805-06, 18/F\nHollywood Plaza, 610 Nathan Road\nKowloon, Hong Kong' },

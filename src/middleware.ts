@@ -10,7 +10,23 @@ export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') || ''
   if (host === 'property.czaah.com') {
     const { pathname } = request.nextUrl
-    const sharedPaths = ['/login', '/register', '/reset-password', '/contact']
+    // Paths served by the MAIN site on this host too. Anything not listed here
+    // and not already under /property-portal gets rewritten — and because
+    // /property-portal/[id] is a catch-all, an unlisted path silently renders
+    // an empty "property detail" page with HTTP 200 rather than a 404. Legal,
+    // group and sector pages must therefore stay listed.
+    const sharedPaths = [
+      '/login',
+      '/register',
+      '/reset-password',
+      '/terms',
+      '/privacy',
+      '/faq',
+      '/team',
+      '/sectors',
+      '/investments',
+      '/process',
+    ]
     const isShared = pathname.startsWith('/api/') || sharedPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))
     if (!isShared && !pathname.startsWith('/property-portal')) {
       const url = request.nextUrl.clone()

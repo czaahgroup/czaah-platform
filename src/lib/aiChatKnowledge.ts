@@ -72,7 +72,7 @@ const GENERAL_TOPICS: Topic[] = [
   },
   {
     test: (m) => includesAny(m, ['contact', 'office', 'email', 'address', 'phone', 'reach you', 'get in touch', 'location']),
-    reply: "You can reach us at info@czaah.com or through the Contact page. Our offices: London (Berkeley Square, Mayfair — group headquarters), Islamabad, Brussels, and Hong Kong.",
+    reply: "You can reach us at info@czaah.com or through the Contact page. Our offices: London (124 City Road, EC1V 2NX — group headquarters), Islamabad, Brussels, and Hong Kong.",
   },
   {
     test: (m) => includesAny(m, ['team', 'leadership', 'founder', 'ceo', 'director', 'who runs', 'management']),

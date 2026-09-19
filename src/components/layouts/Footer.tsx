@@ -1,8 +1,9 @@
 import Link from 'next/link'
+import { PROPERTY_PORTAL_URL } from '@/lib/portalUrl'
 
 const SECTORS = [
   { label: 'Mines & Minerals', href: '/sectors/minerals' },
-  { label: 'Real Estate', href: '/sectors/realestate' },
+  { label: 'Real Estate', href: PROPERTY_PORTAL_URL },
   { label: 'Technology & IT', href: '/sectors/technology' },
   { label: 'Textiles & Trade', href: '/sectors/textiles' },
   { label: 'Agriculture', href: '/sectors/agriculture' },
