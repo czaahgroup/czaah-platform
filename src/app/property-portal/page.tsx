@@ -1,12 +1,16 @@
 'use client';
 // @ts-nocheck
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { PropertyCard } from './_components/PropertyCard';
-import { LiveProperty } from './_components/types';
 import { INSIGHTS } from './_components/insights-data';
+import { useListings } from './_components/useListings';
+import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice } from './_components/types';
+import { useCurrencyPref } from './_components/usePortalPrefs';
+import { WHY_INVEST } from './_components/portal-content';
+import { destinationFor, slugForCity } from './_components/destinations';
 
 
 const MARKETS = [
@@ -25,6 +29,42 @@ const MARKETS = [
     name: 'Pakistan',
     blurb: 'Commercial, industrial and Special Economic Zone assets across Islamabad, Lahore, Karachi and the CPEC corridor — CZAAH-vetted with local partners on the ground.',
   },
+];
+
+// CZAAH's own footage, one clip per market. Each is a silent ~10s loop
+// compressed for web (the 4K masters are 82MB and exceed Cloudflare's 25MiB
+// per-asset limit, so they are not shipped). The poster paints instantly and
+// is all that shows on slow connections or under prefers-reduced-motion.
+const MARKET_MEDIA = [
+  { country: 'United Kingdom', label: 'London', video: '/videos/london.mp4', poster: '/videos/london.jpg' },
+  { country: 'United Arab Emirates', label: 'Dubai', video: '/videos/dubai.mp4', poster: '/videos/dubai.jpg' },
+  { country: 'Pakistan', label: 'Pakistan', video: '/videos/pakistan.mp4', poster: '/videos/pakistan.jpg' },
+];
+
+const HERO_TYPES = [
+  { v: '', l: 'Any type' },
+  { v: 'residential', l: 'Residential' },
+  { v: 'commercial', l: 'Commercial' },
+  { v: 'industrial', l: 'Industrial' },
+  { v: 'mixed_use', l: 'Mixed Use' },
+  { v: 'land', l: 'Land' },
+];
+
+const HERO_BEDS = [
+  { v: '', l: 'Any beds' },
+  { v: '1', l: '1+' },
+  { v: '2', l: '2+' },
+  { v: '3', l: '3+' },
+  { v: '4', l: '4+' },
+];
+
+const HERO_PRICES = [
+  { v: '', l: 'Any price' },
+  { v: '0-250000', l: 'Up to 250k' },
+  { v: '250000-500000', l: '250k – 500k' },
+  { v: '500000-1000000', l: '500k – 1M' },
+  { v: '1000000-3000000', l: '1M – 3M' },
+  { v: '3000000-', l: '3M +' },
 ];
 
 const VALUE_POINTS = [
@@ -75,100 +115,447 @@ const STATS = [
 
 export default function PropertyPortalHome() {
   const router = useRouter();
-  const [properties, setProperties] = useState<LiveProperty[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [listingType, setListingType] = useState<'sale' | 'rent'>('sale');
+  const { all: properties, loading, error, reload } = useListings();
   const [q, setQ] = useState('');
+  const [hType, setHType] = useState('');
+  const [hBeds, setHBeds] = useState('');
+  const [hPrice, setHPrice] = useState('');
+  const [hDest, setHDest] = useState('');
   const [testimonial, setTestimonial] = useState(0);
+  const [slide, setSlide] = useState(0);
+  const [whyMarket, setWhyMarket] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const { currency: currencyPref } = useCurrencyPref();
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(
-          '/api/public/properties?countries=' +
-            encodeURIComponent('Pakistan,United Kingdom,United Arab Emirates')
-        );
-        const json = await res.json();
-        if (res.ok) setProperties(json.data || []);
-      } finally {
-        setLoading(false);
-      }
+  // One project per market, newest first, so the hero tours London → Dubai →
+  // Pakistan with CZAAH's own footage of each behind it. Showing the three
+  // newest overall would have put three London projects over the same clip.
+  const heroProjects = useMemo(() => {
+    const picked: typeof properties = [];
+    MARKET_MEDIA.forEach((m) => {
+      const hit = properties.find(
+        (p) => p.country === m.country && (p.video_url || resolveImage(p.images?.[0]))
+      );
+      if (hit) picked.push(hit);
+    });
+    // If a market has nothing live, backfill so the hero is never empty.
+    if (picked.length === 0) {
+      return properties.filter((p) => resolveImage(p.images?.[0])).slice(0, 3);
     }
-    load();
+    return picked;
+  }, [properties]);
+
+  // Visitors who ask the OS for reduced motion get the still poster instead of
+  // autoplaying footage, and the slides stop advancing on their own.
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => setReduceMotion(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
   }, []);
+
+  // Hero slides rotate on their own; pausing isn't needed since nothing in the
+  // slide is interactive beyond the CTA, which is identical on every slide.
+  useEffect(() => {
+    if (reduceMotion) return;
+    const t = setInterval(() => setSlide((s) => (s + 1) % Math.max(1, heroProjects.length)), 8000);
+    return () => clearInterval(t);
+  }, [reduceMotion, heroProjects.length]);
+
+  // Destinations that actually have stock, for the hero bar.
+  const destOptions = useMemo(() => {
+    const seen = new Map();
+    properties.forEach((p) => {
+      if (!p.city) return;
+      if (!seen.has(p.city)) seen.set(p.city, 0);
+      seen.set(p.city, seen.get(p.city) + 1);
+    });
+    return [...seen.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([city, n]) => ({ city, n }));
+  }, [properties]);
+
+  // Headline numbers for the allocator teaser: average yield and entry cost
+  // per market, normalised to USD so the three are actually comparable.
+  const allocPreview = useMemo(() => {
+    const by = new Map<string, { psf: number[]; y: number[] }>();
+    properties.forEach((p) => {
+      if (!p.country || !p.price || !p.area_sqft) return;
+      const usd = p.currency === 'USD' ? p.price : convertPrice(p.price, p.currency, 'USD');
+      if (usd == null || usd <= 0) return;
+      if (!by.has(p.country)) by.set(p.country, { psf: [], y: [] });
+      const e = by.get(p.country)!;
+      e.psf.push(usd / p.area_sqft);
+      if (p.yield_percentage != null) e.y.push(p.yield_percentage);
+    });
+    const avg = (a: number[]) => a.reduce((x, y) => x + y, 0) / a.length;
+    return [...by.entries()]
+      .filter(([, v]) => v.y.length > 0)
+      .map(([country, v]) => ({
+        country,
+        yieldPct: avg(v.y),
+        psf: `USD ${Math.round(avg(v.psf)).toLocaleString()}`,
+      }))
+      .sort((a, b) => b.yieldPct - a.yieldPct)
+      .slice(0, 3);
+  }, [properties]);
+
+  // Live count for the hero CTA — mirrors exactly the filtering the listings
+  // page will apply, so "Show N results" never over-promises.
+  const heroMatches = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    return properties.filter((p) => {
+      if (hDest && p.city !== hDest) return false;
+      if (hType && p.property_type !== hType) return false;
+      if (hBeds && (p.bedrooms ?? -1) < Number(hBeds)) return false;
+      if (hPrice) {
+        const [min, max] = hPrice.split('-');
+        if (min && (p.price ?? 0) < Number(min)) return false;
+        if (max && (p.price ?? 0) > Number(max)) return false;
+      }
+      if (term) {
+        const hay = `${p.title} ${p.location} ${p.city} ${p.country} ${p.description}`.toLowerCase();
+        if (!hay.includes(term)) return false;
+      }
+      return true;
+    }).length;
+  }, [properties, q, hType, hBeds, hPrice, hDest]);
 
   function runSearch(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
     if (q.trim()) params.set('search', q.trim());
-    params.set('listing_type', listingType);
+    if (hType) params.set('type', hType);
+    if (hBeds) params.set('beds', hBeds);
+    if (hPrice) params.set('price', hPrice);
+    // A destination on its own is a browse intent, not a filter — send
+    // them to the destination page rather than a filtered flat list.
+    if (hDest) {
+      const onlyDest = !q.trim() && !hType && !hBeds && !hPrice;
+      const slug = slugForCity(hDest);
+      if (onlyDest && slug) {
+        router.push(`/property-portal/destinations/${slug}`);
+        return;
+      }
+      params.set('search', hDest);
+    }
     router.push(`/property-portal/listings?${params.toString()}`);
   }
 
-  const featured = properties.slice(0, 6);
+  // The API returns newest-first, so the head of the list IS the latest intake.
+  // Featured skips those so the two sections don't show the same properties.
+  const heroIds = new Set(heroProjects.map((p) => p.id));
+  const showcase = properties.filter((p) => !heroIds.has(p.id) && resolveImage(p.images?.[0])).slice(0, 4);
+  const showcaseIds = new Set(showcase.map((p) => p.id));
+  const featured = properties.filter((p) => !heroIds.has(p.id) && !showcaseIds.has(p.id));
+  const newCount = properties.filter(isNewListing).length;
   const insightTeasers = INSIGHTS.slice(0, 3);
 
   return (
-    <main>
-      {/* ── HERO ───────────────────────────────────────────── */}
-      <section className="pp-hero">
-        <div className="pp-container">
-          <div className="pp-eyebrow">CZAAH Property Portal</div>
-          <h1>
-            Property investment across{' '}
-            <span className="pp-gold">London, Dubai &amp; Pakistan.</span>
-          </h1>
-          <p className="pp-hero-lede">
-            Your property partner across London, Dubai and Pakistan — pre-vetted, title-verified
-            opportunities with structured access and end-to-end transaction support from a
-            single institutional counterparty.
-          </p>
+    <main>      {/* ── HERO ───────────────────────────────────────────── */}
+      <section className="pp-hero pp-hero--slides">
+        <div className="pp-hero-media" aria-hidden="true">
+          {heroProjects.map((p, i) => {
+            // A project's own clip wins over its market's. That is the whole
+            // point of the field: upload footage with the listing and the
+            // hero uses it, with no code change.
+            const market = MARKET_MEDIA.find((m) => m.country === p.country);
+            const video = p.video_url || market?.video || null;
+            const still =
+              p.video_poster_url || resolveImage(p.images?.[0]) || market?.poster || '';
+            const media = video ? { video, poster: still } : null;
+            const active = i === slide;
+            return (
+              <div key={p.id} className={`pp-hero-slide${active ? ' is-active' : ''}`}>
+                {active && media && !reduceMotion ? (
+                  <video
+                    className="pp-hero-video"
+                    src={media.video}
+                    poster={media.poster}
+                    autoPlay
+                    loop
+                    playsInline
+                    preload="auto"
+                    // React does not reliably emit the `muted` ATTRIBUTE from
+                    // the JSX prop, and Chrome blocks autoplay on any video it
+                    // does not consider muted — which leaves the hero frozen
+                    // on its poster. Set the property directly.
+                    ref={(el) => {
+                      if (!el) return;
+                      el.muted = true;
+                      el.defaultMuted = true;
+                    }}
+                    // play() must wait for data: called at mount (readyState 0)
+                    // it resolves but the element stays paused. This also
+                    // covers Safari ignoring `autoplay` on a fresh mount.
+                    onCanPlay={(e) => {
+                      const el = e.currentTarget;
+                      el.muted = true;
+                      el.play().catch(() => {});
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="pp-hero-video"
+                    style={{
+                      backgroundImage: `url(${still})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
 
+        <div className="pp-container pp-hero-body">
+          <div className="pp-hero-bottom">
           <form className="pp-search" onSubmit={runSearch}>
-            <div className="pp-search-toggle">
-              <button
-                type="button"
-                className={listingType === 'sale' ? 'active' : ''}
-                onClick={() => setListingType('sale')}
-              >
-                For Sale
+            <div className="pp-searchbar">
+              <label className="pp-searchbar-field">
+                <span>Destination</span>
+                <select value={hDest} onChange={(e) => setHDest(e.target.value)}>
+                  <option value="">Any destination</option>
+                  {destOptions.map((d) => (
+                    <option key={d.city} value={d.city}>{d.city} ({d.n})</option>
+                  ))}
+                </select>
+              </label>
+              <label className="pp-searchbar-field">
+                <span>Property type</span>
+                <select value={hType} onChange={(e) => setHType(e.target.value)}>
+                  {HERO_TYPES.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
+                </select>
+              </label>
+              <label className="pp-searchbar-field">
+                <span>Bedrooms</span>
+                <select value={hBeds} onChange={(e) => setHBeds(e.target.value)}>
+                  {HERO_BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
+                </select>
+              </label>
+              <label className="pp-searchbar-field">
+                <span>Price range</span>
+                <select value={hPrice} onChange={(e) => setHPrice(e.target.value)}>
+                  {HERO_PRICES.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
+                </select>
+              </label>
+              <button type="submit" className="pp-searchbar-go">
+                Search properties
               </button>
-              <button
-                type="button"
-                className={listingType === 'rent' ? 'active' : ''}
-                onClick={() => setListingType('rent')}
-              >
-                For Rent
-              </button>
-            </div>
-            <div className="pp-search-row">
-              <input
-                type="text"
-                placeholder="Search by city, area or project…"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-              />
-              <button type="submit">Search</button>
             </div>
           </form>
 
-          <div className="pp-hero-stats">
-            <div>
-              <span>{loading ? '—' : properties.length}</span>
-              <small>Live Listings</small>
+          <div className="pp-hero-dots">
+            {heroProjects.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={i === slide ? 'is-active' : ''}
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => setSlide(i)}
+              />
+            ))}
+          </div>
+          </div>
+
+          {error && (
+            <p className="pp-hero-error">
+              Listings are temporarily unavailable.{' '}
+              <button type="button" className="pp-retry" onClick={reload}>Try again</button>
+            </p>
+          )}
+        </div>
+      </section>
+      {/* ── PROJECT SHOWCASE ───────────────────────────────── */}
+      {/* Full-viewport panels: scrolling on from the hero keeps every project
+          at full-bleed scale rather than dropping straight to small cards. */}
+      <section className="pp-showcase" id="latest">
+        {showcase.map((p, i) => (
+          <article className="pp-show" key={p.id}>
+            <div
+              className="pp-show-img"
+              style={{ backgroundImage: `url(${resolveImage(p.images?.[0])})` }}
+              aria-hidden="true"
+            />
+            <div className="pp-container pp-show-body">
+              <div className="pp-show-panel">
+                <div className="pp-show-index">
+                  {String(i + 1).padStart(2, '0')} / {String(showcase.length).padStart(2, '0')}
+                </div>
+                <Link href={`/property-portal/${p.id}`} className="pp-show-title-link">
+                  <h2 className="pp-show-title">{p.title}</h2>
+                </Link>
+                <p className="pp-show-loc">
+                  {p.location}
+                  {p.city ? `, ${p.city}` : ''}
+                  {p.country ? `, ${p.country}` : ''}
+                </p>
+                {p.description && <p className="pp-show-desc">{p.description}</p>}
+                <div className="pp-show-stats">
+                  <div>
+                    <small>Price</small>
+                    <b>{formatPrice(p, currencyPref || undefined)}</b>
+                  </div>
+                  {p.area_sqft != null && (
+                    <div>
+                      <small>Area</small>
+                      <b>{p.area_sqft.toLocaleString()} ft&sup2;</b>
+                    </div>
+                  )}
+                  {p.yield_percentage != null && (
+                    <div>
+                      <small>Yield</small>
+                      <b>{p.yield_percentage}%</b>
+                    </div>
+                  )}
+                  <div>
+                    <small>Type</small>
+                    <b>{p.property_type?.replace('_', ' ')}</b>
+                  </div>
+                </div>
+                <div className="pp-show-actions">
+                  <Link href={`/property-portal/${p.id}`} className="pp-btn pp-btn--gold">
+                    View project
+                  </Link>
+                  <Link
+                    href={`/property-portal/contact?ref=${encodeURIComponent(p.title)}`}
+                    className="pp-btn pp-btn--glass"
+                  >
+                    Enquire
+                  </Link>
+                </div>
+              </div>
             </div>
+          </article>
+        ))}
+      </section>
+
+      {/* ── DESTINATIONS ───────────────────────────────────── */}
+      <section className="pp-section">
+        <div className="pp-container">
+          <div className="pp-section-head">
             <div>
-              <span>3</span>
-              <small>Markets</small>
+              <div className="pp-eyebrow">Where We Operate</div>
+              <h2 className="pp-h2">Explore by destination</h2>
             </div>
+            <Link href="/property-portal/destinations" className="pp-link-arrow">
+              All destinations →
+            </Link>
+          </div>
+          <p className="pp-section-lead" style={{ marginBottom: 36, maxWidth: 700 }}>
+            Each market is covered by a local CZAAH partner. Start with a place to see what we
+            hold there and why it earns its position.
+          </p>
+          <div className="pp-dest-grid">
+            {loading &&
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="pp-skeleton" style={{ height: 300 }} />
+              ))}
+            {!loading && !error && destOptions.slice(0, 6).map((d) => {
+              const meta = destinationFor(d.city);
+              const withImg = properties.find((p) => p.city === d.city && p.images?.[0]);
+              const img = withImg ? resolveImage(withImg.images[0]) : null;
+              return (
+                <Link
+                  key={d.city}
+                  href={`/property-portal/destinations/${slugForCity(d.city)}`}
+                  className="pp-dest"
+                >
+                  <div className="pp-dest-img">
+                    {img ? <img src={img} alt={d.city} loading="lazy" /> : <div className="pp-card-img--empty">⌂</div>}
+                    <span className="pp-dest-count">{d.n} {d.n === 1 ? 'property' : 'properties'}</span>
+                  </div>
+                  <div className="pp-dest-body">
+                    <h2>{d.city}</h2>
+                    <span className="pp-dest-country">{meta?.country || ''}</span>
+                    {meta?.tagline && <p className="pp-dest-tagline">{meta.tagline}</p>}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>      {/* ── ALLOCATOR ──────────────────────────────────────── */}
+      <section className="pp-section pp-alloc-band">
+        <div className="pp-container">
+          <div className="pp-alloc-promo">
             <div>
-              <span>1</span>
-              <small>Counterparty</small>
+              <div className="pp-eyebrow">Cross-market comparison</div>
+              <h2 className="pp-h2">Where should your capital go?</h2>
+              <p className="pp-section-lead">
+                Every other property portal asks which unit you want. That&apos;s the second
+                question. The first is which market your money belongs in — and because we
+                transact in all of ours, we can answer it with the same numbers on every side.
+              </p>
+              <Link href="/property-portal/allocator" className="pp-btn pp-btn--gold">
+                Compare our markets
+              </Link>
+            </div>
+            <div className="pp-alloc-promo-stats">
+              {allocPreview.map((a) => (
+                <div key={a.country}>
+                  <span className="pp-alloc-promo-num">{a.yieldPct.toFixed(1)}%</span>
+                  <small>{a.country}</small>
+                  <em>{a.psf} / ft&sup2;</em>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
+      {/* ── WHY INVEST ─────────────────────────────────────── */}
+      <section className="pp-section pp-stats-band">
+        <div className="pp-container">
+          <h2 className="pp-h2" style={{ textAlign: 'center', marginBottom: 10 }}>
+            Why invest in <span className="pp-gold">{WHY_INVEST[whyMarket].market}</span>?
+          </h2>
+          <div className="pp-why-tabs">
+            {WHY_INVEST.map((w, i) => (
+              <button
+                key={w.market}
+                type="button"
+                className={i === whyMarket ? 'active' : ''}
+                onClick={() => setWhyMarket(i)}
+              >
+                {w.market}
+              </button>
+            ))}
+          </div>
+          <div className="pp-why-grid">
+            {WHY_INVEST[whyMarket].points.map((p) => (
+              <div className="pp-why-tile" key={p.title}>
+                <h3>{p.title}</h3>
+                <p>{p.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* ── FEATURED LISTINGS ──────────────────────────────── */}
+      <section className="pp-section pp-stats-band">
+        <div className="pp-container">
+          <div className="pp-section-head">
+            <div>
+              <div className="pp-eyebrow">Selected</div>
+              <h2 className="pp-h2">Featured opportunities</h2>
+            </div>
+            <Link href="/property-portal/listings" className="pp-link-arrow">
+              View all listings →
+            </Link>
+          </div>
+          <div className="pp-grid">
+            {loading &&
+              Array.from({ length: 3 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
+            {!loading && !error && featured.length === 0 && (
+              <div className="pp-empty">More opportunities are being prepared — check back shortly.</div>
+            )}
+            {!loading && !error && featured.map((prop) => <PropertyCard key={prop.id} prop={prop} />)}
+          </div>
+        </div>
+      </section>
       {/* ── ABOUT BAND ─────────────────────────────────────── */}
       <section className="pp-section">
         <div className="pp-container">
@@ -202,53 +589,6 @@ export default function PropertyPortalHome() {
           </div>
         </div>
       </section>
-
-      {/* ── FEATURED LISTINGS ──────────────────────────────── */}
-      <section className="pp-section pp-stats-band">
-        <div className="pp-container">
-          <div className="pp-section-head">
-            <div>
-              <div className="pp-eyebrow">The Latest</div>
-              <h2 className="pp-h2">Featured opportunities</h2>
-            </div>
-            <Link href="/property-portal/listings" className="pp-link-arrow">
-              View all listings →
-            </Link>
-          </div>
-          <div className="pp-grid">
-            {loading &&
-              Array.from({ length: 3 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
-            {!loading && featured.length === 0 && (
-              <div className="pp-empty">No listings are live right now — check back shortly.</div>
-            )}
-            {!loading && featured.map((prop) => <PropertyCard key={prop.id} prop={prop} />)}
-          </div>
-        </div>
-      </section>
-
-      {/* ── MARKETS ────────────────────────────────────────── */}
-      <section className="pp-section">
-        <div className="pp-container">
-          <div className="pp-eyebrow">Where We Operate</div>
-          <h2 className="pp-h2">Three markets, one desk.</h2>
-          <p className="pp-section-lead" style={{ marginBottom: 40 }}>
-            Each market is covered by a local CZAAH partner. Filter the portal by market, or
-            speak to the team about a specific city or asset class.
-          </p>
-          <div className="pp-markets">
-            {MARKETS.map((m) => (
-              <div className="pp-market" key={m.key}>
-                <h3>{m.name}</h3>
-                <p>{m.blurb}</p>
-                <Link href={`/property-portal/listings?market=${m.key}`} className="pp-link-arrow">
-                  View {m.name} listings →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── CLIENTS STRIP ──────────────────────────────────── */}
       <section className="pp-clients-band">
         <div className="pp-container">
@@ -262,7 +602,6 @@ export default function PropertyPortalHome() {
           </div>
         </div>
       </section>
-
       {/* ── TESTIMONIALS ───────────────────────────────────── */}
       <section className="pp-section pp-stats-band">
         <div className="pp-container">
@@ -287,7 +626,6 @@ export default function PropertyPortalHome() {
           </div>
         </div>
       </section>
-
       {/* ── INSIGHTS TEASER ────────────────────────────────── */}
       <section className="pp-section">
         <div className="pp-container">
@@ -312,28 +650,6 @@ export default function PropertyPortalHome() {
           </div>
         </div>
       </section>
-
-      {/* ── MARKET NOTES CTA ───────────────────────────────── */}
-      <section className="pp-section--tight">
-        <div className="pp-container">
-          <div className="pp-report">
-            <div>
-              <div className="pp-eyebrow">CZAAH Research</div>
-              <h2 className="pp-h2" style={{ marginBottom: 12 }}>
-                Property market analysis, quarter by quarter.
-              </h2>
-              <p className="pp-section-lead">
-                Where values are moving across London, Dubai and Pakistan — and the policy
-                shifts behind them. Read the latest from the CZAAH research desk.
-              </p>
-            </div>
-            <Link href="/property-portal/insights" className="pp-btn pp-btn--gold">
-              Read the Insights
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ── STATS BAND ─────────────────────────────────────── */}
       <section className="pp-section--tight pp-stats-band">
         <div className="pp-container">
@@ -347,7 +663,6 @@ export default function PropertyPortalHome() {
           </div>
         </div>
       </section>
-
       {/* ── CTA ────────────────────────────────────────────── */}
       <section className="pp-cta-band">
         <div className="pp-container">

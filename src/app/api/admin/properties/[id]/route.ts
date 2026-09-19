@@ -67,6 +67,7 @@ export async function PATCH(
       const {
         title, propertyType, listingType, price, currency, location, city, country,
         areaSqft, bedrooms, bathrooms, description, features, images, yieldPercentage,
+        videoUrl, videoPosterUrl,
       } = body
 
       const featuresArray = features
@@ -91,6 +92,9 @@ export async function PATCH(
       if (description !== undefined) editUpdates.description = description
       if (featuresArray !== undefined) editUpdates.features = featuresArray
       if (imagesArray !== undefined) editUpdates.images = imagesArray
+      // Empty string clears the field; undefined leaves it untouched.
+      if (videoUrl !== undefined) editUpdates.video_url = videoUrl || null
+      if (videoPosterUrl !== undefined) editUpdates.video_poster_url = videoPosterUrl || null
       if (yieldPercentage !== undefined) editUpdates.yield_percentage = yieldPercentage
 
       const { data: edited, error: editError } = await supabase

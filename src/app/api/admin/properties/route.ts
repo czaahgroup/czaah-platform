@@ -98,6 +98,8 @@ export async function POST(request: NextRequest) {
       description,
       features,
       images,
+      videoUrl,
+      videoPosterUrl,
       yieldPercentage,
     } = body
 
@@ -134,6 +136,8 @@ export async function POST(request: NextRequest) {
         description: description || null,
         features: featuresArray,
         images: imagesArray,
+        video_url: videoUrl || null,
+        video_poster_url: videoPosterUrl || null,
         yield_percentage: yieldPercentage || null,
         status: 'approved',
         approved_by: user.id,

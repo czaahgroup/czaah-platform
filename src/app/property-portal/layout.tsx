@@ -12,13 +12,15 @@ export const metadata: Metadata = {
 
 const FOOTER_LINKS = [
   { label: 'All Listings', href: '/property-portal/listings' },
+  { label: 'Destinations', href: '/property-portal/destinations' },
   { label: 'Off-Plan Projects', href: '/property-portal/off-plan' },
   { label: 'London', href: '/property-portal/listings?market=london' },
   { label: 'Dubai', href: '/property-portal/listings?market=dubai' },
   { label: 'Pakistan', href: '/property-portal/listings?market=pakistan' },
   { label: 'Sell Your Property', href: '/property-portal/sell' },
   { label: 'Market Insights', href: '/property-portal/insights' },
-  { label: 'Contact', href: '/contact?interest=Real%20Estate#contact-form' },
+  { label: 'About CZAAH Property', href: '/property-portal/about' },
+  { label: 'Contact', href: '/property-portal/contact' },
 ]
 
 export default function PropertyPortalLayout({ children }: { children: React.ReactNode }) {
@@ -41,11 +43,14 @@ export default function PropertyPortalLayout({ children }: { children: React.Rea
                 across London, Dubai and Pakistan.
               </p>
             </div>
-            <div className="pp-footer-col">
+            <div className="pp-footer-col pp-footer-col--wide">
               <h4>Explore</h4>
-              {FOOTER_LINKS.map((l) => (
-                <Link key={l.label} href={l.href}>{l.label}</Link>
-              ))}
+              {/* Nine links in a single spine dwarfed the other columns. */}
+              <div className="pp-footer-links-2">
+                {FOOTER_LINKS.map((l) => (
+                  <Link key={l.label} href={l.href}>{l.label}</Link>
+                ))}
+              </div>
             </div>
             <div className="pp-footer-col">
               <h4>CZAAH Group</h4>

@@ -20,6 +20,8 @@ interface Property {
   description: string | null
   features: string[]
   images: string[]
+  video_url?: string | null
+  video_poster_url?: string | null
   yield_percentage: number | null
   status: string
   rejection_notes: string | null
@@ -68,6 +70,8 @@ const emptyForm = {
   description: '',
   features: '',
   images: '',
+  videoUrl: '',
+  videoPosterUrl: '',
   yieldPercentage: '',
 }
 
@@ -82,6 +86,12 @@ const inputStyle: React.CSSProperties = {
 }
 
 const labelStyle: React.CSSProperties = {
+const hintStyle: React.CSSProperties = {
+  margin: '6px 0 0',
+  fontSize: '11.5px',
+  lineHeight: 1.5,
+  color: 'rgba(228,224,218,0.5)',
+}
   display: 'block',
   fontSize: '11px',
   textTransform: 'uppercase',
@@ -177,7 +187,22 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
       <div>
         <label style={labelStyle}>Image URLs or storage paths (comma-separated)</label>
         <input type="text" value={form.images} onChange={(e) => update('images', e.target.value)} placeholder="/Images/canary-wharf.jpg" style={inputStyle} />
+        <p style={hintStyle}>The first image is the project&apos;s main picture — it is what appears on the home page and on cards.</p>
       </div>
+
+      <div>
+        <label style={labelStyle}>Project video URL (optional)</label>
+        <input type="text" value={form.videoUrl} onChange={(e) => update('videoUrl', e.target.value)} placeholder="https://…/project.mp4" style={inputStyle} />
+        <p style={hintStyle}>
+          Plays behind this project in the home hero instead of the market clip. Must be a direct
+          MP4 (H.264), silent, and ideally under 5MB — not a YouTube or Vimeo link.
+        </p>
+      </div>
+
+      <div>
+        <label style={labelStyle}>Video poster image (optional)</label>
+        <input type="text" value={form.videoPosterUrl} onChange={(e) => update('videoPosterUrl', e.target.value)} placeholder="https://…/project-still.jpg" style={inputStyle} />
+        <p style={hintStyle}>Shown while the video loads, and instead of it under reduced-motion. Defaults to the main picture.</p>
     </div>
   )
 }
@@ -288,6 +313,8 @@ export default function AdminPropertiesPage() {
       description: selected.description || '',
       features: (selected.features || []).join(', '),
       images: (selected.images || []).join(', '),
+      videoUrl: selected.video_url || '',
+      videoPosterUrl: selected.video_poster_url || '',
       yieldPercentage: selected.yield_percentage != null ? String(selected.yield_percentage) : '',
     })
     setEditError(null)

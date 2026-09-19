@@ -15,7 +15,7 @@ export async function GET(
 
     const { data: property, error } = await supabase
       .from('property_listings')
-      .select('id, title, property_type, listing_type, price, currency, location, city, country, area_sqft, bedrooms, bathrooms, description, features, images, yield_percentage, partner_id, created_at')
+      .select('id, title, property_type, listing_type, price, currency, location, city, country, area_sqft, bedrooms, bathrooms, description, features, images, video_url, video_poster_url, yield_percentage, partner_id, created_at')
       .eq('id', id)
       .eq('status', 'approved')
       .single()

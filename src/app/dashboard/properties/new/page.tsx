@@ -3,6 +3,7 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { PORTAL_COUNTRIES } from '@/app/property-portal/_components/types'
 
 const PROPERTY_TYPES = [
   { value: 'residential', label: 'Residential' },
@@ -32,6 +33,7 @@ export default function AddPropertyPage() {
     currency: 'PKR',
     location: '',
     city: '',
+    country: '',
     areaSqft: '',
     bedrooms: '',
     bathrooms: '',
@@ -235,6 +237,23 @@ export default function AddPropertyPage() {
                 placeholder="e.g. Islamabad"
                 style={inputStyle}
               />
+            </div>
+            <div>
+              <label style={labelStyle}>Country *</label>
+              <select
+                required
+                value={form.country}
+                onChange={(e) => updateField('country', e.target.value)}
+                style={inputStyle}
+              >
+                <option value="">Select a country…</option>
+                {PORTAL_COUNTRIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+              <p style={{ margin: '6px 0 0', fontSize: '11.5px', color: 'rgba(228,224,218,0.5)' }}>
+                The portal only publishes these markets — a listing without one never appears.
+              </p>
             </div>
           </div>
 

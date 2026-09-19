@@ -4,7 +4,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { LiveProperty, LISTING_META, resolveImage, formatPrice, CURRENCIES } from '../_components/types';
+import { LiveProperty, LISTING_META, resolveImage, formatPrice, CURRENCIES, isNewListing, listedAgo } from '../_components/types';
+import { Lightbox } from '../_components/Lightbox';
+import { AcquisitionCost } from '../_components/AcquisitionCost';
+import { PropertyCard } from '../_components/PropertyCard';
+import { useWishlist, useCurrencyPref } from '../_components/usePortalPrefs';
 
 
 export default function PropertyDetailPage() {
@@ -15,6 +19,11 @@ export default function PropertyDetailPage() {
   const [state, setState] = useState<'loading' | 'ready' | 'notfound'>('loading');
   const [enquiring, setEnquiring] = useState(false);
   const [ccy, setCcy] = useState('');
+  const [lightbox, setLightbox] = useState(-1);
+  const [similar, setSimilar] = useState<LiveProperty[]>([]);
+  const [enquireError, setEnquireError] = useState('');
+  const { has, toggle, ready: wlReady } = useWishlist();
+  const { currency: prefCcy } = useCurrencyPref();
 
   useEffect(() => {
     async function load() {
@@ -34,9 +43,33 @@ export default function PropertyDetailPage() {
     load();
   }, [id]);
 
+  // Onward exploration: other live listings, nearest first (same city, then
+  // same country, then anything). Loaded separately so a failure here never
+  // blocks the property itself from rendering.
+  useEffect(() => {
+    if (!prop) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/public/properties');
+        const json = await res.json().catch(() => null);
+        if (!res.ok || cancelled) return;
+        const others = (json?.data || []).filter((p) => p.id !== prop.id);
+        const score = (p) =>
+          (p.city === prop.city ? 0 : p.country === prop.country ? 1 : 2) +
+          (p.property_type === prop.property_type ? 0 : 0.5);
+        setSimilar(others.sort((a, b) => score(a) - score(b)).slice(0, 3));
+      } catch {
+        /* onward links are a nice-to-have, never an error state */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [prop]);
+
   async function handleEnquire() {
     if (!prop) return;
     setEnquiring(true);
+    setEnquireError('');
     try {
       const res = await fetch('/api/property-chat', {
         method: 'POST',
@@ -48,17 +81,18 @@ export default function PropertyDetailPage() {
         return;
       }
       const json = await res.json();
+      // Keep the visitor on whichever host they're browsing. Hardcoding
+      // czaah.com threw portal visitors onto the group domain mid-enquiry,
+      // and sent local dev straight to production.
       if (res.ok && json.redirect) {
-        window.location.href = json.redirect.startsWith('http')
-          ? json.redirect
-          : `https://czaah.com${json.redirect}`;
+        window.location.href = json.redirect;
       } else if (res.ok && json.data?.id) {
-        window.location.href = `https://czaah.com/dashboard/property-chats?id=${json.data.id}`;
+        window.location.href = `/dashboard/property-chats?id=${json.data.id}`;
       } else {
-        alert(json.error || 'Could not start an enquiry. Please try again.');
+        setEnquireError(json.error || 'Could not start an enquiry. Please try again.');
       }
     } catch {
-      alert('Could not start an enquiry. Please try again.');
+      setEnquireError('Could not start an enquiry. Please try again.');
     } finally {
       setEnquiring(false);
     }
@@ -121,23 +155,67 @@ export default function PropertyDetailPage() {
           <div className="pp-detail-loc">
             <span className="pp-gold">◆</span> {prop.location}, {prop.city}
             {prop.country ? `, ${prop.country}` : ''}
+            {isNewListing(prop) && <span className="pp-detail-new">New</span>}
+            {listedAgo(prop) && <span className="pp-detail-added">{listedAgo(prop)}</span>}
+            <button
+              type="button"
+              className={`pp-detail-save${wlReady && has(prop.id) ? ' is-saved' : ''}`}
+              aria-pressed={wlReady && has(prop.id)}
+              onClick={() => toggle(prop.id)}
+            >
+              <svg viewBox="0 0 24 24" width="15" height="15" fill={wlReady && has(prop.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                <path d="M12 20s-7-4.6-7-9.3A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.7C19 15.4 12 20 12 20Z" />
+              </svg>
+              {wlReady && has(prop.id) ? 'Saved' : 'Save'}
+            </button>
           </div>
 
-          {/* Gallery */}
-          <div className="pp-gallery">
+          {/* Gallery — click any image to open the full-screen viewer. */}
+          <div className={`pp-gallery${rest.length === 0 ? ' pp-gallery--single' : ''}`}>
             {main ? (
-              <img className="pp-gallery-main" src={main} alt={prop.title} />
+              <button
+                type="button"
+                className="pp-gallery-main-btn"
+                onClick={() => setLightbox(0)}
+                aria-label={`Open gallery — ${images.length} image${images.length === 1 ? '' : 's'}`}
+              >
+                <img className="pp-gallery-main" src={main} alt={prop.title} />
+                <span className="pp-gallery-count">
+                  {images.length} photo{images.length === 1 ? '' : 's'}
+                </span>
+              </button>
             ) : (
               <div className="pp-gallery-main pp-card-img--empty">⌂</div>
             )}
             {rest.length > 0 && (
               <div className="pp-gallery-side">
                 {rest.slice(0, 2).map((src, i) => (
-                  <img key={i} src={src} alt={`${prop.title} ${i + 2}`} />
+                  <button
+                    type="button"
+                    key={i}
+                    className="pp-gallery-thumb"
+                    onClick={() => setLightbox(i + 1)}
+                    aria-label={`Open image ${i + 2}`}
+                  >
+                    <img src={src} alt={`${prop.title} ${i + 2}`} />
+                    {i === 1 && rest.length > 2 && (
+                      <span className="pp-gallery-more">+{rest.length - 2} more</span>
+                    )}
+                  </button>
                 ))}
               </div>
             )}
           </div>
+
+          {lightbox >= 0 && images.length > 0 && (
+            <Lightbox
+              images={images}
+              index={lightbox}
+              alt={prop.title}
+              onClose={() => setLightbox(-1)}
+              onIndex={setLightbox}
+            />
+          )}
 
           <div className="pp-detail-body">
             <div className="pp-detail-main">
@@ -160,6 +238,8 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
 
+              <AcquisitionCost prop={prop} displayCurrency={ccy || prefCcy || undefined} />
+
               {prop.features && prop.features.length > 0 && (
                 <div className="pp-detail-section">
                   <h2>Features &amp; Amenities</h2>
@@ -174,7 +254,7 @@ export default function PropertyDetailPage() {
 
             {/* Enquiry sidebar */}
             <aside className="pp-enquire-card">
-              <div className="pp-enquire-price">{formatPrice(prop, ccy || undefined)}</div>
+              <div className="pp-enquire-price">{formatPrice(prop, ccy || prefCcy || undefined)}</div>
               <div className="pp-enquire-sub">
                 {meta.label} · {prop.city}
                 {prop.price != null && (
@@ -212,8 +292,9 @@ export default function PropertyDetailPage() {
               >
                 {enquiring ? 'Starting…' : 'Enquire About This Property'}
               </button>
+              {enquireError && <p className="pp-sell-err">{enquireError}</p>}
               <Link
-                href={`/contact?interest=${encodeURIComponent(prop.title)}#contact-form`}
+                href={`/property-portal/contact?ref=${encodeURIComponent(prop.title)}`}
                 className="pp-btn pp-btn--ghost"
               >
                 Book a Call
@@ -224,6 +305,20 @@ export default function PropertyDetailPage() {
               </p>
             </aside>
           </div>
+
+          {similar.length > 0 && (
+            <section className="pp-detail-section pp-similar">
+              <div className="pp-section-head">
+                <h2>You might also consider</h2>
+                <Link href="/property-portal/listings" className="pp-link-arrow">
+                  Browse all listings →
+                </Link>
+              </div>
+              <div className="pp-grid">
+                {similar.map((p) => <PropertyCard key={p.id} prop={p} />)}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </main>

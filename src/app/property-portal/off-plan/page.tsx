@@ -5,7 +5,8 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
-import { LiveProperty, MARKETS, matchesMarket, CURRENCIES } from '../_components/types';
+import { MARKETS, matchesMarket, CURRENCIES } from '../_components/types';
+import { useListings } from '../_components/useListings';
 
 
 const PAGE_SIZE = 9;
@@ -38,8 +39,7 @@ function OffPlanInner() {
   const router = useRouter();
   const params = useSearchParams();
 
-  const [all, setAll] = useState<LiveProperty[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { all, loading, error, reload } = useListings();
 
   const market = params.get('market') || 'all';
   const search = params.get('search') || '';
@@ -51,23 +51,6 @@ function OffPlanInner() {
 
   const [searchInput, setSearchInput] = useState(search);
   useEffect(() => setSearchInput(search), [search]);
-
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      try {
-        const res = await fetch(
-          '/api/public/properties?countries=' +
-            encodeURIComponent('Pakistan,United Kingdom,United Arab Emirates')
-        );
-        const json = await res.json();
-        if (res.ok) setAll(json.data || []);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
 
   function setParam(patch: Record<string, string>) {
     const next = new URLSearchParams(params.toString());
@@ -133,7 +116,7 @@ function OffPlanInner() {
 
         <div className="pp-listpage-head" style={{ paddingTop: 18 }}>
           <div className="pp-listpage-meta">
-            <span>{loading ? 'Loading…' : `${visible.length} ${visible.length === 1 ? 'project' : 'projects'}`}</span>
+            <span>{loading ? 'Loading…' : error ? 'Unavailable' : `${visible.length} ${visible.length === 1 ? 'project' : 'projects'}`}</span>
             <label>
               Sort:{' '}
               <select value={sort} onChange={(e) => setParam({ sort: e.target.value })}>
@@ -196,18 +179,25 @@ function OffPlanInner() {
         <div className="pp-listpage-grid">
           <div className="pp-grid">
             {loading && Array.from({ length: 6 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
-            {!loading && visible.length === 0 && (
+            {!loading && error && (
+              <div className="pp-empty">
+                We couldn&apos;t load the projects just now.{' '}
+                <button type="button" className="pp-retry" onClick={reload}>Try again</button>
+                <span className="pp-empty-detail">{error}</span>
+              </div>
+            )}
+            {!loading && !error && visible.length === 0 && (
               <div className="pp-empty">
                 No off-plan projects match these filters.{' '}
                 <Link href="/property-portal/off-plan" className="pp-gold">Clear filters</Link>
               </div>
             )}
-            {!loading && paged.map((prop) => (
+            {!loading && !error && paged.map((prop) => (
               <PropertyCard key={prop.id} prop={prop} displayCurrency={ccy || undefined} />
             ))}
           </div>
 
-          {!loading && totalPages > 1 && (
+          {!loading && !error && totalPages > 1 && (
             <div className="pp-pager">
               <button disabled={currentPage <= 1} onClick={() => setParam({ page: String(currentPage - 1) })}>← Prev</button>
               {Array.from({ length: totalPages }).map((_, i) => (

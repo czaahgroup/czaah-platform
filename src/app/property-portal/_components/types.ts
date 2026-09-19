@@ -14,8 +14,44 @@ export interface LiveProperty {
   description: string | null;
   features?: string[];
   images: string[];
+  /** Optional per-project clip; falls back to the market video. */
+  video_url?: string | null;
+  video_poster_url?: string | null;
   yield_percentage: number | null;
   partner_id?: string | null;
+  created_at?: string | null;
+}
+
+// A listing counts as "new" for this many days after it's published. The API
+// already returns newest-first, so this is only about what gets badged.
+export const NEW_LISTING_DAYS = 30;
+
+function daysSince(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return null;
+  const days = (Date.now() - then) / 86_400_000;
+  // Guard against a future-dated row making something "new" forever.
+  return days < 0 ? 0 : days;
+}
+
+export function isNewListing(prop: Pick<LiveProperty, 'created_at'>): boolean {
+  const d = daysSince(prop.created_at);
+  return d != null && d <= NEW_LISTING_DAYS;
+}
+
+// "Today" / "3 days ago" / "Listed in March" — short enough for a card.
+export function listedAgo(prop: Pick<LiveProperty, 'created_at'>): string | null {
+  const d = daysSince(prop.created_at);
+  if (d == null) return null;
+  if (d < 1) return 'Added today';
+  if (d < 2) return 'Added yesterday';
+  if (d < 14) return `Added ${Math.floor(d)} days ago`;
+  if (d < 60) return `Added ${Math.floor(d / 7)} weeks ago`;
+  return new Date(prop.created_at as string).toLocaleDateString(undefined, {
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 export const LISTING_META: Record<string, { label: string; className: string }> = {
@@ -24,6 +60,17 @@ export const LISTING_META: Record<string, { label: string; className: string }> 
   lease: { label: 'For Lease', className: 'status-for-rent' },
   off_plan: { label: 'Off Plan', className: 'status-off-plan' },
 };
+
+// The countries the portal lists. This is the single source of truth — the
+// home, listings and off-plan pages all load through useListings(), which
+// sends exactly this set to /api/public/properties. Approved listings in any
+// country NOT named here are hidden from the portal, so add a country here
+// (and give it a MARKETS entry below) before expecting its listings to show.
+export const PORTAL_COUNTRIES = [
+  'Pakistan',
+  'United Kingdom',
+  'United Arab Emirates',
+];
 
 export const MARKETS = [
   { key: 'all', label: 'All Markets' },

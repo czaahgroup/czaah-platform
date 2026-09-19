@@ -1,8 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { LiveProperty, LISTING_META, resolveImage, formatPrice } from './types';
+import { LiveProperty, LISTING_META, resolveImage, formatPrice, isNewListing } from './types';
+import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 
+// Image-led portrait card: the photograph IS the card, with the detail laid
+// over a gradient at its foot. Replaces the old image-plus-white-body layout,
+// which spent half its height on chrome and two buttons the whole card could
+// do on its own.
 export function PropertyCard({
   prop,
   displayCurrency,
@@ -13,45 +18,67 @@ export function PropertyCard({
   const meta = LISTING_META[prop.listing_type] || { label: prop.listing_type, className: 'status-for-sale' };
   const imageSrc = resolveImage(prop.images?.[0]);
   const href = `/property-portal/${prop.id}`;
+  const { has, toggle, ready } = useWishlist();
+  const { currency } = useCurrencyPref();
+  // An explicit ?ccy= on the page wins; otherwise fall back to the visitor's
+  // saved preference from the nav.
+  const shownCurrency = displayCurrency || currency || undefined;
+  const saved = ready && has(prop.id);
+
+  // A compact "3 bed, Commercial" line, the way a developer states stock.
+  const summary = [
+    prop.bedrooms != null ? (prop.bedrooms === 0 ? 'Studio' : `${prop.bedrooms} BR`) : null,
+    prop.area_sqft != null ? `${prop.area_sqft.toLocaleString()} ft²` : null,
+    prop.property_type ? prop.property_type.replace('_', ' ') : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   return (
-    <div className="pp-card">
-      <Link href={href} className="pp-card-img-wrap">
+    <article className="pp-card">
+      {/* The whole card is the link; the save button sits above it. */}
+      <Link href={href} className="pp-card-link" aria-label={prop.title}>
         {imageSrc ? (
-          <img className="pp-card-img" src={imageSrc} alt={prop.title} loading="lazy" />
+          <img className="pp-card-img" src={imageSrc} alt="" loading="lazy" />
         ) : (
           <div className="pp-card-img pp-card-img--empty">&#8962;</div>
         )}
-        <span className={`pp-card-status ${meta.className}`}>{meta.label}</span>
-      </Link>
-      <div className="pp-card-body">
-        <div className="pp-card-tags">
-          <span className="pp-card-type">{prop.property_type.replace('_', ' ')}</span>
-          <span className="pp-card-loc">{prop.city}{prop.country ? `, ${prop.country}` : ''}</span>
+
+        <div className="pp-card-flags">
+          <span className={`pp-card-status ${meta.className}`}>{meta.label}</span>
+          {isNewListing(prop) && <span className="pp-card-new">New</span>}
         </div>
-        <Link href={href} className="pp-card-title-link">
+
+        <div className="pp-card-overlay">
           <h3 className="pp-card-title">{prop.title}</h3>
-        </Link>
-        <p className="pp-card-place">{prop.location}</p>
-        <div className="pp-card-specs">
-          {prop.bedrooms != null && <span>{prop.bedrooms === 0 ? 'Studio' : `${prop.bedrooms} bed`}</span>}
-          {prop.bathrooms != null && <span>{prop.bathrooms} bath</span>}
-          {prop.area_sqft != null && <span>{prop.area_sqft.toLocaleString()} ft&sup2;</span>}
-          {prop.yield_percentage != null && <span>{prop.yield_percentage}% yield</span>}
+          <p className="pp-card-place">
+            {prop.location}
+            {prop.city ? `, ${prop.city}` : ''}
+            {prop.country ? `, ${prop.country}` : ''}
+          </p>
+          <p className="pp-card-price">
+            {prop.price ? 'From ' : ''}
+            {formatPrice(prop, shownCurrency)}
+          </p>
+          {summary && <p className="pp-card-summary">{summary}</p>}
+          {prop.yield_percentage != null && (
+            <p className="pp-card-yield">{prop.yield_percentage}% yield</p>
+          )}
         </div>
-        <div className="pp-card-price-row">
-          <span className="pp-card-price">{formatPrice(prop, displayCurrency)}</span>
-        </div>
-        <div className="pp-card-actions">
-          <Link href={href} className="pp-card-btn pp-card-btn--ghost">View Details</Link>
-          <Link
-            href={`/contact?interest=${encodeURIComponent(prop.title)}#contact-form`}
-            className="pp-card-btn pp-card-btn--gold"
-          >
-            Enquire
-          </Link>
-        </div>
-      </div>
-    </div>
+      </Link>
+
+      <button
+        type="button"
+        className={`pp-card-save${saved ? ' is-saved' : ''}`}
+        aria-pressed={saved}
+        aria-label={saved ? `Remove ${prop.title} from saved` : `Save ${prop.title}`}
+        title={saved ? 'Remove from saved' : 'Save this property'}
+        onClick={() => toggle(prop.id)}
+      >
+        <svg viewBox="0 0 24 24" width="17" height="17" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+          <path d="M12 20s-7-4.6-7-9.3A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.7C19 15.4 12 20 12 20Z" />
+        </svg>
+      </button>
+    </article>
   );
 }

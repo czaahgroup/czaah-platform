@@ -89,17 +89,20 @@ export async function POST(request: NextRequest) {
       currency,
       location,
       city,
+      country,
       areaSqft,
       bedrooms,
       bathrooms,
       description,
       features,
       images,
+      videoUrl,
+      videoPosterUrl,
     } = body
 
-    if (!title || !propertyType || !listingType || !location || !city) {
+    if (!title || !propertyType || !listingType || !location || !city || !country) {
       return NextResponse.json(
-        { error: 'Missing required fields: title, propertyType, listingType, location, city' },
+        { error: 'Missing required fields: title, propertyType, listingType, location, city, country' },
         { status: 400 }
       )
     }
@@ -154,12 +157,15 @@ export async function POST(request: NextRequest) {
         currency: currency || 'PKR',
         location,
         city,
+        country,
         area_sqft: areaSqft || null,
         bedrooms: bedrooms || null,
         bathrooms: bathrooms || null,
         description: description || null,
         features: featuresArray,
         images: imageUrls,
+        video_url: videoUrl || null,
+        video_poster_url: videoPosterUrl || null,
         status: 'pending',
       })
       .select()
