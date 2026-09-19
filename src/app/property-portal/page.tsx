@@ -31,24 +31,14 @@ const MARKETS = [
   },
 ];
 
-// CZAAH's own footage, one clip per market. Each is a silent ~10s loop
-// compressed for web (the 4K masters are 82MB and exceed Cloudflare's 25MiB
-// per-asset limit, so they are not shipped). The poster paints instantly and
+// Hero footage, in play order. Masters live in "Home Hero/" (not committed —
+// 4K files exceed Cloudflare's 25MiB per-asset limit); these are 1600×900,
+// 10 s, silent web encodes in /public/videos. The poster paints instantly and
 // is all that shows on slow connections or under prefers-reduced-motion.
-// CZAAH's own footage, in play order — alternating markets so the reel tours
-// London → Dubai → Pakistan and back. Masters live in "Home Hero/" (not
-// committed); these are 1600×900, 10 s, silent web encodes in /public/videos.
 const HERO_REEL = [
-  // Night-city footage added 2026-09-19 (stock clips; not location-specific).
   { key: 'night-skyline', label: 'City at night', video: '/videos/night-skyline.mp4', poster: '/videos/night-skyline.jpg' },
   { key: 'night-river', label: 'City at night', video: '/videos/night-river.mp4', poster: '/videos/night-river.jpg' },
   { key: 'night-towers', label: 'City at night', video: '/videos/night-towers.mp4', poster: '/videos/night-towers.jpg' },
-  { key: 'london-thames', label: 'London', video: '/videos/london-thames.mp4', poster: '/videos/london-thames.jpg' },
-  { key: 'dubai-marina', label: 'Dubai', video: '/videos/dubai-marina.mp4', poster: '/videos/dubai-marina.jpg' },
-  { key: 'pakistan-night', label: 'Pakistan', video: '/videos/pakistan-night.mp4', poster: '/videos/pakistan-night.jpg' },
-  { key: 'london-night', label: 'London', video: '/videos/london-night.mp4', poster: '/videos/london-night.jpg' },
-  { key: 'dubai-aerial', label: 'Dubai', video: '/videos/dubai-aerial.mp4', poster: '/videos/dubai-aerial.jpg' },
-  { key: 'dubai', label: 'Dubai', video: '/videos/dubai.mp4', poster: '/videos/dubai.jpg' },
 ];
 
 // Listings uploaded with their own clip join the front of the reel, newest
