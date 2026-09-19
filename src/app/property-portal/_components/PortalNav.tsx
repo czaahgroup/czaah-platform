@@ -8,9 +8,10 @@ import { CURRENCIES } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 
 const LINKS = [
-  { label: 'Destinations', href: '/property-portal/destinations' },
-  { label: 'Off-Plan', href: '/property-portal/off-plan' },
+  { label: 'Buy', href: '/property-portal/buy' },
   { label: 'Rent', href: '/property-portal/rent' },
+  { label: 'Off-Plan', href: '/property-portal/off-plan' },
+  { label: 'Destinations', href: '/property-portal/destinations' },
   { label: 'Allocate Capital', href: '/property-portal/allocator' },
   { label: 'Insights', href: '/property-portal/insights' },
   { label: 'Sell With Us', href: '/property-portal/sell' },

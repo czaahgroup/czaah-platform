@@ -5,7 +5,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
-import { MARKETS, matchesMarket, CURRENCIES } from '../_components/types';
+import { MARKETS, matchesMarket, CURRENCIES, convertPrice } from '../_components/types';
 import { useListings } from '../_components/useListings';
 
 
@@ -19,14 +19,17 @@ const TYPES = [
   { v: 'land', l: 'Land' },
 ];
 
+// USD equivalents — projects are priced in PKR, AED and GBP.
 const PRICES = [
   { v: '', l: 'Any price' },
-  { v: '0-250000', l: 'Up to 250k' },
-  { v: '250000-500000', l: '250k – 500k' },
-  { v: '500000-1000000', l: '500k – 1M' },
-  { v: '1000000-3000000', l: '1M – 3M' },
-  { v: '3000000-', l: '3M +' },
+  { v: '0-250000', l: 'Up to $250k' },
+  { v: '250000-500000', l: '$250k – 500k' },
+  { v: '500000-1000000', l: '$500k – 1M' },
+  { v: '1000000-3000000', l: '$1M – 3M' },
+  { v: '3000000-', l: '$3M +' },
 ];
+
+const usd = (p) => (p.price ? convertPrice(p.price, p.currency, 'USD') ?? p.price : null);
 
 const SORTS = [
   { v: 'newest', l: 'Newest' },
@@ -68,8 +71,8 @@ function OffPlanInner() {
     if (type) list = list.filter((p) => p.property_type === type);
     if (price) {
       const [min, max] = price.split('-');
-      if (min) list = list.filter((p) => (p.price ?? 0) >= Number(min));
-      if (max) list = list.filter((p) => (p.price ?? 0) <= Number(max));
+      if (min) list = list.filter((p) => (usd(p) ?? -1) >= Number(min));
+      if (max) list = list.filter((p) => usd(p) != null && usd(p) <= Number(max));
     }
     if (search) {
       const s = search.toLowerCase();
@@ -83,8 +86,8 @@ function OffPlanInner() {
       );
     }
     const sorted = [...list];
-    if (sort === 'price-asc') sorted.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
-    if (sort === 'price-desc') sorted.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+    if (sort === 'price-asc') sorted.sort((a, b) => (usd(a) ?? Infinity) - (usd(b) ?? Infinity));
+    if (sort === 'price-desc') sorted.sort((a, b) => (usd(b) ?? -1) - (usd(a) ?? -1));
     if (sort === 'yield-desc') sorted.sort((a, b) => (b.yield_percentage ?? -1) - (a.yield_percentage ?? -1));
     return sorted;
   }, [all, market, type, price, search, sort]);

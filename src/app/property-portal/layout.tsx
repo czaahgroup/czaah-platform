@@ -14,6 +14,7 @@ const FOOTER_LINKS = [
   { label: 'All Listings', href: '/property-portal/listings' },
   { label: 'Destinations', href: '/property-portal/destinations' },
   { label: 'Off-Plan Projects', href: '/property-portal/off-plan' },
+  { label: 'Property to Buy', href: '/property-portal/buy' },
   { label: 'Homes to Rent', href: '/property-portal/rent' },
   { label: 'London', href: '/property-portal/listings?market=london' },
   { label: 'Dubai', href: '/property-portal/listings?market=dubai' },

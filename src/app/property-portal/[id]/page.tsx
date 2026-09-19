@@ -174,7 +174,7 @@ export default function PropertyDetailPage() {
           <Link href="/property-portal">Home</Link> /{' '}
           {rental
             ? <Link href="/property-portal/rent">Rent</Link>
-            : <Link href="/property-portal/listings">Listings</Link>} / {prop.title}
+            : <Link href="/property-portal/buy">Buy</Link>} / {prop.title}
         </div>
 
         <div className="pp-detail">
