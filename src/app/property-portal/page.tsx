@@ -35,11 +35,21 @@ const MARKETS = [
 // compressed for web (the 4K masters are 82MB and exceed Cloudflare's 25MiB
 // per-asset limit, so they are not shipped). The poster paints instantly and
 // is all that shows on slow connections or under prefers-reduced-motion.
-const MARKET_MEDIA = [
-  { country: 'United Kingdom', label: 'London', video: '/videos/london.mp4', poster: '/videos/london.jpg' },
-  { country: 'United Arab Emirates', label: 'Dubai', video: '/videos/dubai.mp4', poster: '/videos/dubai.jpg' },
-  { country: 'Pakistan', label: 'Pakistan', video: '/videos/pakistan.mp4', poster: '/videos/pakistan.jpg' },
+// CZAAH's own footage, in play order — alternating markets so the reel tours
+// London → Dubai → Pakistan and back. Masters live in "Home Hero/" (not
+// committed); these are 1600×900, 10 s, silent web encodes in /public/videos.
+const HERO_REEL = [
+  { key: 'london-thames', label: 'London', video: '/videos/london-thames.mp4', poster: '/videos/london-thames.jpg' },
+  { key: 'dubai-marina', label: 'Dubai', video: '/videos/dubai-marina.mp4', poster: '/videos/dubai-marina.jpg' },
+  { key: 'pakistan-night', label: 'Pakistan', video: '/videos/pakistan-night.mp4', poster: '/videos/pakistan-night.jpg' },
+  { key: 'london-night', label: 'London', video: '/videos/london-night.mp4', poster: '/videos/london-night.jpg' },
+  { key: 'dubai-aerial', label: 'Dubai', video: '/videos/dubai-aerial.mp4', poster: '/videos/dubai-aerial.jpg' },
+  { key: 'dubai', label: 'Dubai', video: '/videos/dubai.mp4', poster: '/videos/dubai.jpg' },
 ];
+
+// Listings uploaded with their own clip join the front of the reel, newest
+// first — capped so the brand footage always gets its turn.
+const MAX_PROJECT_CLIPS = 3;
 
 const HERO_TYPES = [
   { v: '', l: 'Any type' },
@@ -127,23 +137,18 @@ export default function PropertyPortalHome() {
   const [reduceMotion, setReduceMotion] = useState(false);
   const { currency: currencyPref } = useCurrencyPref();
 
-  // One project per market, newest first, so the hero tours London → Dubai →
-  // Pakistan with CZAAH's own footage of each behind it. Showing the three
-  // newest overall would have put three London projects over the same clip.
-  const heroProjects = useMemo(() => {
-    const picked: typeof properties = [];
-    MARKET_MEDIA.forEach((m) => {
-      // Hero and showcase present projects; lettings live on /rent.
-      const hit = properties.find(
-        (p) => !isRental(p) && p.country === m.country && (p.video_url || resolveImage(p.images?.[0]))
-      );
-      if (hit) picked.push(hit);
-    });
-    // If a market has nothing live, backfill so the hero is never empty.
-    if (picked.length === 0) {
-      return properties.filter((p) => !isRental(p) && resolveImage(p.images?.[0])).slice(0, 3);
-    }
-    return picked;
+  // The hero reel: project clips uploaded with a listing (newest first), then
+  // CZAAH's market footage. Rentals are left out — they live on /rent.
+  const heroSlides = useMemo(() => {
+    const projectClips = properties
+      .filter((p) => !isRental(p) && p.video_url)
+      .slice(0, MAX_PROJECT_CLIPS)
+      .map((p) => ({
+        key: p.id,
+        video: p.video_url,
+        poster: p.video_poster_url || resolveImage(p.images?.[0]) || '',
+      }));
+    return [...projectClips, ...HERO_REEL];
   }, [properties]);
 
   // Visitors who ask the OS for reduced motion get the still poster instead of
@@ -160,9 +165,9 @@ export default function PropertyPortalHome() {
   // slide is interactive beyond the CTA, which is identical on every slide.
   useEffect(() => {
     if (reduceMotion) return;
-    const t = setInterval(() => setSlide((s) => (s + 1) % Math.max(1, heroProjects.length)), 8000);
+    const t = setInterval(() => setSlide((s) => (s + 1) % Math.max(1, heroSlides.length)), 8000);
     return () => clearInterval(t);
-  }, [reduceMotion, heroProjects.length]);
+  }, [reduceMotion, heroSlides.length]);
 
   // Destinations that actually have stock, for the hero bar.
   const destOptions = useMemo(() => {
@@ -248,10 +253,9 @@ export default function PropertyPortalHome() {
 
   // The API returns newest-first, so the head of the list IS the latest intake.
   // Featured skips those so the two sections don't show the same properties.
-  const heroIds = new Set(heroProjects.map((p) => p.id));
-  const showcase = properties.filter((p) => !isRental(p) && !heroIds.has(p.id) && resolveImage(p.images?.[0])).slice(0, 4);
+  const showcase = properties.filter((p) => !isRental(p) && resolveImage(p.images?.[0])).slice(0, 4);
   const showcaseIds = new Set(showcase.map((p) => p.id));
-  const featured = properties.filter((p) => !heroIds.has(p.id) && !showcaseIds.has(p.id));
+  const featured = properties.filter((p) => !showcaseIds.has(p.id));
   const newCount = properties.filter(isNewListing).length;
   const insightTeasers = INSIGHTS.slice(0, 3);
 
@@ -262,18 +266,12 @@ export default function PropertyPortalHome() {
             search engines and screen readers without changing the design. */}
         <h1 className="pp-sr-only">CZAAH Property — real estate to buy and rent in London, Dubai and Pakistan</h1>
         <div className="pp-hero-media" aria-hidden="true">
-          {heroProjects.map((p, i) => {
-            // A project's own clip wins over its market's. That is the whole
-            // point of the field: upload footage with the listing and the
-            // hero uses it, with no code change.
-            const market = MARKET_MEDIA.find((m) => m.country === p.country);
-            const video = p.video_url || market?.video || null;
-            const still =
-              p.video_poster_url || resolveImage(p.images?.[0]) || market?.poster || '';
-            const media = video ? { video, poster: still } : null;
+          {heroSlides.map((s, i) => {
+            const still = s.poster;
+            const media = s.video ? { video: s.video, poster: still } : null;
             const active = i === slide;
             return (
-              <div key={p.id} className={`pp-hero-slide${active ? ' is-active' : ''}`}>
+              <div key={s.key} className={`pp-hero-slide${active ? ' is-active' : ''}`}>
                 {active && media && !reduceMotion ? (
                   <video
                     className="pp-hero-video"
@@ -354,7 +352,7 @@ export default function PropertyPortalHome() {
           </form>
 
           <div className="pp-hero-dots">
-            {heroProjects.map((_, i) => (
+            {heroSlides.map((_, i) => (
               <button
                 key={i}
                 type="button"

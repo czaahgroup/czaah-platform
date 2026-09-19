@@ -62,3 +62,7 @@ next-env.d.ts
 /playwright/.cache/
 /blob-report/
 .env.test.local
+
+# Raw 4K video masters for the portal hero (web encodes live in public/videos)
+/src/app/property-portal/Home Hero/
+/src/app/property-portal/pictures and videos/
