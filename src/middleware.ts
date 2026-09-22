@@ -1,6 +1,27 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+/**
+ * Keeps the portal's HTML fresh after a deploy.
+ *
+ * Statically prerendered pages get `Cache-Control: s-maxage=31536000` from
+ * Next by default — a year. Nothing purges that on deploy, so a visitor whose
+ * browser or edge kept a copy carries on seeing the old page indefinitely,
+ * which is exactly what happened after a run of portal changes: the site was
+ * correct while the browser kept showing a layout from hours earlier.
+ *
+ * A year is right for hashed assets under /_next/static, which are immutable.
+ * It is wrong for a document whose content changes every deploy. This asks the
+ * browser to revalidate each time — cheap, since an unchanged page comes back
+ * 304 — while still letting the CDN serve it for a minute.
+ */
+function applyPortalCacheHeaders(response: NextResponse) {
+  response.headers.set(
+    'Cache-Control',
+    'public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300'
+  )
+}
+
 export async function middleware(request: NextRequest) {
   // property.czaah.com is a separate, publicly-browsable property portal
   // (London/Dubai/Pakistan listings) backed by the same app — it lives
@@ -44,7 +65,9 @@ export async function middleware(request: NextRequest) {
     if (!isShared) {
       const url = request.nextUrl.clone()
       url.pathname = `/property-portal${pathname === '/' ? '' : pathname}`
-      return NextResponse.rewrite(url)
+      const rewritten = NextResponse.rewrite(url)
+      applyPortalCacheHeaders(rewritten)
+      return rewritten
     }
   }
 
