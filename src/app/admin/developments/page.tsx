@@ -168,12 +168,8 @@ const emptyForm = {
   brochureName: '',
 }
 
-// API uploads are base64 over JSON, which inflates by a third, so the form
-// refuses anything the request would struggle with rather than letting it
-// fail opaquely half a minute later.
-const MAX_IMAGE_MB = 10
-const MAX_VIDEO_MB = 25
-const MAX_BROCHURE_MB = 15
+// Files go straight to storage, so the only ceiling is the bucket's own.
+const MAX_UPLOAD_MB = 100
 
 /** A preview URL for either a freshly picked file or an already stored path. */
 function mediaPreview(value: string): string {
@@ -182,14 +178,42 @@ function mediaPreview(value: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/${value}`
 }
 
-/** Reads a picked file as a data URL — the API turns it into a storage path. */
-function readAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result))
-    reader.onerror = reject
-    reader.readAsDataURL(file)
+/**
+ * Uploads a file straight into storage and returns its path.
+ *
+ * Files used to be base64'd into the JSON save, which inflates them by a third
+ * and has to be buffered whole in the Worker — a phone video never stood a
+ * chance. A signed URL puts the browser in touch with storage directly, so the
+ * save request only ever carries the resulting path.
+ */
+async function uploadToStorage(file: File, folder: string): Promise<string> {
+  const res = await fetch('/api/admin/media/upload-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      folder,
+      filename: file.name,
+      contentType: file.type || 'application/octet-stream',
+      size: file.size,
+    }),
   })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json?.error || `Could not start the upload (${res.status})`)
+
+  const put = await fetch(json.signedUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true',
+    },
+    body: file,
+  })
+  if (!put.ok) {
+    const detail = await put.text().catch(() => '')
+    throw new Error(`Upload of ${file.name} failed (${put.status}). ${detail.slice(0, 140)}`)
+  }
+
+  return json.path as string
 }
 
 /** Live reconciliation banner — warns, never edits the numbers. */
@@ -446,6 +470,8 @@ export default function AdminDevelopmentsPage() {
   // Variants deleted in the form are only removed from the database on save,
   // so cancelling an edit cannot destroy a plot size.
   const [removedUnitIds, setRemovedUnitIds] = useState<string[]>([])
+  // Which media field is mid-upload, so the form can show it and block save.
+  const [uploading, setUploading] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -471,28 +497,39 @@ export default function AdminDevelopmentsPage() {
     files: FileList | null
   ) {
     if (!files?.length) return
-    const limit = key === 'videoUrl' ? MAX_VIDEO_MB : key === 'brochureUrl' ? MAX_BROCHURE_MB : MAX_IMAGE_MB
     const picked = Array.from(files).slice(0, 12)
-    const tooBig = picked.filter((file) => file.size > limit * 1024 * 1024)
+
+    const tooBig = picked.filter((file) => file.size > MAX_UPLOAD_MB * 1024 * 1024)
     if (tooBig.length) {
       setError(
-        `${tooBig.map((t) => t.name).join(', ')} — over the ${limit}MB limit. ` +
+        `${tooBig.map((t) => t.name).join(', ')} — over the ${MAX_UPLOAD_MB}MB limit. ` +
           (key === 'videoUrl'
-            ? 'Compress the clip (1600x900, a few seconds, no audio) and try again.'
-            : key === 'brochureUrl'
-              ? 'Export the PDF at a lower resolution and try again.'
-              : 'Resize or re-export the image and try again.')
+            ? 'Compress the clip and try again — 1080p and under a minute is plenty.'
+            : 'Re-export it smaller and try again.')
       )
       return
     }
+
     setError(null)
-    const urls = await Promise.all(picked.map(readAsDataUrl))
-    if (key === 'gallery') {
-      update('gallery', [...form.gallery, ...urls])
-    } else {
-      update(key, urls[0])
-      // Keep the original filename so the download is not called "1790095371583_0.pdf".
-      if (key === 'brochureUrl') update('brochureName', picked[0].name)
+    setUploading(key)
+    try {
+      // Files land in storage now, not on save, so a failure is reported here
+      // rather than silently dropping the file out of the record later.
+      const folder = form.name ? form.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'new'
+      const paths: string[] = []
+      for (const file of picked) paths.push(await uploadToStorage(file, folder))
+
+      if (key === 'gallery') {
+        update('gallery', [...form.gallery, ...paths])
+      } else {
+        update(key, paths[0])
+        // Keep the original filename so the download is not called "1790095371583_0.pdf".
+        if (key === 'brochureUrl') update('brochureName', picked[0].name)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed.')
+    } finally {
+      setUploading(null)
     }
   }
 
@@ -942,6 +979,11 @@ export default function AdminDevelopmentsPage() {
 
           <div style={{ marginTop: '18px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
             <strong style={{ fontSize: '13px' }}>Media</strong>
+            {uploading && (
+              <span style={{ ...hintStyle, marginLeft: '10px', color: '#C9A84C' }}>
+                Uploading — don&rsquo;t leave this page.
+              </span>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
               <div>
@@ -1024,7 +1066,10 @@ export default function AdminDevelopmentsPage() {
                     </div>
                   </div>
                 ) : (
-                  <p style={hintStyle}>Up to {MAX_VIDEO_MB}MB, MP4 or WebM. Compress long clips first — a few seconds at 1600&times;900 is plenty.</p>
+                  <p style={hintStyle}>
+                    MP4, WebM or MOV, up to {MAX_UPLOAD_MB}MB. Uploads straight to storage, so a
+                    full site-visit clip is fine.
+                  </p>
                 )}
               </div>
 
@@ -1075,7 +1120,7 @@ export default function AdminDevelopmentsPage() {
                 </div>
               ) : (
                 <p style={hintStyle}>
-                  Adds a &ldquo;Download Brochure&rdquo; button to the public page. Up to {MAX_BROCHURE_MB}MB.
+                  Adds a &ldquo;Download Brochure&rdquo; button to the public page. Up to {MAX_UPLOAD_MB}MB.
                 </p>
               )}
             </div>
@@ -1118,8 +1163,12 @@ export default function AdminDevelopmentsPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '18px' }}>
-            <button type="submit" disabled={saving} style={{ ...buttonStyle, opacity: saving ? 0.6 : 1 }}>
-              {saving ? 'Saving…' : editingId ? 'Save changes' : 'Create development'}
+            <button
+              type="submit"
+              disabled={saving || !!uploading}
+              style={{ ...buttonStyle, opacity: saving || uploading ? 0.6 : 1 }}
+            >
+              {uploading ? 'Uploading…' : saving ? 'Saving…' : editingId ? 'Save changes' : 'Create development'}
             </button>
             <button type="button" style={ghostButton} onClick={resetForm}>Cancel</button>
             {editingId && (
