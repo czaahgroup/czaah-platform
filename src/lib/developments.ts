@@ -286,7 +286,7 @@ export interface UnitPayload {
 /** Columns a unit payload maps onto, shared by insert and update. */
 function unitColumns(unit: UnitPayload, index: number, fallbackCurrency: string) {
   return {
-    title: unit.title,
+    title: unit.title?.trim(),
     property_type: unit.propertyType || 'land',
     property_subtype: unit.propertySubtype || 'plot',
     plot_size: toNullableNumber(unit.plotSize),
@@ -377,7 +377,10 @@ export function plotColumnsFromBody(
   const has = (key: string) => body[key] !== undefined
 
   const text = (key: string, column: string) => {
-    if (mode === 'insert' || has(key)) out[column] = (body[key] as string) || null
+    if (mode === 'insert' || has(key)) {
+      const value = typeof body[key] === 'string' ? (body[key] as string).trim() : body[key]
+      out[column] = (value as string) || null
+    }
   }
   const bool = (key: string, column: string) => {
     if (mode === 'insert' || has(key)) out[column] = !!body[key]

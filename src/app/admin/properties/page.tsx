@@ -292,7 +292,7 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
             </div>
             <div>
               <label style={labelStyle}>Marketing / Agent</label>
-              <input placeholder="Gold Mark" value={form.marketingAgent} onChange={(e) => update('marketingAgent', e.target.value)} style={inputStyle} />
+              <input placeholder="Agency or brand marketing it" value={form.marketingAgent} onChange={(e) => update('marketingAgent', e.target.value)} style={inputStyle} />
             </div>
           </div>
 

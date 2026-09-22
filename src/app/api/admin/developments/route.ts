@@ -55,7 +55,12 @@ export async function POST(request: NextRequest) {
     const { supabase, userId } = auth
 
     const body = await request.json()
-    const { name, country, city } = body
+    // Trim on the way in — a trailing space reaches the public page, and for a
+    // new development it would also land in the slug.
+    const trim = (v: unknown) => (typeof v === 'string' ? v.trim() : v)
+    const name = trim(body.name) as string
+    const country = trim(body.country) as string
+    const city = trim(body.city) as string
 
     if (!name || !country || !city) {
       return NextResponse.json(
@@ -75,14 +80,14 @@ export async function POST(request: NextRequest) {
       .insert({
         name,
         slug,
-        developer_name: body.developerName || null,
-        marketing_agent: body.marketingAgent || null,
-        description: body.description || null,
+        developer_name: trim(body.developerName) || null,
+        marketing_agent: trim(body.marketingAgent) || null,
+        description: trim(body.description) || null,
         country,
-        province_state: body.provinceState || null,
+        province_state: trim(body.provinceState) || null,
         city,
-        area: body.area || null,
-        address: body.address || null,
+        area: trim(body.area) || null,
+        address: trim(body.address) || null,
         latitude: num(body.latitude),
         longitude: num(body.longitude),
         approval_status: body.approvalStatus || null,

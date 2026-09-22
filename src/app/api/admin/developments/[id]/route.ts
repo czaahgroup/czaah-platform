@@ -56,7 +56,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     // Only fields actually present in the payload are written, so a partial
     // save from one admin tab cannot blank out fields owned by another.
     const text = (key: string, column: string) => {
-      if (body[key] !== undefined) updates[column] = body[key] || null
+      if (body[key] === undefined) return
+      const value = typeof body[key] === 'string' ? body[key].trim() : body[key]
+      updates[column] = value || null
     }
     const bool = (key: string, column: string) => {
       if (body[key] !== undefined) updates[column] = !!body[key]

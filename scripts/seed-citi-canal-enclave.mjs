@@ -59,7 +59,8 @@ const DEVELOPMENT = {
   name: 'Citi Canal Enclave',
   slug: SLUG,
   developer_name: 'Citi Housing',
-  marketing_agent: 'Gold Mark',
+  // Set the marketing agency in the admin panel — none is assumed here.
+  marketing_agent: null,
   description:
     'A canal-front residential plot development in Gujranwala by Citi Housing — a gated, ' +
     'secure community with wide roads, green spaces and modern amenities, released on ' +

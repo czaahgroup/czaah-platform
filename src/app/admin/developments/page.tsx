@@ -404,6 +404,13 @@ export default function AdminDevelopmentsPage() {
   const [form, setForm] = useState({ ...emptyForm })
   const [units, setUnits] = useState<Row[]>([emptyUnit()])
   const [expanded, setExpanded] = useState<string | null>(null)
+  // Edit mode reuses the create form rather than duplicating it. editingId
+  // null means the form is creating; a uuid means it is editing that row.
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [loadingEdit, setLoadingEdit] = useState(false)
+  // Variants deleted in the form are only removed from the database on save,
+  // so cancelling an edit cannot destroy a plot size.
+  const [removedUnitIds, setRemovedUnitIds] = useState<string[]>([])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -473,6 +480,150 @@ export default function AdminDevelopmentsPage() {
     }
   }
 
+  function resetForm() {
+    setForm({ ...emptyForm })
+    setUnits([emptyUnit()])
+    setRemovedUnitIds([])
+    setEditingId(null)
+    setCreating(false)
+  }
+
+  /** Pull the full record — units and their payment plans — into the form. */
+  async function openEdit(dev: Row) {
+    setError(null)
+    setNotice(null)
+    setWarnings([])
+    setLoadingEdit(true)
+    setCreating(false)
+    setEditingId(dev.id)
+    setRemovedUnitIds([])
+    try {
+      const res = await fetch(`/api/admin/developments/${dev.id}`)
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`)
+      const d = json.data
+      const plans = d.payment_plans || {}
+
+      setForm({
+        name: d.name || '',
+        developerName: d.developer_name || '',
+        marketingAgent: d.marketing_agent || '',
+        description: d.description || '',
+        country: d.country || '',
+        provinceState: d.province_state || '',
+        city: d.city || '',
+        area: d.area || '',
+        address: d.address || '',
+        latitude: d.latitude != null ? String(d.latitude) : '',
+        longitude: d.longitude != null ? String(d.longitude) : '',
+        currency: d.currency || 'PKR',
+        approvalStatus: d.approval_status || '',
+        approvalAuthority: d.approval_authority || '',
+        developmentStatus: d.development_status || '',
+        possessionStatus: d.possession_status || '',
+        features: (d.features || []).join(', '),
+        status: d.status || 'draft',
+        featured: !!d.featured,
+        verified: !!d.verified,
+        // Images already live in storage; they are only re-sent if replaced.
+        featuredImage: d.featured_image || '',
+        gallery: d.gallery || [],
+      })
+
+      const loaded = [...(d.development_units || [])]
+        .sort((a: Row, b: Row) => (a.display_order ?? 0) - (b.display_order ?? 0))
+        .map((u: Row) => {
+          const entry = plans[u.id]
+          const plan = entry?.plan
+          return {
+            id: u.id,
+            title: u.title || '',
+            propertySubtype: u.property_subtype || 'plot',
+            plotSize: u.plot_size != null ? String(u.plot_size) : '',
+            plotSizeUnit: u.plot_size_unit || 'marla',
+            plotCategory: u.plot_category || 'residential',
+            totalPrice: u.total_price != null ? String(u.total_price) : '',
+            currency: u.currency || d.currency || 'PKR',
+            availabilityStatus: u.availability_status || 'available',
+            possessionStatus: u.possession_status || '',
+            block: u.block || '',
+            sector: u.sector || '',
+            plotNumber: u.plot_number || '',
+            cornerPlot: !!u.corner_plot,
+            parkFacing: !!u.park_facing,
+            mainRoad: !!u.main_road,
+            boulevard: !!u.boulevard,
+            canalFacing: !!u.canal_facing,
+            description: u.description || '',
+            plan: {
+              name: plan?.name || 'Payment plan',
+              totalPrice: plan?.total_price != null ? String(plan.total_price) : '',
+              downPayment: plan?.down_payment != null ? String(plan.down_payment) : '',
+              durationMonths: plan?.duration_months != null ? String(plan.duration_months) : '',
+              installments: (entry?.installments || []).map((r: Row) => ({
+                installment_number: r.installment_number,
+                label: r.label || '',
+                amount: r.amount != null ? String(r.amount) : '',
+                additional_amount: r.additional_amount != null ? String(r.additional_amount) : '',
+                due_after_months: r.due_after_months != null ? String(r.due_after_months) : '',
+              })),
+            },
+          }
+        })
+
+      setUnits(loaded.length ? loaded : [emptyUnit()])
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (err) {
+      setEditingId(null)
+      setError(err instanceof Error ? err.message : 'Could not load that development.')
+    } finally {
+      setLoadingEdit(false)
+    }
+  }
+
+  /** Save an edit: the development, then add / update / remove its variants. */
+  async function saveEdit() {
+    const collected: string[] = []
+
+    const res = await fetch(`/api/admin/developments/${editingId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...form,
+        // Only re-send an image when a new file was picked. A stored path
+        // would otherwise be re-uploaded as if it were fresh base64.
+        featuredImage: String(form.featuredImage || '').startsWith('data:') ? form.featuredImage : undefined,
+        gallery: (form.gallery || []).some((g: string) => String(g).startsWith('data:')) ? form.gallery : undefined,
+      }),
+    })
+    const json = await res.json()
+    if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`)
+
+    for (const id of removedUnitIds) {
+      await fetch(`/api/admin/development-units/${id}`, { method: 'DELETE' })
+    }
+
+    for (const [i, u] of units.filter((x) => x.title).entries()) {
+      const payload = { ...unitPayload(u), displayOrder: i + 1 }
+      const unitRes = u.id
+        ? await fetch(`/api/admin/development-units/${u.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
+        : await fetch(`/api/admin/developments/${editingId}/units`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
+      const unitJson = await unitRes.json()
+      if (!unitRes.ok) throw new Error(`${u.title}: ${unitJson?.error || 'could not be saved'}`)
+      if (unitJson.warning) collected.push(`${u.title}: ${unitJson.warning}`)
+    }
+
+    return { name: json.data.name, warnings: collected }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -480,6 +631,15 @@ export default function AdminDevelopmentsPage() {
     setNotice(null)
     setWarnings([])
     try {
+      if (editingId) {
+        const { name, warnings: unitWarnings } = await saveEdit()
+        setNotice(`Saved "${name}".`)
+        if (unitWarnings.length) setWarnings(unitWarnings)
+        resetForm()
+        load()
+        return
+      }
+
       const res = await fetch('/api/admin/developments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -492,12 +652,10 @@ export default function AdminDevelopmentsPage() {
       if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`)
       setNotice(`Created "${json.data.name}".`)
       if (json.warnings?.length) setWarnings(json.warnings)
-      setForm({ ...emptyForm })
-      setUnits([emptyUnit()])
-      setCreating(false)
+      resetForm()
       load()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not create the development.')
+      setError(err instanceof Error ? err.message : `Could not ${editingId ? 'save' : 'create'} the development.`)
     } finally {
       setSaving(false)
     }
@@ -619,8 +777,14 @@ export default function AdminDevelopmentsPage() {
             development record. Each variant can carry its own payment plan.
           </p>
         </div>
-        <button style={buttonStyle} onClick={() => setCreating((v) => !v)}>
-          {creating ? 'Cancel' : '+ New development'}
+        <button
+          style={buttonStyle}
+          onClick={() => {
+            if (creating || editingId) resetForm()
+            else setCreating(true)
+          }}
+        >
+          {creating || editingId ? 'Cancel' : '+ New development'}
         </button>
       </div>
 
@@ -636,8 +800,13 @@ export default function AdminDevelopmentsPage() {
         </div>
       )}
 
-      {creating && (
+      {loadingEdit && <div style={cardStyle}>Loading development…</div>}
+
+      {(creating || (editingId && !loadingEdit)) && (
         <form onSubmit={submit} style={{ ...cardStyle, padding: '20px', marginBottom: '26px' }}>
+          <h2 style={{ fontSize: '15px', margin: '0 0 16px' }}>
+            {editingId ? `Editing ${form.name || 'development'}` : 'New development'}
+          </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
             <div>
               <label style={labelStyle}>Name *</label>
@@ -649,7 +818,7 @@ export default function AdminDevelopmentsPage() {
             </div>
             <div>
               <label style={labelStyle}>Marketing / agent brand</label>
-              <input value={form.marketingAgent} onChange={(e) => update('marketingAgent', e.target.value)} placeholder="Gold Mark" style={inputStyle} />
+              <input value={form.marketingAgent} onChange={(e) => update('marketingAgent', e.target.value)} placeholder="Agency or brand marketing it" style={inputStyle} />
             </div>
           </div>
 
@@ -747,14 +916,25 @@ export default function AdminDevelopmentsPage() {
                 unit={u}
                 currency={form.currency}
                 onChange={(next) => setUnits((list) => list.map((x, j) => (j === i ? next : x)))}
-                onRemove={() => setUnits((list) => list.filter((_, j) => j !== i))}
+                onRemove={() => {
+                  if (u.id) setRemovedUnitIds((ids) => [...ids, u.id])
+                  setUnits((list) => list.filter((_, j) => j !== i))
+                }}
               />
             ))}
           </div>
 
-          <button type="submit" disabled={saving} style={{ ...buttonStyle, marginTop: '18px', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Saving…' : 'Create development'}
-          </button>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '18px' }}>
+            <button type="submit" disabled={saving} style={{ ...buttonStyle, opacity: saving ? 0.6 : 1 }}>
+              {saving ? 'Saving…' : editingId ? 'Save changes' : 'Create development'}
+            </button>
+            <button type="button" style={ghostButton} onClick={resetForm}>Cancel</button>
+            {editingId && (
+              <span style={hintStyle}>
+                Removed plot variants are only deleted when you save.
+              </span>
+            )}
+          </div>
         </form>
       )}
 
@@ -786,6 +966,9 @@ export default function AdminDevelopmentsPage() {
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <button style={{ ...ghostButton, borderColor: 'rgba(201,168,76,0.55)', color: '#C9A84C' }} onClick={() => openEdit(dev)}>
+                  Edit
+                </button>
                 <button style={ghostButton} onClick={() => setExpanded(expanded === dev.id ? null : dev.id)}>
                   {expanded === dev.id ? 'Hide' : 'Variants'}
                 </button>
@@ -808,6 +991,16 @@ export default function AdminDevelopmentsPage() {
 
             {expanded === dev.id && (
               <div style={{ marginTop: '14px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px' }}>
+                <p style={{ ...hintStyle, marginBottom: '10px' }}>
+                  Availability can be changed here. For sizes, prices and payment plans use{' '}
+                  <button
+                    type="button"
+                    onClick={() => openEdit(dev)}
+                    style={{ background: 'none', border: 0, padding: 0, color: '#C9A84C', cursor: 'pointer', font: 'inherit', textDecoration: 'underline' }}
+                  >
+                    Edit
+                  </button>.
+                </p>
                 {(dev.development_units || []).length === 0 ? (
                   <p style={hintStyle}>No plot variants yet.</p>
                 ) : (
