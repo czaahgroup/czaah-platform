@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { OFFICES, PORTAL_EMAIL } from '../_components/offices';
+import { portalOffices, portalEmail } from '../_components/portalRuntime';
 
 const INTERESTS = [
   'Buying — London',
@@ -90,7 +90,7 @@ export default function PortalContactPage() {
                   <p>
                     A member of the CZAAH property desk will be in touch shortly. For anything
                     urgent, email{' '}
-                    <a href={`mailto:${PORTAL_EMAIL}`} className="pp-gold">{PORTAL_EMAIL}</a>.
+                    <a href={`mailto:${portalEmail()}`} className="pp-gold">{portalEmail()}</a>.
                   </p>
                   <Link href="/property-portal/listings" className="pp-btn pp-btn--ghost">
                     Browse listings
@@ -158,10 +158,10 @@ export default function PortalContactPage() {
               <h2 className="pp-h2" style={{ marginBottom: 10 }}>Our offices</h2>
               <p className="pp-section-lead" style={{ marginBottom: 26 }}>
                 Email reaches the property desk fastest:{' '}
-                <a href={`mailto:${PORTAL_EMAIL}`} className="pp-gold">{PORTAL_EMAIL}</a>
+                <a href={`mailto:${portalEmail()}`} className="pp-gold">{portalEmail()}</a>
               </p>
               <div className="pp-office-list">
-                {OFFICES.map((o) => (
+                {portalOffices().map((o) => (
                   <div className="pp-presence" key={o.city}>
                     <strong>{o.city}</strong>
                     {o.lines.map((l) => (

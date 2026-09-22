@@ -72,11 +72,15 @@ export const LISTING_META: Record<string, { label: string; className: string }> 
 // sends exactly this set to /api/public/properties. Approved listings in any
 // country NOT named here are hidden from the portal, so add a country here
 // (and give it a MARKETS entry below) before expecting its listings to show.
-export const PORTAL_COUNTRIES = [
-  'Pakistan',
-  'United Kingdom',
-  'United Arab Emirates',
-];
+// Editable in admin (Portal content → Settings); falls back to these.
+// A getter rather than a constant so a stored value applies on first render.
+export function portalCountries(): string[] {
+  const countries = portalSettings().countries;
+  return countries && countries.length ? countries : ['Pakistan', 'United Kingdom', 'United Arab Emirates'];
+}
+
+/** @deprecated Read portalCountries() — this is the shipped default only. */
+export const PORTAL_COUNTRIES = ['Pakistan', 'United Kingdom', 'United Arab Emirates'];
 
 export const MARKETS = [
   { key: 'all', label: 'All Markets' },
@@ -104,10 +108,13 @@ export function resolveImage(image: string | null | undefined): string | null {
 // because every portal component already imports them from ./types.
 export { FX_PER_USD, CURRENCIES } from '@/lib/currencies';
 import { FX_PER_USD } from '@/lib/currencies';
+import { portalSettings } from './portalRuntime';
 
 export function convertPrice(price: number, from: string, to: string): number | null {
-  const fromRate = FX_PER_USD[from];
-  const toRate = FX_PER_USD[to];
+  // Rates are editable in admin; the shipped table is the fallback.
+  const rates = portalSettings().fxPerUsd || FX_PER_USD;
+  const fromRate = rates[from] ?? FX_PER_USD[from];
+  const toRate = rates[to] ?? FX_PER_USD[to];
   if (!fromRate || !toRate) return null;
   return (price / fromRate) * toRate;
 }

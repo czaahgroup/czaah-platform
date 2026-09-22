@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { resolveImage, convertPrice, PORTAL_COUNTRIES } from './types';
+import { resolveImage, convertPrice, portalCountries } from './types';
 import { useCurrencyPref } from './usePortalPrefs';
 import { formatPlotSize } from '@/lib/plots';
 import { formatMoney } from '@/lib/paymentPlan';
@@ -27,7 +27,7 @@ export function DevelopmentStrip() {
     async function load() {
       try {
         const res = await fetch(
-          '/api/public/developments?countries=' + encodeURIComponent(PORTAL_COUNTRIES.join(','))
+          '/api/public/developments?countries=' + encodeURIComponent(portalCountries().join(','))
         );
         const json = await res.json();
         if (!cancelled && res.ok) setDevelopments(json.data || []);

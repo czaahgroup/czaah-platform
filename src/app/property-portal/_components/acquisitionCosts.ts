@@ -1,3 +1,5 @@
+import { portalSettings } from './portalRuntime';
+
 // ============================================================================
 // True cost of acquisition
 // ----------------------------------------------------------------------------
@@ -17,7 +19,16 @@
 // Master switch. OFF until every rate below has been verified by a qualified
 // adviser in its jurisdiction — the block renders nothing while this is false.
 // Flip to true once signed off; no other change is needed.
+/**
+ * Shipped default. The live value is the admin setting — see
+ * acquisitionCostEnabled() — so the flag can be turned on once a tax adviser
+ * has signed the rates off, without a deploy.
+ */
 export const ACQUISITION_COST_ENABLED = false;
+
+export function acquisitionCostEnabled(): boolean {
+  return portalSettings().acquisitionCostEnabled === true;
+}
 
 export interface CostLine {
   label: string;

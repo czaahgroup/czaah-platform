@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { PropertyCard } from './_components/PropertyCard';
 import { INSIGHTS } from './_components/insights-data';
 import { useListings } from './_components/useListings';
+import { portalHeroReel } from './_components/portalRuntime';
 import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice, isRental } from './_components/types';
 import { useCurrencyPref } from './_components/usePortalPrefs';
 import { WHY_INVEST } from './_components/portal-content';
@@ -35,14 +36,8 @@ const MARKETS = [
 // 4K files exceed Cloudflare's 25MiB per-asset limit); these are 1600×900,
 // 10 s, silent web encodes in /public/videos. The poster paints instantly and
 // is all that shows on slow connections or under prefers-reduced-motion.
-const HERO_REEL = [
-  { key: 'night-skyline', label: 'City at night', video: '/videos/night-skyline.mp4', poster: '/videos/night-skyline.jpg' },
-  { key: 'dubai-villa-daynight', label: 'Dubai', video: '/videos/dubai-villa-daynight.mp4', poster: '/videos/dubai-villa-daynight.jpg' },
-  { key: 'night-river', label: 'City at night', video: '/videos/night-river.mp4', poster: '/videos/night-river.jpg' },
-  { key: 'dubai-villa', label: 'Dubai', video: '/videos/dubai-villa.mp4', poster: '/videos/dubai-villa.jpg' },
-  { key: 'night-towers', label: 'City at night', video: '/videos/night-towers.mp4', poster: '/videos/night-towers.jpg' },
-  { key: 'dubai-playground', label: 'Dubai', video: '/videos/dubai-playground.mp4', poster: '/videos/dubai-playground.jpg' },
-];
+// The reel is editable in admin (Portal content -> Home hero). The shipped
+// clips remain the fallback, so an empty list never leaves a black hero.
 
 // Listings uploaded with their own clip join the front of the reel, newest
 // first — capped so the brand footage always gets its turn.
@@ -145,7 +140,7 @@ export default function PropertyPortalHome() {
         video: p.video_url,
         poster: p.video_poster_url || resolveImage(p.images?.[0]) || '',
       }));
-    return [...projectClips, ...HERO_REEL];
+    return [...projectClips, ...portalHeroReel()];
   }, [properties]);
 
   // Visitors who ask the OS for reduced motion get the still poster instead of

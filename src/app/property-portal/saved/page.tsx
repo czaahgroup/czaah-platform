@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { PropertyCard } from '../_components/PropertyCard';
 import { useListings } from '../_components/useListings';
 import { useWishlist } from '../_components/usePortalPrefs';
-import { resolveImage, PORTAL_COUNTRIES } from '../_components/types';
+import { resolveImage, portalCountries } from '../_components/types';
 
 export default function SavedPage() {
   const { all, loading, error, reload } = useListings();
@@ -26,7 +26,7 @@ export default function SavedPage() {
     async function load() {
       try {
         const res = await fetch(
-          '/api/public/developments?countries=' + encodeURIComponent(PORTAL_COUNTRIES.join(','))
+          '/api/public/developments?countries=' + encodeURIComponent(portalCountries().join(','))
         );
         const json = await res.json();
         if (!cancelled && res.ok) setDevelopments((json.data || []).filter((d) => devIds.includes(d.id)));

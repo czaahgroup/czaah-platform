@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { LiveProperty, PORTAL_COUNTRIES } from './types';
+import { LiveProperty, portalCountries } from './types';
 
 // Shared loader for every portal page that lists properties (home, listings,
 // off-plan). Previously each page inlined its own fetch and only called
@@ -20,7 +20,7 @@ export function useListings() {
     try {
       const res = await fetch(
         '/api/public/properties?countries=' +
-          encodeURIComponent(PORTAL_COUNTRIES.join(','))
+          encodeURIComponent(portalCountries().join(','))
       );
       const json = await res.json().catch(() => null);
       if (!res.ok) {

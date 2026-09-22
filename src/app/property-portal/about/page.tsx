@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { OFFICES, PORTAL_EMAIL } from '../_components/offices';
+import { portalOffices, portalEmail } from '../_components/portalRuntime';
 import { WHY_INVEST } from '../_components/portal-content';
 
 export const metadata: Metadata = {
@@ -86,7 +86,7 @@ export default function PortalAboutPage() {
         <div className="pp-container">
           <h2 className="pp-h2" style={{ marginBottom: 34 }}>Our offices</h2>
           <div className="pp-presence-grid">
-            {OFFICES.map((o) => (
+            {portalOffices().map((o) => (
               <div className="pp-presence" key={o.city}>
                 <strong>{o.city}</strong>
                 {o.lines.map((l) => (
@@ -108,7 +108,7 @@ export default function PortalAboutPage() {
           </p>
           <div className="pp-cta-row">
             <Link href="/property-portal/contact" className="pp-btn pp-btn--gold">Contact us</Link>
-            <a href={`mailto:${PORTAL_EMAIL}`} className="pp-btn pp-btn--ghost">{PORTAL_EMAIL}</a>
+            <a href={`mailto:${portalEmail()}`} className="pp-btn pp-btn--ghost">{portalEmail()}</a>
           </div>
         </div>
       </section>

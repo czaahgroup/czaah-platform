@@ -2,6 +2,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { MarkhorMark } from '@/components/MarkhorMark'
 import { PortalNav } from './_components/PortalNav'
+import { PortalContentProvider } from './_components/PortalContentProvider'
+import { loadPortalContent } from '@/lib/portalContent'
 import './_components/portal.css'
 
 const PORTAL_TITLE = 'CZAAH Property — Investment Real Estate in London, Dubai & Pakistan'
@@ -45,8 +47,13 @@ const FOOTER_LINKS = [
   { label: 'Contact', href: '/property-portal/contact' },
 ]
 
-export default function PropertyPortalLayout({ children }: { children: React.ReactNode }) {
+export default async function PropertyPortalLayout({ children }: { children: React.ReactNode }) {
+  // Loaded server-side so the first render already has the stored settings —
+  // useListings fires its request before any effect could update them.
+  const content = await loadPortalContent()
+
   return (
+    <PortalContentProvider content={content}>
     <div className="pp-root">
       <PortalNav />
       {children}
@@ -91,5 +98,6 @@ export default function PropertyPortalLayout({ children }: { children: React.Rea
         </div>
       </footer>
     </div>
+    </PortalContentProvider>
   )
 }
