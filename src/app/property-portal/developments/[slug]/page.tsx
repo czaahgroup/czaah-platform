@@ -215,7 +215,16 @@ export default function DevelopmentPage() {
     );
   }
 
-  const hero = resolveImage(dev.featured_image) || resolveImage((dev.gallery || [])[0]);
+  // The main image is often a still from the site-visit clip, which made the
+  // hero and the video below it the same frame. When that happens, and there
+  // is other artwork, the hero takes the first gallery image instead.
+  const galleryPaths = (dev.gallery || []).filter(Boolean);
+  const heroIsVideoStill =
+    !!dev.featured_image && !!dev.video_poster_url && dev.featured_image === dev.video_poster_url;
+  const hero =
+    (heroIsVideoStill && galleryPaths.length ? resolveImage(galleryPaths[0]) : null) ||
+    resolveImage(dev.featured_image) ||
+    resolveImage(galleryPaths[0]);
   // Video, poster and brochure all live in the same bucket as the images.
   const video = resolveImage(dev.video_url);
   const videoPoster = resolveImage(dev.video_poster_url) || hero;
@@ -224,10 +233,19 @@ export default function DevelopmentPage() {
   const lat = Number(dev.latitude);
   const lon = Number(dev.longitude);
   const hasCoords = Number.isFinite(lat) && Number.isFinite(lon) && !(lat === 0 && lon === 0);
-  const gallery = (dev.gallery || []).map(resolveImage).filter(Boolean);
+  const gallery = galleryPaths.map(resolveImage).filter(Boolean).filter((src) => src !== hero);
   const saveId = `dev:${dev.id}`;
   const display = prefCcy || '';
-  const locationLine = [dev.area, dev.city, dev.province_state, dev.country].filter(Boolean).join(', ');
+  // Typed by hand in admin, so capitalise for display rather than trusting it.
+  const titleCase = (value) =>
+    String(value)
+      .split(' ')
+      .map((word) => (word.length > 2 ? word[0].toUpperCase() + word.slice(1) : word))
+      .join(' ');
+  const locationLine = [dev.area, dev.city, dev.province_state, dev.country]
+    .filter(Boolean)
+    .map(titleCase)
+    .join(', ');
 
   return (
     <main>
@@ -261,8 +279,13 @@ export default function DevelopmentPage() {
           )}
           {fromPrice && (
             <p className="pp-dev-from">
-              From <strong>{displayPrice(fromPrice.total_price, fromPrice.currency, display)}</strong>
-              <span> · {available.length || units.length} plot size{(available.length || units.length) === 1 ? '' : 's'}</span>
+              From
+              <strong>{displayPrice(fromPrice.total_price, fromPrice.currency, display)}</strong>
+              <span>
+                {available.length || units.length} plot size
+                {(available.length || units.length) === 1 ? '' : 's'}
+                {units.some((u) => u.payment_plan) ? ' · instalment plans available' : ''}
+              </span>
             </p>
           )}
           <div className="pp-dev-actions">
@@ -304,42 +327,89 @@ export default function DevelopmentPage() {
         {tab === 'overview' && (
           <section className="pp-detail-section">
             <h2 className="pp-h2">Overview</h2>
-            {dev.description ? (
-              <p className="pp-detail-desc">{dev.description}</p>
-            ) : (
-              <p className="pp-detail-desc">Details available on request.</p>
-            )}
-            <div className="pp-spec-grid">
+
+            {/* No placeholder line when there is no description — an empty
+                section is better than "Details available on request." sitting
+                where the copy should be. */}
+            {dev.description && <p className="pp-detail-desc">{dev.description}</p>}
+
+            <div className="pp-dev-facts">
+              <div className="pp-dev-fact">
+                <small>Plot sizes</small>
+                <span>{units.length || '—'}</span>
+              </div>
+              {fromPrice && (
+                <div className="pp-dev-fact">
+                  <small>From</small>
+                  <span>{displayPrice(fromPrice.total_price, fromPrice.currency, display)}</span>
+                </div>
+              )}
               {dev.development_status && (
-                <div className="pp-spec"><small>Status</small><span>{DEVELOPMENT_STATUS_LABEL[dev.development_status] || dev.development_status}</span></div>
+                <div className="pp-dev-fact">
+                  <small>Status</small>
+                  <span>{DEVELOPMENT_STATUS_LABEL[dev.development_status] || dev.development_status}</span>
+                </div>
               )}
               {dev.possession_status && (
-                <div className="pp-spec"><small>Possession</small><span>{POSSESSION_LABEL[dev.possession_status] || dev.possession_status}</span></div>
+                <div className="pp-dev-fact">
+                  <small>Possession</small>
+                  <span>{POSSESSION_LABEL[dev.possession_status] || dev.possession_status}</span>
+                </div>
               )}
-              <div className="pp-spec"><small>Plot sizes</small><span>{units.length || '—'}</span></div>
+              {dev.developer_name && (
+                <div className="pp-dev-fact">
+                  <small>Developer</small>
+                  <span>{dev.developer_name}</span>
+                </div>
+              )}
               {dev.approval_authority && (
-                <div className="pp-spec"><small>Approved by</small><span>{dev.approval_authority}</span></div>
+                <div className="pp-dev-fact">
+                  <small>Approved by</small>
+                  <span>{dev.approval_authority}</span>
+                </div>
               )}
             </div>
             {video && (
-              <div className="pp-dev-video">
-                <video
-                  src={video}
-                  poster={videoPoster || undefined}
-                  controls
-                  playsInline
-                  preload="metadata"
-                />
+              <div className="pp-dev-block">
+                <h3 className="pp-dev-block-title">Site visit</h3>
+                <div className="pp-dev-video">
+                  <video
+                    src={video}
+                    poster={videoPoster || undefined}
+                    controls
+                    playsInline
+                    preload="metadata"
+                  />
+                </div>
               </div>
             )}
+
             {gallery.length > 0 && (
-              <div className="pp-dev-gallery">
-                {gallery.map((src, i) => (
-                  <button key={src} type="button" onClick={() => setLightbox(i)} aria-label={`Open image ${i + 1}`}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt={`${dev.name} ${i + 1}`} />
-                  </button>
-                ))}
+              <div className="pp-dev-block">
+                <h3 className="pp-dev-block-title">
+                  {gallery.length} photo{gallery.length === 1 ? '' : 's'}
+                </h3>
+                <div className="pp-dev-gallery">
+                  {gallery.map((src, i) => (
+                    <button key={src} type="button" onClick={() => setLightbox(i)} aria-label={`Open image ${i + 1}`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt={`${dev.name} ${i + 1}`} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Features belong in the overview too when there are only a few —
+                a whole tab for four bullet points reads as an empty page. */}
+            {(dev.features || []).length > 0 && (
+              <div className="pp-dev-block">
+                <h3 className="pp-dev-block-title">Highlights</h3>
+                <div className="pp-features">
+                  {dev.features.map((feature) => (
+                    <span key={feature} className="pp-feature">{feature}</span>
+                  ))}
+                </div>
               </div>
             )}
           </section>
