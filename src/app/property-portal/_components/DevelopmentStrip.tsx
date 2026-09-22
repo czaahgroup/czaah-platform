@@ -53,14 +53,19 @@ export function DevelopmentStrip() {
   return (
     <section className="pp-section">
       <div className="pp-container">
-        <div className="pp-section-head">
+        {/* The count sat in .pp-section-head, which is space-between — with a
+            wide container that threw "1 scheme" 1,200px from its heading. */}
+        <div className="pp-dev-strip-head">
           <h2 className="pp-h2">Developments</h2>
           <span className="pp-dev-strip-count">
             {developments.length} scheme{developments.length === 1 ? '' : 's'}
           </span>
         </div>
 
-        <div className="pp-dev-strip">
+        {/* One scheme in an auto-fill grid left three empty columns beside it.
+            A single development gets a wide horizontal card instead, which
+            reads as a feature rather than a grid that failed to fill. */}
+        <div className={`pp-dev-strip${developments.length === 1 ? ' pp-dev-strip--single' : ''}`}>
           {developments.map((dev) => {
             const units = dev.development_units || [];
             // Cheapest variant, compared in one currency.
