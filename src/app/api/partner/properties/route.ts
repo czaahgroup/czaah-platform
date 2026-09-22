@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
         const filePath = `properties/${user.id}/${Date.now()}_${i}.${ext}`
 
         const { error: uploadError } = await supabase.storage
-          .from('platform-files')
+          .from('property-images')
           .upload(filePath, buffer, { contentType, upsert: false })
 
         if (!uploadError) {

@@ -96,7 +96,7 @@ export function matchesMarket(prop: LiveProperty, market: string) {
 export function resolveImage(image: string | null | undefined): string | null {
   if (!image) return null;
   if (image.startsWith('http') || image.startsWith('/')) return image;
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/platform-files/${image}`;
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/${image}`;
 }
 
 // FX table and accepted currencies live in src/lib/currencies.ts so the

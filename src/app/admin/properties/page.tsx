@@ -750,7 +750,7 @@ export default function AdminPropertiesPage() {
                       src={
                         selected.images[0].startsWith('http') || selected.images[0].startsWith('/')
                           ? selected.images[0]
-                          : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/platform-files/${selected.images[0]}`
+                          : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/${selected.images[0]}`
                       }
                       alt={selected.title}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}

@@ -38,7 +38,9 @@ export const LISTING_COLUMNS = `
   development_id, development_unit_id, created_at
 `
 
-export const STORAGE_BUCKET = 'platform-files'
+// Marketing images only, and world-readable. platform-files is private and
+// also holds deal/investment/enquiry documents, so it must not be used here.
+export const STORAGE_BUCKET = 'property-images'
 
 /**
  * Accepts what the admin form sends for images: either a data URL / raw

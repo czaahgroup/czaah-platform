@@ -3252,6 +3252,8 @@
 .pp-dev-ghost:hover { border-color: var(--pp-gold); color: var(--pp-gold-deep); }
 
 .pp-dev-tabs {
+  position: static;
+  width: auto;
   display: flex;
   gap: 4px;
   flex-wrap: wrap;

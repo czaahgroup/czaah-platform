@@ -273,18 +273,20 @@ export default function DevelopmentPage() {
       </section>
 
       <div className="pp-container">
-        <nav className="pp-dev-tabs" aria-label="Sections">
+        <div className="pp-dev-tabs" role="tablist" aria-label="Development sections">
           {TABS.map((t) => (
             <button
               key={t.key}
               type="button"
+              role="tab"
+              aria-selected={tab === t.key}
               className={tab === t.key ? 'active' : undefined}
               onClick={() => setTab(t.key)}
             >
               {t.label}
             </button>
           ))}
-        </nav>
+        </div>
 
         {tab === 'overview' && (
           <section className="pp-detail-section">
