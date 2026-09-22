@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MarkhorMark } from '@/components/MarkhorMark';
@@ -51,6 +51,43 @@ export function PortalNav() {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  // The bar is fixed, so .pp-root reserves its height through --pp-nav-h. That
+  // token was maintained by hand in portal.css and drifted every time the bar
+  // changed size (60px reserved against a 65px bar on phones, so the top of
+  // every page sat under the glass). Measure the real bar and publish it —
+  // .pp-nav-inner, not the header, because the header also contains the open
+  // drawer. The CSS values stay as the pre-hydration fallback.
+  const barRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const bar = barRef.current;
+    const root = bar?.closest('.pp-root') as HTMLElement | null;
+    if (!bar || !root) return;
+    const sync = () => {
+      const header = bar.parentElement;
+      const border = header ? parseFloat(getComputedStyle(header).borderBottomWidth) || 0 : 0;
+      root.style.setProperty('--pp-nav-h', `${Math.round(bar.getBoundingClientRect().height + border)}px`);
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(bar);
+    window.addEventListener('resize', sync);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', sync);
+    };
+  }, []);
+
+  // With the drawer open the page behind it still scrolled under the thumb,
+  // which on a phone reads as the menu itself sliding away.
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
   // On a hero page the bar stays clear the whole way down — it carries its
   // own gradient backdrop so the white links hold over the light sections
   // further down the page. The mobile drawer is the one exception: it covers
@@ -68,7 +105,7 @@ export function PortalNav() {
   return (
     <div className="pp-navwrap">
       <header className={`pp-nav${overHero ? ' is-over-hero' : ' is-solid'}${lifted ? ' is-lifted' : ''}`}>
-      <div className="pp-nav-inner">
+      <div className="pp-nav-inner" ref={barRef}>
         <Link href="/property-portal" className="pp-logo" onClick={() => setOpen(false)}>
           <MarkhorMark className="pp-logo-mark" />
           <span className="pp-logo-divider" />

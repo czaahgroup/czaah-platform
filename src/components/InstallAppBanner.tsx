@@ -6,7 +6,7 @@
 // no such API at all, so it gets a instructional hint instead (Share ->
 // Add to Home Screen).
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 
 const DISMISS_KEY = 'czaah-install-dismissed'
@@ -28,9 +28,36 @@ function isStandalone(): boolean {
     (window.navigator as unknown as { standalone?: boolean }).standalone === true
 }
 
+// Both bottom bars are position:fixed, so they sat on top of whatever the page
+// ended with — the property portal's send-enquiry button, the mobile drawer's
+// CTA. Publish the bar's height as --app-bottom-bar and let layouts reserve it.
+function useBottomBarHeight(visible: boolean) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    const root = document.documentElement
+    if (!visible || !el) {
+      root.style.removeProperty('--app-bottom-bar')
+      return
+    }
+    const sync = () => root.style.setProperty('--app-bottom-bar', `${Math.ceil(el.getBoundingClientRect().height)}px`)
+    sync()
+    const observer = new ResizeObserver(sync)
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      root.style.removeProperty('--app-bottom-bar')
+    }
+  }, [visible])
+
+  return ref
+}
+
 export function InstallAppBanner() {
   const pathname = usePathname()
   const [visible, setVisible] = useState(false)
+  const barRef = useBottomBarHeight(visible)
   const [platform, setPlatform] = useState<'android' | 'ios' | null>(null)
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
 
@@ -94,6 +121,7 @@ export function InstallAppBanner() {
 
   return (
     <div
+      ref={barRef}
       style={{
         position: 'fixed',
         bottom: 0,
@@ -151,7 +179,7 @@ export function InstallAppBanner() {
                 background: '#C9A84C',
                 color: '#000000',
                 border: 'none',
-                padding: '8px 24px',
+                padding: '13px 26px',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
@@ -173,7 +201,9 @@ export function InstallAppBanner() {
               fontSize: '20px',
               lineHeight: 1,
               cursor: 'pointer',
-              padding: '4px',
+              padding: '0',
+              minWidth: '44px',
+              minHeight: '44px',
             }}
           >
             &times;

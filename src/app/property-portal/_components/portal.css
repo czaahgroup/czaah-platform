@@ -460,6 +460,7 @@
 }
 .pp-testimonial-dots { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
 .pp-testimonial-dots button {
+  position: relative;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -2904,8 +2905,8 @@
    and make the breadcrumb legible instead of a 44%-grey whisper.
    ========================================================================== */
 .pp-root { --pp-nav-h: 101px; }
-@media (max-width: 1280px) { .pp-root { --pp-nav-h: 64px; } }
-@media (max-width: 860px)  { .pp-root { --pp-nav-h: 60px; } }
+@media (max-width: 1280px) { .pp-root { --pp-nav-h: 65px; } }
+@media (max-width: 860px)  { .pp-root { --pp-nav-h: 65px; } }
 
 /* Inner pages get the gap; hero pages stay flush since their artwork runs
    under the bar by design. */
@@ -3124,3 +3125,63 @@
 @media (max-width: 520px) {
   .pp-footer-links-2 { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   Touch targets.
+   Measured on a 390x844 phone: the hamburger was 26x26, the wishlist heart
+   17x17, the currency select 21px tall, the card save button 32x32 and the
+   carousel dots 8x8 — all far under the ~44px a thumb needs. Each control
+   keeps its visual size; only the hit area grows. Where the control sits in
+   the nav bar the padding is cancelled by an equal negative margin, so the
+   bar does not get taller (PortalNav measures it into --pp-nav-h).
+   ========================================================================== */
+@media (max-width: 1180px) {
+  /* Wider gap first, so the enlarged hit areas below cannot overlap and
+     steal each other’s taps. */
+  .pp-nav .pp-nav-tools { gap: 24px; }
+  .pp-nav .pp-nav-toggle {
+    padding: 11px;
+    margin: -11px;
+    align-items: center;
+    justify-content: center;
+  }
+  .pp-nav .pp-nav-saved { padding: 13px; margin: -13px; }
+  .pp-nav .pp-nav-ccy select { padding: 12px 0; margin: -12px 0; }
+  .pp-nav .pp-logo { padding: 5px 0; margin: -5px 0; }
+
+  /* Overlay on the card artwork — no layout to disturb. */
+  .pp-card .pp-card-save { width: 40px; height: 40px; }
+
+  /* Hero search pill: the selects were 21px tall. */
+  .pp-searchbar-field select { min-height: 34px; }
+  .pp-searchbar-field > span { font-size: 11px; }
+
+  .pp-testimonial-dots { gap: 18px; }
+  .pp-testimonial-dots button::after {
+    content: '';
+    position: absolute;
+    inset: -16px -9px;
+  }
+
+  /* Text links: 44px each would stretch the footer off the screen, so these
+     get a comfortable row instead of a strict square. */
+  .pp-footer .pp-footer-links-2 a,
+  .pp-footer .pp-footer-col > a { padding: 7px 0; }
+  .pp-footer-bottom a { display: inline-block; padding: 8px 0; }
+  .pp-crumbs a { display: inline-block; padding: 6px 0; }
+  .pp-link-arrow { display: inline-block; padding: 8px 0; }
+
+  /* A phone in landscape leaves ~320px of drawer; without this the last
+     links and the CTA are unreachable. */
+  .pp-nav .pp-mobile-menu.open {
+    max-height: calc(100svh - var(--pp-nav-h));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* The fixed cookie / install-app bars at the foot of the viewport used to
+   cover whatever sat at the bottom of the page — the contact form’s send
+   button, the drawer’s CTA. They publish their height now; reserve it. */
+.pp-footer { padding-bottom: calc(28px + var(--app-bottom-bar, 0px)); }

@@ -1,12 +1,39 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 const COOKIE_CONSENT_KEY = 'czaah-cookie-consent'
 
+// Both bottom bars are position:fixed, so they sat on top of whatever the page
+// ended with — the property portal's send-enquiry button, the mobile drawer's
+// CTA. Publish the bar's height as --app-bottom-bar and let layouts reserve it.
+function useBottomBarHeight(visible: boolean) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    const root = document.documentElement
+    if (!visible || !el) {
+      root.style.removeProperty('--app-bottom-bar')
+      return
+    }
+    const sync = () => root.style.setProperty('--app-bottom-bar', `${Math.ceil(el.getBoundingClientRect().height)}px`)
+    sync()
+    const observer = new ResizeObserver(sync)
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      root.style.removeProperty('--app-bottom-bar')
+    }
+  }, [visible])
+
+  return ref
+}
+
 export function CookieConsent() {
   const [visible, setVisible] = useState(false)
+  const barRef = useBottomBarHeight(visible)
 
   useEffect(() => {
     const consent = localStorage.getItem(COOKIE_CONSENT_KEY)
@@ -26,6 +53,7 @@ export function CookieConsent() {
 
   return (
     <div
+      ref={barRef}
       style={{
         position: 'fixed',
         bottom: 0,
@@ -83,6 +111,7 @@ export function CookieConsent() {
               color: '#C9A84C',
               textDecoration: 'none',
               whiteSpace: 'nowrap',
+              padding: '13px 4px',
             }}
           >
             Privacy Policy
@@ -96,7 +125,7 @@ export function CookieConsent() {
               background: '#C9A84C',
               color: '#000000',
               border: 'none',
-              padding: '8px 24px',
+              padding: '13px 26px',
               borderRadius: '4px',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
