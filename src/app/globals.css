@@ -3445,3 +3445,29 @@ footer {
 .im-detail-label { font-family: 'Raleway', sans-serif; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
 .im-detail-value { font-family: 'Raleway', sans-serif; font-size: 0.95rem; color: #fff; font-weight: 500; }
 @media (max-width: 768px) { .im-card { flex-direction: column; padding: 28px 20px; } .im-left, .im-right { flex: 1 1 100%; } .im-section h2 { font-size: 1.8rem; } }
+
+/* Windows Contrast themes — see the portal stylesheet for the reasoning.
+   The wordmark is a gradient clipped to text, which this mode repaints as a
+   solid block unless the gradient is removed. */
+@media (forced-colors: active) {
+  .nav-logo .nav-wordmark {
+    /* Suppresses Chromium's text backplate, which drew a box around the logo. */
+    forced-color-adjust: none;
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: currentColor !important;
+    color: LinkText !important;
+  }
+
+  .nav-logo .markhor-mark {
+    forced-color-adjust: none;
+  }
+
+  nav {
+    background: Canvas;
+    border-bottom: 1px solid CanvasText;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

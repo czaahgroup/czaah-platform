@@ -3625,3 +3625,76 @@ a.pp-dev-ghost {
 @media (max-width: 1180px) {
   .pp-nav .pp-logo-mark { height: 36px; }
 }
+
+/* ==========================================================================
+   Windows Contrast themes (forced-colors).
+   The OS replaces the palette wholesale. Two things broke badly:
+
+   * The wordmark is a gradient clipped to text with color: transparent. The
+     browser keeps painting the background but forces the text colour, so
+     "CZAAH" came out as a filled rectangle rather than letters.
+   * Gold accents — the active-link underline, the CTA — map to the system
+     highlight colour, which in themes like Desert is a vivid yellow. That is
+     the user's choice and correct; they just need to sit on the right
+     backgrounds rather than on a translucent pane.
+
+   The logo mark keeps its own colours: a brand mark is one of the few things
+   forced-color-adjust: none is meant for.
+   ========================================================================== */
+@media (forced-colors: active) {
+  /* The gradient is set by .pp-nav.is-solid .pp-logo-word and friends, which
+     outrank a bare class selector — hence !important. An accessibility
+     override has to win, and there is no cleaner lever here. */
+  .pp-logo-word,
+  .nav-wordmark {
+    /* Chromium paints a backplate behind text in this mode; on the wordmark
+     it reads as a box around the logo. forced-color-adjust: none suppresses
+     it, and the colour is still taken from the system palette below so the
+     logo continues to match the chosen theme. */
+    forced-color-adjust: none;
+    /* Plain text, no clipped gradient, so it renders as letters not a block. */
+    background: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    -webkit-text-fill-color: currentColor !important;
+    color: LinkText !important;
+  }
+
+  .pp-logo-mark,
+  .markhor-mark {
+    forced-color-adjust: none;
+  }
+
+  /* Shadows and blurs are dropped in this mode anyway; the translucent bar
+     becomes a solid system surface, so give it a real edge instead. */
+  .pp-nav,
+  .pp-nav.is-over-hero,
+  .pp-nav.is-solid,
+  .pp-nav.is-lifted {
+    background: Canvas;
+    border-bottom: 1px solid CanvasText;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Over-hero links are white by design, which is invisible on a forced
+     light Canvas. */
+  .pp-nav .pp-nav-links a,
+  .pp-nav.is-over-hero .pp-nav-links a,
+  .pp-nav.is-solid .pp-nav-links a,
+  .pp-nav-ccy select,
+  .pp-nav-saved {
+    color: LinkText;
+  }
+
+  .pp-nav .pp-nav-links a.active { color: LinkText; }
+
+  /* Buttons need a border to exist at all once their gold fill is forced. */
+  .pp-dev-cta,
+  .pp-dev-ghost,
+  .pp-nav-cta,
+  .pp-searchbar-go {
+    border: 1px solid ButtonText;
+  }
+}
