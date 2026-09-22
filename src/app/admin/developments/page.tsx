@@ -168,8 +168,11 @@ const emptyForm = {
   brochureName: '',
 }
 
-// Files go straight to storage, so the only ceiling is the bucket's own.
-const MAX_UPLOAD_MB = 100
+// The real ceiling is the PROJECT-level storage upload limit, which sits
+// above every bucket. It is at the 50MB default; the bucket claiming more just
+// meant a 51MB file uploaded in full and was then refused with EntityTooLarge.
+// Raise it in the Supabase dashboard (Storage -> Settings) before raising this.
+const MAX_UPLOAD_MB = 50
 
 /** A preview URL for either a freshly picked file or an already stored path. */
 function mediaPreview(value: string): string {
@@ -510,9 +513,10 @@ export default function AdminDevelopmentsPage() {
     const tooBig = picked.filter((file) => file.size > MAX_UPLOAD_MB * 1024 * 1024)
     if (tooBig.length) {
       setError(
-        `${tooBig.map((t) => t.name).join(', ')} — over the ${MAX_UPLOAD_MB}MB limit. ` +
+        `${tooBig.map((t) => `${t.name} (${(t.size / 1048576).toFixed(0)}MB)`).join(', ')} — over the ` +
+          `${MAX_UPLOAD_MB}MB storage limit. ` +
           (key === 'videoUrl'
-            ? 'Compress the clip and try again — 1080p and under a minute is plenty.'
+            ? 'Compress the clip — 1080p, under a minute, no audio usually lands well under it.'
             : 'Re-export it smaller and try again.')
       )
       return
@@ -1120,8 +1124,8 @@ export default function AdminDevelopmentsPage() {
                   </div>
                 ) : (
                   <p style={hintStyle}>
-                    MP4, WebM or MOV, up to {MAX_UPLOAD_MB}MB. Uploads straight to storage, so a
-                    full site-visit clip is fine.
+                    MP4, WebM or MOV, up to {MAX_UPLOAD_MB}MB. Phone video is often larger than
+                    that — compress it first, or raise the storage limit in Supabase.
                   </p>
                 )}
               </div>

@@ -21,9 +21,10 @@ const ALLOWED = new Set([
   'application/pdf',
 ])
 
-// Matches the bucket's file_size_limit; checked here too so an oversized file
-// is refused before it is sent rather than after.
-const MAX_BYTES = 100 * 1024 * 1024
+// Matches what storage will actually take. The ceiling is the PROJECT-level
+// upload limit rather than the bucket's, so refuse here and save the caller a
+// pointless full-size transfer that ends in EntityTooLarge.
+const MAX_BYTES = 50 * 1024 * 1024
 
 // Plenty of pickers — Android gallery apps especially — hand over a File with
 // an empty `type`. Rejecting those meant a perfectly good video was refused
@@ -75,7 +76,12 @@ export async function POST(request: NextRequest) {
 
     if (typeof size === 'number' && size > MAX_BYTES) {
       return NextResponse.json(
-        { error: `That file is ${(size / 1048576).toFixed(0)}MB. The limit is ${MAX_BYTES / 1048576}MB — compress it and try again.` },
+        {
+          error:
+            `That file is ${(size / 1048576).toFixed(0)}MB and the storage limit is ` +
+            `${MAX_BYTES / 1048576}MB. Compress it, or raise the upload file size limit ` +
+            `in the Supabase dashboard under Storage -> Settings.`,
+        },
         { status: 400 }
       )
     }
