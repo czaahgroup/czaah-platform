@@ -3185,3 +3185,248 @@
    cover whatever sat at the bottom of the page — the contact form’s send
    button, the drawer’s CTA. They publish their height now; reserve it. */
 .pp-footer { padding-bottom: calc(28px + var(--app-bottom-bar, 0px)); }
+
+
+/* ==========================================================================
+   Developments — a scheme with several plot sizes.
+   Same white/black/gold system as the rest of the portal; the variants read as
+   a priced list rather than cards, because the thing being chosen is a size,
+   not a property.
+   ========================================================================== */
+.pp-dev-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 34px;
+  align-items: center;
+  max-width: 1280px;
+  margin: 8px auto 30px;
+  padding: 0 34px;
+}
+.pp-dev-hero-img {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.pp-dev-hero-img img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: var(--pp-panel);
+}
+.pp-dev-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.pp-dev-badge {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border: 1px solid var(--pp-border-strong);
+  color: var(--pp-text-muted);
+}
+.pp-dev-badge--gold { border-color: var(--pp-gold); color: var(--pp-gold-deep); }
+.pp-dev-brands { font-size: 13.5px; color: var(--pp-text-muted); margin: 10px 0 0; }
+.pp-dev-from { font-size: 16px; margin: 16px 0 0; }
+.pp-dev-from span { color: var(--pp-text-muted); font-size: 13.5px; }
+.pp-dev-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+
+.pp-dev-cta,
+.pp-dev-ghost {
+  font: inherit;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 13px 26px;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 44px;
+}
+.pp-dev-cta { background: var(--pp-gold); color: #080808; border: 0; font-weight: 600; }
+.pp-dev-cta:hover { background: var(--pp-gold-light); }
+.pp-dev-cta:disabled { opacity: 0.6; cursor: default; }
+.pp-dev-ghost { background: transparent; color: var(--pp-text); border: 1px solid var(--pp-border-strong); }
+.pp-dev-ghost:hover { border-color: var(--pp-gold); color: var(--pp-gold-deep); }
+
+.pp-dev-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--pp-border);
+  margin: 10px 0 8px;
+}
+.pp-dev-tabs button {
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--pp-text-muted);
+  padding: 14px 16px;
+  cursor: pointer;
+  min-height: 44px;
+}
+.pp-dev-tabs button:hover { color: var(--pp-text); }
+.pp-dev-tabs button.active { color: var(--pp-gold-deep); border-bottom-color: var(--pp-gold); }
+
+.pp-dev-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+.pp-dev-gallery button { padding: 0; border: 0; background: none; cursor: pointer; overflow: hidden; border-radius: 10px; }
+.pp-dev-gallery img { display: block; width: 100%; height: 150px; object-fit: cover; }
+
+/* ── Plot variants ───────────────────────────────────────────────────── */
+.pp-variants { display: grid; gap: 14px; }
+.pp-variant {
+  border: 1px solid var(--pp-border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  background: var(--pp-card);
+}
+.pp-variant-head { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.pp-variant-head h3 { margin: 0; font-size: 19px; }
+.pp-variant-size { margin: 4px 0 0; font-size: 13px; color: var(--pp-text-muted); }
+.pp-variant-status {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border: 1px solid var(--pp-border-strong);
+  color: var(--pp-text-muted);
+  white-space: nowrap;
+}
+.pp-variant-status--available { border-color: rgba(34, 139, 80, 0.5); color: #1f7a48; }
+.pp-variant-status--reserved { border-color: rgba(190, 150, 40, 0.6); color: #8a6f2e; }
+.pp-variant-status--sold { opacity: 0.7; }
+.pp-variant-price { font-size: 21px; margin: 14px 0 0; }
+.pp-variant-meta {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 12px 0 0;
+}
+.pp-variant-meta li {
+  font-size: 11.5px;
+  color: var(--pp-text-muted);
+  border: 1px solid var(--pp-border);
+  padding: 5px 10px;
+  border-radius: 999px;
+}
+.pp-variant-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+/* ── Payment plan table ──────────────────────────────────────────────── */
+.pp-plan { margin-top: 18px; overflow-x: auto; }
+.pp-plan-table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 420px; }
+.pp-plan-table th {
+  text-align: left;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pp-text-muted);
+  font-weight: 500;
+  padding: 0 12px 10px;
+  border-bottom: 1px solid var(--pp-border);
+}
+.pp-plan-table td { padding: 11px 12px; border-bottom: 1px solid var(--pp-border); }
+.pp-plan-amount { text-align: right; white-space: nowrap; }
+/* The lump sums an advert prints beside an instalment keep their own line. */
+.pp-plan-additional td { color: var(--pp-gold-deep); }
+.pp-plan-table tfoot td {
+  font-weight: 600;
+  border-bottom: 0;
+  border-top: 2px solid var(--pp-border-strong);
+  padding-top: 13px;
+}
+.pp-plan-block { margin-bottom: 38px; }
+.pp-plan-title { font-size: 17px; margin: 0 0 4px; }
+.pp-plan-title span { color: var(--pp-text-muted); font-size: 14px; font-weight: 400; }
+.pp-plan-note { font-size: 12px; color: var(--pp-text-muted); line-height: 1.6; margin: 14px 0 0; max-width: 640px; }
+
+/* ── Enquiry form ────────────────────────────────────────────────────── */
+.pp-dev-form { max-width: 620px; display: grid; gap: 16px; }
+.pp-dev-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pp-dev-form label { display: grid; gap: 6px; font-size: 13px; }
+.pp-dev-form label span { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pp-text-muted); }
+.pp-dev-form input,
+.pp-dev-form textarea {
+  font: inherit;
+  font-size: 15px;
+  padding: 13px 14px;
+  border: 1px solid var(--pp-border-strong);
+  border-radius: 8px;
+  background: var(--pp-card);
+  color: var(--pp-text);
+}
+.pp-dev-form textarea { resize: vertical; }
+.pp-dev-form input:focus,
+.pp-dev-form textarea:focus { outline: 2px solid var(--pp-gold); outline-offset: 1px; }
+.pp-dev-form .pp-dev-cta { justify-self: start; }
+.pp-dev-interest { font-size: 13px; color: var(--pp-text-muted); margin: 0; }
+
+@media (max-width: 900px) {
+  .pp-dev-hero { grid-template-columns: 1fr; gap: 22px; padding: 0 20px; }
+  .pp-dev-form-row { grid-template-columns: 1fr; }
+  .pp-variant { padding: 18px; }
+  .pp-variant-head { flex-direction: column; gap: 10px; }
+  .pp-dev-tabs { gap: 0; overflow-x: auto; flex-wrap: nowrap; }
+  .pp-dev-tabs button { white-space: nowrap; padding: 14px 13px; }
+  .pp-dev-actions .pp-dev-cta,
+  .pp-dev-actions .pp-dev-ghost { flex: 1 1 auto; text-align: center; }
+}
+
+/* Development strip on the off-plan page. */
+.pp-dev-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+.pp-dev-strip-count { font-size: 12px; color: var(--pp-text-muted); }
+.pp-dev-strip-card {
+  display: block;
+  border: 1px solid var(--pp-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--pp-card);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.pp-dev-strip-card:hover { border-color: var(--pp-gold); transform: translateY(-2px); }
+.pp-dev-strip-img { aspect-ratio: 16 / 10; background: var(--pp-panel); }
+.pp-dev-strip-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pp-dev-strip-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #f3efe4, #e6dfcc); }
+.pp-dev-strip-body { padding: 18px 20px 20px; }
+.pp-dev-strip-body h3 { margin: 0; font-size: 18px; }
+.pp-dev-strip-loc { margin: 5px 0 0; font-size: 12.5px; color: var(--pp-text-muted); }
+.pp-dev-strip-sizes { margin: 10px 0 0; font-size: 12px; color: var(--pp-text-muted); }
+.pp-dev-strip-price { margin: 10px 0 12px; font-size: 16px; }
+
+/* Plot-only second filter row. Sits inside the same form so Search and Reset
+   still apply to it; hidden entirely unless the type filter is on land. */
+.pp-plot-filters {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pp-border);
+}
+.pp-plot-flag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--pp-text-muted);
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0 4px;
+}
+.pp-plot-flag input { width: 16px; height: 16px; cursor: pointer; }

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
 import { MARKETS, matchesMarket, CURRENCIES, convertPrice } from '../_components/types';
 import { useListings } from '../_components/useListings';
+import { DevelopmentStrip } from '../_components/DevelopmentStrip';
 
 
 const PAGE_SIZE = 9;
@@ -116,6 +117,11 @@ function OffPlanInner() {
         <div className="pp-crumbs">
           <Link href="/property-portal">Home</Link> / Off-Plan
         </div>
+      </div>
+
+      <DevelopmentStrip />
+
+      <div className="pp-container">
 
         <div className="pp-listpage-head" style={{ paddingTop: 18 }}>
           <div className="pp-listpage-meta">

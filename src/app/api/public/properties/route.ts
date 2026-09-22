@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
-
+import { LISTING_COLUMNS } from '@/lib/developments'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,25 +10,43 @@ export async function GET(request: NextRequest) {
 
     const city = searchParams.get('city')
     const type = searchParams.get('type')
+    const subtype = searchParams.get('subtype')
     const listingType = searchParams.get('listing_type')
     const minPrice = searchParams.get('min_price')
     const maxPrice = searchParams.get('max_price')
     const search = searchParams.get('search')
     const countries = searchParams.get('countries') // comma-separated, e.g. "Pakistan,United Kingdom"
+    const country = searchParams.get('country')
+    // Plot filters. Size bands are NOT filtered here — marla, kanal and ft²
+    // are mixed across markets, so the portal compares them in ft² client-side
+    // the same way it compares prices in USD.
+    const plotCategory = searchParams.get('plot_category')
+    const possession = searchParams.get('possession_status')
+    const development = searchParams.get('development_id')
 
     let query = supabase
       .from('property_listings')
-      .select('id, title, property_type, listing_type, price, currency, location, city, country, area_sqft, bedrooms, bathrooms, description, features, images, video_url, video_poster_url, rent_period, furnishing, available_from, deposit, min_term_months, yield_percentage, created_at')
+      .select(LISTING_COLUMNS)
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
 
     if (city) query = query.ilike('city', `%${city}%`)
     if (type) query = query.eq('property_type', type)
+    if (subtype) query = query.eq('property_subtype', subtype)
     if (listingType) query = query.eq('listing_type', listingType)
     if (minPrice) query = query.gte('price', Number(minPrice))
     if (maxPrice) query = query.lte('price', Number(maxPrice))
-    if (search) query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%,country.ilike.%${search}%`)
+    if (search) query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%,country.ilike.%${search}%,development_name.ilike.%${search}%`)
     if (countries) query = query.in('country', countries.split(',').map((c) => c.trim()))
+    if (country) query = query.eq('country', country)
+    if (plotCategory) query = query.eq('plot_category', plotCategory)
+    if (possession) query = query.eq('possession_status', possession)
+    if (development) query = query.eq('development_id', development)
+    // Boolean plot flags only ever narrow: ?corner_plot=true means "corner
+    // plots only", never "non-corner plots only".
+    for (const flag of ['corner_plot', 'park_facing', 'main_road', 'boulevard', 'canal_facing', 'approved', 'verified', 'featured']) {
+      if (searchParams.get(flag) === 'true') query = query.eq(flag, true)
+    }
 
     const { data: properties, error } = await query
 

@@ -11,13 +11,33 @@ import { useListings } from '../_components/useListings';
 
 const PAGE_SIZE = 9;
 
+import { plotSizeInSqFt, PLOT_CATEGORIES, POSSESSION_STATUSES } from '@/lib/plots';
+
+// Plot size bands, compared in ft² because marla, kanal and ft² are mixed
+// across markets — the same reason prices are compared in USD.
+const PLOT_SIZES = [
+  { v: '', l: 'Any plot size' },
+  { v: '0-1125', l: 'Up to 5 Marla' },
+  { v: '1125-2250', l: '5 – 10 Marla' },
+  { v: '2250-4500', l: '10 Marla – 1 Kanal' },
+  { v: '4500-9000', l: '1 – 2 Kanal' },
+  { v: '9000-', l: '2 Kanal +' },
+];
+
+const PLOT_FLAGS = [
+  { key: 'corner', column: 'corner_plot', label: 'Corner' },
+  { key: 'main_road', column: 'main_road', label: 'Main road' },
+  { key: 'canal_facing', column: 'canal_facing', label: 'Canal facing' },
+  { key: 'approved', column: 'approved', label: 'Approved' },
+];
+
 const TYPES = [
   { v: '', l: 'Any type' },
   { v: 'residential', l: 'Residential' },
   { v: 'commercial', l: 'Commercial' },
   { v: 'industrial', l: 'Industrial' },
   { v: 'mixed_use', l: 'Mixed Use' },
-  { v: 'land', l: 'Land' },
+  { v: 'land', l: 'Plot / Land' },
 ];
 
 const BEDS = [
@@ -88,6 +108,11 @@ function ListingsInner() {
   const price = params.get('price') || '';
   const listingType = params.get('listing_type') || '';
   const rentView = listingType === 'rent' || listingType === 'lease';
+  // Plot filters — only meaningful once the type filter is on land.
+  const plotSize = params.get('plot_size') || '';
+  const plotCategory = params.get('plot_category') || '';
+  const possession = params.get('possession') || '';
+  const plotView = type === 'land';
   const sort = params.get('sort') || 'newest';
   const ccy = params.get('ccy') || '';
   const page = Math.max(1, Number(params.get('page')) || 1);
@@ -125,6 +150,23 @@ function ListingsInner() {
         if (max) list = list.filter((p) => usd(p) != null && usd(p) <= Number(max));
       }
     }
+    // Plot narrowing. Each one only ever removes rows, so a listing with no
+    // plot data simply drops out rather than being treated as a match.
+    if (plotSize) {
+      const [min, max] = plotSize.split('-');
+      list = list.filter((p) => {
+        const sqft = plotSizeInSqFt(p.plot_size, p.plot_size_unit);
+        if (sqft == null) return false;
+        if (min && sqft < Number(min)) return false;
+        if (max && sqft > Number(max)) return false;
+        return true;
+      });
+    }
+    if (plotCategory) list = list.filter((p) => p.plot_category === plotCategory);
+    if (possession) list = list.filter((p) => p.possession_status === possession);
+    for (const flag of PLOT_FLAGS) {
+      if (params.get(flag.key) === '1') list = list.filter((p) => !!p[flag.column]);
+    }
     if (search) {
       const s = search.toLowerCase();
       list = list.filter(
@@ -133,7 +175,8 @@ function ListingsInner() {
           p.location?.toLowerCase().includes(s) ||
           p.city?.toLowerCase().includes(s) ||
           p.country?.toLowerCase().includes(s) ||
-          p.description?.toLowerCase().includes(s)
+          p.description?.toLowerCase().includes(s) ||
+          p.development_name?.toLowerCase().includes(s)
       );
     }
     const sorted = [...list];
@@ -152,7 +195,7 @@ function ListingsInner() {
     if (sort === 'price-desc') sorted.sort(byPrice(-1));
     if (sort === 'yield-desc') sorted.sort((a, b) => (b.yield_percentage ?? -1) - (a.yield_percentage ?? -1));
     return sorted;
-  }, [all, market, type, beds, price, listingType, search, sort, rentView]);
+  }, [all, market, type, beds, price, listingType, search, sort, rentView, plotSize, plotCategory, possession, params]);
 
   const marketLabel = MARKETS.find((m) => m.key === market)?.label;
   const hasFilters = !!(search || type || beds || price || listingType || (market && market !== 'all'));
@@ -223,7 +266,7 @@ function ListingsInner() {
           <select value={type} onChange={(e) => setParam({ type: e.target.value })}>
             {TYPES.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
           </select>
-          <select value={beds} onChange={(e) => setParam({ beds: e.target.value })}>
+          <select value={beds} onChange={(e) => setParam({ beds: e.target.value })} disabled={plotView} title={plotView ? 'Plots have no bedrooms' : undefined}>
             {BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
           </select>
           <select value={price} onChange={(e) => setParam({ price: e.target.value })}>
@@ -241,6 +284,32 @@ function ListingsInner() {
             >
               Reset
             </button>
+          )}
+
+          {plotView && (
+            <div className="pp-plot-filters">
+              <select value={plotSize} onChange={(e) => setParam({ plot_size: e.target.value })}>
+                {PLOT_SIZES.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
+              </select>
+              <select value={plotCategory} onChange={(e) => setParam({ plot_category: e.target.value })}>
+                <option value="">Any category</option>
+                {PLOT_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+              <select value={possession} onChange={(e) => setParam({ possession: e.target.value })}>
+                <option value="">Any possession status</option>
+                {POSSESSION_STATUSES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+              </select>
+              {PLOT_FLAGS.map((flag) => (
+                <label key={flag.key} className="pp-plot-flag">
+                  <input
+                    type="checkbox"
+                    checked={params.get(flag.key) === '1'}
+                    onChange={(e) => setParam({ [flag.key]: e.target.checked ? '1' : '' })}
+                  />
+                  {flag.label}
+                </label>
+              ))}
+            </div>
           )}
         </form>
 

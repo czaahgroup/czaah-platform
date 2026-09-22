@@ -2,6 +2,15 @@
 // @ts-nocheck
 
 import { useEffect, useState } from 'react'
+import {
+  PROPERTY_SUBTYPES,
+  PLOT_SIZE_UNITS,
+  PLOT_CATEGORIES,
+  POSSESSION_STATUSES,
+  DEVELOPMENT_STATUSES,
+  isPlotListing,
+  assetClassFor,
+} from '@/lib/plots'
 
 
 interface Property {
@@ -63,6 +72,29 @@ const LISTING_TYPES = [
 const emptyForm = {
   title: '',
   propertyType: '',
+  propertySubtype: '',
+  plotSize: '',
+  plotSizeUnit: 'marla',
+  plotCategory: 'residential',
+  developmentName: '',
+  developerName: '',
+  marketingAgent: '',
+  block: '',
+  sector: '',
+  plotNumber: '',
+  possessionStatus: '',
+  developmentStatus: '',
+  approvalAuthority: '',
+  provinceState: '',
+  address: '',
+  latitude: '',
+  longitude: '',
+  cornerPlot: false,
+  parkFacing: false,
+  mainRoad: false,
+  boulevard: false,
+  canalFacing: false,
+  approved: false,
   listingType: '',
   price: '',
   currency: 'USD',
@@ -113,6 +145,8 @@ const hintStyle: React.CSSProperties = {
 
 function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm: (fn: (f: typeof emptyForm) => typeof emptyForm) => void }) {
   const update = (key: keyof typeof emptyForm, value: string) => setForm((f) => ({ ...f, [key]: value }))
+  // Land has no bedrooms; asking for them is what blocked plots being listed.
+  const isPlot = isPlotListing({ property_subtype: form.propertySubtype, property_type: form.propertyType })
 
   return (
     <div className="space-y-4">
@@ -124,9 +158,29 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label style={labelStyle}>Property Type *</label>
-          <select required value={form.propertyType} onChange={(e) => update('propertyType', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+          <select
+            required
+            value={form.propertySubtype || form.propertyType}
+            onChange={(e) => {
+              const value = e.target.value
+              const derived = assetClassFor(value)
+              // A subtype sets both; an older asset-class value still works
+              // on its own, so existing listings keep editing cleanly.
+              setForm((f) => ({
+                ...f,
+                propertySubtype: derived ? value : '',
+                propertyType: derived || value,
+              }))
+            }}
+            style={{ ...inputStyle, cursor: 'pointer' }}
+          >
             <option value="">Select type...</option>
-            {PROPERTY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+            <optgroup label="Property">
+              {PROPERTY_SUBTYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </optgroup>
+            <optgroup label="Asset class (legacy)">
+              {PROPERTY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </optgroup>
           </select>
         </div>
         <div>
@@ -206,20 +260,110 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label style={labelStyle}>Area (sq ft)</label>
-          <input type="number" value={form.areaSqft} onChange={(e) => update('areaSqft', e.target.value)} style={inputStyle} />
+      {isPlot ? (
+        <>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label style={labelStyle}>Plot Size *</label>
+              <input type="number" step="0.01" value={form.plotSize} onChange={(e) => update('plotSize', e.target.value)} placeholder="5" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Size Unit *</label>
+              <select value={form.plotSizeUnit} onChange={(e) => update('plotSizeUnit', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                {PLOT_SIZE_UNITS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Plot Category *</label>
+              <select value={form.plotCategory} onChange={(e) => update('plotCategory', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                {PLOT_CATEGORIES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label style={labelStyle}>Development Name</label>
+              <input placeholder="Citi Canal Enclave" value={form.developmentName} onChange={(e) => update('developmentName', e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Developer</label>
+              <input placeholder="Citi Housing" value={form.developerName} onChange={(e) => update('developerName', e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Marketing / Agent</label>
+              <input placeholder="Gold Mark" value={form.marketingAgent} onChange={(e) => update('marketingAgent', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label style={labelStyle}>Block</label>
+              <input value={form.block} onChange={(e) => update('block', e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Sector</label>
+              <input value={form.sector} onChange={(e) => update('sector', e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Plot Number</label>
+              <input value={form.plotNumber} onChange={(e) => update('plotNumber', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label style={labelStyle}>Possession Status</label>
+              <select value={form.possessionStatus} onChange={(e) => update('possessionStatus', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">—</option>
+                {POSSESSION_STATUSES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Development Status</label>
+              <select value={form.developmentStatus} onChange={(e) => update('developmentStatus', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">—</option>
+                {DEVELOPMENT_STATUSES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Approval Authority</label>
+              <input placeholder="e.g. GDA" value={form.approvalAuthority} onChange={(e) => update('approvalAuthority', e.target.value)} style={inputStyle} />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '12px' }}>
+            {[
+              ['approved', 'Approved'],
+              ['cornerPlot', 'Corner plot'],
+              ['parkFacing', 'Park facing'],
+              ['mainRoad', 'Main road'],
+              ['boulevard', 'Boulevard'],
+              ['canalFacing', 'Canal facing'],
+            ].map(([key, label]) => (
+              <label key={key} style={{ display: 'flex', gap: '6px', alignItems: 'center', cursor: 'pointer' }}>
+                <input type="checkbox" checked={!!form[key]} onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.checked }))} />
+                {label}
+              </label>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label style={labelStyle}>Area (sq ft)</label>
+            <input type="number" value={form.areaSqft} onChange={(e) => update('areaSqft', e.target.value)} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Bedrooms</label>
+            <input type="number" value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Bathrooms</label>
+            <input type="number" value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} style={inputStyle} />
+          </div>
         </div>
-        <div>
-          <label style={labelStyle}>Bedrooms</label>
-          <input type="number" value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} style={inputStyle} />
-        </div>
-        <div>
-          <label style={labelStyle}>Bathrooms</label>
-          <input type="number" value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} style={inputStyle} />
-        </div>
-      </div>
+      )}
 
       <div>
         <label style={labelStyle}>Description</label>
@@ -369,6 +513,30 @@ export default function AdminPropertiesPage() {
       availableFrom: selected.available_from || '',
       deposit: selected.deposit != null ? String(selected.deposit) : '',
       minTermMonths: selected.min_term_months != null ? String(selected.min_term_months) : '',
+      // Plot detail — prefilled so a partial edit cannot blank it.
+      propertySubtype: selected.property_subtype || '',
+      plotSize: selected.plot_size != null ? String(selected.plot_size) : '',
+      plotSizeUnit: selected.plot_size_unit || 'marla',
+      plotCategory: selected.plot_category || 'residential',
+      developmentName: selected.development_name || '',
+      developerName: selected.developer_name || '',
+      marketingAgent: selected.marketing_agent || '',
+      block: selected.block || '',
+      sector: selected.sector || '',
+      plotNumber: selected.plot_number || '',
+      possessionStatus: selected.possession_status || '',
+      developmentStatus: selected.development_status || '',
+      approvalAuthority: selected.approval_authority || '',
+      provinceState: selected.province_state || '',
+      address: selected.address || '',
+      latitude: selected.latitude != null ? String(selected.latitude) : '',
+      longitude: selected.longitude != null ? String(selected.longitude) : '',
+      cornerPlot: !!selected.corner_plot,
+      parkFacing: !!selected.park_facing,
+      mainRoad: !!selected.main_road,
+      boulevard: !!selected.boulevard,
+      canalFacing: !!selected.canal_facing,
+      approved: !!selected.approved,
     })
     setEditError(null)
     setEditMode(true)

@@ -4,6 +4,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
 import { rentalTermsForInsert } from '@/lib/rentalTerms'
+import { plotColumnsFromBody } from '@/lib/developments'
+import { assetClassFor, isPlotListing, validatePlotListing } from '@/lib/plots'
+import { CURRENCIES } from '@/lib/currencies'
 
 
 function createAuthClient(request: NextRequest) {
@@ -101,11 +104,35 @@ export async function POST(request: NextRequest) {
       videoPosterUrl,
     } = body
 
-    if (!title || !propertyType || !listingType || !location || !city || !country) {
+    // The upload form sends one "Property type" value; when it is a subtype
+    // (house, plot, …) the asset class is derived from it.
+    const subtype = body.propertySubtype as string | undefined
+    const resolvedType = propertyType || assetClassFor(subtype)
+
+    if (!title || !resolvedType || !listingType || !location || !city || !country) {
       return NextResponse.json(
-        { error: 'Missing required fields: title, propertyType, listingType, location, city, country' },
+        { error: 'Missing required fields: title, propertyType (or propertySubtype), listingType, location, city, country' },
         { status: 400 }
       )
+    }
+
+    // Plots are checked against plot rules — a plot has no bedrooms, and
+    // demanding them is exactly what stopped land being listed before.
+    if (isPlotListing({ property_subtype: subtype, property_type: resolvedType })) {
+      const problems = validatePlotListing({
+        title, country, city,
+        plotSize: body.plotSize,
+        plotSizeUnit: body.plotSizeUnit,
+        plotCategory: body.plotCategory,
+        price,
+        currency: currency || 'PKR',
+        // Images are uploaded further down; check the incoming payload.
+        images,
+        supportedCurrencies: CURRENCIES,
+      })
+      if (problems.length) {
+        return NextResponse.json({ error: problems.join(' ') }, { status: 400 })
+      }
     }
 
     // Parse features from comma-separated string
@@ -152,7 +179,7 @@ export async function POST(request: NextRequest) {
       .insert({
         partner_id: user.id,
         title,
-        property_type: propertyType,
+        property_type: resolvedType,
         listing_type: listingType,
         price: price || null,
         currency: currency || 'PKR',
@@ -167,7 +194,12 @@ export async function POST(request: NextRequest) {
         images: imageUrls,
         video_url: videoUrl || null,
         video_poster_url: videoPosterUrl || null,
+        ...plotColumnsFromBody(body),
         ...rentalTermsForInsert(listingType, body),
+        // A partner cannot self-verify or self-feature; admin approval sets these.
+        approved: false,
+        featured: false,
+        verified: false,
         status: 'pending',
       })
       .select()

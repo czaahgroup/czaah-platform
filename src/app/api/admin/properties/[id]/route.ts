@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { logError } from '@/lib/logError'
 import { rentalTermsForUpdate } from '@/lib/rentalTerms'
+import { plotColumnsFromBody, savePaymentPlan } from '@/lib/developments'
+import { assetClassFor } from '@/lib/plots'
 
 
 function createAuthClient(request: NextRequest) {
@@ -97,6 +99,14 @@ export async function PATCH(
       if (videoUrl !== undefined) editUpdates.video_url = videoUrl || null
       if (videoPosterUrl !== undefined) editUpdates.video_poster_url = videoPosterUrl || null
       if (yieldPercentage !== undefined) editUpdates.yield_percentage = yieldPercentage
+      // Plot / subtype fields, and the flags admins own: featured, verified,
+      // approved. 'update' mode writes only what the payload actually carries.
+      Object.assign(editUpdates, plotColumnsFromBody(body, 'update'))
+      // Changing the subtype re-derives the asset class unless one was sent.
+      if (body.propertySubtype !== undefined && propertyType === undefined) {
+        const derived = assetClassFor(body.propertySubtype)
+        if (derived) editUpdates.property_type = derived
+      }
       Object.assign(editUpdates, rentalTermsForUpdate(listingType, body))
 
       const { data: edited, error: editError } = await supabase
@@ -109,7 +119,20 @@ export async function PATCH(
       if (editError) {
         return NextResponse.json({ error: editError.message }, { status: 500 })
       }
-      return NextResponse.json({ data: edited })
+
+      // paymentPlan present replaces the schedule, null removes it, absent
+      // leaves it alone. A schedule that doesn't match the advertised price
+      // comes back as a warning for the admin to act on.
+      let warning: string | null = null
+      if (body.paymentPlan !== undefined) {
+        const saved = await savePaymentPlan(supabase, { propertyId: id }, body.paymentPlan)
+        if (saved.errors.length) {
+          return NextResponse.json({ error: saved.errors.join(' '), data: edited }, { status: 400 })
+        }
+        warning = saved.warning
+      }
+
+      return NextResponse.json({ data: edited, warning })
     }
 
     if (!['approve', 'reject'].includes(action)) {

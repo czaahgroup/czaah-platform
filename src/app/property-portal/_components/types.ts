@@ -99,17 +99,11 @@ export function resolveImage(image: string | null | undefined): string | null {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/platform-files/${image}`;
 }
 
-// Approximate FX rates — units of the currency per 1 USD. Used only to give a
-// rough cross-market comparison on the portal; not live rates. Adjust here.
-export const FX_PER_USD: Record<string, number> = {
-  USD: 1,
-  GBP: 0.79,
-  EUR: 0.92,
-  AED: 3.67,
-  PKR: 278,
-};
-
-export const CURRENCIES = ['USD', 'GBP', 'EUR', 'AED', 'PKR'];
+// FX table and accepted currencies live in src/lib/currencies.ts so the
+// server-side validators and this file cannot drift apart. Re-exported here
+// because every portal component already imports them from ./types.
+export { FX_PER_USD, CURRENCIES } from '@/lib/currencies';
+import { FX_PER_USD } from '@/lib/currencies';
 
 export function convertPrice(price: number, from: string, to: string): number | null {
   const fromRate = FX_PER_USD[from];

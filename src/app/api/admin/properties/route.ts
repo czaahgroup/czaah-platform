@@ -3,6 +3,9 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
 import { rentalTermsForInsert } from '@/lib/rentalTerms'
+import { plotColumnsFromBody, savePaymentPlan } from '@/lib/developments'
+import { assetClassFor, isPlotListing, validatePlotListing } from '@/lib/plots'
+import { CURRENCIES } from '@/lib/currencies'
 
 
 function createAuthClient(request: NextRequest) {
@@ -104,11 +107,36 @@ export async function POST(request: NextRequest) {
       yieldPercentage,
     } = body
 
-    if (!title || !propertyType || !listingType || !location || !city) {
+    // One "Property type" control in the UI sends a subtype; the asset class
+    // property_type has always driven is derived from it when not given
+    // explicitly, so existing callers keep working unchanged.
+    const subtype = body.propertySubtype as string | undefined
+    const resolvedType = propertyType || assetClassFor(subtype)
+
+    if (!title || !resolvedType || !listingType || !location || !city) {
       return NextResponse.json(
-        { error: 'Missing required fields: title, propertyType, listingType, location, city' },
+        { error: 'Missing required fields: title, propertyType (or propertySubtype), listingType, location, city' },
         { status: 400 }
       )
+    }
+
+    // Plots are validated on plot rules — size and category, never bedrooms.
+    if (isPlotListing({ property_subtype: subtype, property_type: resolvedType })) {
+      const problems = validatePlotListing({
+        title, country, city,
+        plotSize: body.plotSize,
+        plotSizeUnit: body.plotSizeUnit,
+        plotCategory: body.plotCategory,
+        price,
+        currency: currency || 'PKR',
+        images,
+        hasPaymentPlan: !!body.paymentPlan,
+        inheritsDevelopmentImage: !!body.developmentId,
+        supportedCurrencies: CURRENCIES,
+      })
+      if (problems.length) {
+        return NextResponse.json({ error: problems.join(' ') }, { status: 400 })
+      }
     }
 
     const featuresArray = features
@@ -124,7 +152,7 @@ export async function POST(request: NextRequest) {
       .insert({
         partner_id: null, // CZAAH-direct listing, not partner-submitted
         title,
-        property_type: propertyType,
+        property_type: resolvedType,
         listing_type: listingType,
         price: price || null,
         currency: currency || 'USD',
@@ -140,6 +168,7 @@ export async function POST(request: NextRequest) {
         video_url: videoUrl || null,
         video_poster_url: videoPosterUrl || null,
         yield_percentage: yieldPercentage || null,
+        ...plotColumnsFromBody(body),
         ...rentalTermsForInsert(listingType, body),
         status: 'approved',
         approved_by: user.id,
@@ -152,7 +181,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: insertError?.message || 'Failed to create property' }, { status: 500 })
     }
 
-    return NextResponse.json({ data: property }, { status: 201 })
+    // A plot sold on instalments carries its own schedule. Any mismatch with
+    // the advertised price comes back as a warning — never a silent fix.
+    let warning: string | null = null
+    if (body.paymentPlan) {
+      const saved = await savePaymentPlan(supabase, { propertyId: property.id }, body.paymentPlan)
+      if (saved.errors.length) {
+        return NextResponse.json({ error: saved.errors.join(' '), data: property }, { status: 400 })
+      }
+      warning = saved.warning
+    }
+
+    return NextResponse.json({ data: property, warning }, { status: 201 })
   } catch (err) {
     logError("api.admin.properties", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
