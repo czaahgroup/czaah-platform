@@ -2876,7 +2876,10 @@
 /* Slightly denser once you are past the hero, where a light page sits behind
    the glass and the links need a little more to hold against. */
 .pp-nav.is-lifted {
-  background: rgba(12, 11, 10, 0.58);
+  /* 0.58 over white composited to ~rgb(114,114,113), which left the gold
+     wordmark at ~2.1:1. 0.78 gives ~rgb(65,65,64) and ~4.5:1, while keeping
+     the blur so the bar still reads as smoked glass rather than a solid slab. */
+  background: rgba(12, 11, 10, 0.78);
 }
 
 /* The gradient wash is now redundant — the glass carries the contrast. */
@@ -3551,4 +3554,38 @@ a.pp-dev-ghost {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+}
+
+/* ==========================================================================
+   Logo legibility.
+   The markhor's horns are stroked at 2.5 units inside a 128-unit viewBox. At
+   34px tall that renders a 0.66px line — sub-pixel, so the browser fades it to
+   a grey wisp, and the detail strokes at 1.2 units all but vanish. The mark is
+   larger here and its two main strokes are thickened; the faint decorative
+   paths are left alone so the drawing keeps its depth.
+   ========================================================================== */
+.pp-nav .pp-logo-mark {
+  height: 40px;
+  /* Lifts both mark and wordmark off whatever the translucent bar is over. */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* Only the two horn outlines carry no opacity attribute — the decorative
+   strokes all do, so this thickens the silhouette without flattening it. */
+.pp-nav .pp-logo-mark path:not([opacity]) {
+  stroke-width: 3.5;
+}
+
+.pp-nav .pp-logo-word {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+/* The divider was 30% gold on a dark bar — effectively invisible. */
+.pp-nav .pp-logo-divider {
+  background: rgba(201, 168, 76, 0.55);
+  height: 26px;
+}
+
+@media (max-width: 1180px) {
+  .pp-nav .pp-logo-mark { height: 36px; }
 }
