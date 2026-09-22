@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { PropertyCard } from './_components/PropertyCard';
-import { INSIGHTS } from './_components/insights-data';
+import { portalInsights } from './_components/insights-data';
 import { useListings } from './_components/useListings';
 import { portalHeroReel } from './_components/portalRuntime';
 import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice, isRental } from './_components/types';
@@ -249,7 +249,7 @@ export default function PropertyPortalHome() {
   const showcaseIds = new Set(showcase.map((p) => p.id));
   const featured = properties.filter((p) => !showcaseIds.has(p.id));
   const newCount = properties.filter(isNewListing).length;
-  const insightTeasers = INSIGHTS.slice(0, 3);
+  const insightTeasers = portalInsights().slice(0, 3);
 
   return (
     <main>      {/* ── HERO ───────────────────────────────────────────── */}

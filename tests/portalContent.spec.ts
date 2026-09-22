@@ -37,7 +37,7 @@ test.describe('content merging falls back rather than breaking', () => {
   })
 
   test('unknown keys cannot sneak into the shape', () => {
-    const merged = mergeSection(defaults, { somethingElse: 'x' }) as Record<string, unknown>
+    const merged = mergeSection(defaults, { somethingElse: 'x' }) as unknown as Record<string, unknown>
     expect(merged.somethingElse).toBeUndefined()
   })
 

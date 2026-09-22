@@ -1,6 +1,8 @@
 // Property- and infrastructure-relevant analysis, curated from the CZAAH group's
 // static research library on the main site (/insights). Each entry deep-links to
 // the full article by anchor. There is no blog CMS.
+import { portalInsights as portalRuntimeInsights } from './portalRuntime';
+
 export interface InsightArticle {
   id: string;
   category: 'Real Estate' | 'Infrastructure';
@@ -67,3 +69,11 @@ export const INSIGHTS: InsightArticle[] = [
       'Four CPEC SEZs are operational with 10-year tax exemptions. Direct industrial plots are appreciating 15–20% a year as allocation fills up.',
   },
 ];
+/**
+ * The articles shown on the portal — the stored list if one has been saved in
+ * admin, otherwise the shipped list above.
+ */
+export function portalInsights(): InsightArticle[] {
+  const stored = portalRuntimeInsights();
+  return stored && stored.length ? (stored as InsightArticle[]) : INSIGHTS;
+}

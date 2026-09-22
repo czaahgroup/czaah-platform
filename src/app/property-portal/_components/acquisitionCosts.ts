@@ -27,7 +27,7 @@ import { portalSettings } from './portalRuntime';
 export const ACQUISITION_COST_ENABLED = false;
 
 export function acquisitionCostEnabled(): boolean {
-  return portalSettings().acquisitionCostEnabled === true;
+  return portalSettings()?.acquisitionCostEnabled === true;
 }
 
 export interface CostLine {

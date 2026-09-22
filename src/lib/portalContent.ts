@@ -4,6 +4,8 @@ import { CURRENCIES, FX_PER_USD } from '@/lib/currencies'
 // The shipped office list is the default, imported rather than copied so the
 // two cannot drift.
 import { OFFICES, PORTAL_EMAIL } from '@/app/property-portal/_components/offices'
+import { DESTINATIONS } from '@/app/property-portal/_components/destinations'
+import { INSIGHTS } from '@/app/property-portal/_components/insights-data'
 
 /**
  * Editable content and settings for property.czaah.com.
@@ -78,8 +80,8 @@ export const PORTAL_DEFAULTS = {
     offices: OFFICES,
     email: PORTAL_EMAIL,
   } as OfficesContent,
-  destinations: null as unknown,
-  insights: null as unknown,
+  destinations: DESTINATIONS as unknown,
+  insights: INSIGHTS as unknown,
 }
 
 export type PortalContent = {
@@ -149,6 +151,28 @@ export async function loadPortalContent(): Promise<PortalContent> {
 /** Validation for what an admin submits. Returns problems, empty when valid. */
 export function validateSection(key: PortalContentKey, data: unknown): string[] {
   const errors: string[] = []
+
+  // destinations and insights are stored as plain arrays.
+  if (key === 'destinations' || key === 'insights') {
+    if (!Array.isArray(data)) return ['This section must be a list.']
+    if (data.length === 0) {
+      return ['The list is empty. Remove the override instead — Reset to default restores the shipped entries.']
+    }
+    const seen = new Set<string>()
+    data.forEach((raw, i) => {
+      const item = (raw || {}) as Record<string, unknown>
+      const id = String((key === 'destinations' ? item.slug : item.id) || '').trim()
+      const title = String((key === 'destinations' ? item.city : item.title) || '').trim()
+      const idField = key === 'destinations' ? 'slug' : 'id'
+      const titleField = key === 'destinations' ? 'city' : 'title'
+      if (!id) errors.push(`Entry ${i + 1} needs a ${idField}.`)
+      else if (seen.has(id)) errors.push(`"${id}" is used twice — each entry needs its own ${idField}.`)
+      else seen.add(id)
+      if (!title) errors.push(`Entry ${i + 1} needs a ${titleField}.`)
+    })
+    return errors
+  }
+
   if (!data || typeof data !== 'object') return ['Content must be an object.']
   const value = data as Record<string, unknown>
 

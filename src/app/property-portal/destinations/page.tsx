@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { useListings } from '../_components/useListings';
 import { resolveImage } from '../_components/types';
-import { DESTINATIONS, destinationFor, slugForCity } from '../_components/destinations';
+import { portalDestinations, destinationFor, slugForCity } from '../_components/destinations';
 
 export default function DestinationsPage() {
   const { all, loading, error, reload } = useListings();
@@ -118,10 +118,10 @@ export default function DestinationsPage() {
             reach is visible without implying something is available. */}
         {!loading && !error && (
           <p className="pp-saved-note" style={{ marginTop: 34 }}>
-            {DESTINATIONS.filter((d) => !cards.some((c) => c.slug === d.slug)).length > 0 && (
+            {portalDestinations().filter((d) => !cards.some((c) => c.slug === d.slug)).length > 0 && (
               <>
                 Also covered, nothing live today:{' '}
-                {DESTINATIONS.filter((d) => !cards.some((c) => c.slug === d.slug))
+                {portalDestinations().filter((d) => !cards.some((c) => c.slug === d.slug))
                   .map((d) => d.city)
                   .join(', ')}
                 . <Link href="/property-portal/contact" className="pp-gold">Ask the desk →</Link>

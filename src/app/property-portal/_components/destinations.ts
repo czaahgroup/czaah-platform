@@ -6,6 +6,8 @@
 // A city with no entry here still appears (see destinationFor) with its name
 // and a generic label — it just won't have editorial copy until one is added.
 
+import { portalDestinations as portalRuntimeDestinations } from './portalRuntime';
+
 export interface Destination {
   slug: string;
   city: string;
@@ -73,15 +75,26 @@ export const DESTINATIONS: Destination[] = [
   },
 ];
 
+/**
+ * The destinations shown on the portal — the stored list if one has been saved
+ * in admin, otherwise the shipped list below. Every helper goes through this so
+ * an edit reaches the home page, the destinations index and each slug page
+ * without any of them knowing where the data came from.
+ */
+export function portalDestinations(): Destination[] {
+  const stored = portalRuntimeDestinations();
+  return stored && stored.length ? (stored as Destination[]) : DESTINATIONS;
+}
+
 export function destinationFor(city: string | null | undefined): Destination | null {
   if (!city) return null;
   const key = city.trim().toLowerCase();
-  return DESTINATIONS.find((d) => d.city.toLowerCase() === key) || null;
+  return portalDestinations().find((d) => d.city.toLowerCase() === key) || null;
 }
 
 export function destinationBySlug(slug: string): Destination | null {
   const key = slug.trim().toLowerCase();
-  return DESTINATIONS.find((d) => d.slug === key) || null;
+  return portalDestinations().find((d) => d.slug === key) || null;
 }
 
 export function slugForCity(city: string | null | undefined): string | null {

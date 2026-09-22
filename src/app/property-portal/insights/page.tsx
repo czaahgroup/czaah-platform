@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { INSIGHTS as ARTICLES } from '../_components/insights-data';
+import { portalInsights } from '../_components/insights-data';
 
 
 const CATEGORIES = ['All', 'Real Estate', 'Infrastructure'];
@@ -13,7 +13,7 @@ export default function InsightsPage() {
   const [q, setQ] = useState('');
 
   const filtered = useMemo(() => {
-    return ARTICLES.filter((a) => {
+    return portalInsights().filter((a) => {
       if (cat !== 'All' && a.category !== cat) return false;
       if (q) {
         const s = q.toLowerCase();

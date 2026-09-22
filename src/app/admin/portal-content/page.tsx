@@ -61,7 +61,28 @@ const TABS = [
   { key: 'settings', label: 'Settings' },
   { key: 'home', label: 'Home hero' },
   { key: 'offices', label: 'Offices' },
+  { key: 'destinations', label: 'Destinations' },
+  { key: 'insights', label: 'Insights' },
 ]
+
+// destinations and insights are plain arrays, so they get a shared list editor
+// rather than the object-merge path the other sections use.
+const LIST_FIELDS = {
+  destinations: [
+    { key: 'slug', label: 'Slug', hint: 'The URL: /destinations/london', width: 1 },
+    { key: 'city', label: 'City', width: 1 },
+    { key: 'country', label: 'Country', width: 1 },
+    { key: 'tagline', label: 'Tagline', width: 3 },
+    { key: 'blurb', label: 'Blurb', width: 3, textarea: true },
+  ],
+  insights: [
+    { key: 'id', label: 'ID', hint: 'Anchor on the main site, e.g. post-14', width: 1 },
+    { key: 'category', label: 'Category', width: 1, options: ['Real Estate', 'Infrastructure'] },
+    { key: 'date', label: 'Date', hint: '28 February 2026', width: 1 },
+    { key: 'title', label: 'Title', width: 3 },
+    { key: 'excerpt', label: 'Excerpt', width: 3, textarea: true },
+  ],
+}
 
 export default function PortalContentPage() {
   const [content, setContent] = useState<Row | null>(null)
@@ -353,6 +374,92 @@ export default function PortalContentPage() {
             </button>
             {customised.includes('home') && (
               <button type="button" style={ghostButton} onClick={() => reset('home')}>Reset to default</button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {(tab === 'destinations' || tab === 'insights') && (
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <strong style={{ fontSize: '13px' }}>
+              {(content[tab] || []).length} {tab === 'destinations' ? 'destination(s)' : 'article(s)'}
+            </strong>
+            <button
+              type="button"
+              style={ghostButton}
+              onClick={() => setContent((c) => ({ ...c, [tab]: [...(c[tab] || []), {}] }))}
+            >
+              + Add
+            </button>
+          </div>
+          <p style={hintStyle}>
+            {tab === 'destinations'
+              ? 'A city with no entry still appears on the portal with its name and a generic label — it just has no editorial copy. Properties are matched to a destination by city automatically.'
+              : 'Teasers that deep-link to the full article on the main site. The three most recent also appear on the portal home page.'}
+          </p>
+
+          {(content[tab] || []).map((item: Row, i: number) => (
+            <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', padding: '12px', marginTop: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                {LIST_FIELDS[tab].map((field) => (
+                  <div key={field.key} style={{ gridColumn: `span ${field.width}` }}>
+                    <label style={labelStyle}>{field.label}</label>
+                    {field.options ? (
+                      <select
+                        value={item[field.key] || ''}
+                        onChange={(e) => {
+                          const list = [...content[tab]]
+                          list[i] = { ...item, [field.key]: e.target.value }
+                          setContent((c) => ({ ...c, [tab]: list }))
+                        }}
+                        style={{ ...inputStyle, cursor: 'pointer' }}
+                      >
+                        <option value="">Choose…</option>
+                        {field.options.map((o: string) => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    ) : field.textarea ? (
+                      <textarea
+                        rows={3}
+                        value={item[field.key] || ''}
+                        onChange={(e) => {
+                          const list = [...content[tab]]
+                          list[i] = { ...item, [field.key]: e.target.value }
+                          setContent((c) => ({ ...c, [tab]: list }))
+                        }}
+                        style={{ ...inputStyle, resize: 'vertical' }}
+                      />
+                    ) : (
+                      <input
+                        value={item[field.key] || ''}
+                        onChange={(e) => {
+                          const list = [...content[tab]]
+                          list[i] = { ...item, [field.key]: e.target.value }
+                          setContent((c) => ({ ...c, [tab]: list }))
+                        }}
+                        style={inputStyle}
+                      />
+                    )}
+                    {field.hint && <p style={hintStyle}>{field.hint}</p>}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                style={{ ...ghostButton, marginTop: '10px', borderColor: 'rgba(239,68,68,0.4)', color: '#ef4444' }}
+                onClick={() => setContent((c) => ({ ...c, [tab]: c[tab].filter((_: Row, j: number) => j !== i) }))}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+
+          <div style={{ display: 'flex', gap: '10px', marginTop: 22 }}>
+            <button type="button" style={buttonStyle} disabled={saving} onClick={() => save(tab)}>
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            {customised.includes(tab) && (
+              <button type="button" style={ghostButton} onClick={() => reset(tab)}>Reset to default</button>
             )}
           </div>
         </div>
