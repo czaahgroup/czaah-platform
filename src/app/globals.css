@@ -306,7 +306,18 @@ nav.scrolled {
   opacity: 0.8;
 }
 
-.nav-logo .markhor-mark { height: 36px; width: auto; }
+.nav-logo .markhor-mark {
+  height: 40px;
+  width: auto;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* Only the two horn outlines carry no opacity attribute; every decorative
+   stroke does. Thickening just these keeps the silhouette readable without
+   flattening the drawing's depth. */
+.nav-logo .markhor-mark path:not([opacity]) {
+  stroke-width: 3.5;
+}
 
 .nav-logo .nav-wordmark {
   font-family: var(--font-heading);
@@ -323,8 +334,9 @@ nav.scrolled {
 
 .nav-logo .nav-divider {
   width: 1px;
-  height: 24px;
-  background: rgba(201,168,76,0.3);
+  height: 26px;
+  /* 30% gold on a dark bar was effectively invisible. */
+  background: rgba(201, 168, 76, 0.55);
 }
 
 .nav-links {
@@ -2069,7 +2081,9 @@ footer {
   nav { padding: 0 16px; padding-top: env(safe-area-inset-top); gap: 8px; }
   .nav-search-btn { display: none; }
   .nav-logo .nav-wordmark { font-size: 18px; letter-spacing: 5px; text-indent: 5px; }
-  .nav-logo .markhor-mark { height: 28px; }
+  .nav-logo .markhor-mark { height: 32px; }
+  /* Smaller mark, so the strokes need a little more to stay visible. */
+  .nav-logo .markhor-mark path:not([opacity]) { stroke-width: 4; }
   .nav-logo .nav-divider { height: 20px; }
   .nav-logo { gap: 8px; }
 
