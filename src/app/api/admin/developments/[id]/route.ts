@@ -4,7 +4,8 @@ import { logError } from '@/lib/logError'
 import {
   DEVELOPMENT_COLUMNS,
   UNIT_COLUMNS,
-  persistImages,
+  persistMedia,
+  removeOrphanedMedia,
   loadPlansForUnits,
   uniqueSlug,
 } from '@/lib/developments'
@@ -80,6 +81,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     text('currency', 'currency')
     text('status', 'status')
     text('agentId', 'agent_id')
+    text('brochureName', 'brochure_name')
     bool('featured', 'featured')
     bool('verified', 'verified')
 
@@ -99,12 +101,32 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const slugForStorage = (updates.slug as string) || id
+
+    // What the record points at now, so anything dropped can be cleaned up.
+    const { data: current } = await supabase
+      .from('developments')
+      .select('gallery, featured_image, video_url, video_poster_url, brochure_url')
+      .eq('id', id)
+      .single()
+
     if (body.gallery !== undefined) {
-      updates.gallery = await persistImages(supabase, body.gallery, `developments/${slugForStorage}`)
+      updates.gallery = await persistMedia(supabase, body.gallery, `developments/${slugForStorage}`)
     }
     if (body.featuredImage !== undefined) {
-      const stored = await persistImages(supabase, body.featuredImage ? [body.featuredImage] : [], `developments/${slugForStorage}`)
+      const stored = await persistMedia(supabase, body.featuredImage ? [body.featuredImage] : [], `developments/${slugForStorage}`)
       updates.featured_image = stored[0] || null
+    }
+    if (body.videoUrl !== undefined) {
+      const stored = await persistMedia(supabase, body.videoUrl ? [body.videoUrl] : [], `developments/${slugForStorage}`)
+      updates.video_url = stored[0] || null
+    }
+    if (body.videoPosterUrl !== undefined) {
+      const stored = await persistMedia(supabase, body.videoPosterUrl ? [body.videoPosterUrl] : [], `developments/${slugForStorage}`)
+      updates.video_poster_url = stored[0] || null
+    }
+    if (body.brochureUrl !== undefined) {
+      const stored = await persistMedia(supabase, body.brochureUrl ? [body.brochureUrl] : [], `developments/${slugForStorage}`)
+      updates.brochure_url = stored[0] || null
     }
 
     if (!Object.keys(updates).length) {
@@ -120,6 +142,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (error || !data) {
       return NextResponse.json({ error: error?.message || 'Could not update development' }, { status: 500 })
+    }
+
+    // Files the record no longer references are removed from the bucket.
+    if (current) {
+      await removeOrphanedMedia(
+        supabase,
+        [...(current.gallery || []), current.featured_image, current.video_url, current.video_poster_url, current.brochure_url],
+        [
+          ...((updates.gallery as string[]) ?? current.gallery ?? []),
+          (updates.featured_image as string) ?? current.featured_image,
+          (updates.video_url as string) ?? current.video_url,
+          (updates.video_poster_url as string) ?? current.video_poster_url,
+          (updates.brochure_url as string) ?? current.brochure_url,
+        ]
+      )
     }
 
     return NextResponse.json({ data })

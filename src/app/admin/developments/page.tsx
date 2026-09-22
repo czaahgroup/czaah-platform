@@ -63,6 +63,23 @@ const buttonStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
+const removeBadge: React.CSSProperties = {
+  position: 'absolute',
+  top: '-8px',
+  right: '-8px',
+  width: '24px',
+  height: '24px',
+  borderRadius: '50%',
+  border: '1px solid rgba(255,255,255,0.3)',
+  background: '#1a1a1a',
+  color: '#ef4444',
+  fontSize: '15px',
+  lineHeight: 1,
+  cursor: 'pointer',
+  display: 'grid',
+  placeItems: 'center',
+}
+
 const ghostButton: React.CSSProperties = {
   background: 'transparent',
   color: 'inherit',
@@ -145,6 +162,24 @@ const emptyForm = {
   verified: false,
   featuredImage: '',
   gallery: [] as string[],
+  videoUrl: '',
+  videoPosterUrl: '',
+  brochureUrl: '',
+  brochureName: '',
+}
+
+// API uploads are base64 over JSON, which inflates by a third, so the form
+// refuses anything the request would struggle with rather than letting it
+// fail opaquely half a minute later.
+const MAX_IMAGE_MB = 10
+const MAX_VIDEO_MB = 25
+const MAX_BROCHURE_MB = 15
+
+/** A preview URL for either a freshly picked file or an already stored path. */
+function mediaPreview(value: string): string {
+  if (!value) return ''
+  if (value.startsWith('data:') || value.startsWith('http') || value.startsWith('/')) return value
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/${value}`
 }
 
 /** Reads a picked file as a data URL — the API turns it into a storage path. */
@@ -431,11 +466,39 @@ export default function AdminDevelopmentsPage() {
 
   const update = (key: string, value: unknown) => setForm((f) => ({ ...f, [key]: value }))
 
-  async function pickImage(key: 'featuredImage' | 'gallery', files: FileList | null) {
+  async function pickMedia(
+    key: 'featuredImage' | 'gallery' | 'videoUrl' | 'videoPosterUrl' | 'brochureUrl',
+    files: FileList | null
+  ) {
     if (!files?.length) return
-    const urls = await Promise.all(Array.from(files).slice(0, 12).map(readAsDataUrl))
-    if (key === 'featuredImage') update('featuredImage', urls[0])
-    else update('gallery', [...form.gallery, ...urls])
+    const limit = key === 'videoUrl' ? MAX_VIDEO_MB : key === 'brochureUrl' ? MAX_BROCHURE_MB : MAX_IMAGE_MB
+    const picked = Array.from(files).slice(0, 12)
+    const tooBig = picked.filter((file) => file.size > limit * 1024 * 1024)
+    if (tooBig.length) {
+      setError(
+        `${tooBig.map((t) => t.name).join(', ')} — over the ${limit}MB limit. ` +
+          (key === 'videoUrl'
+            ? 'Compress the clip (1600x900, a few seconds, no audio) and try again.'
+            : key === 'brochureUrl'
+              ? 'Export the PDF at a lower resolution and try again.'
+              : 'Resize or re-export the image and try again.')
+      )
+      return
+    }
+    setError(null)
+    const urls = await Promise.all(picked.map(readAsDataUrl))
+    if (key === 'gallery') {
+      update('gallery', [...form.gallery, ...urls])
+    } else {
+      update(key, urls[0])
+      // Keep the original filename so the download is not called "1790095371583_0.pdf".
+      if (key === 'brochureUrl') update('brochureName', picked[0].name)
+    }
+  }
+
+  /** Drop one gallery entry. The file itself is removed on save. */
+  function removeGalleryAt(index: number) {
+    update('gallery', form.gallery.filter((_: string, i: number) => i !== index))
   }
 
   function unitPayload(u: Row) {
@@ -528,6 +591,10 @@ export default function AdminDevelopmentsPage() {
         // Images already live in storage; they are only re-sent if replaced.
         featuredImage: d.featured_image || '',
         gallery: d.gallery || [],
+        videoUrl: d.video_url || '',
+        videoPosterUrl: d.video_poster_url || '',
+        brochureUrl: d.brochure_url || '',
+        brochureName: d.brochure_name || '',
       })
 
       const loaded = [...(d.development_units || [])]
@@ -588,13 +655,11 @@ export default function AdminDevelopmentsPage() {
     const res = await fetch(`/api/admin/developments/${editingId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        // Only re-send an image when a new file was picked. A stored path
-        // would otherwise be re-uploaded as if it were fresh base64.
-        featuredImage: String(form.featuredImage || '').startsWith('data:') ? form.featuredImage : undefined,
-        gallery: (form.gallery || []).some((g: string) => String(g).startsWith('data:')) ? form.gallery : undefined,
-      }),
+      // Every media field is sent on every save. persistMedia passes stored
+      // paths straight through, so this costs nothing — and sending only
+      // changed fields meant a removal, which adds no new data URL, never
+      // reached the server.
+      body: JSON.stringify(form),
     })
     const json = await res.json()
     if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`)
@@ -875,16 +940,144 @@ export default function AdminDevelopmentsPage() {
             <input value={form.features} onChange={(e) => update('features', e.target.value)} placeholder="Canal front location, Gated & secure community" style={inputStyle} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' }}>
-            <div>
-              <label style={labelStyle}>Main image (the advert)</label>
-              <input type="file" accept="image/*" onChange={(e) => pickImage('featuredImage', e.target.files)} style={{ ...inputStyle, padding: '7px' }} />
-              {form.featuredImage && <p style={hintStyle}>1 image ready to upload.</p>}
+          <div style={{ marginTop: '18px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
+            <strong style={{ fontSize: '13px' }}>Media</strong>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
+              <div>
+                <label style={labelStyle}>Main image (the advert)</label>
+                <input type="file" accept="image/*" onChange={(e) => pickMedia('featuredImage', e.target.files)} style={{ ...inputStyle, padding: '7px' }} />
+                {form.featuredImage ? (
+                  <div style={{ position: 'relative', display: 'inline-block', marginTop: '10px' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={mediaPreview(form.featuredImage)}
+                      alt="Main"
+                      style={{ width: '150px', height: '110px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.12)' }}
+                    />
+                    <button
+                      type="button"
+                      aria-label="Remove main image"
+                      onClick={() => update('featuredImage', '')}
+                      style={removeBadge}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <p style={hintStyle}>No main image. This is what shows on cards and at the top of the page.</p>
+                )}
+              </div>
+
+              <div>
+                <label style={labelStyle}>Gallery (site plan, brochure, photos…)</label>
+                <input type="file" accept="image/*" multiple onChange={(e) => pickMedia('gallery', e.target.files)} style={{ ...inputStyle, padding: '7px' }} />
+                {form.gallery.length > 0 ? (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+                    {form.gallery.map((img: string, i: number) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={mediaPreview(img)}
+                          alt={`Gallery ${i + 1}`}
+                          style={{ width: '92px', height: '70px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.12)' }}
+                        />
+                        <button
+                          type="button"
+                          aria-label={`Remove gallery image ${i + 1}`}
+                          onClick={() => removeGalleryAt(i)}
+                          style={removeBadge}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={hintStyle}>No gallery images yet.</p>
+                )}
+              </div>
             </div>
-            <div>
-              <label style={labelStyle}>Gallery (site plan, brochure, map…)</label>
-              <input type="file" accept="image/*" multiple onChange={(e) => pickImage('gallery', e.target.files)} style={{ ...inputStyle, padding: '7px' }} />
-              {form.gallery.length > 0 && <p style={hintStyle}>{form.gallery.length} image(s) ready to upload.</p>}
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+              <div>
+                <label style={labelStyle}>Video (site visit, drone footage)</label>
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime,video/*"
+                  onChange={(e) => pickMedia('videoUrl', e.target.files)}
+                  style={{ ...inputStyle, padding: '7px' }}
+                />
+                {form.videoUrl ? (
+                  <div style={{ marginTop: '10px' }}>
+                    <video
+                      src={mediaPreview(form.videoUrl)}
+                      controls
+                      muted
+                      playsInline
+                      style={{ width: '100%', maxWidth: '260px', border: '1px solid rgba(255,255,255,0.12)' }}
+                    />
+                    <div>
+                      <button type="button" style={{ ...ghostButton, marginTop: '8px' }} onClick={() => update('videoUrl', '')}>
+                        Remove video
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p style={hintStyle}>Up to {MAX_VIDEO_MB}MB, MP4 or WebM. Compress long clips first — a few seconds at 1600&times;900 is plenty.</p>
+                )}
+              </div>
+
+              <div>
+                <label style={labelStyle}>Video poster (optional)</label>
+                <input type="file" accept="image/*" onChange={(e) => pickMedia('videoPosterUrl', e.target.files)} style={{ ...inputStyle, padding: '7px' }} />
+                {form.videoPosterUrl ? (
+                  <div style={{ position: 'relative', display: 'inline-block', marginTop: '10px' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={mediaPreview(form.videoPosterUrl)}
+                      alt="Video poster"
+                      style={{ width: '150px', height: '110px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.12)' }}
+                    />
+                    <button type="button" aria-label="Remove poster" onClick={() => update('videoPosterUrl', '')} style={removeBadge}>
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <p style={hintStyle}>Shown before the video plays. Defaults to the main image.</p>
+                )}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '16px', maxWidth: '520px' }}>
+              <label style={labelStyle}>Brochure (PDF)</label>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => pickMedia('brochureUrl', e.target.files)}
+                style={{ ...inputStyle, padding: '7px' }}
+              />
+              {form.brochureUrl ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+                  <span style={{ fontSize: '12.5px' }}>
+                    📄 {form.brochureName || 'Brochure attached'}
+                  </span>
+                  <button
+                    type="button"
+                    style={ghostButton}
+                    onClick={() => {
+                      update('brochureUrl', '')
+                      update('brochureName', '')
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <p style={hintStyle}>
+                  Adds a &ldquo;Download Brochure&rdquo; button to the public page. Up to {MAX_BROCHURE_MB}MB.
+                </p>
+              )}
             </div>
           </div>
 

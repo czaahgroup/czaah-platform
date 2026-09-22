@@ -10,6 +10,7 @@ export const DEVELOPMENT_COLUMNS = `
   id, name, slug, developer_name, marketing_agent, description,
   country, province_state, city, area, address, latitude, longitude,
   approval_status, approval_authority, featured_image, gallery, features,
+  video_url, video_poster_url, brochure_url, brochure_name,
   currency, development_status, possession_status, status, featured, verified,
   agent_id, created_at, updated_at
 `
@@ -28,7 +29,7 @@ export const LISTING_COLUMNS = `
   id, title, property_type, property_subtype, listing_type, price, currency,
   location, city, country, province_state, address, latitude, longitude,
   area_sqft, bedrooms, bathrooms, description, features, images,
-  video_url, video_poster_url, rent_period, furnishing, available_from,
+  video_url, video_poster_url, brochure_url, brochure_name, rent_period, furnishing, available_from,
   deposit, min_term_months, yield_percentage,
   plot_size, plot_size_unit, plot_category, development_name, developer_name,
   marketing_agent, block, sector, plot_number, price_type,
@@ -43,12 +44,12 @@ export const LISTING_COLUMNS = `
 export const STORAGE_BUCKET = 'property-images'
 
 /**
- * Accepts what the admin form sends for images: either a data URL / raw
- * base64 (uploaded here) or an existing storage path / absolute URL (kept as
- * is). Returns storage paths — never base64, which must not reach the
+ * Accepts what the admin form sends for images and video: either a data URL /
+ * raw base64 (uploaded here) or an existing storage path / absolute URL (kept
+ * as is). Returns storage paths — never base64, which must not reach the
  * database.
  */
-export async function persistImages(
+export async function persistMedia(
   supabase: SupabaseClient,
   images: unknown,
   prefix: string
@@ -84,13 +85,32 @@ export async function persistImages(
       .upload(filePath, buffer, { contentType, upsert: false })
 
     if (error) {
-      logError('lib.developments.persistImages', error, { index: i, prefix })
+      logError('lib.developments.persistMedia', error, { index: i, prefix })
       continue
     }
     out.push(filePath)
   }
 
   return out
+}
+
+/**
+ * Deletes files that were dropped from a record. Only touches paths inside our
+ * own bucket, and only ones no longer referenced — an absolute URL or a path
+ * still in use is left alone.
+ */
+export async function removeOrphanedMedia(
+  supabase: SupabaseClient,
+  before: (string | null | undefined)[],
+  after: (string | null | undefined)[]
+): Promise<void> {
+  const kept = new Set(after.filter(Boolean) as string[])
+  const orphans = (before.filter(Boolean) as string[]).filter(
+    (p) => !kept.has(p) && !p.startsWith('http') && !p.startsWith('/') && !p.startsWith('data:')
+  )
+  if (!orphans.length) return
+  const { error } = await supabase.storage.from(STORAGE_BUCKET).remove(orphans)
+  if (error) logError('lib.developments.removeOrphanedMedia', error, { count: orphans.length })
 }
 
 // A storage path looks like "developments/x/123.jpg"; base64 has no slashes

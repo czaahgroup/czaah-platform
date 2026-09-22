@@ -3432,3 +3432,47 @@
   padding: 0 4px;
 }
 .pp-plot-flag input { width: 16px; height: 16px; cursor: pointer; }
+
+/* Development video and map. Both are fixed-ratio so a portrait clip or a
+   slow-loading iframe cannot shift the rest of the page around them. */
+.pp-dev-video {
+  margin-top: 22px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  max-width: 820px;
+}
+.pp-dev-video video {
+  display: block;
+  width: 100%;
+  max-height: 60vh;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #000;
+}
+.pp-dev-map {
+  margin-top: 18px;
+  border: 1px solid var(--pp-border);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 820px;
+}
+.pp-dev-map iframe {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border: 0;
+}
+@media (max-width: 900px) {
+  .pp-dev-map iframe { height: 280px; }
+}
+
+/* The brochure action is a link, not a button — min-height and centring do
+   not apply to an inline element, so it needs the flex box explicitly. */
+a.pp-dev-cta,
+a.pp-dev-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}

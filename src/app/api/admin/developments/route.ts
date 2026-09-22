@@ -4,7 +4,7 @@ import { logError } from '@/lib/logError'
 import {
   DEVELOPMENT_COLUMNS,
   UNIT_COLUMNS,
-  persistImages,
+  persistMedia,
   uniqueSlug,
   insertUnit,
   type UnitPayload,
@@ -72,8 +72,11 @@ export async function POST(request: NextRequest) {
     const slug = await uniqueSlug(supabase, body.slug ? slugify(body.slug) : slugify(name))
 
     // Images arrive as data URLs from the form; they become storage paths.
-    const gallery = await persistImages(supabase, body.gallery, `developments/${slug}`)
-    const featuredImageList = await persistImages(supabase, body.featuredImage ? [body.featuredImage] : [], `developments/${slug}`)
+    const gallery = await persistMedia(supabase, body.gallery, `developments/${slug}`)
+    const featuredImageList = await persistMedia(supabase, body.featuredImage ? [body.featuredImage] : [], `developments/${slug}`)
+    const videoList = await persistMedia(supabase, body.videoUrl ? [body.videoUrl] : [], `developments/${slug}`)
+    const posterList = await persistMedia(supabase, body.videoPosterUrl ? [body.videoPosterUrl] : [], `developments/${slug}`)
+    const brochureList = await persistMedia(supabase, body.brochureUrl ? [body.brochureUrl] : [], `developments/${slug}`)
 
     const { data: development, error } = await supabase
       .from('developments')
@@ -94,6 +97,10 @@ export async function POST(request: NextRequest) {
         approval_authority: body.approvalAuthority || null,
         featured_image: featuredImageList[0] || null,
         gallery,
+        video_url: videoList[0] || null,
+        video_poster_url: posterList[0] || null,
+        brochure_url: brochureList[0] || null,
+        brochure_name: body.brochureName || null,
         features: Array.isArray(body.features)
           ? body.features
           : String(body.features || '').split(',').map((f: string) => f.trim()).filter(Boolean),

@@ -216,6 +216,14 @@ export default function DevelopmentPage() {
   }
 
   const hero = resolveImage(dev.featured_image) || resolveImage((dev.gallery || [])[0]);
+  // Video, poster and brochure all live in the same bucket as the images.
+  const video = resolveImage(dev.video_url);
+  const videoPoster = resolveImage(dev.video_poster_url) || hero;
+  const brochure = resolveImage(dev.brochure_url);
+  // numeric columns come back as strings over the wire.
+  const lat = Number(dev.latitude);
+  const lon = Number(dev.longitude);
+  const hasCoords = Number.isFinite(lat) && Number.isFinite(lon) && !(lat === 0 && lon === 0);
   const gallery = (dev.gallery || []).map(resolveImage).filter(Boolean);
   const saveId = `dev:${dev.id}`;
   const display = prefCcy || '';
@@ -268,6 +276,11 @@ export default function DevelopmentPage() {
               </button>
             )}
             <button type="button" className="pp-dev-ghost" onClick={share}>{copied ? 'Link copied' : 'Share'}</button>
+            {brochure && (
+              <a className="pp-dev-ghost" href={brochure} download={dev.brochure_name || undefined} target="_blank" rel="noopener noreferrer">
+                ↓ Brochure
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -308,6 +321,17 @@ export default function DevelopmentPage() {
                 <div className="pp-spec"><small>Approved by</small><span>{dev.approval_authority}</span></div>
               )}
             </div>
+            {video && (
+              <div className="pp-dev-video">
+                <video
+                  src={video}
+                  poster={videoPoster || undefined}
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              </div>
+            )}
             {gallery.length > 0 && (
               <div className="pp-dev-gallery">
                 {gallery.map((src, i) => (
@@ -420,19 +444,48 @@ export default function DevelopmentPage() {
           <section className="pp-detail-section">
             <h2 className="pp-h2">Location</h2>
             <p className="pp-detail-desc">{dev.address || locationLine}</p>
-            {dev.latitude != null && dev.longitude != null ? (
-              <p>
-                <a
-                  className="pp-link-arrow"
-                  href={`https://www.google.com/maps/search/?api=1&query=${dev.latitude},${dev.longitude}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open in Maps →
-                </a>
-              </p>
+            {hasCoords ? (
+              <>
+                {/* OpenStreetMap's embed needs no API key, so the map works
+                    without adding a billed Google Maps account. The link out
+                    still goes to Google, which is what people navigate with. */}
+                <div className="pp-dev-map">
+                  <iframe
+                    title={`Map of ${dev.name}`}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.02}%2C${lat - 0.012}%2C${lon + 0.02}%2C${lat + 0.012}&layer=mapnik&marker=${lat}%2C${lon}`}
+                  />
+                </div>
+                <p style={{ marginTop: 14 }}>
+                  <a
+                    className="pp-link-arrow"
+                    href={`https://www.google.com/maps/search/?api=1&query=${lat},${lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open in Google Maps →
+                  </a>
+                </p>
+              </>
             ) : (
-              <p className="pp-detail-desc">Precise coordinates available on request.</p>
+              <>
+                <p className="pp-detail-desc">
+                  Precise coordinates for this development have not been published yet.
+                </p>
+                <p>
+                  <a
+                    className="pp-link-arrow"
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      [dev.name, dev.area, dev.city, dev.country].filter(Boolean).join(', ')
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Search for it on Google Maps →
+                  </a>
+                </p>
+              </>
             )}
           </section>
         )}
