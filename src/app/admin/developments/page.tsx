@@ -203,7 +203,9 @@ async function uploadToStorage(file: File, folder: string): Promise<string> {
   const put = await fetch(json.signedUrl, {
     method: 'PUT',
     headers: {
-      'Content-Type': file.type || 'application/octet-stream',
+      // The server resolves the type (some pickers report none), and the
+      // bucket checks the header against its allow-list, so use its answer.
+      'Content-Type': json.contentType || file.type || 'application/octet-stream',
       'x-upsert': 'true',
     },
     body: file,
@@ -472,6 +474,12 @@ export default function AdminDevelopmentsPage() {
   const [removedUnitIds, setRemovedUnitIds] = useState<string[]>([])
   // Which media field is mid-upload, so the form can show it and block save.
   const [uploading, setUploading] = useState<string | null>(null)
+  // Which media the editor explicitly removed. An empty media field is only
+  // written back as "cleared" if it is in here — otherwise a form that failed
+  // to load a value (a stale bundle, a slow fetch) would silently wipe it.
+  const [clearedMedia, setClearedMedia] = useState<string[]>([])
+  // True once a record's media has actually been read into the form.
+  const [mediaLoaded, setMediaLoaded] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -519,6 +527,7 @@ export default function AdminDevelopmentsPage() {
       const paths: string[] = []
       for (const file of picked) paths.push(await uploadToStorage(file, folder))
 
+      setClearedMedia((c) => c.filter((k) => k !== key))
       if (key === 'gallery') {
         update('gallery', [...form.gallery, ...paths])
       } else {
@@ -536,6 +545,13 @@ export default function AdminDevelopmentsPage() {
   /** Drop one gallery entry. The file itself is removed on save. */
   function removeGalleryAt(index: number) {
     update('gallery', form.gallery.filter((_: string, i: number) => i !== index))
+  }
+
+  /** Clear a single-file media field, and record that it was deliberate. */
+  function clearMedia(key: 'featuredImage' | 'videoUrl' | 'videoPosterUrl' | 'brochureUrl') {
+    update(key, '')
+    if (key === 'brochureUrl') update('brochureName', '')
+    setClearedMedia((c) => (c.includes(key) ? c : [...c, key]))
   }
 
   function unitPayload(u: Row) {
@@ -583,6 +599,8 @@ export default function AdminDevelopmentsPage() {
   function resetForm() {
     setForm({ ...emptyForm })
     setUnits([emptyUnit()])
+    setClearedMedia([])
+    setMediaLoaded(false)
     setRemovedUnitIds([])
     setEditingId(null)
     setCreating(false)
@@ -597,6 +615,8 @@ export default function AdminDevelopmentsPage() {
     setCreating(false)
     setEditingId(dev.id)
     setRemovedUnitIds([])
+    setClearedMedia([])
+    setMediaLoaded(false)
     try {
       const res = await fetch(`/api/admin/developments/${dev.id}`)
       const json = await res.json()
@@ -676,6 +696,7 @@ export default function AdminDevelopmentsPage() {
         })
 
       setUnits(loaded.length ? loaded : [emptyUnit()])
+      setMediaLoaded(true)
       if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
       setEditingId(null)
@@ -685,6 +706,28 @@ export default function AdminDevelopmentsPage() {
     }
   }
 
+  /**
+   * The save payload, with media handled so an edit can only ever set a value
+   * or clear one the editor actually removed.
+   *
+   * Sending every media field unconditionally cost a live brochure: the form
+   * had not loaded it, so an empty string went up and the server dutifully
+   * wrote null. A field that is empty and was NOT explicitly cleared is now
+   * omitted, and the server leaves the stored value alone.
+   */
+  function mediaSafeBody() {
+    const body: Row = { ...form }
+    for (const key of ['featuredImage', 'videoUrl', 'videoPosterUrl', 'brochureUrl']) {
+      if (form[key]) continue
+      if (clearedMedia.includes(key)) body[key] = ''
+      else delete body[key]
+    }
+    if (!form.brochureUrl && !clearedMedia.includes('brochureUrl')) delete body.brochureName
+    // Same for the gallery: only write it when this form actually read one.
+    if (!mediaLoaded && !creating) delete body.gallery
+    return body
+  }
+
   /** Save an edit: the development, then add / update / remove its variants. */
   async function saveEdit() {
     const collected: string[] = []
@@ -692,11 +735,7 @@ export default function AdminDevelopmentsPage() {
     const res = await fetch(`/api/admin/developments/${editingId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      // Every media field is sent on every save. persistMedia passes stored
-      // paths straight through, so this costs nothing — and sending only
-      // changed fields meant a removal, which adds no new data URL, never
-      // reached the server.
-      body: JSON.stringify(form),
+      body: JSON.stringify(mediaSafeBody()),
     })
     const json = await res.json()
     if (!res.ok) throw new Error(json?.error || `Request failed (${res.status})`)
@@ -984,6 +1023,20 @@ export default function AdminDevelopmentsPage() {
                 Uploading — don&rsquo;t leave this page.
               </span>
             )}
+            {error && (
+              <div
+                style={{
+                  border: '1px solid rgba(239,68,68,0.5)',
+                  background: 'rgba(239,68,68,0.1)',
+                  color: '#ef4444',
+                  padding: '9px 12px',
+                  fontSize: '12.5px',
+                  marginTop: '10px',
+                }}
+              >
+                {error}
+              </div>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '12px' }}>
               <div>
@@ -1000,7 +1053,7 @@ export default function AdminDevelopmentsPage() {
                     <button
                       type="button"
                       aria-label="Remove main image"
-                      onClick={() => update('featuredImage', '')}
+                      onClick={() => clearMedia('featuredImage')}
                       style={removeBadge}
                     >
                       ×
@@ -1060,7 +1113,7 @@ export default function AdminDevelopmentsPage() {
                       style={{ width: '100%', maxWidth: '260px', border: '1px solid rgba(255,255,255,0.12)' }}
                     />
                     <div>
-                      <button type="button" style={{ ...ghostButton, marginTop: '8px' }} onClick={() => update('videoUrl', '')}>
+                      <button type="button" style={{ ...ghostButton, marginTop: '8px' }} onClick={() => clearMedia('videoUrl')}>
                         Remove video
                       </button>
                     </div>
@@ -1084,7 +1137,7 @@ export default function AdminDevelopmentsPage() {
                       alt="Video poster"
                       style={{ width: '150px', height: '110px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.12)' }}
                     />
-                    <button type="button" aria-label="Remove poster" onClick={() => update('videoPosterUrl', '')} style={removeBadge}>
+                    <button type="button" aria-label="Remove poster" onClick={() => clearMedia('videoPosterUrl')} style={removeBadge}>
                       ×
                     </button>
                   </div>
@@ -1110,10 +1163,7 @@ export default function AdminDevelopmentsPage() {
                   <button
                     type="button"
                     style={ghostButton}
-                    onClick={() => {
-                      update('brochureUrl', '')
-                      update('brochureName', '')
-                    }}
+                    onClick={() => clearMedia('brochureUrl')}
                   >
                     Remove
                   </button>

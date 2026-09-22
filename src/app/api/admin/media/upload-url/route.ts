@@ -25,6 +25,24 @@ const ALLOWED = new Set([
 // is refused before it is sent rather than after.
 const MAX_BYTES = 100 * 1024 * 1024
 
+// Plenty of pickers — Android gallery apps especially — hand over a File with
+// an empty `type`. Rejecting those meant a perfectly good video was refused
+// for having no MIME type, which is what stopped the first site-visit clip.
+const BY_EXTENSION: Record<string, string> = {
+  jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp',
+  avif: 'image/avif', gif: 'image/gif',
+  mp4: 'video/mp4', m4v: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime',
+  pdf: 'application/pdf',
+}
+
+function resolveContentType(contentType: unknown, filename: unknown): string | null {
+  const given = String(contentType || '').toLowerCase()
+  if (ALLOWED.has(given)) return given
+  const ext = String(filename || '').split('.').pop()?.toLowerCase() || ''
+  const guessed = BY_EXTENSION[ext]
+  return guessed && ALLOWED.has(guessed) ? guessed : null
+}
+
 /** Keeps a user-supplied filename from escaping its folder or breaking a URL. */
 function safeName(name: string): string {
   const cleaned = (name || 'file')
@@ -42,9 +60,15 @@ export async function POST(request: NextRequest) {
 
     const { folder, filename, contentType, size } = await request.json()
 
-    if (!contentType || !ALLOWED.has(contentType)) {
+    const resolvedType = resolveContentType(contentType, filename)
+    if (!resolvedType) {
       return NextResponse.json(
-        { error: `${contentType || 'That file type'} is not accepted. Use JPG, PNG, WebP, MP4, WebM or PDF.` },
+        {
+          error:
+            `${filename || 'That file'} was not accepted` +
+            `${contentType ? ` (type "${contentType}")` : ' (the browser reported no file type)'}` +
+            '. Use JPG, PNG, WebP, MP4, WebM, MOV or PDF.',
+        },
         { status: 400 }
       )
     }
@@ -69,7 +93,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error?.message || 'Could not start the upload' }, { status: 500 })
     }
 
-    return NextResponse.json({ signedUrl: data.signedUrl, token: data.token, path })
+    // The browser must PUT with this exact type, or the bucket rejects it.
+    return NextResponse.json({ signedUrl: data.signedUrl, token: data.token, path, contentType: resolvedType })
   } catch (err) {
     logError('api.admin.media.uploadUrl', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
