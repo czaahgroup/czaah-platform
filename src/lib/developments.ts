@@ -29,7 +29,7 @@ export const LISTING_COLUMNS = `
   id, title, property_type, property_subtype, listing_type, price, currency,
   location, city, country, province_state, address, latitude, longitude,
   area_sqft, bedrooms, bathrooms, description, features, images,
-  video_url, video_poster_url, brochure_url, brochure_name, rent_period, furnishing, available_from,
+  video_url, video_poster_url, rent_period, furnishing, available_from,
   deposit, min_term_months, yield_percentage,
   plot_size, plot_size_unit, plot_category, development_name, developer_name,
   marketing_agent, block, sector, plot_number, price_type,
