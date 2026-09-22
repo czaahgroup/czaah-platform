@@ -21,10 +21,9 @@ const ALLOWED = new Set([
   'application/pdf',
 ])
 
-// Matches what storage will actually take. The ceiling is the PROJECT-level
-// upload limit rather than the bucket's, so refuse here and save the caller a
-// pointless full-size transfer that ends in EntityTooLarge.
-const MAX_BYTES = 50 * 1024 * 1024
+// No size limit is imposed here. Storage is the single authority: the bucket
+// has none, so whatever the project-level "upload file size limit" allows is
+// what lands. Re-adding a number here would just be one more place to drift.
 
 // Plenty of pickers — Android gallery apps especially — hand over a File with
 // an empty `type`. Rejecting those meant a perfectly good video was refused
@@ -69,18 +68,6 @@ export async function POST(request: NextRequest) {
             `${filename || 'That file'} was not accepted` +
             `${contentType ? ` (type "${contentType}")` : ' (the browser reported no file type)'}` +
             '. Use JPG, PNG, WebP, MP4, WebM, MOV or PDF.',
-        },
-        { status: 400 }
-      )
-    }
-
-    if (typeof size === 'number' && size > MAX_BYTES) {
-      return NextResponse.json(
-        {
-          error:
-            `That file is ${(size / 1048576).toFixed(0)}MB and the storage limit is ` +
-            `${MAX_BYTES / 1048576}MB. Compress it, or raise the upload file size limit ` +
-            `in the Supabase dashboard under Storage -> Settings.`,
         },
         { status: 400 }
       )

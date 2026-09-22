@@ -168,11 +168,10 @@ const emptyForm = {
   brochureName: '',
 }
 
-// The real ceiling is the PROJECT-level storage upload limit, which sits
-// above every bucket. It is at the 50MB default; the bucket claiming more just
-// meant a 51MB file uploaded in full and was then refused with EntityTooLarge.
-// Raise it in the Supabase dashboard (Storage -> Settings) before raising this.
-const MAX_UPLOAD_MB = 50
+// No size limit is enforced in the form. Storage decides, and if it refuses
+// the upload the message below says so with the file's real size — rather than
+// this file carrying a number that has to be kept in step with a setting it
+// cannot see.
 
 /** A preview URL for either a freshly picked file or an already stored path. */
 function mediaPreview(value: string): string {
@@ -215,7 +214,16 @@ async function uploadToStorage(file: File, folder: string): Promise<string> {
   })
   if (!put.ok) {
     const detail = await put.text().catch(() => '')
-    throw new Error(`Upload of ${file.name} failed (${put.status}). ${detail.slice(0, 140)}`)
+    const sizeMb = (file.size / 1048576).toFixed(0)
+    // Storage rejects anything over the project's upload file size limit, which
+    // no part of the app can read — so name the setting rather than a number.
+    if (put.status === 413 || detail.includes('EntityTooLarge')) {
+      throw new Error(
+        `${file.name} is ${sizeMb}MB and storage refused it. Raise "Upload file size limit" ` +
+          'in the Supabase dashboard under Storage → Settings, or compress the file.'
+      )
+    }
+    throw new Error(`Upload of ${file.name} (${sizeMb}MB) failed (${put.status}). ${detail.slice(0, 140)}`)
   }
 
   return json.path as string
@@ -509,18 +517,6 @@ export default function AdminDevelopmentsPage() {
   ) {
     if (!files?.length) return
     const picked = Array.from(files).slice(0, 12)
-
-    const tooBig = picked.filter((file) => file.size > MAX_UPLOAD_MB * 1024 * 1024)
-    if (tooBig.length) {
-      setError(
-        `${tooBig.map((t) => `${t.name} (${(t.size / 1048576).toFixed(0)}MB)`).join(', ')} — over the ` +
-          `${MAX_UPLOAD_MB}MB storage limit. ` +
-          (key === 'videoUrl'
-            ? 'Compress the clip — 1080p, under a minute, no audio usually lands well under it.'
-            : 'Re-export it smaller and try again.')
-      )
-      return
-    }
 
     setError(null)
     setUploading(key)
@@ -1124,8 +1120,8 @@ export default function AdminDevelopmentsPage() {
                   </div>
                 ) : (
                   <p style={hintStyle}>
-                    MP4, WebM or MOV, up to {MAX_UPLOAD_MB}MB. Phone video is often larger than
-                    that — compress it first, or raise the storage limit in Supabase.
+                    MP4, WebM or MOV. No size limit here — but a large file costs every
+                    visitor the download, so compress long clips where you can.
                   </p>
                 )}
               </div>
@@ -1174,7 +1170,7 @@ export default function AdminDevelopmentsPage() {
                 </div>
               ) : (
                 <p style={hintStyle}>
-                  Adds a &ldquo;Download Brochure&rdquo; button to the public page. Up to {MAX_UPLOAD_MB}MB.
+                  Adds a &ldquo;Download Brochure&rdquo; button to the public page.
                 </p>
               )}
             </div>
