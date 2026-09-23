@@ -18,23 +18,23 @@ export const INSIGHTS: InsightArticle[] = [
     date: '28 February 2026',
     title: "Islamabad's Blue Area Expansion — commercial real estate at an inflection point",
     excerpt:
-      "Relaxed height limits and Grade-A office demand are reshaping the capital's commercial district — Class-A occupancy is above 92% and USD yields sit at 7–9%.",
+      "Relaxed height limits and demand for Grade-A office space are reshaping the capital's commercial district.",
   },
   {
     id: 'post-13',
     category: 'Infrastructure',
     date: '21 February 2026',
-    title: "Pakistan's construction sector posts 12% growth — infrastructure leads",
+    title: "Pakistan's construction sector — infrastructure leads",
     excerpt:
-      'Public infrastructure spending drove 12% YoY growth in FY2025. The materials and engineering supply chain is the lower-risk way into the boom.',
+      'Public infrastructure spending is driving construction activity, with the materials and engineering supply chain one way into the sector.',
   },
   {
     id: 'post-11',
     category: 'Real Estate',
     date: '7 February 2026',
-    title: 'Gwadar Free Zone Phase 1 — why investors are moving now',
+    title: 'Gwadar Free Zone Phase 1 — what investors should know',
     excerpt:
-      'Phase 1 is 90% allocated. 23-year tax exemptions, duty-free imports and full profit repatriation, with land values up 300% since 2020.',
+      'The free zone offers long-term tax exemptions, duty-free imports and profit repatriation for qualifying businesses. What that means for land and how allocation works.',
   },
   {
     id: 'post-9',
@@ -42,23 +42,23 @@ export const INSIGHTS: InsightArticle[] = [
     date: '24 January 2026',
     title: "ML-1 railway upgrade — Pakistan's $6.8bn infrastructure bet",
     excerpt:
-      'The 1,872km Karachi–Peshawar mainline upgrade is driving 40–80% land appreciation around planned station redevelopments.',
+      'The Karachi–Peshawar mainline upgrade and what planned station redevelopments could mean for surrounding land.',
   },
   {
     id: 'post-8',
     category: 'Real Estate',
     date: '17 January 2026',
-    title: 'Diaspora investment in Pakistani real estate — record inflows in 2025',
+    title: 'Diaspora investment in Pakistani real estate',
     excerpt:
-      'Overseas Pakistanis invested a record $3.8bn in 2025, up 28%. The shift is from land banking toward commercial property and purpose-built rentals.',
+      'How overseas Pakistanis are investing in property at home, and a shift from land banking toward commercial property and purpose-built rentals.',
   },
   {
     id: 'post-6',
     category: 'Infrastructure',
     date: '3 January 2026',
-    title: "Pakistan's housing shortage — 10 million units and counting",
+    title: "Pakistan's housing shortage",
     excerpt:
-      'A 10-million-unit deficit growing by 300,000 a year. Addressing even 10% of it is a $12bn market for developers who can deliver title-clean units at scale.',
+      'A large and growing housing deficit, and the opportunity for developers who can deliver title-clean units at scale.',
   },
   {
     id: 'post-5',
@@ -66,7 +66,7 @@ export const INSIGHTS: InsightArticle[] = [
     date: '27 December 2025',
     title: "Special Economic Zones — Pakistan's industrial real estate opportunity",
     excerpt:
-      'Four CPEC SEZs are operational with 10-year tax exemptions. Direct industrial plots are appreciating 15–20% a year as allocation fills up.',
+      'CPEC Special Economic Zones offer tax incentives to qualifying operators. How direct industrial plots in the zones are allocated.',
   },
 ];
 /**

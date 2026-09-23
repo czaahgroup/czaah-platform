@@ -1,22 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { portalOffices, portalEmail } from '../_components/portalRuntime';
-import { WHY_INVEST } from '../_components/portal-content';
+import { portalWhyInvest } from '../_components/portal-content';
 
 export const metadata: Metadata = {
   title: 'About CZAAH Property — Investment Real Estate in London, Dubai & Pakistan',
   description:
-    'CZAAH Property is the real estate arm of CZAAH, the London-based international investment facilitation group. Title-verified property across London, Dubai and Pakistan with one counterparty end to end.',
+    'CZAAH Property is the real estate arm of CZAAH, the London-based international investment facilitation group. Property across London, Dubai and Pakistan with one counterparty end to end.',
 };
 
 const PILLARS = [
   {
-    t: 'Title-verified before listing',
-    d: 'Every property is checked for clean title and encumbrances before it reaches the portal. Nothing is published on a seller’s word alone.',
+    t: 'Title checks built in',
+    d: 'Title and encumbrance checks form part of our transaction support, so they are done before you commit, not after.',
   },
   {
     t: 'Local partners, not a remote feed',
-    d: 'Each market is covered by a CZAAH partner on the ground who inspects, verifies and represents the asset — so what you read matches what exists.',
+    d: 'Each core market is covered by a CZAAH partner on the ground who can view and represent an asset for you.',
   },
   {
     t: 'One counterparty, start to finish',
@@ -71,7 +71,7 @@ export default function PortalAboutPage() {
             chosen for a different reason.
           </p>
           <div className="pp-presence-grid">
-            {WHY_INVEST.map((m) => (
+            {portalWhyInvest().map((m) => (
               <div className="pp-presence" key={m.market}>
                 <strong>{m.market}</strong>
                 <span>{m.points[0].title}</span>

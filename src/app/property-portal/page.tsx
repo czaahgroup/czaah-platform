@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation';
 import { PropertyCard } from './_components/PropertyCard';
 import { portalInsights } from './_components/insights-data';
 import { useListings } from './_components/useListings';
-import { portalHeroReel } from './_components/portalRuntime';
+import { portalHeroReel, portalOffices } from './_components/portalRuntime';
 import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice, isRental } from './_components/types';
 import { useCurrencyPref } from './_components/usePortalPrefs';
-import { WHY_INVEST } from './_components/portal-content';
+import { portalWhyInvest, portalTestimonials } from './_components/portal-content';
 import { destinationFor, slugForCity } from './_components/destinations';
 
 
@@ -23,12 +23,12 @@ const MARKETS = [
   {
     key: 'dubai',
     name: 'Dubai',
-    blurb: 'Freehold offices, off-plan residential and income-producing units in Business Bay, Downtown and Dubai South — tax-free returns with structured payment plans.',
+    blurb: 'Freehold offices, off-plan residential and income-producing units in Business Bay, Downtown and Dubai South — with structured payment plans on off-plan stock.',
   },
   {
     key: 'pakistan',
     name: 'Pakistan',
-    blurb: 'Commercial, industrial and Special Economic Zone assets across Islamabad, Lahore, Karachi and the CPEC corridor — CZAAH-vetted with local partners on the ground.',
+    blurb: 'Commercial, industrial and Special Economic Zone assets across Islamabad, Lahore, Karachi and the CPEC corridor — with CZAAH partners on the ground.',
   },
 ];
 
@@ -70,50 +70,29 @@ const HERO_PRICES = [
 ];
 
 const VALUE_POINTS = [
-  { t: 'Title-verified', d: 'Every listing is checked for clean title and encumbrances before it reaches the portal.' },
-  { t: 'Local partners', d: 'On-the-ground representation in each market — not a remote listings feed.' },
+  { t: 'Title checks', d: 'Title and encumbrance checks form part of our transaction support in every market.' },
+  { t: 'Local partners', d: 'On-the-ground representation in each core market — not a remote listings feed.' },
   { t: 'One counterparty', d: 'Structuring, due diligence and transaction support handled end-to-end by CZAAH.' },
-  { t: 'Investor-grade data', d: 'Yield, area and pricing stated up front so you can compare like for like.' },
+  { t: 'Like-for-like data', d: 'Seller-stated yield, area and pricing shown up front, so listings can be compared.' },
 ];
 
+// Who the portal is built for — an audience, not a list of named clients.
 const CLIENTS = [
-  'Gulf Family Offices',
-  'Diaspora HNWIs',
-  'Institutional Funds',
-  'Sovereign Investors',
-  'Developer Partners',
-  'Private Investors',
+  'Diaspora investors',
+  'Family offices',
+  'Private investors',
+  'Developer partners',
 ];
 
-// Anonymised client testimonials — the same ones CZAAH publishes on czaah.com,
-// filtered to the real-estate-relevant quotes.
-const TESTIMONIALS = [
-  {
-    quote:
-      'As overseas Pakistanis, finding transparent, structured real estate investment access was impossible — until CZAAH. Their institutional structure gave us the security we needed.',
-    author: 'Private Investor',
-    role: 'UK-based Diaspora HNWI',
-  },
-  {
-    quote:
-      "CZAAH's cross-party political coverage means our investments are protected regardless of which government is in power. That level of continuity is unmatched.",
-    author: 'Managing Director',
-    role: 'Saudi Family Office',
-  },
-  {
-    quote:
-      'What sets CZAAH apart is their institutional discipline. Clean documentation, transparent reporting, and a compliance standard you rarely see in frontier markets.',
-    author: 'Portfolio Manager',
-    role: 'London-based PE Fund',
-  },
-];
 
-const STATS = [
-  { n: '3', l: 'Core Markets' },
-  { n: '5', l: 'CZAAH Offices' },
-  { n: '13', l: 'Investment Sectors' },
-  { n: 'London', l: 'Headquartered' },
-];
+function portalStats() {
+  return [
+    { n: '3', l: 'Core Markets' },
+    { n: String(portalOffices().length), l: 'CZAAH Offices' },
+    { n: '13', l: 'Investment Sectors' },
+    { n: 'London', l: 'Headquartered' },
+  ];
+}
 
 export default function PropertyPortalHome() {
   const router = useRouter();
@@ -128,6 +107,10 @@ export default function PropertyPortalHome() {
   const [whyMarket, setWhyMarket] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
   const { currency: currencyPref } = useCurrencyPref();
+  const whyInvest = portalWhyInvest();
+  const whyCurrent = whyInvest[Math.min(whyMarket, whyInvest.length - 1)];
+  const testimonials = portalTestimonials();
+  const currentTestimonial = testimonials[Math.min(testimonial, testimonials.length - 1)];
 
   // The hero reel: project clips uploaded with a listing (newest first), then
   // CZAAH's market footage. Rentals are left out — they live on /rent.
@@ -506,10 +489,10 @@ export default function PropertyPortalHome() {
       <section className="pp-section pp-stats-band">
         <div className="pp-container">
           <h2 className="pp-h2" style={{ textAlign: 'center', marginBottom: 10 }}>
-            Why invest in <span className="pp-gold">{WHY_INVEST[whyMarket].market}</span>?
+            Why invest in <span className="pp-gold">{whyCurrent.market}</span>?
           </h2>
           <div className="pp-why-tabs">
-            {WHY_INVEST.map((w, i) => (
+            {whyInvest.map((w, i) => (
               <button
                 key={w.market}
                 type="button"
@@ -521,13 +504,17 @@ export default function PropertyPortalHome() {
             ))}
           </div>
           <div className="pp-why-grid">
-            {WHY_INVEST[whyMarket].points.map((p) => (
+            {whyCurrent.points.map((p) => (
               <div className="pp-why-tile" key={p.title}>
                 <h3>{p.title}</h3>
                 <p>{p.body}</p>
               </div>
             ))}
           </div>
+          <p className="pp-disclaimer" style={{ textAlign: 'center', marginInline: 'auto' }}>
+            General information, not investment, tax or legal advice. Tax treatment depends on
+            your circumstances and may change; take independent advice before investing.
+          </p>
         </div>
       </section>
       {/* ── FEATURED LISTINGS ──────────────────────────────── */}
@@ -557,7 +544,7 @@ export default function PropertyPortalHome() {
         <div className="pp-container">
           <div className="pp-intro" style={{ alignItems: 'stretch' }}>
             <div>
-              <div className="pp-eyebrow">Over a decade of CZAAH</div>
+              <div className="pp-eyebrow">About CZAAH Property</div>
               <h2 className="pp-h2">Institutional discipline, applied to property.</h2>
               <p className="pp-section-lead">
                 CZAAH Property is the real estate arm of CZAAH&apos;s international investment
@@ -589,7 +576,7 @@ export default function PropertyPortalHome() {
       <section className="pp-clients-band">
         <div className="pp-container">
           <div className="pp-eyebrow" style={{ textAlign: 'center', marginBottom: 24 }}>
-            Who We Act For
+            Built For
           </div>
           <div className="pp-clients">
             {CLIENTS.map((c) => (
@@ -599,6 +586,7 @@ export default function PropertyPortalHome() {
         </div>
       </section>
       {/* ── TESTIMONIALS ───────────────────────────────────── */}
+      {currentTestimonial && (
       <section className="pp-section pp-stats-band">
         <div className="pp-container">
           <div className="pp-eyebrow" style={{ textAlign: 'center' }}>Client Confidence</div>
@@ -606,11 +594,11 @@ export default function PropertyPortalHome() {
             What investors say
           </h2>
           <div className="pp-testimonial">
-            <p className="pp-testimonial-quote">&ldquo;{TESTIMONIALS[testimonial].quote}&rdquo;</p>
-            <div className="pp-testimonial-author">{TESTIMONIALS[testimonial].author}</div>
-            <div className="pp-testimonial-role">{TESTIMONIALS[testimonial].role}</div>
+            <p className="pp-testimonial-quote">&ldquo;{currentTestimonial.quote}&rdquo;</p>
+            <div className="pp-testimonial-author">{currentTestimonial.author}</div>
+            <div className="pp-testimonial-role">{currentTestimonial.role}</div>
             <div className="pp-testimonial-dots">
-              {TESTIMONIALS.map((_, i) => (
+              {testimonials.length > 1 && testimonials.map((_, i) => (
                 <button
                   key={i}
                   className={i === testimonial ? 'active' : ''}
@@ -622,6 +610,7 @@ export default function PropertyPortalHome() {
           </div>
         </div>
       </section>
+      )}
       {/* ── INSIGHTS TEASER ────────────────────────────────── */}
       <section className="pp-section">
         <div className="pp-container">
@@ -650,7 +639,7 @@ export default function PropertyPortalHome() {
       <section className="pp-section--tight pp-stats-band">
         <div className="pp-container">
           <div className="pp-stats">
-            {STATS.map((s) => (
+            {portalStats().map((s) => (
               <div className="pp-stat" key={s.l}>
                 <b>{s.n}</b>
                 <span>{s.l}</span>
@@ -665,7 +654,7 @@ export default function PropertyPortalHome() {
           <h2 className="pp-h2">Planning a property investment?</h2>
           <p>
             Tell us the market, budget and objective. We&apos;ll come back with a shortlist of
-            title-verified opportunities and a structuring route.
+            opportunities and a structuring route.
           </p>
           <div className="pp-cta-actions">
             <Link href="/contact?interest=Real%20Estate#contact-form" className="pp-btn pp-btn--gold">

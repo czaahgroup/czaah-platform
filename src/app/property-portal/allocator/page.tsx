@@ -12,10 +12,9 @@ import { slugForCity } from '../_components/destinations';
 // summaries, not tax advice — the disclaimer at the foot of the page says so.
 const TAX_NOTE: Record<string, string> = {
   'United Kingdom': 'Income tax on rent; SDLT on purchase; CGT on disposal.',
-  'United Arab Emirates': 'No income, capital gains or wealth tax on property.',
+  'United Arab Emirates': 'No UAE personal income or capital gains tax on property; home-country tax may apply.',
   Pakistan: 'Rental income taxable; withholding differs for filers/non-filers.',
   'Saudi Arabia': 'No personal income tax; 5% RETT on transfer.',
-  Qatar: 'No personal income tax on rental income.',
 };
 
 const BUDGETS = [250_000, 500_000, 1_000_000, 2_500_000];

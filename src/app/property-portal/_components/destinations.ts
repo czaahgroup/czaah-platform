@@ -23,15 +23,15 @@ export const DESTINATIONS: Destination[] = [
     country: 'United Kingdom',
     tagline: 'The mature safe haven',
     blurb:
-      'Grade-A commercial floors, mixed-use blocks and prime residential across the City, Canary Wharf and the West End. HM Land Registry title, English law and the deepest professional tenant base in Europe.',
+      'Grade-A commercial floors, mixed-use blocks and prime residential across the City, Canary Wharf and the West End. HM Land Registry title, English law and one of Europe’s deepest rental markets.',
   },
   {
     slug: 'dubai',
     city: 'Dubai',
     country: 'United Arab Emirates',
-    tagline: 'Tax-free yield',
+    tagline: 'Low-tax ownership',
     blurb:
-      'Freehold offices, off-plan residential and income-producing units across Business Bay, Downtown and Dubai South. No income, capital gains or wealth tax on property, with staged payment plans on off-plan stock.',
+      'Freehold offices, off-plan residential and income-producing units across Business Bay, Downtown and Dubai South. No UAE personal income or capital gains tax on property held by individuals, with staged payment plans on off-plan stock.',
   },
   {
     slug: 'islamabad',
@@ -39,7 +39,7 @@ export const DESTINATIONS: Destination[] = [
     country: 'Pakistan',
     tagline: 'The administrative capital',
     blurb:
-      'Commercial and office assets in Blue Area, F-7 Markaz and the surrounding sectors — the institutional and diplomatic centre of Pakistan, verified on the ground by CZAAH partners.',
+      'Commercial and office assets in Blue Area, F-7 Markaz and the surrounding sectors — the institutional and diplomatic centre of Pakistan, with CZAAH partners on the ground.',
   },
   {
     slug: 'lahore',
@@ -71,7 +71,7 @@ export const DESTINATIONS: Destination[] = [
     country: 'Pakistan',
     tagline: 'Special Economic Zones',
     blurb:
-      'Manufacturing units and industrial plots in the Rashakai Special Economic Zone and the wider Khyber Pakhtunkhwa corridor, with SEZ incentives for qualifying operators.',
+      'Manufacturing units and industrial plots in the Rashakai Special Economic Zone and the wider Khyber Pakhtunkhwa corridor, with SEZ incentives available to qualifying operators.',
   },
 ];
 

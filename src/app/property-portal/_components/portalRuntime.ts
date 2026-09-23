@@ -63,3 +63,18 @@ export function portalInsights(): unknown[] | null {
   const list = runtime?.insights as unknown[] | undefined
   return Array.isArray(list) && list.length ? list : null
 }
+
+/** Null when nothing is stored — portal-content.ts supplies the shipped reasons. */
+export function portalWhyInvest(): unknown[] | null {
+  const list = runtime?.whyInvest as unknown[] | undefined
+  return Array.isArray(list) && list.length ? list : null
+}
+
+/**
+ * Null when nothing is stored. An empty stored list is returned as-is: an
+ * editor may deliberately choose to show no testimonials.
+ */
+export function portalTestimonials(): unknown[] | null {
+  const list = runtime?.testimonials as unknown[] | undefined
+  return Array.isArray(list) ? list : null
+}

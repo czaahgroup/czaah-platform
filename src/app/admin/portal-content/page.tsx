@@ -63,11 +63,22 @@ const TABS = [
   { key: 'offices', label: 'Offices' },
   { key: 'destinations', label: 'Destinations' },
   { key: 'insights', label: 'Insights' },
+  { key: 'whyInvest', label: 'Why invest' },
+  { key: 'testimonials', label: 'Testimonials' },
 ]
 
-// destinations and insights are plain arrays, so they get a shared list editor
-// rather than the object-merge path the other sections use.
-const LIST_FIELDS = {
+// These sections are plain arrays, so they get a shared list editor rather
+// than the object-merge path the other sections use.
+interface ListField {
+  key: string
+  label: string
+  width: number
+  hint?: string
+  textarea?: boolean
+  options?: string[]
+}
+
+const LIST_FIELDS: Record<string, ListField[]> = {
   destinations: [
     { key: 'slug', label: 'Slug', hint: 'The URL: /destinations/london', width: 1 },
     { key: 'city', label: 'City', width: 1 },
@@ -82,6 +93,36 @@ const LIST_FIELDS = {
     { key: 'title', label: 'Title', width: 3 },
     { key: 'excerpt', label: 'Excerpt', width: 3, textarea: true },
   ],
+  whyInvest: [
+    { key: 'market', label: 'Market', hint: 'Reasons with the same market form one tab, in list order', width: 1 },
+    { key: 'title', label: 'Title', width: 2 },
+    { key: 'body', label: 'Text', width: 3, textarea: true },
+  ],
+  testimonials: [
+    { key: 'author', label: 'Author', hint: 'e.g. Managing Director', width: 1 },
+    { key: 'role', label: 'Role', hint: 'e.g. Saudi Family Office', width: 2 },
+    { key: 'quote', label: 'Quote', width: 3, textarea: true },
+  ],
+}
+
+const LIST_NOUN: Record<string, string> = {
+  destinations: 'destination(s)',
+  insights: 'article(s)',
+  whyInvest: 'reason(s)',
+  testimonials: 'testimonial(s)',
+}
+
+// Shown under each list. Why invest and testimonials carry the claims rules
+// agreed in the 2026-09-23 review, so editors see them where they type.
+const LIST_HINT: Record<string, string> = {
+  destinations:
+    'A city with no entry still appears on the portal with its name and a generic label — it just has no editorial copy. Properties are matched to a destination by city automatically.',
+  insights:
+    'Teasers that deep-link to the full article on the main site. The three most recent also appear on the portal home page. Only quote a figure you can source.',
+  whyInvest:
+    'The home page "Why invest in …" tabs. Keep it factual: no yield or growth figures, comparisons or guarantees you cannot evidence, and say when tax treatment depends on the buyer’s own country.',
+  testimonials:
+    'Only add a quote from a real client who agreed to it and that you could evidence if challenged. Nothing that promises returns or protection from risk. While the list is empty the section is hidden.',
 }
 
 export default function PortalContentPage() {
@@ -379,11 +420,11 @@ export default function PortalContentPage() {
         </div>
       )}
 
-      {(tab === 'destinations' || tab === 'insights') && (
+      {LIST_FIELDS[tab] && (
         <div style={cardStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <strong style={{ fontSize: '13px' }}>
-              {(content[tab] || []).length} {tab === 'destinations' ? 'destination(s)' : 'article(s)'}
+              {(content[tab] || []).length} {LIST_NOUN[tab]}
             </strong>
             <button
               type="button"
@@ -393,11 +434,7 @@ export default function PortalContentPage() {
               + Add
             </button>
           </div>
-          <p style={hintStyle}>
-            {tab === 'destinations'
-              ? 'A city with no entry still appears on the portal with its name and a generic label — it just has no editorial copy. Properties are matched to a destination by city automatically.'
-              : 'Teasers that deep-link to the full article on the main site. The three most recent also appear on the portal home page.'}
-          </p>
+          <p style={hintStyle}>{LIST_HINT[tab]}</p>
 
           {(content[tab] || []).map((item: Row, i: number) => (
             <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', padding: '12px', marginTop: '12px' }}>

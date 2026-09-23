@@ -6,6 +6,7 @@ import { CURRENCIES, FX_PER_USD } from '@/lib/currencies'
 import { OFFICES, PORTAL_EMAIL } from '@/app/property-portal/_components/offices'
 import { DESTINATIONS } from '@/app/property-portal/_components/destinations'
 import { INSIGHTS } from '@/app/property-portal/_components/insights-data'
+import { WHY_INVEST_POINTS, TESTIMONIALS } from '@/app/property-portal/_components/portal-content'
 
 /**
  * Editable content and settings for property.czaah.com.
@@ -17,14 +18,26 @@ import { INSIGHTS } from '@/app/property-portal/_components/insights-data'
  * existed. Nothing an editor does in the admin panel can leave a blank page.
  */
 
-export type PortalContentKey = 'settings' | 'home' | 'offices' | 'destinations' | 'insights'
+export type PortalContentKey =
+  | 'settings'
+  | 'home'
+  | 'offices'
+  | 'destinations'
+  | 'insights'
+  | 'whyInvest'
+  | 'testimonials'
 export const PORTAL_CONTENT_KEYS: PortalContentKey[] = [
   'settings',
   'home',
   'offices',
   'destinations',
   'insights',
+  'whyInvest',
+  'testimonials',
 ]
+
+/** Sections stored as a plain array rather than an object with known keys. */
+export const LIST_SECTIONS: PortalContentKey[] = ['destinations', 'insights', 'whyInvest', 'testimonials']
 
 export interface PortalSettings {
   /** Countries whose approved listings appear on the portal. */
@@ -82,6 +95,8 @@ export const PORTAL_DEFAULTS = {
   } as OfficesContent,
   destinations: DESTINATIONS as unknown,
   insights: INSIGHTS as unknown,
+  whyInvest: WHY_INVEST_POINTS as unknown,
+  testimonials: TESTIMONIALS as unknown,
 }
 
 export type PortalContent = {
@@ -90,6 +105,8 @@ export type PortalContent = {
   offices: OfficesContent
   destinations: unknown
   insights: unknown
+  whyInvest: unknown
+  testimonials: unknown
 }
 
 /**
@@ -123,6 +140,8 @@ export async function loadPortalContent(): Promise<PortalContent> {
     offices: PORTAL_DEFAULTS.offices,
     destinations: PORTAL_DEFAULTS.destinations,
     insights: PORTAL_DEFAULTS.insights,
+    whyInvest: PORTAL_DEFAULTS.whyInvest,
+    testimonials: PORTAL_DEFAULTS.testimonials,
   }
 
   try {
@@ -140,6 +159,9 @@ export async function loadPortalContent(): Promise<PortalContent> {
       // they are taken as-is or not at all.
       destinations: stored.get('destinations') ?? defaults.destinations,
       insights: stored.get('insights') ?? defaults.insights,
+      whyInvest: stored.get('whyInvest') ?? defaults.whyInvest,
+      // An empty stored list is honoured — see portalTestimonials().
+      testimonials: stored.get('testimonials') ?? defaults.testimonials,
     }
   } catch (err) {
     // A portal that renders its shipped content beats a portal that 500s.
@@ -151,6 +173,30 @@ export async function loadPortalContent(): Promise<PortalContent> {
 /** Validation for what an admin submits. Returns problems, empty when valid. */
 export function validateSection(key: PortalContentKey, data: unknown): string[] {
   const errors: string[] = []
+
+  if (key === 'whyInvest') {
+    if (!Array.isArray(data)) return ['This section must be a list.']
+    if (data.length === 0) {
+      return ['The list is empty. Remove the override instead — Reset to default restores the shipped reasons.']
+    }
+    data.forEach((raw, i) => {
+      const item = (raw || {}) as Record<string, unknown>
+      if (!String(item.market || '').trim()) errors.push(`Reason ${i + 1} needs a market.`)
+      if (!String(item.title || '').trim()) errors.push(`Reason ${i + 1} needs a title.`)
+    })
+    return errors
+  }
+
+  // Empty is allowed: it hides the testimonials section.
+  if (key === 'testimonials') {
+    if (!Array.isArray(data)) return ['This section must be a list.']
+    data.forEach((raw, i) => {
+      const item = (raw || {}) as Record<string, unknown>
+      if (!String(item.quote || '').trim()) errors.push(`Testimonial ${i + 1} needs a quote.`)
+      if (!String(item.author || '').trim()) errors.push(`Testimonial ${i + 1} needs an author.`)
+    })
+    return errors
+  }
 
   // destinations and insights are stored as plain arrays.
   if (key === 'destinations' || key === 'insights') {

@@ -8,7 +8,7 @@ import './_components/portal.css'
 
 const PORTAL_TITLE = 'CZAAH Property — Investment Real Estate in London, Dubai & Pakistan'
 const PORTAL_DESCRIPTION =
-  'CZAAH Property — pre-vetted, title-verified real estate investment opportunities across London, Dubai and Pakistan, with end-to-end transaction support from a single institutional counterparty.'
+  'CZAAH Property — real estate investment opportunities across London, Dubai and Pakistan, with end-to-end transaction support from a single counterparty.'
 
 // The portal's public home is property.czaah.com, so relative share images and
 // canonical URLs resolve there — and links shared from the portal get a

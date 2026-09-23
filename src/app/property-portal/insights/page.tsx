@@ -88,6 +88,11 @@ export default function InsightsPage() {
             ))}
           </div>
 
+          <p className="pp-disclaimer">
+            Market commentary for general information, not investment, tax or legal advice.
+            Past performance is not a guide to future returns.
+          </p>
+
           <div className="pp-insights-foot">
             <p>Looking for the full research library across all 13 CZAAH sectors?</p>
             <Link href="/insights" className="pp-btn pp-btn--ghost">All CZAAH Insights</Link>

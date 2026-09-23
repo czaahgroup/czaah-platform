@@ -8,7 +8,7 @@ import { PropertyCard } from '../../_components/PropertyCard';
 import { useListings } from '../../_components/useListings';
 import { resolveImage } from '../../_components/types';
 import { destinationBySlug, slugForCity } from '../../_components/destinations';
-import { WHY_INVEST } from '../../_components/portal-content';
+import { portalWhyInvest } from '../../_components/portal-content';
 
 export default function DestinationPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -38,9 +38,10 @@ export default function DestinationPage() {
   // Pakistan case rather than showing nothing.
   const why = useMemo(() => {
     if (!country) return null;
-    if (/united kingdom/i.test(country)) return WHY_INVEST.find((w) => w.market === 'London');
-    if (/emirates/i.test(country)) return WHY_INVEST.find((w) => w.market === 'Dubai');
-    if (/pakistan/i.test(country)) return WHY_INVEST.find((w) => w.market === 'Pakistan');
+    const markets = portalWhyInvest();
+    if (/united kingdom/i.test(country)) return markets.find((w) => w.market === 'London');
+    if (/emirates/i.test(country)) return markets.find((w) => w.market === 'Dubai');
+    if (/pakistan/i.test(country)) return markets.find((w) => w.market === 'Pakistan');
     return null;
   }, [country]);
 
@@ -153,6 +154,10 @@ export default function DestinationPage() {
             </Link>
           </div>
         </section>
+        <p className="pp-disclaimer">
+          General information about the market, not investment, tax or legal advice. Take
+          independent advice before investing.
+        </p>
       </div>
     </main>
   );
