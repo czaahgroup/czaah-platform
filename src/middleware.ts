@@ -116,6 +116,9 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/verify') ||
     pathname.startsWith('/api/public/') ||
     pathname === '/api/contact' ||
+    // Sell / let / list-a-development submissions from property.czaah.com —
+    // public by design; the route validates, rate-limits and never publishes.
+    pathname === '/api/property-submissions' ||
     // Meeting rooms allow guest join with no account, same as a Google
     // Meet link — the room page itself handles both a logged-in member
     // and a name-only guest.
