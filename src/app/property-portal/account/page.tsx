@@ -208,12 +208,20 @@ function NewPassword({ onDone }: { onDone: () => void }) {
 }
 
 interface SavedSearch { id: string; name: string; path: string; created_at: string }
+interface Activity {
+  id: string; reference: string; kind: string; listing_id: string | null; listing_title: string | null; created_at: string; open: boolean
+  viewing: { status: string; preferred_date: string | null; preferred_slot: string | null; scheduled_at: string | null; mode: string } | null
+}
+const KIND: Record<string, string> = { property_enquiry: 'Enquiry', viewing_request: 'Viewing request', investment_enquiry: 'Investment enquiry' };
+const VIEWING: Record<string, string> = { requested: 'Waiting for CZAAH to confirm a time', confirmed: 'Confirmed', completed: 'Completed', cancelled: 'Cancelled', no_show: 'Missed' };
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
 function Dashboard({ notice }: { notice: string }) {
   const { user } = useBuyer();
   const { all, loading, error, reload } = useListings();
   const { ids, ready } = useWishlist();
   const [searches, setSearches] = useState<SavedSearch[] | null>(null);
+  const [activity, setActivity] = useState<Activity[] | null>(null);
   const [searchError, setSearchError] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteError, setDeleteError] = useState('');
@@ -226,6 +234,13 @@ function Dashboard({ notice }: { notice: string }) {
         if (error) setSearchError('We couldn’t load your saved searches just now.');
         setSearches((data as SavedSearch[]) || []);
       });
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/property-account/activity').then((r) => r.json().then((j) => (r.ok ? j.data : [])))
+      .then((d) => setActivity(d || []))
+      .catch(() => setActivity([]));
   }, [user]);
 
   async function removeSearch(id: string) {
@@ -305,6 +320,26 @@ function Dashboard({ notice }: { notice: string }) {
           </ul>
         )}
       </section>
+
+      {activity && activity.length > 0 && (
+        <section className="pp-section" style={{ paddingTop: 0 }}>
+          <div className="pp-section-head"><div><h2 className="pp-h2">Your enquiries &amp; viewings</h2></div></div>
+          <ul className="pp-saved-searches">
+            {activity.map((a) => (
+              <li key={a.id}>
+                {a.listing_id ? <Link href={`/property-portal/${a.listing_id}`}>{a.listing_title || 'Property'}</Link> : <strong style={{ flex: '1 1 260px' }}>{KIND[a.kind] || 'Enquiry'}</strong>}
+                <span>
+                  {KIND[a.kind] || 'Enquiry'} · {a.reference} · {shortDate(a.created_at)}
+                  {a.viewing && <> · {a.viewing.status === 'confirmed' && a.viewing.scheduled_at
+                    ? <>Viewing confirmed for {new Date(a.viewing.scheduled_at).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}{a.viewing.mode === 'video' ? ' (video call)' : ''}</>
+                    : VIEWING[a.viewing.status] || ''}</>}
+                  {!a.open && ' · Closed'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="pp-section pp-account-settings" style={{ paddingTop: 0 }}>
         <div className="pp-section-head"><div><h2 className="pp-h2">Account</h2></div></div>

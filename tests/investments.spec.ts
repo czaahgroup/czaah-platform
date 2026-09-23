@@ -3,34 +3,34 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { buildInvestmentEnquiry, type InvestmentForm } from '@/app/property-portal/_components/InvestmentEnquiry'
 import { investmentCategories } from '@/app/property-portal/investments/categories'
+import { cleanLead } from '@/lib/propertyLeads'
 
 const FORM: InvestmentForm = {
   name: ' Sam ', email: 'sam@example.com ', phone: '', currency: 'AED', budget: '1500000', country: 'United Arab Emirates', city: 'Dubai',
   property_type: 'apartment', funding: 'Cash', purpose: 'Rental income', timeline: 'Within 3 months', message: '',
 }
 
-test('an investment enquiry carries every answer to the inbox', () => {
+test('an investment enquiry carries every answer as a structured lead', () => {
   const p = buildInvestmentEnquiry(FORM)
-  expect(p.name).toBe('Sam')
-  expect(p.email).toBe('sam@example.com')
+  expect(p).toMatchObject({
+    kind: 'investment_enquiry', name: 'Sam', email: 'sam@example.com',
+    budget_amount: 1500000, budget_currency: 'AED', country: 'United Arab Emirates', city: 'Dubai',
+    property_type: 'Apartment / flat', funding: 'Cash', purpose: 'Rental income', timeline: 'Within 3 months',
+  })
   expect(p.phone).toBeUndefined()
-  expect(p.interest).toBe('Investment enquiry — United Arab Emirates')
-  expect(p.message).toContain('Budget: AED 1,500,000')
-  expect(p.message).toContain('Preferred location: Dubai, United Arab Emirates')
-  expect(p.message).toContain('Property type: Apartment / flat')
-  expect(p.message).toContain('Funding: Cash')
-  expect(p.message).toContain('Purpose: Rental income')
-  expect(p.message).toContain('Timeline: Within 3 months')
-  // /api/contact's limits.
-  expect(p.interest.length).toBeLessThanOrEqual(200)
+  // It passes the server's own validation unchanged.
+  const { data, error } = cleanLead(p)
+  expect(error).toBeUndefined()
+  expect(data).toMatchObject({ kind: 'investment_enquiry', budget_amount: 1500000, budget_currency: 'AED', city: 'Dubai' })
 })
 
-test('blank answers read as "not stated", never as made-up values', () => {
+test('blank answers are left out, never made up', () => {
   const p = buildInvestmentEnquiry({ ...FORM, budget: 'abc', country: '', city: '', property_type: '', funding: '', purpose: '', timeline: '' })
-  expect(p.interest).toBe('Investment enquiry — any market')
-  expect(p.message).toContain('Budget: not stated')
-  expect(p.message).toContain('Preferred location: open to suggestions')
-  expect(p.message).toContain('Property type: any')
+  expect(p.budget_amount).toBeUndefined()
+  expect(p.budget_currency).toBeUndefined()
+  expect(p.country).toBeUndefined()
+  expect(p.property_type).toBeUndefined()
+  expect(cleanLead(p).data).toMatchObject({ budget_amount: null, country: null, property_type: null })
 })
 
 test('categories count only for-sale listings and hide empty ones', () => {

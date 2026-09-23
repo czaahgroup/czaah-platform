@@ -123,6 +123,8 @@ export async function middleware(request: NextRequest) {
     // and they never say whether an address is registered.
     pathname === '/api/property-account/register' ||
     pathname === '/api/property-account/forgot' ||
+    // Enquiries, viewing requests and investment enquiries from the portal.
+    pathname === '/api/property-leads' ||
     // Meeting rooms allow guest join with no account, same as a Google
     // Meet link — the room page itself handles both a logged-in member
     // and a name-only guest.

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { portalPhone, portalWhatsApp } from './portalRuntime';
 import { track } from './analytics';
 import { Button } from './ui';
+import { VIEWING_SLOTS } from '@/lib/propertyLeads';
 
 // Listing actions (brief §11, §33): enquire and request a viewing without an
 // account, Call / WhatsApp to CZAAH's own numbers (never the owner's), share.
@@ -41,7 +42,7 @@ export function phoneHref() {
 }
 
 type Mode = 'enquiry' | 'viewing';
-const SLOTS = ['Morning (9–12)', 'Afternoon (12–5)', 'Evening (5–8)', 'Any time'];
+const SLOTS = VIEWING_SLOTS;
 
 /** The enquiry / viewing form. `mode` switches which request is sent. */
 export function EnquiryForm({
@@ -56,7 +57,8 @@ export function EnquiryForm({
   rental: boolean;
 }) {
   const ref = listingReference(listing.id);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', date: '', slot: SLOTS[3] });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', date: '', slot: SLOTS[3], company_site: '' });
+  const [leadRef, setLeadRef] = useState<string | null>(null);
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -66,32 +68,26 @@ export function EnquiryForm({
     e.preventDefault();
     setState('sending');
     setError('');
-    const kind = mode === 'viewing' ? 'Viewing request' : 'Property enquiry';
-    const title = listing.title.length > 120 ? `${listing.title.slice(0, 117)}…` : listing.title;
-    const lines = [
-      form.message.trim() || (mode === 'viewing' ? 'I would like to arrange a viewing.' : 'I would like more information about this property.'),
-      '',
-      `Listing: ${listing.title}`,
-      `Reference: ${ref}`,
-      `Link: ${listingUrl(listing.id)}`,
-      mode === 'viewing' ? `Preferred date: ${form.date || 'flexible'}` : null,
-      mode === 'viewing' ? `Preferred time: ${form.slot}` : null,
-    ].filter((l) => l !== null);
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('/api/property-leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          kind: mode === 'viewing' ? 'viewing_request' : 'property_enquiry',
+          listing_id: listing.id,
           name: form.name,
           email: form.email,
-          phone: form.phone || undefined,
-          interest: `${kind} — ${title} (${ref})`,
-          message: lines.join('\n'),
-          source: 'contact_form',
+          phone: form.phone,
+          message: form.message.trim() || (mode === 'viewing' ? 'I would like to arrange a viewing.' : 'I would like more information about this property.'),
+          preferred_date: mode === 'viewing' ? form.date : undefined,
+          preferred_slot: mode === 'viewing' ? form.slot : undefined,
+          source_page: window.location.pathname,
+          company_site: form.company_site,
         }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error || 'Something went wrong. Please try again.');
+      setLeadRef(json.reference || null);
       track(mode === 'viewing' ? 'viewing_request' : 'property_enquiry', { listing_id: listing.id });
       setState('sent');
     } catch (err) {
@@ -106,7 +102,7 @@ export function EnquiryForm({
         <strong>{mode === 'viewing' ? 'Viewing request sent.' : 'Enquiry sent.'}</strong>
         <p>
           The CZAAH Properties team will be in touch{mode === 'viewing' ? ' to confirm a time' : ''}. Your
-          reference is {ref}.
+          reference is {leadRef || ref}.
         </p>
         <button type="button" className="pp-link-btn" onClick={() => { setState('idle'); setForm((f) => ({ ...f, message: '' })); }}>
           Send another message
@@ -123,6 +119,9 @@ export function EnquiryForm({
             {m === 'enquiry' ? 'Enquire' : 'Book a viewing'}
           </button>
         ))}
+      </div>
+      <div aria-hidden="true" className="pp-hp">
+        <label>Company website<input tabIndex={-1} autoComplete="off" value={form.company_site} onChange={(e) => set('company_site', e.target.value)} /></label>
       </div>
       <label><span>Name *</span><input required maxLength={200} autoComplete="name" value={form.name} onChange={(e) => set('name', e.target.value)} /></label>
       <label><span>Email *</span><input required type="email" maxLength={254} autoComplete="email" value={form.email} onChange={(e) => set('email', e.target.value)} /></label>

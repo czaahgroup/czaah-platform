@@ -7,8 +7,8 @@ import { Button } from './ui';
 import { CURRENCIES } from './types';
 import { SUBMISSION_PROPERTY_TYPES, TIMELINES } from '@/lib/propertySubmissions';
 
-// Investment enquiry (brief §8). Goes to the enquiries inbox through
-// /api/contact, like the listing enquiry form — no account needed.
+// Investment enquiry (brief §8). Stored as a lead (Admin → Property Leads)
+// through /api/property-leads, like the listing enquiry form — no account needed.
 
 export const PURPOSES = ['Rental income', 'Long-term hold', 'Own use / second home', 'Business premises', 'Not sure yet'];
 export const FUNDING = ['Cash', 'Mortgage / finance', 'Not decided'];
@@ -33,31 +33,24 @@ const EMPTY: InvestmentForm = {
   property_type: '', funding: '', purpose: '', timeline: '', message: '',
 };
 
-/** The /api/contact payload for an investment enquiry. */
+/** The /api/property-leads payload for an investment enquiry. */
 export function buildInvestmentEnquiry(f: InvestmentForm) {
   const amount = Number(f.budget);
-  const budget = f.budget.trim() && Number.isFinite(amount) && amount > 0
-    ? `${f.currency} ${Math.round(amount).toLocaleString('en-GB')}`
-    : 'not stated';
-  const type = SUBMISSION_PROPERTY_TYPES.find((t) => t.v === f.property_type)?.l || f.property_type || 'any';
-  const where = [f.city.trim(), f.country].filter(Boolean).join(', ') || 'open to suggestions';
-  const lines = [
-    f.message.trim() || 'I would like to discuss investing in property.',
-    '',
-    `Budget: ${budget}`,
-    `Preferred location: ${where}`,
-    `Property type: ${type}`,
-    `Funding: ${f.funding || 'not stated'}`,
-    `Purpose: ${f.purpose || 'not stated'}`,
-    `Timeline: ${f.timeline || 'not stated'}`,
-  ];
+  const hasBudget = f.budget.trim() !== '' && Number.isFinite(amount) && amount > 0;
   return {
+    kind: 'investment_enquiry',
     name: f.name.trim(),
     email: f.email.trim(),
     phone: f.phone.trim() || undefined,
-    interest: `Investment enquiry — ${f.country || 'any market'}`,
-    message: lines.join('\n'),
-    source: 'contact_form',
+    message: f.message.trim() || 'I would like to discuss investing in property.',
+    budget_amount: hasBudget ? Math.round(amount) : undefined,
+    budget_currency: hasBudget ? f.currency : undefined,
+    country: f.country || undefined,
+    city: f.city.trim() || undefined,
+    property_type: SUBMISSION_PROPERTY_TYPES.find((t) => t.v === f.property_type)?.l || undefined,
+    funding: f.funding || undefined,
+    purpose: f.purpose || undefined,
+    timeline: f.timeline || undefined,
   };
 }
 
@@ -66,6 +59,8 @@ export function InvestmentEnquiry() {
   const [form, setForm] = useState<InvestmentForm>(EMPTY);
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const [reference, setReference] = useState<string | null>(null);
   const set = (k: keyof InvestmentForm, v: string) => setForm((f) => ({ ...f, [k]: v }));
   const cities = countries.find((c) => c.name === form.country)?.cities || [];
 
@@ -74,13 +69,14 @@ export function InvestmentEnquiry() {
     setState('sending');
     setError('');
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('/api/property-leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(buildInvestmentEnquiry(form)),
+        body: JSON.stringify({ ...buildInvestmentEnquiry(form), source_page: window.location.pathname, company_site: honeypot }),
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.error || 'Something went wrong. Please try again.');
+      setReference(json.reference || null);
       track('investment_enquiry', { country: form.country || 'any' });
       setState('sent');
     } catch (err) {
@@ -98,6 +94,7 @@ export function InvestmentEnquiry() {
           A member of the CZAAH Properties team will be in touch to talk through what you&apos;re
           looking for. A confirmation is on its way to your email.
         </p>
+        {reference && <p>Your reference is <strong>{reference}</strong>.</p>}
         <button type="button" className="pp-link-btn" onClick={() => { setForm(EMPTY); setState('idle'); }}>
           Send another enquiry
         </button>
@@ -119,6 +116,9 @@ export function InvestmentEnquiry() {
   return (
     <form className="pp-sell-form" onSubmit={submit}>
       <h3>Investment enquiry</h3>
+      <div aria-hidden="true" className="pp-hp">
+        <label>Company website<input tabIndex={-1} autoComplete="off" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} /></label>
+      </div>
       <fieldset>
         <legend>Your details</legend>
         <label><span>Full name *</span><input required maxLength={200} autoComplete="name" value={form.name} onChange={(e) => set('name', e.target.value)} /></label>
