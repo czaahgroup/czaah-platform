@@ -141,7 +141,8 @@ export function AiChatWidget() {
     // --app-bottom-bar is published by CookieConsent / InstallAppBanner, so the
     // bubble sits above those bars rather than on them.
     <div
-      className={`fixed right-4 sm:right-5 z-50 flex flex-col items-end gap-3 transition-[translate,opacity] duration-300 bottom-[calc(1rem+var(--app-bottom-bar,0px))] sm:bottom-[calc(1.25rem+var(--app-bottom-bar,0px))] ${
+      // czaah-ai-fab: hook for pages with their own bottom bar (property listings) to lift it.
+      className={`czaah-ai-fab fixed right-4 sm:right-5 z-50 flex flex-col items-end gap-3 transition-[translate,opacity] duration-300 bottom-[calc(1rem+var(--app-bottom-bar,0px))] sm:bottom-[calc(1.25rem+var(--app-bottom-bar,0px))] ${
         tucked && !open ? 'max-sm:translate-y-24 max-sm:opacity-0 max-sm:pointer-events-none' : ''
       }`}
     >

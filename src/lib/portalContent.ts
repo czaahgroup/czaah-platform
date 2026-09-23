@@ -68,6 +68,12 @@ export interface HomeContent {
 export interface OfficesContent {
   offices: { city: string; role: string; lines: string[] }[]
   email: string
+  /**
+   * CZAAH's own numbers for the Call / WhatsApp buttons on listings. Never an
+   * owner's or partner's (brief §33). Empty = those buttons are hidden.
+   */
+  phone: string
+  whatsapp: string
 }
 
 export const PORTAL_DEFAULTS = {
@@ -92,6 +98,8 @@ export const PORTAL_DEFAULTS = {
   offices: {
     offices: OFFICES,
     email: PORTAL_EMAIL,
+    phone: '',
+    whatsapp: '',
   } as OfficesContent,
   destinations: DESTINATIONS as unknown,
   insights: INSIGHTS as unknown,
@@ -251,6 +259,14 @@ export function validateSection(key: PortalContentKey, data: unknown): string[] 
   if (key === 'offices') {
     const email = String(value.email || '')
     if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.push('Contact email is not a valid address.')
+    for (const [field, label] of [['phone', 'Phone'], ['whatsapp', 'WhatsApp']] as const) {
+      const v = String(value[field] || '').trim()
+      if (!v) continue
+      const digits = v.replace(/\D/g, '')
+      if (!/^\+?[\d\s()-]+$/.test(v) || digits.length < 7 || digits.length > 15) {
+        errors.push(`${label} number should be in international format, e.g. +44 20 1234 5678.`)
+      }
+    }
   }
 
   return errors

@@ -54,6 +54,16 @@ export function portalEmail(): string {
   return runtime?.offices?.email || PORTAL_EMAIL
 }
 
+/** CZAAH's phone number, or '' when none is set (the Call button is hidden). */
+export function portalPhone(): string {
+  return String(runtime?.offices?.phone || '').trim()
+}
+
+/** CZAAH's WhatsApp number as digits for wa.me, or '' when none is set. */
+export function portalWhatsApp(): string {
+  return String(runtime?.offices?.whatsapp || '').replace(/\D/g, '')
+}
+
 /** Null when nothing is stored — destinations.ts supplies the shipped list. */
 export function portalDestinations(): unknown[] | null {
   const list = runtime?.destinations as unknown[] | undefined

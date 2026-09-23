@@ -10,6 +10,8 @@ import { AcquisitionCost } from '../_components/AcquisitionCost';
 import { PropertyCard } from '../_components/PropertyCard';
 import { useWishlist, useCurrencyPref } from '../_components/usePortalPrefs';
 import { TENURE_LABEL, BUILD_STATUS_LABEL, yieldLabel } from '@/lib/marketFields';
+import { EnquiryForm, ContactButtons, ShareButton, StickyActions, listingReference } from '../_components/PropertyActions';
+import { track } from '../_components/analytics';
 
 
 export default function PropertyDetailPage() {
@@ -24,6 +26,7 @@ export default function PropertyDetailPage() {
   const [similar, setSimilar] = useState<LiveProperty[]>([]);
   const [enquireError, setEnquireError] = useState('');
   const { has, toggle, ready: wlReady } = useWishlist();
+  const [enquiryMode, setEnquiryMode] = useState<'enquiry' | 'viewing'>('enquiry');
   const { currency: prefCcy } = useCurrencyPref();
 
   useEffect(() => {
@@ -67,6 +70,17 @@ export default function PropertyDetailPage() {
     })();
     return () => { cancelled = true; };
   }, [prop]);
+
+  useEffect(() => {
+    if (prop?.id) track('property_view', { listing_id: prop.id });
+  }, [prop?.id]);
+
+  /** The sticky bar's Enquire: bring the form into view and focus it. */
+  function openEnquiry() {
+    const form = document.getElementById('enquiry-form');
+    form?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => form?.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true }), 400);
+  }
 
   async function handleEnquire() {
     if (!prop) return;
@@ -150,6 +164,7 @@ export default function PropertyDetailPage() {
     prop.completion_date && { k: 'Expected completion', v: new Date(prop.completion_date).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) },
     prop.society && { k: 'Society', v: prop.society },
     prop.phase && { k: 'Phase', v: prop.phase },
+    { k: 'Reference', v: listingReference(prop.id) },
     prop.city && { k: 'City', v: prop.city },
     prop.country && { k: 'Country', v: prop.country },
   ].filter(Boolean) as { k: string; v: string }[];
@@ -199,13 +214,14 @@ export default function PropertyDetailPage() {
               type="button"
               className={`pp-detail-save${wlReady && has(prop.id) ? ' is-saved' : ''}`}
               aria-pressed={wlReady && has(prop.id)}
-              onClick={() => toggle(prop.id)}
+              onClick={() => { if (!has(prop.id)) track('property_save', { listing_id: prop.id }); toggle(prop.id); }}
             >
               <svg viewBox="0 0 24 24" width="15" height="15" fill={wlReady && has(prop.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
                 <path d="M12 20s-7-4.6-7-9.3A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.7C19 15.4 12 20 12 20Z" />
               </svg>
               {wlReady && has(prop.id) ? 'Saved' : 'Save'}
             </button>
+            <ShareButton listing={prop} />
           </div>
 
           {/* Gallery — click any image to open the full-screen viewer. */}
@@ -340,23 +356,20 @@ export default function PropertyDetailPage() {
                   <div><span>Available</span><b>{availableLabel}</b></div>
                 )}
               </div>
-              <button
-                className="pp-btn pp-btn--gold"
-                onClick={handleEnquire}
-                disabled={enquiring}
-              >
-                {enquiring ? 'Starting…' : rental ? 'Enquire About This Rental' : 'Enquire About This Property'}
-              </button>
-              {enquireError && <p className="pp-sell-err">{enquireError}</p>}
-              <Link
-                href={`/property-portal/contact?ref=${encodeURIComponent(prop.title)}`}
-                className="pp-btn pp-btn--ghost"
-              >
-                Book a Call
-              </Link>
+              <ContactButtons listing={prop} />
+              <EnquiryForm listing={prop} mode={enquiryMode} onModeChange={setEnquiryMode} rental={rental} />
+              {/* Partner listings keep the account-based chat with the agent. */}
+              {prop.partner_id && (
+                <>
+                  <button type="button" className="pp-link-btn" onClick={handleEnquire} disabled={enquiring}>
+                    {enquiring ? 'Opening…' : 'Or message the listing agent from your account'}
+                  </button>
+                  {enquireError && <p className="pp-sell-err">{enquireError}</p>}
+                </>
+              )}
               <p className="pp-enquire-note">
-                Handled directly by the CZAAH Properties team — one point of contact from viewing
-                to completion.
+                Handled by the CZAAH Properties team — one point of contact from viewing to
+                completion.
               </p>
             </aside>
           </div>
@@ -376,6 +389,7 @@ export default function PropertyDetailPage() {
           )}
         </div>
       </div>
+      <StickyActions listing={prop} onEnquire={openEnquiry} />
     </main>
   );
 }

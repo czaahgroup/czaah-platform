@@ -4277,3 +4277,118 @@ a.pp-dev-ghost {
     white-space: nowrap;
   }
 }
+
+/* ==========================================================================
+   Phase 5: listing actions — enquiry / viewing form, Call / WhatsApp, share,
+   sticky phone bar.
+   ========================================================================== */
+.pp-enquiry-form { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+.pp-enquiry-form label { display: flex; flex-direction: column; gap: 5px; }
+.pp-enquiry-form label > span {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pp-text-muted);
+}
+.pp-enquiry-form input,
+.pp-enquiry-form select,
+.pp-enquiry-form textarea {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--pp-border-strong);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--pp-text);
+  font: inherit;
+  font-size: 14px;
+}
+.pp-enquiry-form textarea { resize: vertical; }
+.pp-enquiry-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pp-enquiry-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(20, 19, 15, 0.06);
+}
+.pp-enquiry-modes button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pp-text);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.pp-enquiry-modes button.is-active { background: var(--pp-gold); color: #080808; }
+.pp-enquiry-done {
+  padding: 16px;
+  border-radius: 10px;
+  background: rgba(138, 111, 46, 0.08);
+}
+.pp-enquiry-done p { margin: 6px 0 10px; font-size: 14px; }
+.pp-link-btn {
+  min-height: 44px;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--pp-gold-deep);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: left;
+}
+.pp-contact-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0 6px; }
+.pp-contact-btns .pp-btn { min-height: 44px; justify-content: center; }
+
+/* Sticky bar: phones and small tablets only. */
+.pp-sticky-cta { display: none; }
+@media (max-width: 900px) {
+  .pp-sticky-cta {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--app-bottom-bar, 0px);
+    z-index: 45;
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.97);
+    border-top: 1px solid var(--pp-border-strong);
+    box-shadow: 0 -8px 24px rgba(20, 19, 15, 0.1);
+  }
+  .pp-sticky-cta > a,
+  .pp-sticky-cta > button {
+    flex: 1 1 0;
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--pp-border-strong);
+    border-radius: 999px;
+    background: #fff;
+    color: #14130f;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .pp-sticky-cta > .is-primary { background: var(--pp-gold); border-color: var(--pp-gold); color: #080808; }
+  /* Room for the bar: the footer's end and the AI bubble move up. */
+  :root[data-sticky-cta] .pp-footer { padding-bottom: calc(28px + 76px + var(--app-bottom-bar, 0px)); }
+  :root[data-sticky-cta] .czaah-ai-fab { bottom: calc(82px + var(--app-bottom-bar, 0px)) !important; }
+}
+/* Grid children default to min-width:auto, so a <select> refused to shrink and
+   poked out of the enquiry card. */
+.pp-enquiry-row > label { min-width: 0; }
+.pp-enquiry-row input,
+.pp-enquiry-row select { width: 100%; min-width: 0; }

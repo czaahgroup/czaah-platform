@@ -505,6 +505,21 @@ export default function PortalContentPage() {
           <label style={labelStyle}>Contact email</label>
           <input value={offices.email || ''} onChange={(e) => edit('offices', { email: e.target.value })} style={inputStyle} />
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 14 }}>
+            <div>
+              <label style={labelStyle}>Phone (Call button)</label>
+              <input value={String((offices as Row).phone || '')} onChange={(e) => edit('offices', { phone: e.target.value })} placeholder="+44 20 1234 5678" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>WhatsApp</label>
+              <input value={String((offices as Row).whatsapp || '')} onChange={(e) => edit('offices', { whatsapp: e.target.value })} placeholder="+44 7700 900000" style={inputStyle} />
+            </div>
+          </div>
+          <p style={hintStyle}>
+            CZAAH&apos;s own numbers — shown as Call and WhatsApp on every listing. Leave empty to hide those
+            buttons. Never enter an owner&apos;s or partner&apos;s number here.
+          </p>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 20 }}>
             <strong style={{ fontSize: '13px' }}>Offices</strong>
             <button
