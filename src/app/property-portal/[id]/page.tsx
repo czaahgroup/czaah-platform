@@ -205,6 +205,11 @@ export default function PropertyDetailPage() {
 
         <div className="pp-detail">
           <h1 className="pp-detail-title">{prop.title}</h1>
+          {prop.verified && (
+            <Link href="/property-portal/about#verification" className="pp-verified-badge" style={{ marginBottom: 10 }}>
+              ✓ Verified by CZAAH
+            </Link>
+          )}
           <div className="pp-detail-loc">
             <span className="pp-gold">◆</span> {prop.location}, {prop.city}
             {prop.country ? `, ${prop.country}` : ''}

@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         possession_status: body.possessionStatus || null,
         status: body.status || 'draft',
         featured: !!body.featured,
-        verified: !!body.verified,
+        // New developments start unverified: Admin → Verification only.
         agent_id: body.agentId || null,
         created_by: userId,
       })

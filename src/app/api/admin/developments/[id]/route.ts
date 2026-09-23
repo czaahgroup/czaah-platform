@@ -83,7 +83,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     text('agentId', 'agent_id')
     text('brochureName', 'brochure_name')
     bool('featured', 'featured')
-    bool('verified', 'verified')
+    // 'verified' is set only through Admin → Verification (checks + record).
 
     if (body.latitude !== undefined) updates.latitude = num(body.latitude)
     if (body.longitude !== undefined) updates.longitude = num(body.longitude)

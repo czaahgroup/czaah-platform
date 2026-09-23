@@ -440,7 +440,7 @@ export function plotColumnsFromBody(
   bool('canalFacing', 'canal_facing')
   bool('approved', 'approved')
   bool('featured', 'featured')
-  bool('verified', 'verified')
+  // 'verified' is set only through Admin → Verification (checks + record).
 
   return out
 }

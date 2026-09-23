@@ -96,6 +96,11 @@ export function portalTestimonials(): unknown[] | null {
  * above: propertyLocations reads the database and must never reach the client
  * bundle.
  */
+/** The stored home layout, raw — normalise with homeLayout.ts. */
+export function portalHomeLayout(): unknown {
+  return runtime?.homeLayout ?? null
+}
+
 export function portalLocations(): LocationTree | null {
   const tree = runtime?.locations as LocationTree | undefined
   return Array.isArray(tree) ? tree : null

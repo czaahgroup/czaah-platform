@@ -1188,9 +1188,9 @@ export default function AdminDevelopmentsPage() {
             <label style={{ display: 'flex', gap: '6px', alignItems: 'center', cursor: 'pointer', marginTop: '18px' }}>
               <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} /> Featured
             </label>
-            <label style={{ display: 'flex', gap: '6px', alignItems: 'center', cursor: 'pointer', marginTop: '18px' }}>
-              <input type="checkbox" checked={form.verified} onChange={(e) => update('verified', e.target.checked)} /> Verified
-            </label>
+            <a href="/admin/verification" style={{ display: 'flex', alignItems: 'center', marginTop: '18px', fontSize: '12px', color: '#C9A84C' }}>
+              {form.verified ? '✓ Verified — manage in Verification' : 'Verify in Admin → Verification'}
+            </a>
           </div>
 
           <div style={{ marginTop: '22px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
@@ -1273,9 +1273,9 @@ export default function AdminDevelopmentsPage() {
                 <button style={ghostButton} onClick={() => patchDevelopment(dev.id, { featured: !dev.featured }, dev.featured ? 'Unfeatured.' : 'Featured.')}>
                   {dev.featured ? 'Unfeature' : 'Feature'}
                 </button>
-                <button style={ghostButton} onClick={() => patchDevelopment(dev.id, { verified: !dev.verified }, dev.verified ? 'Verification removed.' : 'Verified.')}>
-                  {dev.verified ? 'Unverify' : 'Verify'}
-                </button>
+                <a href="/admin/verification" style={{ ...ghostButton, textDecoration: 'none' }}>
+                  {dev.verified ? 'Verification…' : 'Verify…'}
+                </a>
                 <button style={ghostButton} onClick={() => duplicateDevelopment(dev)}>Duplicate</button>
                 <button style={{ ...ghostButton, borderColor: 'rgba(239,68,68,0.4)', color: '#ef4444' }} onClick={() => removeDevelopment(dev)}>Delete</button>
               </div>

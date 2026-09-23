@@ -121,6 +121,12 @@ export type PortalContent = {
    * tables and adds it here so it reaches the runtime the same way.
    */
   locations?: unknown
+  /**
+   * Home section order / visibility (portal_content 'homeLayout', written by
+   * Admin → Homepage — not an editable Portal Content section). Normalised by
+   * src/lib/homeLayout.ts wherever it is read.
+   */
+  homeLayout?: unknown
 }
 
 /**
@@ -164,6 +170,7 @@ export async function loadPortalContent(): Promise<PortalContent> {
     if (error || !data) return defaults
 
     const stored = new Map(data.map((row) => [row.key as PortalContentKey, row.data]))
+    const homeLayout = data.find((row) => row.key === 'homeLayout')?.data ?? null
 
     return {
       settings: mergeSection(defaults.settings, stored.get('settings')),
@@ -176,6 +183,7 @@ export async function loadPortalContent(): Promise<PortalContent> {
       whyInvest: stored.get('whyInvest') ?? defaults.whyInvest,
       // An empty stored list is honoured — see portalTestimonials().
       testimonials: stored.get('testimonials') ?? defaults.testimonials,
+      homeLayout,
     }
   } catch (err) {
     // A portal that renders its shipped content beats a portal that 500s.

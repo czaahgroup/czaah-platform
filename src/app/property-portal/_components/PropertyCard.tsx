@@ -48,6 +48,8 @@ export function PropertyCard({
         <div className="pp-card-flags">
           <span className={`pp-card-status ${meta.className}`}>{meta.label}</span>
           {isNewListing(prop) && <span className="pp-card-new">New</span>}
+          {/* Set only through Admin → Verification, with its checks recorded. */}
+          {prop.verified && <span className="pp-card-verified" title="Checked by CZAAH — see About us">Verified</span>}
         </div>
 
         <div className="pp-card-overlay">

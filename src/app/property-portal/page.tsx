@@ -1,13 +1,14 @@
 'use client';
 // @ts-nocheck
 
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { PropertyCard } from './_components/PropertyCard';
 import { portalInsights } from './_components/insights-data';
 import { useListings } from './_components/useListings';
-import { portalHeroReel, portalOffices } from './_components/portalRuntime';
+import { portalHeroReel, portalOffices, portalHomeLayout } from './_components/portalRuntime';
+import { normaliseHomeLayout, type HomeSectionKey } from '@/lib/homeLayout';
 import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice, isRental } from './_components/types';
 import { useCurrencyPref } from './_components/usePortalPrefs';
 import { FeaturedMarkets, InvestmentOpportunities, OwnerCta } from './_components/HomeSections';
@@ -209,6 +210,350 @@ export default function PropertyPortalHome() {
     .sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
   const newCount = properties.filter(isNewListing).length;
   const insightTeasers = portalInsights().slice(0, 3);
+  const homeLayout = normaliseHomeLayout(portalHomeLayout());
+
+  // Every home section, by key. Hero stays first; the rest follow homeLayout.
+  const blocks: Record<HomeSectionKey, React.ReactNode> = {
+    markets: (
+      <>
+          <FeaturedMarkets properties={properties} />
+      </>
+    ),
+    showcase: (
+      <>
+          {/* Full-viewport panels: scrolling on from the hero keeps every project
+              at full-bleed scale rather than dropping straight to small cards. */}
+          <section className="pp-showcase" id="latest">
+            {showcase.map((p, i) => (
+              <article className="pp-show" key={p.id}>
+                <div
+                  className="pp-show-img"
+                  style={{ backgroundImage: `url(${resolveImage(p.images?.[0])})` }}
+                  aria-hidden="true"
+                />
+                <div className="pp-container pp-show-body">
+                  <div className="pp-show-panel">
+                    <div className="pp-show-index">
+                      {String(i + 1).padStart(2, '0')} / {String(showcase.length).padStart(2, '0')}
+                    </div>
+                    <Link href={`/property-portal/${p.id}`} className="pp-show-title-link">
+                      <h2 className="pp-show-title">{p.title}</h2>
+                    </Link>
+                    <p className="pp-show-loc">
+                      {p.location}
+                      {p.city ? `, ${p.city}` : ''}
+                      {p.country ? `, ${p.country}` : ''}
+                    </p>
+                    {p.description && <p className="pp-show-desc">{p.description}</p>}
+                    <div className="pp-show-stats">
+                      <div>
+                        <small>Price</small>
+                        <b>{formatPrice(p, currencyPref || undefined)}</b>
+                      </div>
+                      {p.area_sqft != null && (
+                        <div>
+                          <small>Area</small>
+                          <b>{p.area_sqft.toLocaleString()} ft&sup2;</b>
+                        </div>
+                      )}
+                      {p.yield_percentage != null && (
+                        <div>
+                          <small>{yieldLabel(p.yield_source)}</small>
+                          <b>{p.yield_percentage}%</b>
+                        </div>
+                      )}
+                      <div>
+                        <small>Type</small>
+                        <b>{p.property_type?.replace('_', ' ')}</b>
+                      </div>
+                    </div>
+                    <div className="pp-show-actions">
+                      <Link href={`/property-portal/${p.id}`} className="pp-btn pp-btn--gold">
+                        View project
+                      </Link>
+                      <Link
+                        href={`/property-portal/contact?ref=${encodeURIComponent(p.title)}`}
+                        className="pp-btn pp-btn--glass"
+                      >
+                        Enquire
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </section>
+      </>
+    ),
+    featured: (
+      <>
+          <section className="pp-section pp-stats-band">
+            <div className="pp-container">
+              <div className="pp-section-head">
+                <div>
+                  <div className="pp-eyebrow">Properties</div>
+                  <h2 className="pp-h2">Featured properties</h2>
+                </div>
+                <Link href="/property-portal/listings" className="pp-link-arrow">
+                  View all listings →
+                </Link>
+              </div>
+              <div className="pp-grid">
+                {loading &&
+                  Array.from({ length: 3 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
+                {!loading && !error && featured.length === 0 && (
+                  <div className="pp-empty">More opportunities are being prepared — check back shortly.</div>
+                )}
+                {!loading && !error && featured.slice(0, 8).map((prop) => <PropertyCard key={prop.id} prop={prop} />)}
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    projects: (
+      <>
+          <DevelopmentStrip eyebrow="New projects" title="New & off-plan projects" viewAllHref="/property-portal/new-projects" />
+      </>
+    ),
+    investments: (
+      <>
+          <InvestmentOpportunities properties={properties} />
+      </>
+    ),
+    destinations: (
+      <>
+          <section className="pp-section">
+            <div className="pp-container">
+              <div className="pp-section-head">
+                <div>
+                  <div className="pp-eyebrow">Locations</div>
+                  <h2 className="pp-h2">Explore by location</h2>
+                </div>
+                <Link href="/property-portal/destinations" className="pp-link-arrow">
+                  All locations →
+                </Link>
+              </div>
+              <p className="pp-section-lead" style={{ marginBottom: 36, maxWidth: 700 }}>
+                Start with a city to see what is available there today.
+              </p>
+              <div className="pp-dest-grid">
+                {loading &&
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="pp-skeleton" style={{ height: 300 }} />
+                  ))}
+                {!loading && !error && destOptions.slice(0, 6).map((d) => {
+                  const meta = destinationFor(d.city);
+                  const withImg = properties.find((p) => p.city === d.city && p.images?.[0]);
+                  const img = withImg ? resolveImage(withImg.images[0]) : null;
+                  return (
+                    <Link
+                      key={d.city}
+                      href={`/property-portal/destinations/${slugForCity(d.city)}`}
+                      className="pp-dest"
+                    >
+                      <div className="pp-dest-img">
+                        {img ? <img src={img} alt={d.city} loading="lazy" /> : <div className="pp-card-img--empty">⌂</div>}
+                        <span className="pp-dest-count">{d.n} {d.n === 1 ? 'property' : 'properties'}</span>
+                      </div>
+                      <div className="pp-dest-body">
+                        <h3>{d.city}</h3>
+                        <span className="pp-dest-country">{meta?.country || ''}</span>
+                        {meta?.tagline && <p className="pp-dest-tagline">{meta.tagline}</p>}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    about: (
+      <>
+          <section className="pp-section">
+            <div className="pp-container">
+              <div className="pp-intro" style={{ alignItems: 'stretch' }}>
+                <div>
+                  <div className="pp-eyebrow">About CZAAH Properties</div>
+                  <h2 className="pp-h2">Why CZAAH Properties</h2>
+                  <p className="pp-section-lead">
+                    CZAAH Properties is a London-based international property company, part of the
+                    CZAAH group. We help people buy, sell, rent and invest in property across the
+                    United Kingdom, Dubai and Pakistan, with one point of contact from first viewing to
+                    completion.
+                  </p>
+                  <div style={{ marginTop: 28 }}>
+                    <Link href="/sectors/realestate" className="pp-btn pp-btn--ghost">
+                      About the Real Estate Sector
+                    </Link>
+                  </div>
+                </div>
+                <div className="pp-intro-points">
+                  {VALUE_POINTS.map((p) => (
+                    <div className="pp-intro-point" key={p.t}>
+                      <i>◆</i>
+                      <div>
+                        <b>{p.t}</b>
+                        <span>{p.d}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    whyInvest: (
+      <>
+          <section className="pp-section pp-stats-band">
+            <div className="pp-container">
+              <h2 className="pp-h2" style={{ textAlign: 'center', marginBottom: 10 }}>
+                Why invest in <span className="pp-gold">{whyCurrent.market}</span>?
+              </h2>
+              <div className="pp-why-tabs">
+                {whyInvest.map((w, i) => (
+                  <button
+                    key={w.market}
+                    type="button"
+                    className={i === whyMarket ? 'active' : ''}
+                    onClick={() => setWhyMarket(i)}
+                  >
+                    {w.market}
+                  </button>
+                ))}
+              </div>
+              <div className="pp-why-grid">
+                {whyCurrent.points.map((p) => (
+                  <div className="pp-why-tile" key={p.title}>
+                    <h3>{p.title}</h3>
+                    <p>{p.body}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="pp-disclaimer" style={{ textAlign: 'center', marginInline: 'auto' }}>
+                General information, not investment, tax or legal advice. Tax treatment depends on
+                your circumstances and may change; take independent advice before investing.
+              </p>
+            </div>
+          </section>
+      </>
+    ),
+    owner: (
+      <>
+          <OwnerCta />
+      </>
+    ),
+    clients: (
+      <>
+          <section className="pp-clients-band">
+            <div className="pp-container">
+              <div className="pp-eyebrow" style={{ textAlign: 'center', marginBottom: 24 }}>
+                Built For
+              </div>
+              <div className="pp-clients">
+                {CLIENTS.map((c) => (
+                  <span key={c}>{c}</span>
+                ))}
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    testimonials: (
+      <>
+          {currentTestimonial && (
+          <section className="pp-section pp-stats-band">
+            <div className="pp-container">
+              <div className="pp-eyebrow" style={{ textAlign: 'center' }}>Client Confidence</div>
+              <h2 className="pp-h2" style={{ textAlign: 'center', marginBottom: 40 }}>
+                What investors say
+              </h2>
+              <div className="pp-testimonial">
+                <p className="pp-testimonial-quote">&ldquo;{currentTestimonial.quote}&rdquo;</p>
+                <div className="pp-testimonial-author">{currentTestimonial.author}</div>
+                <div className="pp-testimonial-role">{currentTestimonial.role}</div>
+                <div className="pp-testimonial-dots">
+                  {testimonials.length > 1 && testimonials.map((_, i) => (
+                    <button
+                      key={i}
+                      className={i === testimonial ? 'active' : ''}
+                      aria-label={`Testimonial ${i + 1}`}
+                      onClick={() => setTestimonial(i)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+          )}
+      </>
+    ),
+    insights: (
+      <>
+          <section className="pp-section">
+            <div className="pp-container">
+              <div className="pp-section-head">
+                <div>
+                  <div className="pp-eyebrow">Insights</div>
+                  <h2 className="pp-h2">The market at your fingertips</h2>
+                </div>
+                <Link href="/property-portal/insights" className="pp-link-arrow">
+                  All insights →
+                </Link>
+              </div>
+              <div className="pp-insights-grid pp-insights-grid--home">
+                {insightTeasers.map((a) => (
+                  <Link key={a.id} href={`/insights#${a.id}`} className="pp-insight-card">
+                    <span className="pp-insight-cat">{a.category}</span>
+                    <h3>{a.title}</h3>
+                    <p>{a.excerpt}</p>
+                    <span className="pp-insight-meta">{a.date} →</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    stats: (
+      <>
+          <section className="pp-section--tight pp-stats-band">
+            <div className="pp-container">
+              <div className="pp-stats">
+                {portalStats().map((s) => (
+                  <div className="pp-stat" key={s.l}>
+                    <b>{s.n}</b>
+                    <span>{s.l}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+    cta: (
+      <>
+          <section className="pp-cta-band">
+            <div className="pp-container">
+              <h2 className="pp-h2">Planning a property investment?</h2>
+              <p>
+                Tell us the market, budget and objective. We&apos;ll come back with a shortlist of
+                opportunities and a structuring route.
+              </p>
+              <div className="pp-cta-actions">
+                <Link href="/contact?interest=Real%20Estate#contact-form" className="pp-btn pp-btn--gold">
+                  Book a Call
+                </Link>
+                <Link href="/property-portal/listings" className="pp-btn pp-btn--ghost">
+                  Browse Listings
+                </Link>
+              </div>
+            </div>
+          </section>
+      </>
+    ),
+  };
 
   return (
     <main>
@@ -352,303 +697,8 @@ export default function PropertyPortalHome() {
           )}
         </div>
       </section>
-      {/* ── FEATURED MARKETS ────────────────────────────── */}
-      <FeaturedMarkets properties={properties} />
-      {/* ── PROJECT SHOWCASE ───────────────────────────────── */}
-      {/* Full-viewport panels: scrolling on from the hero keeps every project
-          at full-bleed scale rather than dropping straight to small cards. */}
-      <section className="pp-showcase" id="latest">
-        {showcase.map((p, i) => (
-          <article className="pp-show" key={p.id}>
-            <div
-              className="pp-show-img"
-              style={{ backgroundImage: `url(${resolveImage(p.images?.[0])})` }}
-              aria-hidden="true"
-            />
-            <div className="pp-container pp-show-body">
-              <div className="pp-show-panel">
-                <div className="pp-show-index">
-                  {String(i + 1).padStart(2, '0')} / {String(showcase.length).padStart(2, '0')}
-                </div>
-                <Link href={`/property-portal/${p.id}`} className="pp-show-title-link">
-                  <h2 className="pp-show-title">{p.title}</h2>
-                </Link>
-                <p className="pp-show-loc">
-                  {p.location}
-                  {p.city ? `, ${p.city}` : ''}
-                  {p.country ? `, ${p.country}` : ''}
-                </p>
-                {p.description && <p className="pp-show-desc">{p.description}</p>}
-                <div className="pp-show-stats">
-                  <div>
-                    <small>Price</small>
-                    <b>{formatPrice(p, currencyPref || undefined)}</b>
-                  </div>
-                  {p.area_sqft != null && (
-                    <div>
-                      <small>Area</small>
-                      <b>{p.area_sqft.toLocaleString()} ft&sup2;</b>
-                    </div>
-                  )}
-                  {p.yield_percentage != null && (
-                    <div>
-                      <small>{yieldLabel(p.yield_source)}</small>
-                      <b>{p.yield_percentage}%</b>
-                    </div>
-                  )}
-                  <div>
-                    <small>Type</small>
-                    <b>{p.property_type?.replace('_', ' ')}</b>
-                  </div>
-                </div>
-                <div className="pp-show-actions">
-                  <Link href={`/property-portal/${p.id}`} className="pp-btn pp-btn--gold">
-                    View project
-                  </Link>
-                  <Link
-                    href={`/property-portal/contact?ref=${encodeURIComponent(p.title)}`}
-                    className="pp-btn pp-btn--glass"
-                  >
-                    Enquire
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </section>
-      {/* ── FEATURED LISTINGS ──────────────────────────────── */}
-      <section className="pp-section pp-stats-band">
-        <div className="pp-container">
-          <div className="pp-section-head">
-            <div>
-              <div className="pp-eyebrow">Properties</div>
-              <h2 className="pp-h2">Featured properties</h2>
-            </div>
-            <Link href="/property-portal/listings" className="pp-link-arrow">
-              View all listings →
-            </Link>
-          </div>
-          <div className="pp-grid">
-            {loading &&
-              Array.from({ length: 3 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
-            {!loading && !error && featured.length === 0 && (
-              <div className="pp-empty">More opportunities are being prepared — check back shortly.</div>
-            )}
-            {!loading && !error && featured.slice(0, 8).map((prop) => <PropertyCard key={prop.id} prop={prop} />)}
-          </div>
-        </div>
-      </section>
-      {/* ── NEW & OFF-PLAN PROJECTS ─────────────────────── */}
-      <DevelopmentStrip eyebrow="New projects" title="New & off-plan projects" viewAllHref="/property-portal/new-projects" />
-      {/* ── INVESTMENT OPPORTUNITIES ────────────────────── */}
-      <InvestmentOpportunities properties={properties} />
-      {/* ── DESTINATIONS ───────────────────────────────────── */}
-      <section className="pp-section">
-        <div className="pp-container">
-          <div className="pp-section-head">
-            <div>
-              <div className="pp-eyebrow">Locations</div>
-              <h2 className="pp-h2">Explore by location</h2>
-            </div>
-            <Link href="/property-portal/destinations" className="pp-link-arrow">
-              All locations →
-            </Link>
-          </div>
-          <p className="pp-section-lead" style={{ marginBottom: 36, maxWidth: 700 }}>
-            Start with a city to see what is available there today.
-          </p>
-          <div className="pp-dest-grid">
-            {loading &&
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="pp-skeleton" style={{ height: 300 }} />
-              ))}
-            {!loading && !error && destOptions.slice(0, 6).map((d) => {
-              const meta = destinationFor(d.city);
-              const withImg = properties.find((p) => p.city === d.city && p.images?.[0]);
-              const img = withImg ? resolveImage(withImg.images[0]) : null;
-              return (
-                <Link
-                  key={d.city}
-                  href={`/property-portal/destinations/${slugForCity(d.city)}`}
-                  className="pp-dest"
-                >
-                  <div className="pp-dest-img">
-                    {img ? <img src={img} alt={d.city} loading="lazy" /> : <div className="pp-card-img--empty">⌂</div>}
-                    <span className="pp-dest-count">{d.n} {d.n === 1 ? 'property' : 'properties'}</span>
-                  </div>
-                  <div className="pp-dest-body">
-                    <h3>{d.city}</h3>
-                    <span className="pp-dest-country">{meta?.country || ''}</span>
-                    {meta?.tagline && <p className="pp-dest-tagline">{meta.tagline}</p>}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-      {/* ── ABOUT BAND ─────────────────────────────────────── */}
-      <section className="pp-section">
-        <div className="pp-container">
-          <div className="pp-intro" style={{ alignItems: 'stretch' }}>
-            <div>
-              <div className="pp-eyebrow">About CZAAH Properties</div>
-              <h2 className="pp-h2">Why CZAAH Properties</h2>
-              <p className="pp-section-lead">
-                CZAAH Properties is a London-based international property company, part of the
-                CZAAH group. We help people buy, sell, rent and invest in property across the
-                United Kingdom, Dubai and Pakistan, with one point of contact from first viewing to
-                completion.
-              </p>
-              <div style={{ marginTop: 28 }}>
-                <Link href="/sectors/realestate" className="pp-btn pp-btn--ghost">
-                  About the Real Estate Sector
-                </Link>
-              </div>
-            </div>
-            <div className="pp-intro-points">
-              {VALUE_POINTS.map((p) => (
-                <div className="pp-intro-point" key={p.t}>
-                  <i>◆</i>
-                  <div>
-                    <b>{p.t}</b>
-                    <span>{p.d}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* ── WHY INVEST ─────────────────────────────────────── */}
-      <section className="pp-section pp-stats-band">
-        <div className="pp-container">
-          <h2 className="pp-h2" style={{ textAlign: 'center', marginBottom: 10 }}>
-            Why invest in <span className="pp-gold">{whyCurrent.market}</span>?
-          </h2>
-          <div className="pp-why-tabs">
-            {whyInvest.map((w, i) => (
-              <button
-                key={w.market}
-                type="button"
-                className={i === whyMarket ? 'active' : ''}
-                onClick={() => setWhyMarket(i)}
-              >
-                {w.market}
-              </button>
-            ))}
-          </div>
-          <div className="pp-why-grid">
-            {whyCurrent.points.map((p) => (
-              <div className="pp-why-tile" key={p.title}>
-                <h3>{p.title}</h3>
-                <p>{p.body}</p>
-              </div>
-            ))}
-          </div>
-          <p className="pp-disclaimer" style={{ textAlign: 'center', marginInline: 'auto' }}>
-            General information, not investment, tax or legal advice. Tax treatment depends on
-            your circumstances and may change; take independent advice before investing.
-          </p>
-        </div>
-      </section>
-      {/* ── OWNER / DEVELOPER CTA ───────────────────────── */}
-      <OwnerCta />
-      {/* ── CLIENTS STRIP ──────────────────────────────────── */}
-      <section className="pp-clients-band">
-        <div className="pp-container">
-          <div className="pp-eyebrow" style={{ textAlign: 'center', marginBottom: 24 }}>
-            Built For
-          </div>
-          <div className="pp-clients">
-            {CLIENTS.map((c) => (
-              <span key={c}>{c}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ── TESTIMONIALS ───────────────────────────────────── */}
-      {currentTestimonial && (
-      <section className="pp-section pp-stats-band">
-        <div className="pp-container">
-          <div className="pp-eyebrow" style={{ textAlign: 'center' }}>Client Confidence</div>
-          <h2 className="pp-h2" style={{ textAlign: 'center', marginBottom: 40 }}>
-            What investors say
-          </h2>
-          <div className="pp-testimonial">
-            <p className="pp-testimonial-quote">&ldquo;{currentTestimonial.quote}&rdquo;</p>
-            <div className="pp-testimonial-author">{currentTestimonial.author}</div>
-            <div className="pp-testimonial-role">{currentTestimonial.role}</div>
-            <div className="pp-testimonial-dots">
-              {testimonials.length > 1 && testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  className={i === testimonial ? 'active' : ''}
-                  aria-label={`Testimonial ${i + 1}`}
-                  onClick={() => setTestimonial(i)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-      )}
-      {/* ── INSIGHTS TEASER ────────────────────────────────── */}
-      <section className="pp-section">
-        <div className="pp-container">
-          <div className="pp-section-head">
-            <div>
-              <div className="pp-eyebrow">Insights</div>
-              <h2 className="pp-h2">The market at your fingertips</h2>
-            </div>
-            <Link href="/property-portal/insights" className="pp-link-arrow">
-              All insights →
-            </Link>
-          </div>
-          <div className="pp-insights-grid pp-insights-grid--home">
-            {insightTeasers.map((a) => (
-              <Link key={a.id} href={`/insights#${a.id}`} className="pp-insight-card">
-                <span className="pp-insight-cat">{a.category}</span>
-                <h3>{a.title}</h3>
-                <p>{a.excerpt}</p>
-                <span className="pp-insight-meta">{a.date} →</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ── STATS BAND ─────────────────────────────────────── */}
-      <section className="pp-section--tight pp-stats-band">
-        <div className="pp-container">
-          <div className="pp-stats">
-            {portalStats().map((s) => (
-              <div className="pp-stat" key={s.l}>
-                <b>{s.n}</b>
-                <span>{s.l}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* ── CTA ────────────────────────────────────────────── */}
-      <section className="pp-cta-band">
-        <div className="pp-container">
-          <h2 className="pp-h2">Planning a property investment?</h2>
-          <p>
-            Tell us the market, budget and objective. We&apos;ll come back with a shortlist of
-            opportunities and a structuring route.
-          </p>
-          <div className="pp-cta-actions">
-            <Link href="/contact?interest=Real%20Estate#contact-form" className="pp-btn pp-btn--gold">
-              Book a Call
-            </Link>
-            <Link href="/property-portal/listings" className="pp-btn pp-btn--ghost">
-              Browse Listings
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Sections under the hero, in the order set in Admin → Homepage. */}
+      {homeLayout.filter((sec) => sec.visible).map((sec) => <Fragment key={sec.key}>{blocks[sec.key]}</Fragment>)}
 
     </main>
   );

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { portalOffices, portalEmail } from '../_components/portalRuntime';
 import { portalWhyInvest } from '../_components/portal-content';
 import { portalMetadata } from '../_components/seo';
+import { VERIFICATION_CHECKS } from '@/lib/verification';
 
 export const metadata = portalMetadata({
   path: '/about',
@@ -80,6 +81,24 @@ export default function PortalAboutPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="pp-section" id="verification" style={{ scrollMarginTop: 110 }}>
+        <div className="pp-container">
+          <h2 className="pp-h2" style={{ marginBottom: 14 }}>What &ldquo;Verified&rdquo; means</h2>
+          <p className="pp-section-lead" style={{ marginBottom: 20, maxWidth: 720 }}>
+            A property or development marked Verified has been checked by the CZAAH Properties team.
+            Before we add the badge we have:
+          </p>
+          <ul className="pp-verify-list">
+            {VERIFICATION_CHECKS.filter((c) => c.required).map((c) => <li key={c.key}>{c.label}.</li>)}
+          </ul>
+          <p className="pp-disclaimer" style={{ maxWidth: 720 }}>
+            Verification is not a survey, valuation or legal opinion, and it does not replace your own
+            due diligence. Always take independent legal advice before you buy or rent. Listings without
+            the badge have not been through these checks yet.
+          </p>
         </div>
       </section>
 
