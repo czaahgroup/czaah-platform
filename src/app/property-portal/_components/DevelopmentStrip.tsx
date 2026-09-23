@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { resolveImage, convertPrice, portalCountries } from './types';
 import { useCurrencyPref } from './usePortalPrefs';
-import { formatPlotSize } from '@/lib/plots';
+import { formatPlotSize, DEVELOPMENT_STATUS_LABEL, POSSESSION_LABEL } from '@/lib/plots';
 import { formatMoney } from '@/lib/paymentPlan';
 
 /**
@@ -18,7 +18,11 @@ import { formatMoney } from '@/lib/paymentPlan';
  * Renders nothing at all when there are no published developments, so the page
  * looks unchanged until the first one goes live.
  */
-export function DevelopmentStrip() {
+export function DevelopmentStrip({
+  title = 'Developments',
+  eyebrow,
+  viewAllHref,
+}: { title?: string; eyebrow?: string; viewAllHref?: string } = {}) {
   const [developments, setDevelopments] = useState([]);
   const { currency: prefCcy } = useCurrencyPref();
 
@@ -55,11 +59,13 @@ export function DevelopmentStrip() {
       <div className="pp-container">
         {/* The count sat in .pp-section-head, which is space-between — with a
             wide container that threw "1 scheme" 1,200px from its heading. */}
+        {eyebrow && <div className="pp-eyebrow">{eyebrow}</div>}
         <div className="pp-dev-strip-head">
-          <h2 className="pp-h2">Developments</h2>
+          <h2 className="pp-h2">{title}</h2>
           <span className="pp-dev-strip-count">
             {developments.length} scheme{developments.length === 1 ? '' : 's'}
           </span>
+          {viewAllHref && <Link href={viewAllHref} className="pp-link-arrow" style={{ marginLeft: 'auto' }}>View all →</Link>}
         </div>
 
         {/* One scheme in an auto-fill grid left three empty columns beside it.
@@ -111,6 +117,13 @@ export function DevelopmentStrip() {
                   {cheapest && (
                     <p className="pp-dev-strip-price">
                       From {price(cheapest.total_price, cheapest.currency)}
+                    </p>
+                  )}
+                  {(dev.development_status || dev.possession_status || dev.has_payment_plan) && (
+                    <p className="pp-dev-strip-tags">
+                      {dev.development_status && <span>{DEVELOPMENT_STATUS_LABEL[dev.development_status] || dev.development_status}</span>}
+                      {dev.possession_status && <span>{POSSESSION_LABEL[dev.possession_status] || dev.possession_status}</span>}
+                      {dev.has_payment_plan && <span className="is-plan">Payment plan</span>}
                     </p>
                   )}
                   <span className="pp-link-arrow">View development →</span>

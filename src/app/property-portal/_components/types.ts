@@ -1,4 +1,7 @@
 export interface LiveProperty {
+  /** Admin flags, returned by the public API (LISTING_COLUMNS). */
+  featured?: boolean | null;
+  verified?: boolean | null;
   // Market-specific details (migration 20260923162442) — see src/lib/marketFields.ts.
   tenure?: string | null;
   lease_years_remaining?: number | null;

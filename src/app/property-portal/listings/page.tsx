@@ -133,6 +133,8 @@ function ListingsInner() {
 
   const visible = useMemo(() => {
     let list = all.filter((p) => matchesMarket(p, market));
+    // Investments: purchasable listings that state a yield.
+    if (params.get('with_yield')) list = list.filter((p) => p.yield_percentage != null && !isRental(p));
     if (type) list = list.filter((p) => p.property_type === type);
     // "For Rent" covers commercial leases too — both are tenancies.
     if (listingType) list = list.filter((p) => (rentView ? isRental(p) : p.listing_type === listingType));
@@ -198,7 +200,7 @@ function ListingsInner() {
   }, [all, market, type, beds, price, listingType, search, sort, rentView, plotSize, plotCategory, possession, params]);
 
   const marketLabel = MARKETS.find((m) => m.key === market)?.label;
-  const hasFilters = !!(search || type || beds || price || listingType || (market && market !== 'all'));
+  const hasFilters = !!(search || type || beds || price || listingType || (market && market !== 'all') || params.get('with_yield'));
 
   const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);

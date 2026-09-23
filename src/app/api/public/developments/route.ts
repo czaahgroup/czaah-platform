@@ -33,7 +33,17 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    return NextResponse.json({ data })
+    // Payment-plan indicator for project cards: any unit with a plan.
+    const rows = (data || []) as unknown as { development_units?: { id: string }[] }[]
+    const unitIds = rows.flatMap((d) => (d.development_units || []).map((u) => u.id))
+    const planned = new Set<string>()
+    if (unitIds.length) {
+      const { data: plans } = await supabase.from('property_payment_plans').select('development_unit_id').in('development_unit_id', unitIds)
+      for (const p of plans || []) if (p.development_unit_id) planned.add(p.development_unit_id)
+    }
+    return NextResponse.json({
+      data: rows.map((d) => ({ ...d, has_payment_plan: (d.development_units || []).some((u) => planned.has(u.id)) })),
+    })
   } catch (err) {
     logError('api.public.developments', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

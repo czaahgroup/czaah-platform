@@ -16,7 +16,7 @@ const LINKS: { label: string; href: string; neverActive?: boolean }[] = [
   { label: 'Rent', href: '/property-portal/rent' },
   { label: 'Sell', href: '/property-portal/sell' },
   // Shares /listings with search results, so it must not light up for them.
-  { label: 'Investments', href: '/property-portal/listings?sort=yield-desc', neverActive: true },
+  { label: 'Investments', href: '/property-portal/listings?with_yield=1&sort=yield-desc', neverActive: true },
   { label: 'New Projects', href: '/property-portal/off-plan' },
   { label: 'Locations', href: '/property-portal/destinations' },
   { label: 'About', href: '/property-portal/about' },

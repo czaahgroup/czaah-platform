@@ -10,6 +10,9 @@ import { useListings } from './_components/useListings';
 import { portalHeroReel, portalOffices } from './_components/portalRuntime';
 import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice, isRental } from './_components/types';
 import { useCurrencyPref } from './_components/usePortalPrefs';
+import { FeaturedMarkets, InvestmentOpportunities, OwnerCta } from './_components/HomeSections';
+import { DevelopmentStrip } from './_components/DevelopmentStrip';
+import { ButtonLink } from './_components/ui';
 import { portalWhyInvest, portalTestimonials } from './_components/portal-content';
 import { destinationFor, slugForCity } from './_components/destinations';
 import { LocationSearch, suggestionHref, type SearchSection } from './_components/LocationSearch';
@@ -91,10 +94,11 @@ const HERO_MODES: { v: SearchSection; l: string }[] = [
 ];
 
 const VALUE_POINTS = [
-  { t: 'Title checks', d: 'Title and encumbrance checks form part of our transaction support in every market.' },
-  { t: 'Local partners', d: 'On-the-ground representation in each core market — not a remote listings feed.' },
-  { t: 'One counterparty', d: 'Structuring, due diligence and transaction support handled end-to-end by CZAAH.' },
-  { t: 'Like-for-like data', d: 'Seller-stated yield, area and pricing shown up front, so listings can be compared.' },
+  { t: 'International market access', d: 'Property in the United Kingdom, Dubai and Pakistan through one team.' },
+  { t: 'Residential & commercial', d: 'Homes, offices, retail, industrial space and land.' },
+  { t: 'New development opportunities', d: 'Off-plan and new projects, with payment plans where the developer offers them.' },
+  { t: 'Property investment support', d: 'Title and encumbrance checks and transaction support through to completion.' },
+  { t: 'Local market partners', d: 'On-the-ground representation in each core market.' },
 ];
 
 // Who the portal is built for — an audience, not a list of named clients.
@@ -182,28 +186,6 @@ export default function PropertyPortalHome() {
 
   // Headline numbers for the allocator teaser: average yield and entry cost
   // per market, normalised to USD so the three are actually comparable.
-  const allocPreview = useMemo(() => {
-    const by = new Map<string, { psf: number[]; y: number[] }>();
-    properties.forEach((p) => {
-      if (isRental(p) || !p.country || !p.price || !p.area_sqft) return;
-      const usd = p.currency === 'USD' ? p.price : convertPrice(p.price, p.currency, 'USD');
-      if (usd == null || usd <= 0) return;
-      if (!by.has(p.country)) by.set(p.country, { psf: [], y: [] });
-      const e = by.get(p.country)!;
-      e.psf.push(usd / p.area_sqft);
-      if (p.yield_percentage != null) e.y.push(p.yield_percentage);
-    });
-    const avg = (a: number[]) => a.reduce((x, y) => x + y, 0) / a.length;
-    return [...by.entries()]
-      .filter(([, v]) => v.y.length > 0)
-      .map(([country, v]) => ({
-        country,
-        yieldPct: avg(v.y),
-        psf: `USD ${Math.round(avg(v.psf)).toLocaleString()}`,
-      }))
-      .sort((a, b) => b.yieldPct - a.yieldPct)
-      .slice(0, 3);
-  }, [properties]);
 
   function runSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -222,16 +204,16 @@ export default function PropertyPortalHome() {
   // Featured skips those so the two sections don't show the same properties.
   const showcase = properties.filter((p) => !isRental(p) && resolveImage(p.images?.[0])).slice(0, 4);
   const showcaseIds = new Set(showcase.map((p) => p.id));
-  const featured = properties.filter((p) => !showcaseIds.has(p.id));
+  const featured = properties
+    .filter((p) => !showcaseIds.has(p.id))
+    .sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
   const newCount = properties.filter(isNewListing).length;
   const insightTeasers = portalInsights().slice(0, 3);
 
   return (
-    <main>      {/* ── HERO ───────────────────────────────────────────── */}
+    <main>
+      {/* ── HERO ───────────────────────────────────────────── */}
       <section className="pp-hero pp-hero--slides">
-        {/* The hero is visual (slides + search); this names the page for
-            search engines and screen readers without changing the design. */}
-        <h1 className="pp-sr-only">CZAAH Properties — global property investment and real estate in the United Kingdom, Dubai and Pakistan</h1>
         <div className="pp-hero-media" aria-hidden="true">
           {heroSlides.map((s, i) => {
             const still = s.poster;
@@ -283,7 +265,21 @@ export default function PropertyPortalHome() {
 
         <div className="pp-container pp-hero-body">
           <div className="pp-hero-bottom">
-          <form className="pp-search" onSubmit={runSearch} role="search" aria-label="Property search">
+          <div className="pp-hero-copy">
+            <h1>Global Property Investment &amp; Real Estate</h1>
+            <p>Buy, sell, rent and invest in property across the United Kingdom, Dubai and Pakistan.</p>
+            <div className="pp-hero-ctas">
+              <button
+                type="button"
+                className="pp-btn pp-btn--gold"
+                onClick={() => document.querySelector<HTMLInputElement>('#hero-search .pp-locsearch input')?.focus()}
+              >
+                Search properties
+              </button>
+              <ButtonLink href="/property-portal/contact" variant="glass">Speak to CZAAH</ButtonLink>
+            </div>
+          </div>
+          <form className="pp-search" id="hero-search" onSubmit={runSearch} role="search" aria-label="Property search">
             <div className="pp-search-modes" role="radiogroup" aria-label="Search for">
               {HERO_MODES.map((m) => (
                 <button
@@ -356,6 +352,8 @@ export default function PropertyPortalHome() {
           )}
         </div>
       </section>
+      {/* ── FEATURED MARKETS ────────────────────────────── */}
+      <FeaturedMarkets properties={properties} />
       {/* ── PROJECT SHOWCASE ───────────────────────────────── */}
       {/* Full-viewport panels: scrolling on from the hero keeps every project
           at full-bleed scale rather than dropping straight to small cards. */}
@@ -419,22 +417,46 @@ export default function PropertyPortalHome() {
           </article>
         ))}
       </section>
-
+      {/* ── FEATURED LISTINGS ──────────────────────────────── */}
+      <section className="pp-section pp-stats-band">
+        <div className="pp-container">
+          <div className="pp-section-head">
+            <div>
+              <div className="pp-eyebrow">Properties</div>
+              <h2 className="pp-h2">Featured properties</h2>
+            </div>
+            <Link href="/property-portal/listings" className="pp-link-arrow">
+              View all listings →
+            </Link>
+          </div>
+          <div className="pp-grid">
+            {loading &&
+              Array.from({ length: 3 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
+            {!loading && !error && featured.length === 0 && (
+              <div className="pp-empty">More opportunities are being prepared — check back shortly.</div>
+            )}
+            {!loading && !error && featured.slice(0, 8).map((prop) => <PropertyCard key={prop.id} prop={prop} />)}
+          </div>
+        </div>
+      </section>
+      {/* ── NEW & OFF-PLAN PROJECTS ─────────────────────── */}
+      <DevelopmentStrip eyebrow="New projects" title="New & off-plan projects" viewAllHref="/property-portal/off-plan" />
+      {/* ── INVESTMENT OPPORTUNITIES ────────────────────── */}
+      <InvestmentOpportunities properties={properties} />
       {/* ── DESTINATIONS ───────────────────────────────────── */}
       <section className="pp-section">
         <div className="pp-container">
           <div className="pp-section-head">
             <div>
-              <div className="pp-eyebrow">Where We Operate</div>
-              <h2 className="pp-h2">Explore by destination</h2>
+              <div className="pp-eyebrow">Locations</div>
+              <h2 className="pp-h2">Explore by location</h2>
             </div>
             <Link href="/property-portal/destinations" className="pp-link-arrow">
-              All destinations →
+              All locations →
             </Link>
           </div>
           <p className="pp-section-lead" style={{ marginBottom: 36, maxWidth: 700 }}>
-            Each market is covered by a local CZAAH partner. Start with a place to see what we
-            hold there and why it earns its position.
+            Start with a city to see what is available there today.
           </p>
           <div className="pp-dest-grid">
             {loading &&
@@ -456,7 +478,7 @@ export default function PropertyPortalHome() {
                     <span className="pp-dest-count">{d.n} {d.n === 1 ? 'property' : 'properties'}</span>
                   </div>
                   <div className="pp-dest-body">
-                    <h2>{d.city}</h2>
+                    <h3>{d.city}</h3>
                     <span className="pp-dest-country">{meta?.country || ''}</span>
                     {meta?.tagline && <p className="pp-dest-tagline">{meta.tagline}</p>}
                   </div>
@@ -465,35 +487,40 @@ export default function PropertyPortalHome() {
             })}
           </div>
         </div>
-      </section>      {/* ── ALLOCATOR ──────────────────────────────────────── */}
-      <section className="pp-section pp-alloc-band">
+      </section>
+      {/* ── ABOUT BAND ─────────────────────────────────────── */}
+      <section className="pp-section">
         <div className="pp-container">
-          <div className="pp-alloc-promo">
+          <div className="pp-intro" style={{ alignItems: 'stretch' }}>
             <div>
-              <div className="pp-eyebrow">Cross-market comparison</div>
-              <h2 className="pp-h2">Where should your capital go?</h2>
+              <div className="pp-eyebrow">About CZAAH Properties</div>
+              <h2 className="pp-h2">Why CZAAH Properties</h2>
               <p className="pp-section-lead">
-                Every other property portal asks which unit you want. That&apos;s the second
-                question. The first is which market your money belongs in — and because we
-                transact in all of ours, we can answer it with the same numbers on every side.
+                CZAAH Properties is a London-based international property company, part of the
+                CZAAH group. We help people buy, sell, rent and invest in property across the
+                United Kingdom, Dubai and Pakistan, with one point of contact from first viewing to
+                completion.
               </p>
-              <Link href="/property-portal/allocator" className="pp-btn pp-btn--gold">
-                Compare our markets
-              </Link>
+              <div style={{ marginTop: 28 }}>
+                <Link href="/sectors/realestate" className="pp-btn pp-btn--ghost">
+                  About the Real Estate Sector
+                </Link>
+              </div>
             </div>
-            <div className="pp-alloc-promo-stats">
-              {allocPreview.map((a) => (
-                <div key={a.country}>
-                  <span className="pp-alloc-promo-num">{a.yieldPct.toFixed(1)}%</span>
-                  <small>{a.country}</small>
-                  <em>{a.psf} / ft&sup2;</em>
+            <div className="pp-intro-points">
+              {VALUE_POINTS.map((p) => (
+                <div className="pp-intro-point" key={p.t}>
+                  <i>◆</i>
+                  <div>
+                    <b>{p.t}</b>
+                    <span>{p.d}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </section>
-
       {/* ── WHY INVEST ─────────────────────────────────────── */}
       <section className="pp-section pp-stats-band">
         <div className="pp-container">
@@ -526,61 +553,8 @@ export default function PropertyPortalHome() {
           </p>
         </div>
       </section>
-      {/* ── FEATURED LISTINGS ──────────────────────────────── */}
-      <section className="pp-section pp-stats-band">
-        <div className="pp-container">
-          <div className="pp-section-head">
-            <div>
-              <div className="pp-eyebrow">Selected</div>
-              <h2 className="pp-h2">Featured opportunities</h2>
-            </div>
-            <Link href="/property-portal/listings" className="pp-link-arrow">
-              View all listings →
-            </Link>
-          </div>
-          <div className="pp-grid">
-            {loading &&
-              Array.from({ length: 3 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
-            {!loading && !error && featured.length === 0 && (
-              <div className="pp-empty">More opportunities are being prepared — check back shortly.</div>
-            )}
-            {!loading && !error && featured.map((prop) => <PropertyCard key={prop.id} prop={prop} />)}
-          </div>
-        </div>
-      </section>
-      {/* ── ABOUT BAND ─────────────────────────────────────── */}
-      <section className="pp-section">
-        <div className="pp-container">
-          <div className="pp-intro" style={{ alignItems: 'stretch' }}>
-            <div>
-              <div className="pp-eyebrow">About CZAAH Properties</div>
-              <h2 className="pp-h2">Institutional discipline, applied to property.</h2>
-              <p className="pp-section-lead">
-                CZAAH Properties is the real estate arm of CZAAH&apos;s international investment
-                facilitation group. We source, verify and structure opportunities so overseas
-                investors can commit capital across borders with the same rigour they would
-                expect at home — one point of contact, from first viewing to completion.
-              </p>
-              <div style={{ marginTop: 28 }}>
-                <Link href="/sectors/realestate" className="pp-btn pp-btn--ghost">
-                  About the Real Estate Sector
-                </Link>
-              </div>
-            </div>
-            <div className="pp-intro-points">
-              {VALUE_POINTS.map((p) => (
-                <div className="pp-intro-point" key={p.t}>
-                  <i>◆</i>
-                  <div>
-                    <b>{p.t}</b>
-                    <span>{p.d}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── OWNER / DEVELOPER CTA ───────────────────────── */}
+      <OwnerCta />
       {/* ── CLIENTS STRIP ──────────────────────────────────── */}
       <section className="pp-clients-band">
         <div className="pp-container">
@@ -675,6 +649,7 @@ export default function PropertyPortalHome() {
           </div>
         </div>
       </section>
+
     </main>
   );
 }
