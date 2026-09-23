@@ -3722,3 +3722,70 @@ a.pp-dev-ghost {
     border: 1px solid ButtonText;
   }
 }
+
+/* ==========================================================================
+   Phase 2 (2026-09-23): shared primitives (see _components/ui.tsx) and a
+   visible keyboard focus ring. Only two focus-visible rules existed, so
+   keyboard users could not see where they were on most of the portal.
+   ========================================================================== */
+.pp-root :where(a, button, select, input, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--pp-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Light sections: the deep gold holds contrast on white. */
+.pp-root main :where(a, button, select, input, textarea, summary, [tabindex]):focus-visible {
+  outline-color: var(--pp-gold-deep);
+}
+
+.pp-empty-title {
+  display: block;
+  color: var(--pp-text);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pp-empty-action {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Four tools (currency, search, saved, menu) with 44px tap areas do not fit
+   beside the logo on a phone: the menu button was pushed off-screen. The
+   drawer carries Search, so the bar drops its search icon at this width. */
+@media (max-width: 560px) {
+  .pp-nav .pp-nav-search { display: none; }
+}
+
+/* Currency picker inside the drawer (always there; the only one below 380px). */
+.pp-nav .pp-mobile-ccy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 34px;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #14130f;
+  border-bottom: 1px solid var(--pp-border);
+}
+.pp-nav .pp-mobile-ccy select {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--pp-border-strong);
+  border-radius: 6px;
+  background: #fff;
+  color: #14130f;
+  font: inherit;
+  letter-spacing: 0.04em;
+}
+/* The iPhone SE class of phone (320–379px) cannot fit the logo, currency,
+   saved and menu: the menu button sat off-screen. Currency moves to the
+   drawer at this width. */
+@media (max-width: 379px) {
+  .pp-nav .pp-nav-ccy { display: none; }
+}

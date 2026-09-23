@@ -32,18 +32,18 @@ export const metadata: Metadata = {
   },
 }
 
+// The brief's footer: the main sections, then tools and legal.
 const FOOTER_LINKS = [
-  { label: 'All Listings', href: '/property-portal/listings' },
-  { label: 'Destinations', href: '/property-portal/destinations' },
-  { label: 'Off-Plan Projects', href: '/property-portal/off-plan' },
-  { label: 'Property to Buy', href: '/property-portal/buy' },
-  { label: 'Homes to Rent', href: '/property-portal/rent' },
-  { label: 'London', href: '/property-portal/listings?market=london' },
-  { label: 'Dubai', href: '/property-portal/listings?market=dubai' },
-  { label: 'Pakistan', href: '/property-portal/listings?market=pakistan' },
-  { label: 'Sell Your Property', href: '/property-portal/sell' },
+  { label: 'Buy', href: '/property-portal/buy' },
+  { label: 'Rent', href: '/property-portal/rent' },
+  { label: 'Sell', href: '/property-portal/sell' },
+  { label: 'Investments', href: '/property-portal/listings?sort=yield-desc' },
+  { label: 'New Projects', href: '/property-portal/off-plan' },
+  { label: 'Locations', href: '/property-portal/destinations' },
+  { label: 'All Properties', href: '/property-portal/listings' },
+  { label: 'Compare Markets', href: '/property-portal/allocator' },
   { label: 'Market Insights', href: '/property-portal/insights' },
-  { label: 'About CZAAH Properties', href: '/property-portal/about' },
+  { label: 'About', href: '/property-portal/about' },
   { label: 'Contact', href: '/property-portal/contact' },
 ]
 
@@ -67,9 +67,8 @@ export default async function PropertyPortalLayout({ children }: { children: Rea
                 <span className="pp-logo-word">CZAAH</span>
               </div>
               <p className="pp-footer-tagline">
-                A dedicated property investment practice within CZAAH — the London-based
-                international investment facilitation group. Structured access to real estate
-                across London, Dubai and Pakistan.
+                CZAAH Properties is a London-based international property company. Buy, sell,
+                rent and invest in property across the United Kingdom, Dubai and Pakistan.
               </p>
             </div>
             <div className="pp-footer-col pp-footer-col--wide">
@@ -83,17 +82,18 @@ export default async function PropertyPortalLayout({ children }: { children: Rea
             </div>
             <div className="pp-footer-col">
               <h4>CZAAH Group</h4>
-              <Link href="/">czaah.com</Link>
-              <Link href="/sectors/realestate">Real Estate Sector</Link>
-              <Link href="/about">About CZAAH</Link>
-              <p>Islamabad · London · Brussels · Hong Kong · Middle East</p>
+              <a href="https://czaah.com">czaah.com</a>
+              <a href="https://czaah.com/sectors/realestate">Real Estate Sector</a>
+              <a href="https://czaah.com/about">About CZAAH</a>
+              {/* From the office list, so it can never claim an office that isn't there. */}
+              <p>{content.offices.offices.map((o) => o.city).join(' · ')}</p>
             </div>
           </div>
         </div>
         <div className="pp-footer-bottom">
-          <span>© 2026 CZAAH. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} CZAAH Properties · part of CZAAH. All rights reserved.</span>
           <span>
-            <Link href="/terms">Terms</Link> &nbsp;·&nbsp; <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms &amp; Conditions</Link> &nbsp;·&nbsp; <Link href="/privacy">Privacy Policy</Link> &nbsp;·&nbsp; <Link href="/privacy#cookies">Cookie Policy</Link>
           </span>
         </div>
       </footer>

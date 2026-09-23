@@ -7,18 +7,24 @@ import { MarkhorMark } from '@/components/MarkhorMark';
 import { CURRENCIES } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 
-const LINKS = [
+// The CZAAH Properties brief's navigation. Investments and New Projects point
+// at the existing listings and off-plan pages until their own sections exist
+// (phases 6–7); Allocate Capital and Insights moved to the footer.
+const LINKS: { label: string; href: string; neverActive?: boolean }[] = [
+  { label: 'Home', href: '/property-portal' },
   { label: 'Buy', href: '/property-portal/buy' },
   { label: 'Rent', href: '/property-portal/rent' },
-  { label: 'Off-Plan', href: '/property-portal/off-plan' },
-  { label: 'Destinations', href: '/property-portal/destinations' },
-  { label: 'Allocate Capital', href: '/property-portal/allocator' },
-  { label: 'Insights', href: '/property-portal/insights' },
-  { label: 'Sell With Us', href: '/property-portal/sell' },
-  { label: 'About Us', href: '/property-portal/about' },
+  { label: 'Sell', href: '/property-portal/sell' },
+  // Shares /listings with search results, so it must not light up for them.
+  { label: 'Investments', href: '/property-portal/listings?sort=yield-desc', neverActive: true },
+  { label: 'New Projects', href: '/property-portal/off-plan' },
+  { label: 'Locations', href: '/property-portal/destinations' },
+  { label: 'About', href: '/property-portal/about' },
+  { label: 'Contact', href: '/property-portal/contact' },
 ];
 
 const CTA_HREF = '/property-portal/contact';
+const SEARCH_HREF = '/property-portal/listings';
 
 // Pages that open with a full-bleed hero the bar can sit over. Anywhere else
 // it is solid from the first pixel, otherwise it would float over body copy.
@@ -50,6 +56,28 @@ export function PortalNav() {
   }, []);
 
   useEffect(() => setOpen(false), [pathname]);
+
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    // Closed, the drawer is only visually hidden, so `inert` keeps its links
+    // out of the tab order and away from screen readers. Set on the element:
+    // React 18 drops an `inert` prop.
+    if (drawerRef.current) drawerRef.current.inert = !open;
+    if (open) {
+      drawerRef.current?.querySelector<HTMLElement>('a, button')?.focus();
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setOpen(false);
+      };
+      window.addEventListener('keydown', onKey);
+      wasOpen.current = true;
+      return () => window.removeEventListener('keydown', onKey);
+    }
+    // Only return focus when the drawer actually closed, not on first render.
+    if (wasOpen.current) toggleRef.current?.focus();
+    wasOpen.current = false;
+  }, [open]);
 
   // The bar is fixed, so .pp-root reserves its height through --pp-nav-h. That
   // token was maintained by hand in portal.css and drifted every time the bar
@@ -96,7 +124,8 @@ export function PortalNav() {
   // Past the hero the bar gains a shadow to lift it off the page.
   const lifted = overHero && (scrolled || !hasHero(pathname));
 
-  function isActive(href: string) {
+  function isActive(href: string, neverActive?: boolean) {
+    if (neverActive) return false;
     const path = href.split('?')[0];
     if (path === '/property-portal') return pathname === path;
     return pathname === path || pathname.startsWith(path + '/');
@@ -117,8 +146,8 @@ export function PortalNav() {
             <Link
               key={l.label}
               href={l.href}
-              className={isActive(l.href) ? 'active' : undefined}
-              aria-current={isActive(l.href) ? 'page' : undefined}
+              className={isActive(l.href, l.neverActive) ? 'active' : undefined}
+              aria-current={isActive(l.href, l.neverActive) ? 'page' : undefined}
             >
               {l.label}
             </Link>
@@ -137,6 +166,17 @@ export function PortalNav() {
           </label>
 
           <Link
+            href={SEARCH_HREF}
+            className="pp-nav-saved pp-nav-search"
+            aria-label="Search properties"
+          >
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="M16 16l4.5 4.5" />
+            </svg>
+          </Link>
+
+          <Link
             href="/property-portal/saved"
             className="pp-nav-saved"
             aria-label={`Saved properties${count ? ` (${count})` : ''}`}
@@ -147,12 +187,12 @@ export function PortalNav() {
             {count > 0 && <span className="pp-nav-badge">{count}</span>}
           </Link>
 
-          <Link href={CTA_HREF} className="pp-nav-cta">Get in Touch</Link>
-
           <button
+            ref={toggleRef}
             className="pp-nav-toggle"
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
+            aria-controls="pp-mobile-menu"
             onClick={() => setOpen((v) => !v)}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -162,22 +202,38 @@ export function PortalNav() {
         </div>
       </div>
 
-      <div className={`pp-mobile-menu${open ? ' open' : ''}`}>
+      <div
+        id="pp-mobile-menu"
+        ref={drawerRef}
+        className={`pp-mobile-menu${open ? ' open' : ''}`}
+      >
         {LINKS.map((l) => (
           <Link
             key={l.label}
             href={l.href}
-            className={isActive(l.href) ? 'active' : undefined}
+            className={isActive(l.href, l.neverActive) ? 'active' : undefined}
             onClick={() => setOpen(false)}
           >
             {l.label}
           </Link>
         ))}
+        <Link href={SEARCH_HREF} onClick={() => setOpen(false)}>Search</Link>
+        {/* On the smallest phones the bar has no room for the currency
+            picker, so it lives here too. */}
+        <label className="pp-mobile-ccy">
+          <span>Display currency</span>
+          <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+            <option value="">Original</option>
+            {CURRENCIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </label>
         <Link href="/property-portal/saved" onClick={() => setOpen(false)}>
           Saved{count > 0 ? ` (${count})` : ''}
         </Link>
         <Link href={CTA_HREF} className="pp-mobile-cta" onClick={() => setOpen(false)}>
-          Get in Touch
+          Speak to CZAAH
         </Link>
       </div>
       </header>

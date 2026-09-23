@@ -106,7 +106,7 @@ export default function PrivacyPage() {
 
             <div className="h-px bg-outline-variant/10 mb-10"></div>
 
-            <h2 className="cinzel-text text-2xl font-bold text-on-surface mb-6">8. Cookies</h2>
+            <h2 id="cookies" className="cinzel-text text-2xl font-bold text-on-surface mb-6 scroll-mt-28">8. Cookies</h2>
             <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4">Our website may use cookies and similar tracking technologies to enhance your browsing experience. Cookies are small data files stored on your device that help us understand how you interact with our website.</p>
             <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4">We may use the following types of cookies:</p>
             <ul className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4 ml-6 space-y-2 list-none">
