@@ -9,6 +9,7 @@ import { Lightbox } from '../_components/Lightbox';
 import { AcquisitionCost } from '../_components/AcquisitionCost';
 import { PropertyCard } from '../_components/PropertyCard';
 import { useWishlist, useCurrencyPref } from '../_components/usePortalPrefs';
+import { TENURE_LABEL, BUILD_STATUS_LABEL, yieldLabel } from '@/lib/marketFields';
 
 
 export default function PropertyDetailPage() {
@@ -138,7 +139,17 @@ export default function PropertyDetailPage() {
     prop.bedrooms != null && { k: 'Bedrooms', v: prop.bedrooms === 0 ? 'Studio' : String(prop.bedrooms) },
     prop.bathrooms != null && { k: 'Bathrooms', v: String(prop.bathrooms) },
     prop.area_sqft != null && { k: 'Area', v: `${prop.area_sqft.toLocaleString()} ft²` },
-    prop.yield_percentage != null && { k: 'Est. yield', v: `${prop.yield_percentage}%` },
+    // A yield always carries its source; an unlabelled one is the seller's.
+    prop.yield_percentage != null && { k: yieldLabel(prop.yield_source), v: `${prop.yield_percentage}%` },
+    prop.tenure && { k: 'Tenure', v: TENURE_LABEL[prop.tenure] || prop.tenure },
+    prop.tenure === 'leasehold' && prop.lease_years_remaining != null && { k: 'Lease remaining', v: `${prop.lease_years_remaining} years` },
+    prop.build_status && { k: 'Build', v: BUILD_STATUS_LABEL[prop.build_status] || prop.build_status },
+    prop.council_tax_band && { k: 'Council tax band', v: prop.council_tax_band },
+    prop.service_charge != null && { k: 'Service charge', v: `${prop.currency} ${Number(prop.service_charge).toLocaleString()} / year` },
+    prop.ground_rent != null && { k: 'Ground rent', v: `${prop.currency} ${Number(prop.ground_rent).toLocaleString()} / year` },
+    prop.completion_date && { k: 'Expected completion', v: new Date(prop.completion_date).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) },
+    prop.society && { k: 'Society', v: prop.society },
+    prop.phase && { k: 'Phase', v: prop.phase },
     prop.city && { k: 'City', v: prop.city },
     prop.country && { k: 'Country', v: prop.country },
   ].filter(Boolean) as { k: string; v: string }[];
@@ -323,7 +334,7 @@ export default function PropertyDetailPage() {
                   <div><span>Area</span><b>{prop.area_sqft.toLocaleString()} ft²</b></div>
                 )}
                 {prop.yield_percentage != null && (
-                  <div><span>Est. yield</span><b>{prop.yield_percentage}%</b></div>
+                  <div><span>{yieldLabel(prop.yield_source)}</span><b>{prop.yield_percentage}%</b></div>
                 )}
                 {availableLabel && (
                   <div><span>Available</span><b>{availableLabel}</b></div>

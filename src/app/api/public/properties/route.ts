@@ -64,7 +64,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ data: properties })
+    // Payment-plan flag for the Dubai / off-plan filter: a plan on the listing
+    // itself or on the development unit it belongs to. One extra query.
+    const rows = (properties || []) as unknown as { id: string; development_unit_id?: string | null }[]
+    const unitIds = rows.map((p) => p.development_unit_id).filter(Boolean) as string[]
+    const withPlan = new Set<string>()
+    if (rows.length) {
+      const ors = [`property_id.in.(${rows.map((p) => p.id).join(',')})`]
+      if (unitIds.length) ors.push(`development_unit_id.in.(${unitIds.join(',')})`)
+      const { data: plans } = await supabase.from('property_payment_plans').select('property_id, development_unit_id').or(ors.join(','))
+      for (const pl of plans || []) {
+        if (pl.property_id) withPlan.add(pl.property_id)
+        if (pl.development_unit_id) withPlan.add(`unit:${pl.development_unit_id}`)
+      }
+    }
+    const data = rows.map((p) => ({
+      ...p,
+      has_payment_plan: withPlan.has(p.id) || (!!p.development_unit_id && withPlan.has(`unit:${p.development_unit_id}`)),
+    }))
+
+    return NextResponse.json({ data })
   } catch (err) {
     logError("api.public.properties", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -1,4 +1,17 @@
 export interface LiveProperty {
+  // Market-specific details (migration 20260923162442) — see src/lib/marketFields.ts.
+  tenure?: string | null;
+  lease_years_remaining?: number | null;
+  council_tax_band?: string | null;
+  service_charge?: number | null;
+  ground_rent?: number | null;
+  build_status?: string | null;
+  completion_date?: string | null;
+  society?: string | null;
+  phase?: string | null;
+  yield_source?: string | null;
+  /** Set by the public API: the listing (or its development unit) has a payment plan. */
+  has_payment_plan?: boolean;
   id: string;
   title: string;
   property_type: string;

@@ -14,6 +14,7 @@ import { portalWhyInvest, portalTestimonials } from './_components/portal-conten
 import { destinationFor, slugForCity } from './_components/destinations';
 import { LocationSearch, suggestionHref, type SearchSection } from './_components/LocationSearch';
 import type { Suggestion } from './_components/locationNav';
+import { yieldLabel } from '@/lib/marketFields';
 
 
 const MARKETS = [
@@ -393,7 +394,7 @@ export default function PropertyPortalHome() {
                   )}
                   {p.yield_percentage != null && (
                     <div>
-                      <small>Yield</small>
+                      <small>{yieldLabel(p.yield_source)}</small>
                       <b>{p.yield_percentage}%</b>
                     </div>
                   )}

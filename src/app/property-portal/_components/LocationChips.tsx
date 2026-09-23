@@ -24,7 +24,8 @@ export function LocationChips({ section, loc }: { section: Section; loc: Resolve
   if (!countries.length) return null;
   return (
     <>
-      <nav className="pp-loc-chips" aria-label="Markets">
+      {/* Not <nav>: the root layout pins every <nav> across the top of the page. */}
+      <div role="navigation" className="pp-loc-chips" aria-label="Markets">
         <Link href={`${locationHref(section)}${qs}`} className={!loc ? 'active' : undefined} aria-current={!loc ? 'page' : undefined}>
           All markets
         </Link>
@@ -36,9 +37,9 @@ export function LocationChips({ section, loc }: { section: Section; loc: Resolve
             </Link>
           );
         })}
-      </nav>
+      </div>
       {loc && loc.country.cities.length > 1 && (
-        <nav className="pp-loc-chips pp-loc-chips--cities" aria-label={`Cities in ${loc.country.name}`}>
+        <div role="navigation" className="pp-loc-chips pp-loc-chips--cities" aria-label={`Cities in ${loc.country.name}`}>
           <Link href={`${locationHref(section, loc.country)}${qs}`} className={!loc.city ? 'active' : undefined}>
             All {loc.country.name}
           </Link>
@@ -47,7 +48,7 @@ export function LocationChips({ section, loc }: { section: Section; loc: Resolve
               {ci.name}
             </Link>
           ))}
-        </nav>
+        </div>
       )}
     </>
   );

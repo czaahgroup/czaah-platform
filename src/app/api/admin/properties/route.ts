@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
 import { rentalTermsForInsert } from '@/lib/rentalTerms'
+import { marketColumnsFromBody } from '@/lib/marketFields'
 import { plotColumnsFromBody, savePaymentPlan } from '@/lib/developments'
 import { assetClassFor, isPlotListing, validatePlotListing } from '@/lib/plots'
 import { CURRENCIES } from '@/lib/currencies'
@@ -139,6 +140,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const market = marketColumnsFromBody(body, 'insert')
+    if (market.problems.length) {
+      return NextResponse.json({ error: market.problems.join(' ') }, { status: 400 })
+    }
+
     const featuresArray = features
       ? (typeof features === 'string' ? features.split(',').map((f: string) => f.trim()).filter(Boolean) : features)
       : []
@@ -170,6 +176,7 @@ export async function POST(request: NextRequest) {
         yield_percentage: yieldPercentage || null,
         ...plotColumnsFromBody(body),
         ...rentalTermsForInsert(listingType, body),
+        ...market.columns,
         status: 'approved',
         approved_by: user.id,
         approved_at: new Date().toISOString(),

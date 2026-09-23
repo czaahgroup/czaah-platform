@@ -4089,3 +4089,83 @@ a.pp-dev-ghost {
 }
 /* Honeypot: off-screen rather than display:none, which some bots skip. */
 .pp-hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* Phase 4.3: "More filters" per market. */
+.pp-more-filters {
+  margin: 0 0 22px;
+  border: 1px solid var(--pp-border-strong);
+  border-radius: 12px;
+  background: #fff;
+}
+.pp-more-filters summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pp-text);
+  list-style: none;
+}
+.pp-more-filters summary::-webkit-details-marker { display: none; }
+.pp-more-filters summary::after { content: '▾'; margin-left: auto; color: var(--pp-text-muted); }
+.pp-more-filters[open] summary::after { content: '▴'; }
+.pp-more-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: var(--pp-gold);
+  color: #080808;
+  font-size: 11px;
+}
+.pp-more-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+  padding: 4px 18px 18px;
+  align-items: end;
+}
+.pp-more-grid label { display: flex; flex-direction: column; gap: 6px; }
+.pp-more-grid label > span {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pp-text-muted);
+}
+.pp-more-grid select {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--pp-border-strong);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--pp-text);
+  font: inherit;
+  font-size: 14px;
+}
+.pp-more-clear {
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: var(--pp-gold-deep);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  justify-self: start;
+}
+
+/* Belt and braces: in-page link groups must never pick up the root layout's
+   fixed full-width <nav> styling, whatever element they end up as. */
+.pp-loc-chips,
+.pp-region-jump {
+  position: static;
+  width: auto;
+  justify-content: flex-start;
+}

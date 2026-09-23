@@ -10,6 +10,8 @@ import { portalLocations } from '../_components/portalRuntime';
 import { resolveLocation, inLocation, locationLabel, locationHref } from '../_components/locationNav';
 import { LocationChips } from '../_components/LocationChips';
 import { LocationSearch, suggestionHref } from '../_components/LocationSearch';
+import { MarketFilters } from '../_components/MarketFilters';
+import { marketFiltersFor, applyMarketFilters } from '@/lib/marketFields';
 import { useListings } from '../_components/useListings';
 
 
@@ -70,6 +72,8 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
   // /rent/<country>/<city> — resolved against Admin → Locations.
   const loc = resolveLocation(portalLocations(), countrySlug, citySlug);
   const basePath = locationHref('rent', loc?.country, loc?.city);
+  // Market-specific filters appear once a country is chosen (brief §5).
+  const marketFilters = marketFiltersFor(loc?.country.code, 'rent');
 
   const { all, loading, error, reload } = useListings();
 
@@ -101,6 +105,7 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
     let list = all.filter(isRental);
     list = list.filter((p) => matchesMarket(p, market));
     list = list.filter((p) => inLocation(p, loc));
+    list = applyMarketFilters(list, marketFilters, params);
     if (type) list = list.filter((p) => p.property_type === type);
     if (beds) list = list.filter((p) => (p.bedrooms ?? -1) >= Number(beds));
     if (furnishing) list = list.filter((p) => p.furnishing === furnishing);
@@ -135,9 +140,9 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
       sorted.sort((a, b) => t(a) - t(b));
     }
     return sorted;
-  }, [all, market, loc, type, beds, furnishing, price, search, sort]);
+  }, [all, market, loc, type, beds, furnishing, price, search, sort, params]);
 
-  const hasFilters = !!(search || type || beds || furnishing || price || (market && market !== 'all'));
+  const hasFilters = !!(search || type || beds || furnishing || price || (market && market !== 'all') || marketFilters.some((f) => params.get(f.param)));
   const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paged = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -233,6 +238,16 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
             </button>
           )}
         </form>
+
+        {loc && (
+          <MarketFilters
+            filters={marketFilters}
+            listings={all.filter((p) => inLocation(p, loc))}
+            params={params}
+            onChange={setParam}
+            marketName={loc.country.name}
+          />
+        )}
 
         <div className="pp-listpage-grid">
           <div className="pp-grid">

@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { logError } from '@/lib/logError'
+import { marketColumnsFromBody } from '@/lib/marketFields'
 import { rentalTermsForUpdate } from '@/lib/rentalTerms'
 import { plotColumnsFromBody, savePaymentPlan } from '@/lib/developments'
 import { assetClassFor } from '@/lib/plots'
@@ -108,6 +109,12 @@ export async function PATCH(
         if (derived) editUpdates.property_type = derived
       }
       Object.assign(editUpdates, rentalTermsForUpdate(listingType, body))
+      // Market details: only what the payload carries is written.
+      const market = marketColumnsFromBody(body, 'update')
+      if (market.problems.length) {
+        return NextResponse.json({ error: market.problems.join(' ') }, { status: 400 })
+      }
+      Object.assign(editUpdates, market.columns)
 
       const { data: edited, error: editError } = await supabase
         .from('property_listings')

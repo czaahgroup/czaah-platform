@@ -37,6 +37,16 @@ interface Property {
   deposit?: number | null
   min_term_months?: number | null
   yield_percentage: number | null
+  yield_source?: string | null
+  tenure?: string | null
+  lease_years_remaining?: number | null
+  council_tax_band?: string | null
+  service_charge?: number | null
+  ground_rent?: number | null
+  build_status?: string | null
+  completion_date?: string | null
+  society?: string | null
+  phase?: string | null
   status: string
   rejection_notes: string | null
   partner_id: string | null
@@ -110,6 +120,16 @@ const emptyForm = {
   videoUrl: '',
   videoPosterUrl: '',
   yieldPercentage: '',
+  yieldSource: '',
+  tenure: '',
+  leaseYearsRemaining: '',
+  councilTaxBand: '',
+  serviceCharge: '',
+  groundRent: '',
+  buildStatus: '',
+  completionDate: '',
+  society: '',
+  phase: '',
   rentPeriod: 'month',
   furnishing: '',
   availableFrom: '',
@@ -207,7 +227,89 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
           <label style={labelStyle}>Yield %</label>
           <input type="number" step="0.1" value={form.yieldPercentage} onChange={(e) => update('yieldPercentage', e.target.value)} placeholder="e.g. 7.5" style={inputStyle} />
         </div>
+        <div>
+          <label style={labelStyle}>Yield source</label>
+          <select value={form.yieldSource} onChange={(e) => update('yieldSource', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+            <option value="">Not stated (shown as seller-stated)</option>
+            <option value="estimated">Estimated</option>
+            <option value="historical">Historical</option>
+            <option value="developer_supplied">Developer supplied</option>
+            <option value="third_party">Third-party source</option>
+          </select>
+        </div>
       </div>
+      {form.yieldPercentage && (
+        <p style={hintStyle}>A yield is always shown with its source. Never enter a guaranteed return unless it is contractually guaranteed and you can evidence it.</p>
+      )}
+
+      {/* Market details — each market describes property differently, so only
+          the fields for the listing's own country appear. */}
+      {/united kingdom|^uk$|^gb$/i.test(form.country.trim()) && (
+        <div>
+          <label style={{ ...labelStyle, opacity: 0.85 }}>UK details</label>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label style={labelStyle}>Tenure</label>
+              <select value={form.tenure} onChange={(e) => update('tenure', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">Not stated</option>
+                <option value="freehold">Freehold</option>
+                <option value="leasehold">Leasehold</option>
+                <option value="share_of_freehold">Share of freehold</option>
+                <option value="commonhold">Commonhold</option>
+              </select>
+            </div>
+            {form.tenure === 'leasehold' && (
+              <div>
+                <label style={labelStyle}>Lease years remaining</label>
+                <input type="number" min={1} value={form.leaseYearsRemaining} onChange={(e) => update('leaseYearsRemaining', e.target.value)} placeholder="e.g. 125" style={inputStyle} />
+              </div>
+            )}
+            <div>
+              <label style={labelStyle}>Council tax band</label>
+              <select value={form.councilTaxBand} onChange={(e) => update('councilTaxBand', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">Not stated</option>
+                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].map((b) => <option key={b} value={b}>Band {b}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Service charge (per year)</label>
+              <input type="number" min={0} value={form.serviceCharge} onChange={(e) => update('serviceCharge', e.target.value)} placeholder="Same currency" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Ground rent (per year)</label>
+              <input type="number" min={0} value={form.groundRent} onChange={(e) => update('groundRent', e.target.value)} placeholder="Same currency" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>New build / resale</label>
+              <select value={form.buildStatus} onChange={(e) => update('buildStatus', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                <option value="">Not stated</option>
+                <option value="new_build">New build</option>
+                <option value="resale">Resale</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+      {(/emirates|^uae$|dubai/i.test(form.country.trim()) || form.listingType === 'off_plan') && (
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label style={labelStyle}>Expected completion</label>
+            <input type="date" value={form.completionDate} onChange={(e) => update('completionDate', e.target.value)} style={inputStyle} />
+          </div>
+        </div>
+      )}
+      {/pakistan/i.test(form.country.trim()) && (
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label style={labelStyle}>Society</label>
+            <input value={form.society} onChange={(e) => update('society', e.target.value)} placeholder="e.g. DHA, Bahria Town" style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Phase</label>
+            <input value={form.phase} onChange={(e) => update('phase', e.target.value)} placeholder="e.g. Phase 6" style={inputStyle} />
+          </div>
+        </div>
+      )}
 
       {(form.listingType === 'rent' || form.listingType === 'lease') && (
         <div>
@@ -508,6 +610,16 @@ export default function AdminPropertiesPage() {
       videoUrl: selected.video_url || '',
       videoPosterUrl: selected.video_poster_url || '',
       yieldPercentage: selected.yield_percentage != null ? String(selected.yield_percentage) : '',
+      yieldSource: selected.yield_source || '',
+      tenure: selected.tenure || '',
+      leaseYearsRemaining: selected.lease_years_remaining != null ? String(selected.lease_years_remaining) : '',
+      councilTaxBand: selected.council_tax_band || '',
+      serviceCharge: selected.service_charge != null ? String(selected.service_charge) : '',
+      groundRent: selected.ground_rent != null ? String(selected.ground_rent) : '',
+      buildStatus: selected.build_status || '',
+      completionDate: selected.completion_date || '',
+      society: selected.society || '',
+      phase: selected.phase || '',
       rentPeriod: selected.rent_period || 'month',
       furnishing: selected.furnishing || '',
       availableFrom: selected.available_from || '',

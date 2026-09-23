@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { LiveProperty, LISTING_META, resolveImage, formatPrice, isNewListing, isRental } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
+import { yieldLabel } from '@/lib/marketFields';
 
 // Image-led portrait card: the photograph IS the card, with the detail laid
 // over a gradient at its foot. Replaces the old image-plus-white-body layout,
@@ -62,7 +63,7 @@ export function PropertyCard({
           </p>
           {summary && <p className="pp-card-summary">{summary}</p>}
           {prop.yield_percentage != null && (
-            <p className="pp-card-yield">{prop.yield_percentage}% yield</p>
+            <p className="pp-card-yield">{prop.yield_percentage}% {yieldLabel(prop.yield_source).toLowerCase()}</p>
           )}
         </div>
       </Link>

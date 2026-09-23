@@ -126,11 +126,11 @@ export default function DestinationsPage() {
         </p>
 
         {sections.length > 1 && (
-          <nav className="pp-region-jump" aria-label="Regions">
+          <div role="navigation" className="pp-region-jump" aria-label="Regions">
             {sections.map((s) => (
               <a key={s.slug} href={`#${s.slug}`}>{s.name}</a>
             ))}
-          </nav>
+          </div>
         )}
 
         {loading && (
