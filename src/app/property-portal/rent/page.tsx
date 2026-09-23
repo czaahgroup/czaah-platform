@@ -139,7 +139,7 @@ function RentInner() {
       {/* Intro */}
       <section className="pp-hero pp-hero--compact">
         <div className="pp-container">
-          <div className="pp-eyebrow">CZAAH Property</div>
+          <div className="pp-eyebrow">CZAAH Properties</div>
           <h1>Homes &amp; spaces <span className="pp-gold">to rent.</span></h1>
           <p className="pp-hero-lede">
             Residential lets and commercial leases across London, Dubai and Pakistan — vetted

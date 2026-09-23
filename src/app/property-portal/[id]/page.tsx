@@ -344,7 +344,7 @@ export default function PropertyDetailPage() {
                 Book a Call
               </Link>
               <p className="pp-enquire-note">
-                Handled directly by the CZAAH Property team — one point of contact from viewing
+                Handled directly by the CZAAH Properties team — one point of contact from viewing
                 to completion.
               </p>
             </aside>

@@ -6,9 +6,9 @@ import { PortalContentProvider } from './_components/PortalContentProvider'
 import { loadPortalContent } from '@/lib/portalContent'
 import './_components/portal.css'
 
-const PORTAL_TITLE = 'CZAAH Property — Investment Real Estate in London, Dubai & Pakistan'
+const PORTAL_TITLE = 'CZAAH Properties — Global Property Investment & Real Estate'
 const PORTAL_DESCRIPTION =
-  'CZAAH Property — real estate investment opportunities across London, Dubai and Pakistan, with end-to-end transaction support from a single counterparty.'
+  'Buy, sell, rent and invest in property across the United Kingdom, Dubai and Pakistan with CZAAH Properties, a London-based international property company.'
 
 // The portal's public home is property.czaah.com, so relative share images and
 // canonical URLs resolve there — and links shared from the portal get a
@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: PORTAL_TITLE,
     description: PORTAL_DESCRIPTION,
-    siteName: 'CZAAH Property',
+    siteName: 'CZAAH Properties',
     type: 'website',
-    images: [{ url: '/videos/dubai.jpg', alt: 'CZAAH Property' }],
+    images: [{ url: '/videos/dubai.jpg', alt: 'CZAAH Properties' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -43,7 +43,7 @@ const FOOTER_LINKS = [
   { label: 'Pakistan', href: '/property-portal/listings?market=pakistan' },
   { label: 'Sell Your Property', href: '/property-portal/sell' },
   { label: 'Market Insights', href: '/property-portal/insights' },
-  { label: 'About CZAAH Property', href: '/property-portal/about' },
+  { label: 'About CZAAH Properties', href: '/property-portal/about' },
   { label: 'Contact', href: '/property-portal/contact' },
 ]
 

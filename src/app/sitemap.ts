@@ -1,6 +1,13 @@
 import { MetadataRoute } from 'next'
+import { headers } from 'next/headers'
+import { portalSitemap } from '@/lib/portalSitemap'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// One app, two sites. The middleware matcher skips .xml, so this file sees
+// every host directly — property.czaah.com used to be served czaah.com's
+// sitemap. It now gets its own (listings, developments, destinations).
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  if ((await headers()).get('host') === 'property.czaah.com') return portalSitemap()
+
   const baseUrl = 'https://czaah.com'
 
   const staticPages = [

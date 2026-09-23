@@ -103,7 +103,7 @@ function OffPlanInner() {
       {/* Intro */}
       <section className="pp-hero pp-hero--compact">
         <div className="pp-container">
-          <div className="pp-eyebrow">CZAAH Property</div>
+          <div className="pp-eyebrow">CZAAH Properties</div>
           <h1>Off-plan <span className="pp-gold">projects.</span></h1>
           <p className="pp-hero-lede">
             Early-stage opportunities across London, Dubai and Pakistan — priced ahead of

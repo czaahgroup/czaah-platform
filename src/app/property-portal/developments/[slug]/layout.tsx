@@ -61,14 +61,14 @@ export async function generateMetadata({
   const url = `/developments/${d.slug}`
 
   return {
-    title: `${d.name} | CZAAH Property`,
+    title: `${d.name} | CZAAH Properties`,
     description,
     alternates: { canonical: url },
     openGraph: {
       title: d.name,
       description,
       url,
-      siteName: 'CZAAH Property',
+      siteName: 'CZAAH Properties',
       type: 'website',
       ...(image ? { images: [{ url: image, alt: d.name }] } : {}),
     },

@@ -78,14 +78,14 @@ export async function generateMetadata({
   const image = resolveImage(p.images?.[0])
 
   return {
-    title: `${title} | CZAAH Property`,
+    title: `${title} | CZAAH Properties`,
     description,
     alternates: { canonical: `/${p.id}` },
     openGraph: {
       title,
       description,
       url: `/${p.id}`,
-      siteName: 'CZAAH Property',
+      siteName: 'CZAAH Properties',
       type: 'website',
       ...(image ? { images: [{ url: image, alt: p.title }] } : {}),
     },

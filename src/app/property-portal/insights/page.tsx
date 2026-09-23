@@ -29,7 +29,7 @@ export default function InsightsPage() {
     <main>
       <section className="pp-hero pp-hero--compact">
         <div className="pp-container">
-          <div className="pp-eyebrow">CZAAH Property</div>
+          <div className="pp-eyebrow">CZAAH Properties</div>
           <h1>Market <span className="pp-gold">insights.</span></h1>
           <p className="pp-hero-lede">
             Analysis on the markets CZAAH operates in — real estate, infrastructure and the

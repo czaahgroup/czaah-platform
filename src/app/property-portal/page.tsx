@@ -239,7 +239,7 @@ export default function PropertyPortalHome() {
       <section className="pp-hero pp-hero--slides">
         {/* The hero is visual (slides + search); this names the page for
             search engines and screen readers without changing the design. */}
-        <h1 className="pp-sr-only">CZAAH Property — real estate to buy and rent in London, Dubai and Pakistan</h1>
+        <h1 className="pp-sr-only">CZAAH Properties — global property investment and real estate in the United Kingdom, Dubai and Pakistan</h1>
         <div className="pp-hero-media" aria-hidden="true">
           {heroSlides.map((s, i) => {
             const still = s.poster;
@@ -544,10 +544,10 @@ export default function PropertyPortalHome() {
         <div className="pp-container">
           <div className="pp-intro" style={{ alignItems: 'stretch' }}>
             <div>
-              <div className="pp-eyebrow">About CZAAH Property</div>
+              <div className="pp-eyebrow">About CZAAH Properties</div>
               <h2 className="pp-h2">Institutional discipline, applied to property.</h2>
               <p className="pp-section-lead">
-                CZAAH Property is the real estate arm of CZAAH&apos;s international investment
+                CZAAH Properties is the real estate arm of CZAAH&apos;s international investment
                 facilitation group. We source, verify and structure opportunities so overseas
                 investors can commit capital across borders with the same rigour they would
                 expect at home — one point of contact, from first viewing to completion.

@@ -37,6 +37,7 @@ export async function middleware(request: NextRequest) {
     // an empty "property detail" page with HTTP 200 rather than a 404. Legal,
     // group and sector pages must therefore stay listed.
     const sharedPaths = [
+      '/robots.txt',
       '/login',
       '/register',
       '/reset-password',
@@ -100,7 +101,7 @@ export async function middleware(request: NextRequest) {
 
 
   // Public routes — no auth required
-  const publicRoutes = ['/', '/about', '/contact', '/team', '/login', '/register', '/reset-password', '/process', '/insights', '/faq', '/privacy', '/terms', '/investments', '/webmail']
+  const publicRoutes = ['/', '/robots.txt', '/about', '/contact', '/team', '/login', '/register', '/reset-password', '/process', '/insights', '/faq', '/privacy', '/terms', '/investments', '/webmail']
   const isPublicRoute = publicRoutes.some(route => pathname === route) ||
     // Webmail: the page authenticates itself via a per-mailbox password
     // session (not Supabase). All /api/mail/* routes call requireMailAccess,

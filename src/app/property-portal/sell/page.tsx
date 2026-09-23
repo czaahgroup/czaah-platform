@@ -56,7 +56,7 @@ export default function SellPage() {
     setError('');
 
     const message = [
-      `Property for sale enquiry submitted via the CZAAH Property portal.`,
+      `Property for sale enquiry submitted via the CZAAH Properties portal.`,
       ``,
       `Location / city: ${form.location || '—'}`,
       `Property type: ${form.type || '—'}`,
@@ -96,7 +96,7 @@ export default function SellPage() {
       {/* HERO */}
       <section className="pp-hero">
         <div className="pp-container">
-          <div className="pp-eyebrow">CZAAH Property · Sellers</div>
+          <div className="pp-eyebrow">CZAAH Properties · Sellers</div>
           <h1>
             Sell your property <span className="pp-gold">with confidence.</span>
           </h1>
@@ -132,7 +132,7 @@ export default function SellPage() {
                   <div className="pp-sell-sent-mark">✓</div>
                   <h3>Thank you — we&apos;ve got it.</h3>
                   <p>
-                    A member of the CZAAH Property team will be in touch within one business day to
+                    A member of the CZAAH Properties team will be in touch within one business day to
                     discuss valuation and next steps. A confirmation has been sent to your email.
                   </p>
                   <Link href="/property-portal/listings" className="pp-btn pp-btn--ghost">
@@ -178,7 +178,7 @@ export default function SellPage() {
                     {status === 'sending' ? 'Sending…' : 'Submit Property'}
                   </button>
                   <p className="pp-enquire-note">
-                    Submitting sends your details to the CZAAH Property team. No obligation.
+                    Submitting sends your details to the CZAAH Properties team. No obligation.
                   </p>
                 </form>
               )}
@@ -191,7 +191,7 @@ export default function SellPage() {
       <section className="pp-cta-band">
         <div className="pp-container">
           <h2 className="pp-h2">Prefer to talk it through first?</h2>
-          <p>Book a call with the CZAAH Property team and we&apos;ll walk you through valuation, timing and the sale process.</p>
+          <p>Book a call with the CZAAH Properties team and we&apos;ll walk you through valuation, timing and the sale process.</p>
           <div className="pp-cta-actions">
             <Link href="/contact?interest=Sell%20a%20Property#contact-form" className="pp-btn pp-btn--gold">
               Book a Call

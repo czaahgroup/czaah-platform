@@ -1,13 +1,14 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { portalOffices, portalEmail } from '../_components/portalRuntime';
 import { portalWhyInvest } from '../_components/portal-content';
+import { portalMetadata } from '../_components/seo';
 
-export const metadata: Metadata = {
-  title: 'About CZAAH Property — Investment Real Estate in London, Dubai & Pakistan',
+export const metadata = portalMetadata({
+  path: '/about',
+  title: 'About Us',
   description:
-    'CZAAH Property is the real estate arm of CZAAH, the London-based international investment facilitation group. Property across London, Dubai and Pakistan with one counterparty end to end.',
-};
+    'CZAAH Properties is a London-based international property company — residential, commercial and investment property across the United Kingdom, Dubai and Pakistan.',
+});
 
 const PILLARS = [
   {
@@ -38,12 +39,12 @@ export default function PortalAboutPage() {
 
         <div className="pp-listpage-head">
           <h1>
-            About <span className="pp-gold">CZAAH Property</span>
+            About <span className="pp-gold">CZAAH Properties</span>
           </h1>
         </div>
 
         <p className="pp-section-lead" style={{ maxWidth: 760 }}>
-          CZAAH Property is the real estate practice of CZAAH — a London-based international
+          CZAAH Properties is the real estate practice of CZAAH — a London-based international
           investment facilitation group. We give investors a single, accountable route into
           property across three markets that rarely share a common standard of diligence.
         </p>

@@ -135,7 +135,7 @@ function BuyInner() {
       {/* Intro */}
       <section className="pp-hero pp-hero--compact">
         <div className="pp-container">
-          <div className="pp-eyebrow">CZAAH Property</div>
+          <div className="pp-eyebrow">CZAAH Properties</div>
           <h1>Property <span className="pp-gold">to buy.</span></h1>
           <p className="pp-hero-lede">
             Ready homes, commercial space and off-plan projects across London, Dubai and
