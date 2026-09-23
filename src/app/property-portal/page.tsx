@@ -154,6 +154,20 @@ export default function PropertyPortalHome() {
     return [...projectClips, ...portalHeroReel()];
   }, [properties]);
 
+  // On phones the CZAAH AI bubble sits over the hero search button, so it
+  // steps aside while the search is on screen (CSS: html[data-hero-search]).
+  useEffect(() => {
+    const el = document.getElementById('hero-search');
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const root = document.documentElement;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) root.setAttribute('data-hero-search', '');
+      else root.removeAttribute('data-hero-search');
+    }, { threshold: 0.2 });
+    io.observe(el);
+    return () => { io.disconnect(); root.removeAttribute('data-hero-search'); };
+  }, []);
+
   // Visitors who ask the OS for reduced motion get the still poster instead of
   // autoplaying footage, and the slides stop advancing on their own.
   useEffect(() => {
@@ -614,13 +628,7 @@ export default function PropertyPortalHome() {
             <h1>Global Property Investment &amp; Real Estate</h1>
             <p>Buy, sell, rent and invest in property across the United Kingdom, Dubai and Pakistan.</p>
             <div className="pp-hero-ctas">
-              <button
-                type="button"
-                className="pp-btn pp-btn--gold"
-                onClick={() => document.querySelector<HTMLInputElement>('#hero-search .pp-locsearch input')?.focus()}
-              >
-                Search properties
-              </button>
+              {/* One search action only: the search bar below has its own button. */}
               <ButtonLink href="/property-portal/contact" variant="glass">Speak to CZAAH</ButtonLink>
             </div>
           </div>

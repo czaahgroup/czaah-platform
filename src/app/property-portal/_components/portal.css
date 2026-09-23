@@ -4538,3 +4538,16 @@ a.pp-verified-badge { text-decoration: none; display: inline-flex; }
 /* Skip link: hidden until focused by keyboard. */
 .pp-skip { position: absolute; left: 12px; top: -60px; z-index: 1000; background: #14130f; color: #fff; padding: 10px 16px; border-radius: 4px; font-size: 14px; text-decoration: none; }
 .pp-skip:focus { top: 12px; }
+
+/* The CZAAH AI bubble is fixed bottom-right and sat over the hero search
+   button. Where the bar would reach the bubble, it stops short of it. */
+@media (min-width: 761px) and (max-width: 1560px) {
+  .pp-hero--slides .pp-search { width: calc(100% - 84px); }
+}
+@media (max-width: 760px) {
+  :root[data-hero-search] .czaah-ai-fab { opacity: 0; pointer-events: none; }
+}
+/* With a single hero button, keep it button-sized rather than full width. */
+@media (max-width: 560px) {
+  .pp-hero-ctas .pp-btn:only-child { flex: 0 0 auto; padding: 0 22px; }
+}
