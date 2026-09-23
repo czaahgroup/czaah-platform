@@ -12,12 +12,13 @@
   --pp-border-strong: rgba(20, 19, 15, 0.24);
   --pp-text: #14130f;
   --pp-text-muted: rgba(20, 19, 15, 0.64);
-  --pp-text-dim: rgba(20, 19, 15, 0.44);
+  /* 0.6, not 0.44: small print must reach 4.5:1 on every light panel (WCAG 1.4.3). */
+  --pp-text-dim: rgba(20, 19, 15, 0.6);
   --pp-gold: #c9a84c;
   --pp-gold-light: #e2c97e;
   /* #c9a84c on white is ~2.1:1 — far below readable. Gold TEXT on a light
      surface uses this deeper stop from the logo instead (~4.7:1). */
-  --pp-gold-deep: #8a6f2e;
+  --pp-gold-deep: #7d6429; /* 4.7:1+ on the palest panel; was #8a6f2e (4.0:1) */
   /* Surfaces that were translucent white on black become a warm tint. */
   --pp-tint: rgba(20, 19, 15, 0.028);
   --pp-tint-strong: rgba(20, 19, 15, 0.05);
@@ -1601,7 +1602,7 @@
   box-shadow: 0 1px 24px rgba(20, 19, 15, 0.06);
   --pp-text: #14130f;
   --pp-text-muted: rgba(20, 19, 15, 0.66);
-  --pp-gold-deep: #8a6f2e;
+  --pp-gold-deep: #7d6429; /* 4.7:1+ on the palest panel; was #8a6f2e (4.0:1) */
 }
 .pp-nav .pp-nav-inner {
   width: 100%;
@@ -1729,7 +1730,7 @@
   color: #14130f;
   border-bottom: 1px solid var(--pp-border);
 }
-.pp-nav .pp-mobile-menu a.active { color: #8a6f2e; }
+.pp-nav .pp-mobile-menu a.active { color: #7d6429; }
 .pp-nav .pp-mobile-cta {
   margin: 16px 34px 0;
   padding: 14px !important;
@@ -2171,7 +2172,7 @@
   border-bottom: 1px solid var(--pp-border);
   --pp-text: #14130f;
   --pp-text-muted: rgba(20, 19, 15, 0.66);
-  --pp-gold-deep: #8a6f2e;
+  --pp-gold-deep: #7d6429; /* 4.7:1+ on the palest panel; was #8a6f2e (4.0:1) */
 }
 .pp-root main > .pp-hero--slides:first-child { margin-top: 0; }
 .pp-hero--slides,
@@ -3408,7 +3409,7 @@
   white-space: nowrap;
 }
 .pp-variant-status--available { border-color: rgba(34, 139, 80, 0.5); color: #1f7a48; }
-.pp-variant-status--reserved { border-color: rgba(190, 150, 40, 0.6); color: #8a6f2e; }
+.pp-variant-status--reserved { border-color: rgba(190, 150, 40, 0.6); color: #7d6429; }
 .pp-variant-status--sold { opacity: 0.7; }
 .pp-variant-price { font-size: 21px; margin: 14px 0 0; }
 .pp-variant-meta {
@@ -4508,3 +4509,32 @@ a.pp-dev-ghost {
 a.pp-verified-badge { text-decoration: none; display: inline-flex; }
 .pp-verify-list { margin: 0 0 18px; padding-left: 20px; max-width: 720px; }
 .pp-verify-list li { font-size: 14px; line-height: 1.8; color: var(--pp-text); }
+
+/* iOS zooms into any focused field under 16px. Pinch-zoom is allowed again
+   (WCAG 1.4.4), so fields stay at 16px on phones instead of blocking zoom. */
+@media (max-width: 760px) {
+  .pp-root input:not([type='checkbox']):not([type='radio']),
+  .pp-root select,
+  .pp-root textarea { font-size: 16px; }
+}
+
+
+/* ── Contrast (Phase 11) ─────────────────────────────────────────────────
+   Rules written before the light theme paint TEXT in the bright gold, which
+   is 2.3:1 on white. --pp-gold-deep is the text gold: dark on light surfaces
+   and the bright stop inside the black scopes, so one value serves both. */
+.pp-root .pp-listpage-head h1 .pp-gold,
+.pp-root .pp-detail-loc .pp-gold,
+.pp-root .pp-stat span,
+.pp-root .pp-invest-tile em,
+.pp-root .pp-insight-cat,
+.pp-root .pp-testimonial-author,
+.pp-root .pp-crumbs a:hover { color: var(--pp-gold-deep); }
+/* Gold buttons always carry dark text (white on gold is 2.3:1). */
+.pp-root .pp-btn--gold, .pp-root .pp-btn--gold:hover { color: #080808; }
+/* Faded gold labels fell to 3.3:1; full opacity with the text gold passes. */
+.pp-root .pp-presence small { opacity: 1; }
+
+/* Skip link: hidden until focused by keyboard. */
+.pp-skip { position: absolute; left: 12px; top: -60px; z-index: 1000; background: #14130f; color: #fff; padding: 10px 16px; border-radius: 4px; font-size: 14px; text-decoration: none; }
+.pp-skip:focus { top: 12px; }

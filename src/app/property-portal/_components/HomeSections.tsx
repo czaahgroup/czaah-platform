@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { portalLocations, portalHeroReel } from './portalRuntime';
-import { resolveImage, isRental, type LiveProperty } from './types';
+import { isRental, sizedImage, fallbackToOriginal, type LiveProperty } from './types';
 import { locationHref } from './locationNav';
 import { ButtonLink } from './ui';
 
@@ -49,7 +49,7 @@ export function FeaturedMarkets({ properties }: { properties: LiveProperty[] }) 
           text: c.tagline || c.description || `Property to buy and rent in ${list}.`,
           count: mine.length,
           href: locationHref('buy', c),
-          image: (c.image_url && pick([resolveImage(c.image_url)])) || pick(mine.map((p) => resolveImage(p.images?.[0]))) || nextPoster(),
+          image: (c.image_url && pick([sizedImage(c.image_url)])) || pick(mine.map((p) => sizedImage(p.images?.[0]))) || nextPoster(),
           cta: 'Explore properties',
         });
       }
@@ -85,7 +85,7 @@ export function FeaturedMarkets({ properties }: { properties: LiveProperty[] }) 
           {cards.map((m) => (
             <Link key={m.key} href={m.href} className="pp-market-card">
               <div className="pp-market-card-img">
-                {m.image ? <img src={m.image} alt="" loading="lazy" /> : <div className="pp-card-img--empty" aria-hidden="true">⌂</div>}
+                {m.image ? <img src={m.image} alt="" loading="lazy" decoding="async" onError={fallbackToOriginal} /> : <div className="pp-card-img--empty" aria-hidden="true">⌂</div>}
               </div>
               <div className="pp-market-card-body">
                 <h3>{m.name}</h3>

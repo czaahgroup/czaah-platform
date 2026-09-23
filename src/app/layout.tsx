@@ -44,7 +44,8 @@ export const viewport: Viewport = {
   themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // Pinch-zoom stays allowed (no maximum scale) — blocking it fails WCAG 1.4.4. Form fields are
+  // 16px on phones instead, so iOS does not auto-zoom when one is focused.
   viewportFit: "cover",
 }
 
@@ -63,7 +64,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0,0&display=swap"
           rel="stylesheet"
         />
         {/* PWA: Apple-specific */}

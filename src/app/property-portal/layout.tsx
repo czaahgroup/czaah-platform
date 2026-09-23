@@ -58,8 +58,10 @@ export default async function PropertyPortalLayout({ children }: { children: Rea
   return (
     <PortalContentProvider content={content}>
     <div className="pp-root">
+      {/* WCAG 2.4.1: keyboard users can jump past the navigation. */}
+      <a href="#pp-main" className="pp-skip">Skip to content</a>
       <PortalNav />
-      {children}
+      <div id="pp-main" tabIndex={-1} style={{ outline: "none" }}>{children}</div>
       <footer className="pp-footer">
         <div className="pp-container">
           <div className="pp-footer-grid">

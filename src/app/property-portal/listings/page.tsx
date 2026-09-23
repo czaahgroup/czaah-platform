@@ -267,16 +267,16 @@ function ListingsInner() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
-          <select value={type} onChange={(e) => setParam({ type: e.target.value })}>
+          <select aria-label="Property type" value={type} onChange={(e) => setParam({ type: e.target.value })}>
             {TYPES.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
           </select>
-          <select value={beds} onChange={(e) => setParam({ beds: e.target.value })} disabled={plotView} title={plotView ? 'Plots have no bedrooms' : undefined}>
+          <select aria-label="Bedrooms" value={beds} onChange={(e) => setParam({ beds: e.target.value })} disabled={plotView} title={plotView ? 'Plots have no bedrooms' : undefined}>
             {BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
           </select>
-          <select value={price} onChange={(e) => setParam({ price: e.target.value })}>
+          <select aria-label="Price range" value={price} onChange={(e) => setParam({ price: e.target.value })}>
             {(rentView ? RENT_PRICES : PRICES).map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
           </select>
-          <select value={listingType} onChange={(e) => setParam({ listing_type: e.target.value, price: '' })}>
+          <select aria-label="Listing type" value={listingType} onChange={(e) => setParam({ listing_type: e.target.value, price: '' })}>
             {LISTING_TYPES.map((l) => <option key={l.v} value={l.v}>{l.l}</option>)}
           </select>
           <button type="submit">Search</button>
@@ -292,14 +292,14 @@ function ListingsInner() {
 
           {plotView && (
             <div className="pp-plot-filters">
-              <select value={plotSize} onChange={(e) => setParam({ plot_size: e.target.value })}>
+              <select aria-label="Plot size" value={plotSize} onChange={(e) => setParam({ plot_size: e.target.value })}>
                 {PLOT_SIZES.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
               </select>
-              <select value={plotCategory} onChange={(e) => setParam({ plot_category: e.target.value })}>
+              <select aria-label="Plot category" value={plotCategory} onChange={(e) => setParam({ plot_category: e.target.value })}>
                 <option value="">Any category</option>
                 {PLOT_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
-              <select value={possession} onChange={(e) => setParam({ possession: e.target.value })}>
+              <select aria-label="Possession status" value={possession} onChange={(e) => setParam({ possession: e.target.value })}>
                 <option value="">Any possession status</option>
                 {POSSESSION_STATUSES.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
               </select>

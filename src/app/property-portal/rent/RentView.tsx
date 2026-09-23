@@ -217,16 +217,16 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
             }}
             onSubmitText={(text) => setParam({ search: text.trim() })}
           />
-          <select value={type} onChange={(e) => setParam({ type: e.target.value })}>
+          <select aria-label="Property type" value={type} onChange={(e) => setParam({ type: e.target.value })}>
             {TYPES.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
           </select>
-          <select value={beds} onChange={(e) => setParam({ beds: e.target.value })}>
+          <select aria-label="Bedrooms" value={beds} onChange={(e) => setParam({ beds: e.target.value })}>
             {BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
           </select>
-          <select value={price} onChange={(e) => setParam({ price: e.target.value })}>
+          <select aria-label="Price range" value={price} onChange={(e) => setParam({ price: e.target.value })}>
             {RENTS.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
           </select>
-          <select value={furnishing} onChange={(e) => setParam({ furnishing: e.target.value })}>
+          <select aria-label="Furnishing" value={furnishing} onChange={(e) => setParam({ furnishing: e.target.value })}>
             {FURNISHING.map((f) => <option key={f.v} value={f.v}>{f.l}</option>)}
           </select>
           <button type="submit">Search</button>

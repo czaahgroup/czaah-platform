@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { resolveImage, convertPrice, portalCountries } from './types';
+import { resolveImage, convertPrice, portalCountries, sizedImage, fallbackToOriginal } from './types';
 import { useCurrencyPref } from './usePortalPrefs';
 import { formatPlotSize, DEVELOPMENT_STATUS_LABEL, POSSESSION_LABEL } from '@/lib/plots';
 import { formatMoney } from '@/lib/paymentPlan';
@@ -89,7 +89,7 @@ export function DevelopmentStrip({
               .map((u) => formatPlotSize(u.plot_size, u.plot_size_unit))
               .filter(Boolean);
 
-            const image = resolveImage(dev.featured_image) || resolveImage((dev.gallery || [])[0]);
+            const image = sizedImage(dev.featured_image) || sizedImage((dev.gallery || [])[0]);
 
             return (
               <Link
@@ -100,7 +100,7 @@ export function DevelopmentStrip({
                 <div className="pp-dev-strip-img">
                   {image ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={image} alt={dev.name} />
+                    <img src={image} alt={dev.name} loading="lazy" decoding="async" onError={fallbackToOriginal} />
                   ) : (
                     <div className="pp-dev-strip-placeholder" aria-hidden="true" />
                   )}

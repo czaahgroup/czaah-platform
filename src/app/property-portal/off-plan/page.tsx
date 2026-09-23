@@ -169,10 +169,10 @@ function OffPlanInner() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
-          <select value={type} onChange={(e) => setParam({ type: e.target.value })}>
+          <select aria-label="Property type" value={type} onChange={(e) => setParam({ type: e.target.value })}>
             {TYPES.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
           </select>
-          <select value={price} onChange={(e) => setParam({ price: e.target.value })}>
+          <select aria-label="Price range" value={price} onChange={(e) => setParam({ price: e.target.value })}>
             {PRICES.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
           </select>
           <button type="submit">Search</button>

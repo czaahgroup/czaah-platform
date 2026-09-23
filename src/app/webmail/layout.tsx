@@ -14,6 +14,11 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#ffffff',
+  // The mail app behaves like an installed app (see the PWA manifest); it
+  // keeps the old no-zoom viewport the whole site used to have.
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function WebmailLayout({ children }: { children: React.ReactNode }) {

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LiveProperty, LISTING_META, resolveImage, formatPrice, isNewListing, isRental } from './types';
+import { LiveProperty, LISTING_META, formatPrice, isNewListing, isRental, sizedImage, fallbackToOriginal } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 import { yieldLabel } from '@/lib/marketFields';
 
@@ -17,7 +17,7 @@ export function PropertyCard({
   displayCurrency?: string;
 }) {
   const meta = LISTING_META[prop.listing_type] || { label: prop.listing_type, className: 'status-for-sale' };
-  const imageSrc = resolveImage(prop.images?.[0]);
+  const imageSrc = sizedImage(prop.images?.[0]);
   const href = `/property-portal/${prop.id}`;
   const { has, toggle, ready } = useWishlist();
   const { currency } = useCurrencyPref();
@@ -40,7 +40,7 @@ export function PropertyCard({
       {/* The whole card is the link; the save button sits above it. */}
       <Link href={href} className="pp-card-link" aria-label={prop.title}>
         {imageSrc ? (
-          <img className="pp-card-img" src={imageSrc} alt="" loading="lazy" />
+          <img className="pp-card-img" src={imageSrc} alt="" loading="lazy" decoding="async" onError={fallbackToOriginal} />
         ) : (
           <div className="pp-card-img pp-card-img--empty">&#8962;</div>
         )}

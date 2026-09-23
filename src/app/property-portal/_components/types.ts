@@ -127,6 +127,29 @@ export function resolveImage(image: string | null | undefined): string | null {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/${image}`;
 }
 
+/**
+ * A resized copy for cards and thumbnails (Supabase image transformation):
+ * an 800px card image is ~75% lighter than the uploaded original. Anything
+ * not in Supabase public storage is returned unchanged. Pair with
+ * fallbackToOriginal so a failed resize shows the original, never a gap.
+ */
+export function sizedImage(image: string | null | undefined, width = 800): string | null {
+  const url = resolveImage(image);
+  if (!url) return null;
+  const marker = '/storage/v1/object/public/';
+  const at = url.indexOf(marker);
+  if (at < 0 || !url.startsWith(process.env.NEXT_PUBLIC_SUPABASE_URL || '\u0000')) return url;
+  return `${url.slice(0, at)}/storage/v1/render/image/public/${url.slice(at + marker.length).split('?')[0]}?width=${width}&quality=75`;
+}
+
+/** <img onError>: swap a resized image back to its original, once. */
+export function fallbackToOriginal(e: { currentTarget: HTMLImageElement }) {
+  const img = e.currentTarget;
+  if (img.dataset.fallback || !img.src.includes('/storage/v1/render/image/public/')) return;
+  img.dataset.fallback = '1';
+  img.src = img.src.replace('/storage/v1/render/image/public/', '/storage/v1/object/public/').split('?')[0];
+}
+
 // FX table and accepted currencies live in src/lib/currencies.ts so the
 // server-side validators and this file cannot drift apart. Re-exported here
 // because every portal component already imports them from ./types.

@@ -213,16 +213,16 @@ function BuyInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?: 
             }}
             onSubmitText={(text) => setParam({ search: text.trim() })}
           />
-          <select value={type} onChange={(e) => setParam({ type: e.target.value })}>
+          <select aria-label="Property type" value={type} onChange={(e) => setParam({ type: e.target.value })}>
             {TYPES.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
           </select>
-          <select value={beds} onChange={(e) => setParam({ beds: e.target.value })}>
+          <select aria-label="Bedrooms" value={beds} onChange={(e) => setParam({ beds: e.target.value })}>
             {BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
           </select>
-          <select value={price} onChange={(e) => setParam({ price: e.target.value })}>
+          <select aria-label="Price range" value={price} onChange={(e) => setParam({ price: e.target.value })}>
             {PRICES.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
           </select>
-          <select value={stage} onChange={(e) => setParam({ stage: e.target.value })}>
+          <select aria-label="Construction stage" value={stage} onChange={(e) => setParam({ stage: e.target.value })}>
             {STAGES.map((st) => <option key={st.v} value={st.v}>{st.l}</option>)}
           </select>
           <button type="submit">Search</button>
