@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
+import { LISTING_IMAGE_TYPES, LISTING_IMAGE_MAX_BYTES, base64Bytes, sniffImageType } from '@/lib/uploadSafety'
 import { rentalTermsForInsert } from '@/lib/rentalTerms'
 import { plotColumnsFromBody } from '@/lib/developments'
 import { assetClassFor, isPlotListing, validatePlotListing } from '@/lib/plots'
@@ -158,8 +159,20 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        // The declared type is the caller's choice and this bucket is public,
+        // so check the size before decoding and the real bytes after.
+        if (typeof base64Data !== 'string' || base64Bytes(base64Data) > LISTING_IMAGE_MAX_BYTES) {
+          logError('api.partner.properties', new Error('image rejected: too large'), { index: i })
+          continue
+        }
         const buffer = Buffer.from(base64Data, 'base64')
-        const ext = contentType.split('/')[1] || 'jpg'
+        const sniffed = sniffImageType(buffer)
+        if (!sniffed || !LISTING_IMAGE_TYPES[sniffed]) {
+          logError('api.partner.properties', new Error('image rejected: not a JPEG/PNG/WebP/AVIF'), { index: i, declared: contentType })
+          continue
+        }
+        contentType = sniffed
+        const ext = LISTING_IMAGE_TYPES[sniffed]
         const filePath = `properties/${user.id}/${Date.now()}_${i}.${ext}`
 
         const { error: uploadError } = await supabase.storage

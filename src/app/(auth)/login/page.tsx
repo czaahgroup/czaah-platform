@@ -5,6 +5,7 @@ import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { safeRedirect } from '@/lib/safeRedirect'
 import { Navbar } from '@/components/layouts/Navbar'
 import { Footer } from '@/components/layouts/Footer'
 
@@ -32,7 +33,8 @@ function LoginForm() {
   const [mfaCode, setMfaCode] = useState('')
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/'
+  // Same-site paths only — see safeRedirect.
+  const redirect = safeRedirect(searchParams.get('redirect'))
 
   function navigateByRole(profile: { role: string }) {
     if (redirect !== '/') {

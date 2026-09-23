@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
+import { safeFileName } from '@/lib/uploadSafety'
 
 
 export async function POST(request: NextRequest) {
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
     let storedFileName: string | null = null
     if (messageType === 'file' || (fileData && fileName)) {
       const buffer = Buffer.from(fileData, 'base64')
-      const filePath = `chat/${enquiryId}/${fileName}`
+      const filePath = `chat/${enquiryId}/${Date.now()}_${safeFileName(fileName)}`
 
       const { error: uploadError } = await supabase.storage
         .from('platform-files')

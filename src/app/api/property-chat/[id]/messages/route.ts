@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
+import { safeFileName } from '@/lib/uploadSafety'
 
 
 function createAuthClient(request: NextRequest) {
@@ -72,7 +73,7 @@ export async function POST(
     // Upload file if provided
     if (fileData && fileName) {
       const buffer = Buffer.from(fileData, 'base64')
-      const filePath = `property-chats/${chatId}/${Date.now()}_${fileName}`
+      const filePath = `property-chats/${chatId}/${Date.now()}_${safeFileName(fileName)}`
 
       const { error: uploadError } = await supabase.storage
         .from('platform-files')

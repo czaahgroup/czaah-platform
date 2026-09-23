@@ -1,16 +1,22 @@
-import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/adminAuth'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
+import { escapeHtml } from '@/lib/escapeHtml'
 
+// Admin only. Before 2026-09-23 this used the service-role client with no
+// caller check, so any request could trigger an official CZAAH email to any
+// user id — and the reject route put caller-supplied text into it unescaped.
+export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (auth.error) return auth.error
 
-export async function POST(request: Request) {
   const { userId, reason } = await request.json()
 
   if (!userId || !reason) {
     return NextResponse.json({ error: 'userId and reason required' }, { status: 400 })
   }
 
-  const supabase = createAdminClient()
+  const supabase = auth.supabase
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -35,14 +41,14 @@ export async function POST(request: Request) {
         <div style="background: #080808; border: 1px solid #1A1A1A; border-radius: 8px; padding: 32px;">
           <h2 style="color: #ffffff; font-size: 20px; margin: 0 0 16px 0;">Application Update</h2>
           <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 16px 0;">
-            Dear ${profile.full_name},
+            Dear ${escapeHtml(profile.full_name)},
           </p>
           <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 16px 0;">
             Unfortunately, we were unable to verify your application at this time.
           </p>
           <div style="background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.2); border-radius: 4px; padding: 16px; margin: 0 0 24px 0;">
             <p style="color: rgba(255,255,255,0.6); margin: 0; font-size: 14px;">
-              <strong style="color: #ffffff;">Reason:</strong> ${reason}
+              <strong style="color: #ffffff;">Reason:</strong> ${escapeHtml(String(reason))}
             </p>
           </div>
           <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 24px 0;">

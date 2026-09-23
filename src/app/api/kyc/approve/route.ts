@@ -1,16 +1,22 @@
-import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/adminAuth'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
+import { escapeHtml } from '@/lib/escapeHtml'
 
+// Admin only. Before 2026-09-23 this used the service-role client with no
+// caller check, so any request could trigger an official CZAAH email to any
+// user id — and the reject route put caller-supplied text into it unescaped.
+export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request)
+  if (auth.error) return auth.error
 
-export async function POST(request: Request) {
   const { userId } = await request.json()
 
   if (!userId) {
     return NextResponse.json({ error: 'userId required' }, { status: 400 })
   }
 
-  const supabase = createAdminClient()
+  const supabase = auth.supabase
 
   // Get user profile
   const { data: profile } = await supabase
@@ -35,7 +41,7 @@ export async function POST(request: Request) {
           <p style="color: rgba(255,255,255,0.4); font-size: 11px; letter-spacing: 4px; margin-top: 8px;">CAPITAL · VENTURES · INFRASTRUCTURE</p>
         </div>
         <div style="background: #080808; border: 1px solid #1A1A1A; border-radius: 8px; padding: 32px;">
-          <h2 style="color: #C9A84C; font-size: 20px; margin: 0 0 16px 0;">Welcome, ${profile.full_name}</h2>
+          <h2 style="color: #C9A84C; font-size: 20px; margin: 0 0 16px 0;">Welcome, ${escapeHtml(profile.full_name)}</h2>
           <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 24px 0;">
             Your membership application has been approved. You now have full access to CZAAH Group's platform — including all sectors, services, and investment opportunities.
           </p>

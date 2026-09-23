@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
+import { safeFileName } from '@/lib/uploadSafety'
 import { logActivity } from '@/lib/activity'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
         if (!fileName || !fileData) continue
 
         const buffer = Buffer.from(fileData, 'base64')
-        const filePath = `enquiries/${enquiry.id}/${fileName}`
+        const filePath = `enquiries/${enquiry.id}/${Date.now()}_${safeFileName(fileName)}`
 
         const { error: uploadError } = await supabase.storage
           .from('platform-files')

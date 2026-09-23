@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
+import { escapeHtml } from '@/lib/escapeHtml'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 
@@ -61,6 +62,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Plain strings of sane length only — this endpoint is public, and it
+    // emails the sender a confirmation, so it must not become a relay.
+    const LIMITS: Record<string, number> = { name: 200, email: 254, phone: 50, interest: 200, message: 5000 }
+    for (const [field, max] of Object.entries(LIMITS)) {
+      const value = body[field]
+      if (value == null || value === '') continue
+      if (typeof value !== 'string' || value.length > max) {
+        return NextResponse.json({ error: `The ${field} field is too long or not text.` }, { status: 400 })
+      }
+    }
+
+    // Everything interpolated into an email body is escaped: a visitor's name
+    // or message must never become markup or links in a CZAAH-branded email.
+    const safe = {
+      name: escapeHtml(name),
+      email: escapeHtml(email),
+      phone: escapeHtml(phone),
+      interest: escapeHtml(interest),
+      message: escapeHtml(message).replace(/\n/g, '<br/>'),
+    }
+
     // Store in the admin portal — best-effort, never blocks email delivery
     try {
       const supabase = createAdminClient()
@@ -89,29 +111,29 @@ export async function POST(request: NextRequest) {
         <table style="width: 100%; border-collapse: collapse; margin: 0 0 24px 0;">
           <tr>
             <td style="color: rgba(255,255,255,0.4); padding: 8px 0; font-size: 13px; vertical-align: top; width: 120px;">Name</td>
-            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;">${name}</td>
+            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;">${safe.name}</td>
           </tr>
           <tr>
             <td style="color: rgba(255,255,255,0.4); padding: 8px 0; font-size: 13px; vertical-align: top;">Email</td>
-            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;"><a href="mailto:${email}" style="color: #C9A84C; text-decoration: none;">${email}</a></td>
+            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;"><a href="mailto:${safe.email}" style="color: #C9A84C; text-decoration: none;">${safe.email}</a></td>
           </tr>
           ${phone ? `
           <tr>
             <td style="color: rgba(255,255,255,0.4); padding: 8px 0; font-size: 13px; vertical-align: top;">Phone</td>
-            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;">${phone}</td>
+            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;">${safe.phone}</td>
           </tr>
           ` : ''}
           <tr>
             <td style="color: rgba(255,255,255,0.4); padding: 8px 0; font-size: 13px; vertical-align: top;">Interest</td>
-            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;">${interest}</td>
+            <td style="color: #ffffff; padding: 8px 0; font-size: 13px;">${safe.interest}</td>
           </tr>
           <tr>
             <td style="color: rgba(255,255,255,0.4); padding: 8px 0; font-size: 13px; vertical-align: top;">Message</td>
-            <td style="color: #ffffff; padding: 8px 0; font-size: 13px; line-height: 1.6;">${message.replace(/\n/g, '<br/>')}</td>
+            <td style="color: #ffffff; padding: 8px 0; font-size: 13px; line-height: 1.6;">${safe.message}</td>
           </tr>
         </table>
-        <a href="mailto:${email}" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px;">
-          Reply to ${name} &rarr;
+        <a href="mailto:${safe.email}" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          Reply to ${safe.name} &rarr;
         </a>
       `),
     })
@@ -124,10 +146,10 @@ export async function POST(request: NextRequest) {
       html: wrapEmail(`
         <h2 style="color: #C9A84C; font-size: 20px; margin: 0 0 16px 0;">We've Received Your Message</h2>
         <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 16px 0;">
-          Dear ${name},
+          Dear ${safe.name},
         </p>
         <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 16px 0;">
-          Thank you for reaching out to CZAAH. We have received your enquiry regarding <strong style="color: #ffffff;">${interest}</strong> and a member of our team will respond within 24 hours.
+          Thank you for reaching out to CZAAH. We have received your enquiry regarding <strong style="color: #ffffff;">${safe.interest}</strong> and a member of our team will respond within 24 hours.
         </p>
         <p style="color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 24px 0;">
           In the meantime, feel free to explore our sectors and services on our website.
