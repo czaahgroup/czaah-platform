@@ -55,7 +55,7 @@ export async function portalSitemap(): Promise<MetadataRoute.Sitemap> {
     const [listings, developments] = await Promise.all([
       supabase
         .from('property_listings')
-        .select('id, updated_at')
+        .select('id, updated_at, country, city, listing_type')
         .eq('status', 'approved')
         .in('country', countries)
         .order('updated_at', { ascending: false })
@@ -69,6 +69,23 @@ export async function portalSitemap(): Promise<MetadataRoute.Sitemap> {
 
     for (const l of listings.data || []) {
       entries.push({ url: `${BASE}/${l.id}`, lastModified: new Date(l.updated_at), changeFrequency: 'weekly', priority: 0.8 })
+    }
+
+    // /buy/<country>[/<city>] and /rent/… — only where something is listed,
+    // so the sitemap never points search engines at an empty page.
+    if (tree) {
+      const pages = new Set<string>()
+      for (const l of listings.data || []) {
+        const section = l.listing_type === 'rent' || l.listing_type === 'lease' ? 'rent' : 'buy'
+        const country = tree.flatMap((r) => r.countries).find((c) => c.name.toLowerCase() === String(l.country || '').toLowerCase())
+        if (!country) continue
+        pages.add(`/${section}/${country.slug}`)
+        const city = country.cities.find((c) => c.name.toLowerCase() === String(l.city || '').trim().toLowerCase())
+        if (city) pages.add(`/${section}/${country.slug}/${city.slug}`)
+      }
+      for (const p of [...pages].sort()) {
+        entries.push({ url: `${BASE}${p}`, lastModified: now, changeFrequency: 'daily', priority: p.split('/').length > 3 ? 0.8 : 0.85 })
+      }
     }
     for (const d of developments.data || []) {
       entries.push({ url: `${BASE}/developments/${d.slug}`, lastModified: new Date(d.updated_at), changeFrequency: 'weekly', priority: 0.8 })

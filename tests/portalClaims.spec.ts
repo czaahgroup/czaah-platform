@@ -25,7 +25,8 @@ const BANNED: [RegExp, string][] = [
   [/\d+(\.\d+)?\s?%/, 'a percentage figure'],
   [/tax[- ]free/i, '"tax-free"'],
   [/guarantee/i, 'a guarantee'],
-  [/title[- ]verified/i, '"title-verified"'],
+  [/title[- ](verified|checked)/i, '"title-verified / title-checked"'],
+  [/vetted by CZAAH|CZAAH-vetted/i, '"vetted by CZAAH"'],
   // "record inflows", "a record $3.8bn" — not "a matter of public record".
   [/\ba record\b|\brecord (high|inflows?|levels?|growth|year|returns?)/i, 'a "record" claim'],
   [/regardless of which government/i, 'political-risk protection'],
@@ -51,7 +52,7 @@ test.describe('shipped portal copy makes no unevidenced claims', () => {
     const root = join(__dirname, '..', 'src', 'app', 'property-portal')
     // The allocator is left out: its percentages are computed from live listings
     // and carry their own disclaimer, and its tax notes quote statutory rates.
-    const files = ['page.tsx', 'about/page.tsx', 'layout.tsx', 'destinations/[slug]/page.tsx', 'insights/page.tsx']
+    const files = ['page.tsx', 'about/page.tsx', 'layout.tsx', 'destinations/[slug]/page.tsx', 'insights/page.tsx', 'buy/BuyView.tsx', 'rent/RentView.tsx', 'off-plan/page.tsx', 'listings/page.tsx', 'sell/page.tsx', 'contact/page.tsx', '[id]/page.tsx']
     const problems = files.flatMap((f) => {
       // Comments may name the banned phrases when explaining their removal.
       const code = readFileSync(join(root, f), 'utf8')

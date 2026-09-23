@@ -12,6 +12,8 @@ import { isNewListing, NEW_LISTING_DAYS, resolveImage, convertPrice, formatPrice
 import { useCurrencyPref } from './_components/usePortalPrefs';
 import { portalWhyInvest, portalTestimonials } from './_components/portal-content';
 import { destinationFor, slugForCity } from './_components/destinations';
+import { LocationSearch, suggestionHref, type SearchSection } from './_components/LocationSearch';
+import type { Suggestion } from './_components/locationNav';
 
 
 const MARKETS = [
@@ -60,13 +62,31 @@ const HERO_BEDS = [
   { v: '4', l: '4+' },
 ];
 
+// Bands match the page the search lands on: Buy and New Projects compare
+// USD-equivalent prices, Rent compares USD-equivalent monthly rent. (The hero
+// used to compare raw prices, so its bands disagreed with the results page.)
 const HERO_PRICES = [
   { v: '', l: 'Any price' },
-  { v: '0-250000', l: 'Up to 250k' },
-  { v: '250000-500000', l: '250k – 500k' },
-  { v: '500000-1000000', l: '500k – 1M' },
-  { v: '1000000-3000000', l: '1M – 3M' },
-  { v: '3000000-', l: '3M +' },
+  { v: '0-250000', l: 'Up to $250k' },
+  { v: '250000-500000', l: '$250k – 500k' },
+  { v: '500000-1000000', l: '$500k – 1M' },
+  { v: '1000000-3000000', l: '$1M – 3M' },
+  { v: '3000000-', l: '$3M +' },
+];
+
+const HERO_RENTS = [
+  { v: '', l: 'Any rent' },
+  { v: '0-1500', l: 'Up to $1.5k / mo' },
+  { v: '1500-3000', l: '$1.5k – 3k / mo' },
+  { v: '3000-6000', l: '$3k – 6k / mo' },
+  { v: '6000-12000', l: '$6k – 12k / mo' },
+  { v: '12000-', l: '$12k+ / mo' },
+];
+
+const HERO_MODES: { v: SearchSection; l: string }[] = [
+  { v: 'buy', l: 'Buy' },
+  { v: 'rent', l: 'Rent' },
+  { v: 'new-projects', l: 'New Projects' },
 ];
 
 const VALUE_POINTS = [
@@ -102,6 +122,8 @@ export default function PropertyPortalHome() {
   const [hBeds, setHBeds] = useState('');
   const [hPrice, setHPrice] = useState('');
   const [hDest, setHDest] = useState('');
+  const [hPick, setHPick] = useState<Suggestion | null>(null);
+  const [hMode, setHMode] = useState<SearchSection>('buy');
   const [testimonial, setTestimonial] = useState(0);
   const [slide, setSlide] = useState(0);
   const [whyMarket, setWhyMarket] = useState(0);
@@ -182,49 +204,18 @@ export default function PropertyPortalHome() {
       .slice(0, 3);
   }, [properties]);
 
-  // Live count for the hero CTA — mirrors exactly the filtering the listings
-  // page will apply, so "Show N results" never over-promises.
-  const heroMatches = useMemo(() => {
-    const term = q.trim().toLowerCase();
-    return properties.filter((p) => {
-      if (hDest && p.city !== hDest) return false;
-      if (hType && p.property_type !== hType) return false;
-      if (hBeds && (p.bedrooms ?? -1) < Number(hBeds)) return false;
-      if (hPrice) {
-        // The hero's bands are purchase prices; a monthly rent never matches.
-        if (isRental(p)) return false;
-        const [min, max] = hPrice.split('-');
-        if (min && (p.price ?? 0) < Number(min)) return false;
-        if (max && (p.price ?? 0) > Number(max)) return false;
-      }
-      if (term) {
-        const hay = `${p.title} ${p.location} ${p.city} ${p.country} ${p.description}`.toLowerCase();
-        if (!hay.includes(term)) return false;
-      }
-      return true;
-    }).length;
-  }, [properties, q, hType, hBeds, hPrice, hDest]);
-
   function runSearch(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
     if (q.trim()) params.set('search', q.trim());
     if (hType) params.set('type', hType);
-    if (hBeds) params.set('beds', hBeds);
+    if (hBeds && hMode !== 'new-projects') params.set('beds', hBeds);
     if (hPrice) params.set('price', hPrice);
-    // A destination on its own is a browse intent, not a filter — send
-    // them to the destination page rather than a filtered flat list.
-    if (hDest) {
-      const onlyDest = !q.trim() && !hType && !hBeds && !hPrice;
-      const slug = slugForCity(hDest);
-      if (onlyDest && slug) {
-        router.push(`/property-portal/destinations/${slug}`);
-        return;
-      }
-      params.set('search', hDest);
-    }
-    router.push(`/property-portal/listings?${params.toString()}`);
+    // A picked suggestion only counts while the box still shows its name.
+    const pick = hPick && hPick.label === hDest ? hPick : null;
+    router.push(suggestionHref(hMode, pick, hDest, params));
   }
+
 
   // The API returns newest-first, so the head of the list IS the latest intake.
   // Featured skips those so the two sections don't show the same properties.
@@ -291,33 +282,50 @@ export default function PropertyPortalHome() {
 
         <div className="pp-container pp-hero-body">
           <div className="pp-hero-bottom">
-          <form className="pp-search" onSubmit={runSearch}>
+          <form className="pp-search" onSubmit={runSearch} role="search" aria-label="Property search">
+            <div className="pp-search-modes" role="radiogroup" aria-label="Search for">
+              {HERO_MODES.map((m) => (
+                <button
+                  key={m.v}
+                  type="button"
+                  role="radio"
+                  aria-checked={hMode === m.v}
+                  className={hMode === m.v ? 'is-active' : undefined}
+                  // Price bands differ between modes, so a chosen band resets.
+                  onClick={() => { if (m.v !== hMode) { setHMode(m.v); setHPrice(''); } }}
+                >
+                  {m.l}
+                </button>
+              ))}
+            </div>
             <div className="pp-searchbar">
-              <label className="pp-searchbar-field">
-                <span>Destination</span>
-                <select value={hDest} onChange={(e) => setHDest(e.target.value)}>
-                  <option value="">Anywhere</option>
-                  {destOptions.map((d) => (
-                    <option key={d.city} value={d.city}>{d.city} ({d.n})</option>
-                  ))}
-                </select>
-              </label>
+              <div className="pp-searchbar-field pp-searchbar-field--loc">
+                <span aria-hidden="true">Location</span>
+                <LocationSearch
+                  value={hDest}
+                  onChange={(t) => { setHDest(t); if (hPick && t !== hPick.label) setHPick(null); }}
+                  onPick={(sug) => setHPick(sug)}
+                  placeholder="City, area or development"
+                />
+              </div>
               <label className="pp-searchbar-field">
                 <span>Property type</span>
                 <select value={hType} onChange={(e) => setHType(e.target.value)}>
                   {HERO_TYPES.map((t) => <option key={t.v} value={t.v}>{t.l}</option>)}
                 </select>
               </label>
+              {hMode !== 'new-projects' && (
               <label className="pp-searchbar-field">
                 <span>Bedrooms</span>
                 <select value={hBeds} onChange={(e) => setHBeds(e.target.value)}>
                   {HERO_BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
                 </select>
               </label>
+              )}
               <label className="pp-searchbar-field">
-                <span>Price range</span>
+                <span>{hMode === 'rent' ? 'Monthly rent' : 'Price range'}</span>
                 <select value={hPrice} onChange={(e) => setHPrice(e.target.value)}>
-                  {HERO_PRICES.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
+                  {(hMode === 'rent' ? HERO_RENTS : HERO_PRICES).map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
                 </select>
               </label>
               <button type="submit" className="pp-searchbar-go">
