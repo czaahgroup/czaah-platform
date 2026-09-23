@@ -3758,7 +3758,8 @@ a.pp-dev-ghost {
    beside the logo on a phone: the menu button was pushed off-screen. The
    drawer carries Search, so the bar drops its search icon at this width. */
 @media (max-width: 560px) {
-  .pp-nav .pp-nav-search { display: none; }
+  .pp-nav .pp-nav-search,
+  .pp-nav .pp-nav-account { display: none; }
 }
 
 /* Currency picker inside the drawer (always there; the only one below 380px). */
@@ -4475,3 +4476,29 @@ a.pp-dev-ghost {
 .pp-invest-risk { margin-top: 30px; border: 1px solid var(--pp-border); border-left: 2px solid rgba(201, 168, 76, 0.5); border-radius: 6px; padding: 16px 18px; }
 .pp-invest-risk h3 { font-size: 14px; font-weight: 600; color: var(--pp-text); margin: 0 0 8px; }
 .pp-invest-risk p { font-size: 12.5px; line-height: 1.7; color: var(--pp-text-muted); margin: 0; }
+
+/* ── Buyer account ───────────────────────────────────────────────── */
+.pp-account { padding-bottom: 80px; }
+.pp-account-grid { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 56px; align-items: start; margin-top: 18px; }
+.pp-account-card { border: 1px solid var(--pp-border); border-radius: 10px; background: rgba(255, 255, 255, 0.02); padding: 28px; }
+.pp-account-title { font-family: var(--font-heading, 'Cinzel', serif); font-size: 24px; font-weight: 600; margin: 0 0 18px; color: var(--pp-text); }
+.pp-account-hint { font-size: 12.5px; line-height: 1.6; color: var(--pp-text-muted); margin: -6px 0 14px; }
+.pp-account-switch { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; font-size: 13px; color: var(--pp-text-muted); }
+.pp-account-why ul { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-direction: column; gap: 22px; }
+.pp-account-why li { border-left: 2px solid rgba(201, 168, 76, 0.35); padding-left: 18px; }
+.pp-account-why strong { display: block; font-size: 15px; color: var(--pp-text); margin-bottom: 6px; }
+.pp-account-why span { font-size: 13px; line-height: 1.7; color: var(--pp-text-muted); }
+.pp-account-notice { border: 1px solid rgba(34, 197, 94, 0.35); background: rgba(34, 197, 94, 0.08); color: #86efac; border-radius: 6px; padding: 12px 16px; font-size: 13.5px; }
+.pp-saved-searches { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--pp-border); }
+.pp-saved-searches li { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; padding: 14px 0; border-bottom: 1px solid var(--pp-border); }
+.pp-saved-searches a { color: var(--pp-text); font-weight: 600; font-size: 14.5px; flex: 1 1 260px; min-width: 0; overflow-wrap: anywhere; }
+.pp-saved-searches a:hover { color: var(--pp-gold); }
+.pp-saved-searches span { font-size: 12px; color: var(--pp-text-dim); }
+.pp-account-actions { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.pp-account-confirm { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.pp-account-confirm p { margin: 0; font-size: 13px; color: var(--pp-text-muted); flex-basis: 100%; }
+.pp-danger { color: #f87171 !important; }
+.pp-save-search { background: none; border: 1px solid var(--pp-border-strong); border-radius: 999px; color: var(--pp-text); font: inherit; font-size: 12px; padding: 6px 14px; cursor: pointer; white-space: nowrap; }
+.pp-save-search:hover { border-color: var(--pp-gold); color: var(--pp-gold); }
+.pp-save-search.is-done { border-color: rgba(34, 197, 94, 0.45); color: #86efac; }
+@media (max-width: 860px) { .pp-account-grid { grid-template-columns: 1fr; gap: 32px; } .pp-account-card { padding: 22px 18px; } }

@@ -119,6 +119,10 @@ export async function middleware(request: NextRequest) {
     // Sell / let / list-a-development submissions from property.czaah.com —
     // public by design; the route validates, rate-limits and never publishes.
     pathname === '/api/property-submissions' ||
+    // CZAAH Properties buyer sign-up and password reset — public, rate-limited,
+    // and they never say whether an address is registered.
+    pathname === '/api/property-account/register' ||
+    pathname === '/api/property-account/forgot' ||
     // Meeting rooms allow guest join with no account, same as a Google
     // Meet link — the room page itself handles both a logged-in member
     // and a name-only guest.
@@ -152,6 +156,12 @@ export async function middleware(request: NextRequest) {
 
   // No profile yet (just signed up) → redirect to pending
   if (!profile) {
+    // A CZAAH Properties buyer has no profile by design (src/lib/buyerAccount.ts)
+    // — their home is the portal account page, not the KYC queue. The flag
+    // only picks where to send them; it grants nothing.
+    if (user.user_metadata?.account_type === 'buyer') {
+      return NextResponse.redirect(new URL('/property-portal/account', request.url))
+    }
     if (pathname !== '/pending') {
       return NextResponse.redirect(new URL('/pending', request.url))
     }

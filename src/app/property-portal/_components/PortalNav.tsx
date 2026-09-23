@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { MarkhorMark } from '@/components/MarkhorMark';
 import { CURRENCIES } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
+import { useBuyer } from './buyerSession';
 
 // The CZAAH Properties brief's navigation. Allocate Capital and Insights
 // moved to the footer.
@@ -34,6 +35,8 @@ function hasHero(pathname: string) {
 }
 
 export function PortalNav() {
+  // Also starts the session watch that keeps saved properties in the account.
+  const { user } = useBuyer();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // On property.czaah.com the address bar shows clean paths (/buy) while the
@@ -185,6 +188,17 @@ export function PortalNav() {
             {count > 0 && <span className="pp-nav-badge">{count}</span>}
           </Link>
 
+          <Link
+            href="/property-portal/account"
+            className="pp-nav-saved pp-nav-account"
+            aria-label={user ? 'Your account' : 'Sign in'}
+          >
+            <svg viewBox="0 0 24 24" width="17" height="17" fill={user ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <circle cx="12" cy="8.5" r="3.6" />
+              <path d="M4.8 20c.9-3.6 3.8-5.6 7.2-5.6s6.3 2 7.2 5.6" strokeLinecap="round" />
+            </svg>
+          </Link>
+
           <button
             ref={toggleRef}
             className="pp-nav-toggle"
@@ -229,6 +243,9 @@ export function PortalNav() {
         </label>
         <Link href="/property-portal/saved" onClick={() => setOpen(false)}>
           Saved{count > 0 ? ` (${count})` : ''}
+        </Link>
+        <Link href="/property-portal/account" onClick={() => setOpen(false)}>
+          {user ? 'Your account' : 'Sign in / Create account'}
         </Link>
         <Link href={CTA_HREF} className="pp-mobile-cta" onClick={() => setOpen(false)}>
           Speak to CZAAH

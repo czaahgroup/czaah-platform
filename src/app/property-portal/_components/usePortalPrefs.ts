@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 // Per-visitor portal preferences (saved properties + display currency).
-// These are deliberately browser-local: the portal is publicly browsable with
-// no account, so there's nowhere server-side to hang them. Everything is
+// Saved properties live in the browser; for a signed-in buyer, buyerSession.ts
+// also mirrors them into their account (onWishlistChange). Everything is
 // wrapped in try/catch — localStorage throws in private mode and in embedded
 // webviews, and a thrown preference read must never take the page down.
 
@@ -34,6 +34,17 @@ function writeList(ids: string[]) {
   window.dispatchEvent(new Event(SYNC_EVENT));
 }
 
+type WishlistChange = { type: 'toggle'; id: string; added: boolean } | { type: 'clear' };
+let changeListener: ((c: WishlistChange) => void) | null = null;
+
+/** One listener (the account sync) hears every save, unsave and clear. */
+export function onWishlistChange(fn: (c: WishlistChange) => void) {
+  changeListener = fn;
+}
+export const readWishlist = readList;
+/** Replace the saved list without notifying the listener (used by the account merge). */
+export const replaceWishlist = writeList;
+
 export function useWishlist() {
   // Always start empty so server and first client render agree; the real list
   // arrives in the effect below. Rendering saved state during SSR would
@@ -60,11 +71,13 @@ export function useWishlist() {
     else next.push(id);
     writeList(next);
     setIds(next);
+    changeListener?.({ type: 'toggle', id, added: at < 0 });
   }, []);
 
   const clear = useCallback(() => {
     writeList([]);
     setIds([]);
+    changeListener?.({ type: 'clear' });
   }, []);
 
   const has = useCallback((id: string) => ids.includes(id), [ids]);

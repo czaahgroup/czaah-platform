@@ -5,6 +5,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
+import { SaveSearchButton } from '../_components/SaveSearchButton';
 import { MARKETS, matchesMarket, CURRENCIES, convertPrice } from '../_components/types';
 import { useListings } from '../_components/useListings';
 import { DevelopmentStrip } from '../_components/DevelopmentStrip';
@@ -126,6 +127,7 @@ function OffPlanInner() {
         <div className="pp-listpage-head" style={{ paddingTop: 18 }}>
           <div className="pp-listpage-meta">
             <span>{loading ? 'Loading…' : error ? 'Unavailable' : `${visible.length} ${visible.length === 1 ? 'project' : 'projects'}`}</span>
+            <SaveSearchButton />
             <label>
               Sort:{' '}
               <select value={sort} onChange={(e) => setParam({ sort: e.target.value })}>

@@ -5,6 +5,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
+import { SaveSearchButton } from '../_components/SaveSearchButton';
 import { MARKETS, matchesMarket, CURRENCIES, isRental, convertPrice } from '../_components/types';
 import { useListings } from '../_components/useListings';
 
@@ -220,6 +221,7 @@ function ListingsInner() {
           </h1>
           <div className="pp-listpage-meta">
             <span>{loading ? 'Loading…' : error ? 'Unavailable' : `${visible.length} ${visible.length === 1 ? 'listing' : 'listings'}`}</span>
+            <SaveSearchButton />
             <label>
               Sort:{' '}
               <select value={sort} onChange={(e) => setParam({ sort: e.target.value })}>

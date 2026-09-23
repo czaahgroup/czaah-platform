@@ -5,6 +5,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
+import { SaveSearchButton } from '../_components/SaveSearchButton';
 import { matchesMarket, CURRENCIES, isRental, convertPrice } from '../_components/types';
 import { portalLocations } from '../_components/portalRuntime';
 import { resolveLocation, inLocation, locationLabel, locationHref } from '../_components/locationNav';
@@ -178,6 +179,7 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
         <div className="pp-listpage-head" style={{ paddingTop: 18 }}>
           <div className="pp-listpage-meta">
             <span>{loading ? 'Loading…' : error ? 'Unavailable' : `${visible.length} ${visible.length === 1 ? 'rental' : 'rentals'}`}</span>
+            <SaveSearchButton />
             <label>
               Sort:{' '}
               <select value={sort} onChange={(e) => setParam({ sort: e.target.value })}>
