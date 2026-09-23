@@ -20,6 +20,8 @@
   "vars": {
     "MAIL_AI_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
     "VAPID_SUBJECT": "mailto:czaahgroup@gmail.com",
-    "CLOUDFLARE_ACCOUNT_ID": "ecf18c5413cb6cb2fe340c68b991197c"
+    "CLOUDFLARE_ACCOUNT_ID": "ecf18c5413cb6cb2fe340c68b991197c",
+    // Daily FX refresh source (/api/reference/fx): USD-base, free, no key.
+    "FX_API_URL": "https://open.er-api.com/v6/latest/USD"
   }
 }

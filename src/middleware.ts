@@ -125,6 +125,10 @@ export async function middleware(request: NextRequest) {
     pathname === '/api/property-account/forgot' ||
     // Enquiries, viewing requests and investment enquiries from the portal.
     pathname === '/api/property-leads' ||
+    // Scheduled jobs (GitHub Actions). No session: each route refuses anything
+    // without Authorization: Bearer CRON_SECRET, and only accepts POST.
+    pathname === '/api/crm/tasks/reminders' ||
+    pathname === '/api/reference/fx' ||
     // Meeting rooms allow guest join with no account, same as a Google
     // Meet link — the room page itself handles both a logged-in member
     // and a name-only guest.
