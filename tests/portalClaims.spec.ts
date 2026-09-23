@@ -60,7 +60,7 @@ test.describe('shipped portal copy makes no unevidenced claims', () => {
     const root = join(__dirname, '..', 'src', 'app', 'property-portal')
     // The allocator is left out: its percentages are computed from live listings
     // and carry their own disclaimer, and its tax notes quote statutory rates.
-    const files = ['page.tsx', 'about/page.tsx', 'layout.tsx', 'destinations/[slug]/page.tsx', 'insights/page.tsx', 'buy/BuyView.tsx', 'rent/RentView.tsx', 'off-plan/page.tsx', 'listings/page.tsx', 'sell/page.tsx', 'contact/page.tsx', '[id]/page.tsx', 'developers/page.tsx', 'developers/[slug]/page.tsx', 'new-projects/NewProjectsView.tsx', '_components/HomeSections.tsx', '_components/ProjectCard.tsx', '_components/PropertyActions.tsx']
+    const files = ['page.tsx', 'about/page.tsx', 'layout.tsx', 'destinations/[slug]/page.tsx', 'insights/page.tsx', 'buy/BuyView.tsx', 'rent/RentView.tsx', 'off-plan/page.tsx', 'listings/page.tsx', 'sell/page.tsx', 'contact/page.tsx', '[id]/page.tsx', 'developers/page.tsx', 'developers/[slug]/page.tsx', 'new-projects/NewProjectsView.tsx', 'investments/page.tsx', 'investments/categories.ts', '_components/InvestmentEnquiry.tsx', '_components/HomeSections.tsx', '_components/ProjectCard.tsx', '_components/PropertyActions.tsx']
     const problems = files.flatMap((f) => {
       // Comments may name the banned phrases when explaining their removal.
       const code = readFileSync(join(root, f), 'utf8')

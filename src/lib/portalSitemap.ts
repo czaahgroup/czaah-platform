@@ -14,6 +14,7 @@ const STATIC_PAGES: { path: string; priority: number; changeFrequency: 'daily' |
   { path: '/rent', priority: 0.9, changeFrequency: 'daily' },
   { path: '/off-plan', priority: 0.9, changeFrequency: 'daily' },
   { path: '/new-projects', priority: 0.9, changeFrequency: 'daily' },
+  { path: '/investments', priority: 0.8, changeFrequency: 'daily' },
   { path: '/developers', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/listings', priority: 0.8, changeFrequency: 'daily' },
   { path: '/destinations', priority: 0.8, changeFrequency: 'weekly' },

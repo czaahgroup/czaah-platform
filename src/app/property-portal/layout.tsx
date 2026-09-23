@@ -38,7 +38,7 @@ const FOOTER_LINKS = [
   { label: 'Buy', href: '/property-portal/buy' },
   { label: 'Rent', href: '/property-portal/rent' },
   { label: 'Sell', href: '/property-portal/sell' },
-  { label: 'Investments', href: '/property-portal/listings?with_yield=1&sort=yield-desc' },
+  { label: 'Investments', href: '/property-portal/investments' },
   { label: 'New Projects', href: '/property-portal/new-projects' },
   { label: 'Developers', href: '/property-portal/developers' },
   { label: 'Locations', href: '/property-portal/destinations' },

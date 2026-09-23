@@ -4470,3 +4470,8 @@ a.pp-dev-ghost {
 .pp-project-card-dev a { color: var(--pp-gold-deep); }
 .pp-project-card-price { margin: 4px 0 0; font-size: 15px; font-weight: 600; color: var(--pp-text); }
 .pp-project-card .pp-link-arrow { margin-top: auto; }
+
+/* ── Investments page ─────────────────────────────────────────────── */
+.pp-invest-risk { margin-top: 30px; border: 1px solid var(--pp-border); border-left: 2px solid rgba(201, 168, 76, 0.5); border-radius: 6px; padding: 16px 18px; }
+.pp-invest-risk h3 { font-size: 14px; font-weight: 600; color: var(--pp-text); margin: 0 0 8px; }
+.pp-invest-risk p { font-size: 12.5px; line-height: 1.7; color: var(--pp-text-muted); margin: 0; }

@@ -143,7 +143,7 @@ export function InvestmentOpportunities({ properties }: { properties: LiveProper
           ))}
         </div>
         <div className="pp-invest-foot">
-          <ButtonLink href="/property-portal/listings?with_yield=1&sort=yield-desc">Explore investments</ButtonLink>
+          <ButtonLink href="/property-portal/investments">Explore investments</ButtonLink>
           <p className="pp-disclaimer" style={{ margin: 0 }}>
             Figures are as supplied for each listing and labelled with their source. No return is
             guaranteed; take independent advice before investing.

@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
       '/faq',
       '/team',
       '/sectors',
-      '/investments',
+      // Not /investments: the portal has its own (czaah.com/investments is unaffected).
       '/process',
     ]
     // Portal pages link to their internal /property-portal/... paths (so the

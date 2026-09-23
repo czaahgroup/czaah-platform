@@ -7,16 +7,14 @@ import { MarkhorMark } from '@/components/MarkhorMark';
 import { CURRENCIES } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 
-// The CZAAH Properties brief's navigation. Investments and New Projects point
-// at the existing listings and off-plan pages until their own sections exist
-// (phases 6–7); Allocate Capital and Insights moved to the footer.
+// The CZAAH Properties brief's navigation. Allocate Capital and Insights
+// moved to the footer.
 const LINKS: { label: string; href: string; neverActive?: boolean }[] = [
   { label: 'Home', href: '/property-portal' },
   { label: 'Buy', href: '/property-portal/buy' },
   { label: 'Rent', href: '/property-portal/rent' },
   { label: 'Sell', href: '/property-portal/sell' },
-  // Shares /listings with search results, so it must not light up for them.
-  { label: 'Investments', href: '/property-portal/listings?with_yield=1&sort=yield-desc', neverActive: true },
+  { label: 'Investments', href: '/property-portal/investments' },
   { label: 'New Projects', href: '/property-portal/new-projects' },
   { label: 'Locations', href: '/property-portal/destinations' },
   { label: 'About', href: '/property-portal/about' },
