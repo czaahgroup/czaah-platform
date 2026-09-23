@@ -206,3 +206,91 @@ export async function PATCH(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+
+/**
+ * Permanently delete an enquiry. Super admin only.
+ *
+ * The database cascades the enquiry's chat messages, attachments and shared
+ * documents, so the member loses them from their dashboard too — the admin UI
+ * says so before confirming. Their files live in the private platform-files
+ * bucket and are removed after the rows, best-effort: a file that fails to
+ * delete is orphaned storage, never a half-deleted enquiry.
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+
+    const userClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll() {},
+        },
+      }
+    )
+    const { data: { user }, error: authError } = await userClient.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const supabase = createAdminClient()
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    if (profile?.role !== 'super_admin') {
+      return NextResponse.json({ error: 'Only a super admin can delete enquiries' }, { status: 403 })
+    }
+
+    const { data: enquiry } = await supabase
+      .from('enquiries')
+      .select('id, reference_number, member_id, product_name')
+      .eq('id', id)
+      .single()
+    if (!enquiry) return NextResponse.json({ error: 'Enquiry not found' }, { status: 404 })
+
+    // Collect file paths before the cascade removes the rows that name them.
+    const [attachments, shared, chat] = await Promise.all([
+      supabase.from('enquiry_attachments').select('file_url').eq('enquiry_id', id),
+      supabase.from('shared_documents').select('file_url').eq('enquiry_id', id),
+      supabase.from('chat_messages').select('file_url').eq('enquiry_id', id).not('file_url', 'is', null),
+    ])
+    const paths = [...(attachments.data || []), ...(shared.data || []), ...(chat.data || [])]
+      .map((r) => r.file_url as string | null)
+      // Only storage paths; an absolute URL points somewhere this bucket doesn't own.
+      .filter((p): p is string => !!p && !/^https?:\/\//i.test(p))
+
+    const { error: deleteError } = await supabase.from('enquiries').delete().eq('id', id)
+    if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 })
+
+    let filesRemoved = 0
+    if (paths.length) {
+      const { data: removed, error: storageError } = await supabase.storage
+        .from('platform-files')
+        .remove([...new Set(paths)])
+      if (storageError) logError('api.enquiries.delete', storageError, { step: 'storage', enquiryId: id })
+      filesRemoved = removed?.length ?? 0
+    }
+
+    await logActivity({
+      actorId: user.id,
+      action: 'enquiry.deleted',
+      targetType: 'enquiry',
+      targetId: id,
+      metadata: {
+        reference: enquiry.reference_number,
+        product: enquiry.product_name,
+        member_id: enquiry.member_id,
+        files_removed: filesRemoved,
+      },
+    })
+
+    return NextResponse.json({ success: true, filesRemoved })
+  } catch (err) {
+    logError('api.enquiries.delete', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}

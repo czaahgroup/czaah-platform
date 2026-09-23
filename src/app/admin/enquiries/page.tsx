@@ -135,6 +135,7 @@ export default function AdminEnquiriesPage() {
   const [replySentId, setReplySentId] = useState<string | null>(null)
   const [propertyChatMessages, setPropertyChatMessages] = useState<PropertyChatMessage[]>([])
   const [loadingPropertyChat, setLoadingPropertyChat] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -262,6 +263,38 @@ export default function AdminEnquiriesPage() {
       setSendingReply(false)
     }
   }
+
+  // Permanent — both endpoints are super-admin only and write an audit entry.
+  async function deleteItem(item: CombinedItem) {
+    if (deleting) return
+    const isEnquiry = item.kind === 'enquiry'
+    const label = isEnquiry
+      ? `enquiry ${item.enquiry!.reference_number}`
+      : `the message from ${item.message!.name}`
+    const warning = isEnquiry
+      ? 'This also deletes its chat, attachments and shared documents, and removes it from the member’s dashboard.'
+      : 'The message cannot be recovered.'
+    if (!window.confirm(`Permanently delete ${label}?\n\n${warning}`)) return
+
+    setDeleting(true)
+    setError(null)
+    try {
+      const res = isEnquiry
+        ? await fetch(`/api/enquiries/${item.enquiry!.id}`, { method: 'DELETE' })
+        : await fetch(`/api/admin/messages?id=${encodeURIComponent(item.message!.id)}`, { method: 'DELETE' })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.error || 'Delete failed')
+      if (isEnquiry) setEnquiries((prev) => prev.filter((e) => e.id !== item.enquiry!.id))
+      else setMessages((prev) => prev.filter((m) => m.id !== item.message!.id))
+      setSelectedKey(null)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Delete failed')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const canDelete = currentUserRole === 'super_admin'
 
   function getAdminsForSector(sectorId: string | null): AdminProfile[] {
     const sectorPartners = sectorId
@@ -634,6 +667,15 @@ export default function AdminEnquiriesPage() {
                 >
                   {assigning ? 'Assigning...' : selected.enquiry!.assigned_admin_id ? 'Reassign' : 'Assign'}
                 </button>
+                {canDelete && (
+                  <button
+                    onClick={() => deleteItem(selected)}
+                    disabled={deleting}
+                    className="w-full mt-2 py-2.5 text-sm border border-red-500/40 text-red-400 hover:border-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-40"
+                  >
+                    {deleting ? 'Deleting...' : 'Delete Enquiry'}
+                  </button>
+                )}
               </div>
 
               <div className="h-[500px] border-t border-outline-variant/10">
@@ -736,6 +778,15 @@ export default function AdminEnquiriesPage() {
                       className="text-sm px-4 py-2.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors disabled:opacity-40"
                     >
                       Mark as Replied
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      onClick={() => deleteItem(selected)}
+                      disabled={deleting}
+                      className="text-sm px-4 py-2.5 border border-red-500/40 text-red-400 hover:border-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-40 sm:ml-auto"
+                    >
+                      {deleting ? 'Deleting...' : 'Delete'}
                     </button>
                   )}
                 </div>

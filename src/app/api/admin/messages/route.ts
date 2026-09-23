@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
 import { logError } from '@/lib/logError'
+import { logActivity } from '@/lib/activity'
 
 
 function escapeHtml(str: string) {
@@ -53,7 +54,7 @@ async function requireSuperAdmin(request: NextRequest) {
   if (!profile || profile.role !== 'super_admin') {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
-  return { supabase }
+  return { supabase, userId: user.id }
 }
 
 export async function GET(request: NextRequest) {
@@ -142,6 +143,39 @@ export async function POST(request: NextRequest) {
     })
 
     await auth.supabase!.from('public_messages').update({ status: 'replied' }).eq('id', id)
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    logError("api.admin.messages", err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+/** Permanently delete a website message (contact form / AI chat). Super admin only. */
+export async function DELETE(request: NextRequest) {
+  try {
+    const auth = await requireSuperAdmin(request)
+    if (auth.error) return auth.error
+
+    const id = new URL(request.url).searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+
+    const { data: msg } = await auth.supabase!
+      .from('public_messages')
+      .select('id, name, email, interest, source')
+      .eq('id', id)
+      .single()
+    if (!msg) return NextResponse.json({ error: 'Message not found' }, { status: 404 })
+
+    const { error } = await auth.supabase!.from('public_messages').delete().eq('id', id)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await logActivity({
+      actorId: auth.userId!,
+      action: 'public_message.deleted',
+      targetId: id,
+      metadata: { name: msg.name, email: msg.email, interest: msg.interest, source: msg.source },
+    })
 
     return NextResponse.json({ success: true })
   } catch (err) {
