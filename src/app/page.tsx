@@ -61,16 +61,12 @@ const statsData = [
   { flag: 'https://flagcdn.com/w80/cn.png', alt: 'China', name: 'Asia', label: 'CPEC partnerships & cross-border trade facilitation' },
 ] as const
 
-const testimonials = [
-  { quote: 'CZAAH navigated the entire SECP registration and BOI approval process for our Pakistan subsidiary in under three weeks. Their regulatory relationships saved us months of delays.', author: 'Senior Partner', role: 'Gulf-based Investment Fund' },
-  { quote: 'We needed a trusted local partner to evaluate mining opportunities in Balochistan. CZAAH\'s on-the-ground expertise and government access gave us the confidence to commit capital.', author: 'Director of Operations', role: 'International Mining Company' },
-  { quote: 'As overseas Pakistanis, finding transparent, structured real estate investment access was impossible — until CZAAH. Their institutional structure gave us the security we needed.', author: 'Private Investor', role: 'UK-based Diaspora HNWI' },
-  { quote: 'CZAAH\'s cross-party political coverage means our investments are protected regardless of which government is in power. That level of continuity is unmatched in Pakistan.', author: 'Managing Director', role: 'Saudi Family Office' },
-  { quote: 'Their team secured our textile export documentation and FBR duty rebates faster than any agent we\'ve worked with. The connections they have in customs are extraordinary.', author: 'Head of Sourcing', role: 'European Fashion House' },
-  { quote: 'We were evaluating IT outsourcing in Pakistan but had no local visibility. CZAAH vetted three development firms, structured the contracts, and handled all compliance. Seamless.', author: 'CTO', role: 'US-based SaaS Company' },
-  { quote: 'The aviation logistics CZAAH arranged for our site inspection across three provinces was flawless. It turned a two-week trip into four days and impressed our entire board.', author: 'VP of Development', role: 'Chinese Infrastructure Firm' },
-  { quote: 'What sets CZAAH apart is their institutional discipline. Clean documentation, transparent reporting, and a compliance standard you rarely see in frontier markets.', author: 'Portfolio Manager', role: 'London-based PE Fund' },
-] as const
+// Ships empty (claims review, 2026-09-23). The eight anonymous quotes here
+// could not be tied to a client on record, and several implied influence over
+// officials ("government access", "connections … in customs", "protected
+// regardless of which government is in power"). The section below renders only
+// when there is at least one real, attributable quote.
+const testimonials: { quote: string; author: string; role: string }[] = []
 
 const filterTabsData = [
   { label: 'All', query: 'Pakistan investment business economy' },
@@ -82,7 +78,8 @@ const filterTabsData = [
   { label: 'Economy', query: 'Pakistan stock market PSX economy' },
 ] as const
 
-const partnerNames = ['Sovereign Funds', 'Chinese SOEs', 'Gulf Family Offices', 'Mining Corporates', 'Diaspora HNWIs', 'Global Tech Firms'] as const
+// An audience, not a list of named clients.
+const partnerNames = ['Family Offices', 'Mining & Industrial Corporates', 'Diaspora Investors', 'Technology Firms', 'Private Investors'] as const
 
 /* ------------------------------------------------------------------ */
 /*  News Types & Helpers                                               */
@@ -507,13 +504,14 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════════════ */}
       {/*  TESTIMONIALS                                                 */}
       {/* ══════════════════════════════════════════════════════════════ */}
+      {testimonials.length > 0 && (
       <section className="py-20 md:py-32 bg-surface-container-lowest px-5 md:px-24 overflow-hidden">
         <div className="max-w-[1600px] mx-auto">
           <div className="text-center mb-20">
             <span className="text-primary tracking-[0.4em] uppercase text-xs font-semibold raleway-text block mb-4">Trusted Partners</span>
             <h2 className="text-4xl md:text-5xl cinzel-text text-on-surface">What our clients say.</h2>
             <p className="text-on-surface-variant raleway-text leading-relaxed max-w-xl mx-auto mt-6">
-              From Gulf sovereign wealth to London private equity — how our partners describe the experience.
+              How our clients describe working with CZAAH.
             </p>
           </div>
 
@@ -549,13 +547,14 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════ */}
       {/*  PARTNERS                                                     */}
       {/* ══════════════════════════════════════════════════════════════ */}
       <section className="py-16 md:py-24 bg-surface px-5 md:px-24">
         <div className="max-w-[1600px] mx-auto text-center">
-          <span className="text-primary tracking-[0.4em] uppercase text-xs font-semibold raleway-text block mb-4">Who We Serve</span>
+          <span className="text-primary tracking-[0.4em] uppercase text-xs font-semibold raleway-text block mb-4">Who It&rsquo;s For</span>
           <h2 className="text-4xl md:text-5xl cinzel-text text-on-surface mb-16">Built for serious partners.</h2>
 
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">

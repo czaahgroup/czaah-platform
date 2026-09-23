@@ -98,7 +98,7 @@ export default function InsightsPage() {
                     <p>The Reko Diq copper-gold project in Balochistan has officially entered its operational phase, marking the single largest mining development in Pakistan&rsquo;s history. With estimated reserves of 12.3 million tonnes of copper and 20.9 million ounces of gold, the project is valued at over $100 billion across its lifecycle.</p>
                     <p>The restructured deal &mdash; a joint venture between Barrick Gold and the Pakistani government &mdash; has resolved the legal disputes that stalled progress for over a decade. Balochistan now holds a 25% free-carry stake, with royalties flowing directly to the provincial government.</p>
                     <p><strong className="text-on-surface">Why this matters for investors:</strong> Reko Diq is a proof of concept. It demonstrates that large-scale, international-grade mining operations can be structured and executed in Pakistan. The project has already attracted downstream interest from smelting companies, logistics providers, and equipment manufacturers looking for a foothold in what is now an active mining corridor.</p>
-                    <p>Provincial governments in KPK and Gilgit-Baltistan are now accelerating their own licensing frameworks, using Reko Diq as the benchmark for investor protections and revenue-sharing structures. The window for early positioning in Pakistan&rsquo;s mining sector has never been more clearly defined.</p>
+                    <p>Provincial governments in KPK and Gilgit-Baltistan are now accelerating their own licensing frameworks, using Reko Diq as the benchmark for investor protections and revenue-sharing structures. For investors, it sets a clearer reference point for how future mining projects may be structured.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Discuss mining opportunities &rarr;</Link></div>
                 </article>
@@ -112,7 +112,7 @@ export default function InsightsPage() {
                   <h2 className="cinzel-text text-2xl font-semibold text-on-surface mb-4 leading-tight">Islamabad&rsquo;s Blue Area Expansion &mdash; <span className="text-primary">Commercial Real Estate</span> at an Inflection Point</h2>
                   <div className="raleway-text text-sm leading-[1.85] text-on-surface-variant space-y-4">
                     <p>Islamabad&rsquo;s Blue Area &mdash; the capital&rsquo;s primary commercial district &mdash; is undergoing its most significant expansion in two decades. New high-rise approvals, relaxed height restrictions, and a surge in Grade A office demand are reshaping the city&rsquo;s commercial landscape.</p>
-                    <p>CDA&rsquo;s revised master plan has opened up adjacent sectors for mixed-use commercial development, with plots along Jinnah Avenue commanding premium valuations. Occupancy rates in existing Grade A buildings remain above 92%, and pre-lease agreements for buildings still under construction signal sustained demand.</p>
+                    <p>CDA&rsquo;s revised master plan has opened up adjacent sectors for mixed-use commercial development, with plots along Jinnah Avenue commanding premium valuations. Pre-lease agreements for buildings still under construction point to continued demand for Grade A space.</p>
                     <p><strong className="text-on-surface">Key drivers:</strong></p>
                     <ul className="ml-5 space-y-2 list-none">
                       <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">Growing presence of multinational companies establishing Pakistan headquarters in Islamabad</li>
@@ -120,7 +120,7 @@ export default function InsightsPage() {
                       <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">Diplomatic enclave proximity driving premium for corporate offices near embassies</li>
                       <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">Limited supply of Class A inventory relative to Karachi and Lahore</li>
                     </ul>
-                    <p>For international investors, Islamabad commercial real estate offers USD-denominated rental yields of 7&ndash;9% with capital appreciation that has consistently outpaced inflation over the past five years.</p>
+                    <p>For international investors, Islamabad commercial real estate offers exposure to the capital&rsquo;s institutional and corporate demand. Yields and capital growth vary widely by asset, and past performance is not a guide to the future &mdash; each opportunity needs its own assessment.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Explore real estate opportunities &rarr;</Link></div>
                 </article>
@@ -136,7 +136,7 @@ export default function InsightsPage() {
                     <p>Pakistan&rsquo;s construction sector grew 12% year-on-year in FY2025, driven primarily by public infrastructure spending under the National Highway Authority and provincial development programmes. The sector now accounts for approximately 2.5% of GDP and employs over 7 million workers.</p>
                     <p>The Sukkur&ndash;Hyderabad motorway, ML-1 railway upgrades, and Karachi&ndash;Quetta highway expansion are the three largest active projects, collectively valued at over $12 billion. These projects have created significant opportunities for both international construction firms seeking joint venture partnerships and suppliers of construction materials, equipment, and engineering services.</p>
                     <p><strong className="text-on-surface">The cement story is instructive:</strong> Pakistan&rsquo;s cement production capacity has reached 75 million tonnes per annum, with domestic consumption at an all-time high. Lucky Cement, Bestway, and DG Khan are all expanding capacity, signalling industry confidence in sustained construction activity through 2028.</p>
-                    <p>For investors, the construction supply chain &mdash; steel, cement, heavy equipment, and specialised engineering &mdash; represents a lower-risk entry point into Pakistan&rsquo;s infrastructure boom compared to direct project participation.</p>
+                    <p>For investors, the construction supply chain &mdash; steel, cement, heavy equipment, and specialised engineering &mdash; offers a different route into Pakistan&rsquo;s infrastructure build-out than direct project participation, with its own risk profile.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Discuss construction sector entry &rarr;</Link></div>
                 </article>
@@ -151,7 +151,7 @@ export default function InsightsPage() {
                   <div className="raleway-text text-sm leading-[1.85] text-on-surface-variant space-y-4">
                     <p>Pakistan holds the world&rsquo;s fourth-largest marble reserves, with an estimated 300 billion cubic feet of extractable stone across Balochistan, KPK, and the tribal areas. Yet the country currently captures less than 1% of the global marble trade. That is changing rapidly.</p>
                     <p>New processing facilities in Risalpur and Buner are producing export-grade polished marble that competes directly with Italian and Turkish product at 40&ndash;60% lower cost. Chinese demand alone grew 35% in 2025, with buyers increasingly sourcing from Pakistan as Turkish prices rise.</p>
-                    <p><strong className="text-on-surface">The investment case is compelling:</strong> a modern marble processing plant with 50,000 sq ft capacity requires approximately $2&ndash;3 million in capital expenditure and generates payback within 18&ndash;24 months at current export pricing. The margins are structurally protected by low labour costs and abundant raw material supply.</p>
+                    <p><strong className="text-on-surface">The investment case is compelling:</strong> a modern marble processing plant with 50,000 sq ft capacity requires approximately $2&ndash;3 million in capital expenditure. Low labour costs and abundant raw material support the economics, though returns depend on export pricing, power costs and execution.</p>
                     <p>Pakistan&rsquo;s marble sector is where the country&rsquo;s textile sector was 20 years ago &mdash; fragmented, underleveraged, and ripe for consolidation by operators who can bring modern processing, quality control, and direct export relationships.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Explore marble investment &rarr;</Link></div>
@@ -163,10 +163,10 @@ export default function InsightsPage() {
                     <span className="raleway-text text-[10px] font-medium tracking-[0.08em] uppercase px-2.5 py-1 border border-primary/30 text-primary">Real Estate</span>
                     <span className="raleway-text text-xs text-on-surface-variant">Friday, 7 February 2026</span>
                   </div>
-                  <h2 className="cinzel-text text-2xl font-semibold text-on-surface mb-4 leading-tight">Gwadar Free Zone Phase 1 &mdash; <span className="text-primary">Why Investors</span> Are Moving Now</h2>
+                  <h2 className="cinzel-text text-2xl font-semibold text-on-surface mb-4 leading-tight">Gwadar Free Zone Phase 1 &mdash; <span className="text-primary">What Investors</span> Should Know</h2>
                   <div className="raleway-text text-sm leading-[1.85] text-on-surface-variant space-y-4">
-                    <p>Gwadar Free Zone Phase 1 is now 90% allocated, with over 40 enterprises registered and operational. The zone offers 23-year tax exemptions, duty-free imports, and full profit repatriation &mdash; terms unmatched anywhere else in Pakistan.</p>
-                    <p>The completion of the Gwadar East Bay Expressway and the new international airport (expected operational by late 2026) are the catalysts that have shifted Gwadar from speculative to actionable. Land values within the free zone have appreciated 300% since 2020, and Phase 2 allocations are already oversubscribed.</p>
+                    <p>Gwadar Free Zone Phase 1 has enterprises registered and operating. The zone offers long-term tax exemptions, duty-free imports and profit repatriation for qualifying businesses.</p>
+                    <p>The completion of the Gwadar East Bay Expressway and the new international airport (expected operational by late 2026) are the catalysts investors are watching. Land in and around the zone remains a long-horizon position whose value depends on port operations scaling up.</p>
                     <p><strong className="text-on-surface">The strategic picture:</strong> Gwadar sits at the mouth of the Persian Gulf, 400km from the Strait of Hormuz. It offers the shortest trade route from Central Asia and western China to the Arabian Sea. As CPEC matures from a construction project into a functioning trade corridor, Gwadar becomes the logistics and warehousing hub for goods moving between China, Central Asia, and the Middle East.</p>
                     <p>Current opportunities centre on warehousing, fish processing, logistics yards, and hospitality &mdash; sectors where demand is already outstripping supply as port operations scale up.</p>
                   </div>
@@ -206,7 +206,7 @@ export default function InsightsPage() {
                       <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">Station construction and urban redevelopment around 24 upgraded stations</li>
                       <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">Rolling stock maintenance facilities &mdash; long-term service contracts</li>
                     </ul>
-                    <p>The knock-on effects for real estate are already visible. Land prices around planned station upgrades in secondary cities like Sukkur, Multan, and Rawalpindi have appreciated 40&ndash;80% in the past 18 months as developers anticipate transit-oriented development.</p>
+                    <p>The knock-on effects for real estate are already visible. Developers are watching land around planned station upgrades in secondary cities like Sukkur, Multan, and Rawalpindi in anticipation of transit-oriented development.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Discuss infrastructure opportunities &rarr;</Link></div>
                 </article>
@@ -217,11 +217,11 @@ export default function InsightsPage() {
                     <span className="raleway-text text-[10px] font-medium tracking-[0.08em] uppercase px-2.5 py-1 border border-primary/30 text-primary">Real Estate</span>
                     <span className="raleway-text text-xs text-on-surface-variant">Friday, 17 January 2026</span>
                   </div>
-                  <h2 className="cinzel-text text-2xl font-semibold text-on-surface mb-4 leading-tight">Diaspora Investment in Pakistani Real Estate &mdash; <span className="text-primary">Record Inflows</span> in 2025</h2>
+                  <h2 className="cinzel-text text-2xl font-semibold text-on-surface mb-4 leading-tight">Diaspora Investment in Pakistani Real Estate &mdash; <span className="text-primary">Where the Money</span> Is Going</h2>
                   <div className="raleway-text text-sm leading-[1.85] text-on-surface-variant space-y-4">
-                    <p>Overseas Pakistanis invested a record $3.8 billion in domestic real estate in 2025, up 28% from the previous year. The UK, UAE, and Saudi Arabia remain the top three source markets, with the Roshan Digital Account serving as the primary channel for compliant property transactions.</p>
-                    <p>The growth is driven by three factors: favourable exchange rates making PKR-denominated assets attractive for dollar earners; government incentives including tax amnesty provisions for documented property purchases; and a new generation of diaspora investors who grew up abroad but see Pakistan as a high-yield frontier market.</p>
-                    <p><strong className="text-on-surface">Where the money is going:</strong> Islamabad and Lahore account for 65% of diaspora real estate investment, with DHA (Defence Housing Authority) phases and Bahria Town developments dominating. However, a notable shift is emerging toward commercial property and purpose-built rental apartments as diaspora investors seek yield rather than speculative land banking.</p>
+                    <p>Overseas Pakistanis are a major source of investment in domestic real estate. The UK, UAE, and Saudi Arabia remain the top three source markets, with the Roshan Digital Account serving as the primary channel for compliant property transactions.</p>
+                    <p>The growth is driven by three factors: favourable exchange rates making PKR-denominated assets attractive for dollar earners; government incentives including tax amnesty provisions for documented property purchases; and a new generation of diaspora investors who grew up abroad but see Pakistan as a frontier market with long-term potential.</p>
+                    <p><strong className="text-on-surface">Where the money is going:</strong> Islamabad and Lahore attract most diaspora real estate investment, with DHA (Defence Housing Authority) phases and Bahria Town developments dominating. However, a notable shift is emerging toward commercial property and purpose-built rental apartments as diaspora investors seek yield rather than speculative land banking.</p>
                     <p>For diaspora investors, the key challenge remains trust and transparency. Investors need reliable local partners who can manage due diligence, legal compliance, and ongoing property management &mdash; particularly when purchasing from abroad.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Discuss diaspora investment &rarr;</Link></div>
@@ -268,9 +268,9 @@ export default function InsightsPage() {
                   <h2 className="cinzel-text text-2xl font-semibold text-on-surface mb-4 leading-tight">Special Economic Zones &mdash; <span className="text-primary">Pakistan&rsquo;s Industrial</span> Real Estate Opportunity</h2>
                   <div className="raleway-text text-sm leading-[1.85] text-on-surface-variant space-y-4">
                     <p>Pakistan has designated nine Special Economic Zones under CPEC, with four now operational: Rashakai (KPK), Allama Iqbal (Punjab), Dhabeji (Sindh), and Bostan (Balochistan). Tenants in these zones receive 10-year income tax exemptions, duty-free machinery imports, and one-window regulatory clearance.</p>
-                    <p>Rashakai SEZ alone has attracted over $2 billion in committed investment, with Chinese, Turkish, and local manufacturers establishing facilities for textiles, auto parts, pharmaceuticals, and food processing. Occupancy in Phase 1 has reached 85%, and Phase 2 expansion is underway.</p>
-                    <p><strong className="text-on-surface">The real estate play is twofold:</strong> direct industrial plots within SEZs are appreciating at 15&ndash;20% annually as allocation fills up. Surrounding commercial and residential development &mdash; worker housing, retail, logistics parks &mdash; is following the same pattern seen around successful SEZs in China, Vietnam, and Bangladesh.</p>
-                    <p>For investors who understand industrial real estate, Pakistan&rsquo;s SEZ programme offers the rare combination of government-backed incentives, genuine manufacturing demand, and early-stage pricing that has largely been arbitraged away in competing markets.</p>
+                    <p>Rashakai SEZ alone has attracted over $2 billion in committed investment, with Chinese, Turkish, and local manufacturers establishing facilities for textiles, auto parts, pharmaceuticals, and food processing. Phase 2 expansion is underway.</p>
+                    <p><strong className="text-on-surface">The real estate play is twofold:</strong> direct industrial plots within SEZs, allocated to qualifying operators. Surrounding commercial and residential development &mdash; worker housing, retail, logistics parks &mdash; is following the same pattern seen around successful SEZs in China, Vietnam, and Bangladesh.</p>
+                    <p>For investors who understand industrial real estate, Pakistan&rsquo;s SEZ programme offers the rare combination of government-backed incentives, genuine manufacturing demand, and pricing at an earlier stage than in more established markets.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Explore SEZ opportunities &rarr;</Link></div>
                 </article>
@@ -302,7 +302,7 @@ export default function InsightsPage() {
                     <p>Pakistan is the world&rsquo;s third-largest producer of chromite ore, with the Muslim Bagh and Khanozai deposits in Balochistan producing approximately 200,000 tonnes annually. Chromite &mdash; essential for stainless steel production, refractory materials, and chrome plating &mdash; is one of Pakistan&rsquo;s most consistent mineral exports, with over 90% of production shipped to China.</p>
                     <p>The sector has historically been dominated by small-scale, artisanal miners operating with minimal mechanisation. This is changing. New mining leases issued in 2024&ndash;2025 include mechanisation requirements and environmental compliance standards that favour larger, capitalised operators.</p>
                     <p><strong className="text-on-surface">The value-add opportunity:</strong> Pakistan currently exports almost all chromite as raw ore at $150&ndash;200 per tonne. Processed ferrochrome sells for $1,200&ndash;1,500 per tonne. A single ferrochrome smelter in Balochistan could capture 8&ndash;10x the value currently being exported, while creating hundreds of local jobs and qualifying for CPEC industrial zone incentives.</p>
-                    <p>This pattern &mdash; raw material export at low margins versus domestic processing at high margins &mdash; repeats across Pakistan&rsquo;s mineral sector. The first investors to build processing infrastructure will capture outsized returns.</p>
+                    <p>This pattern &mdash; raw material export at low margins versus domestic processing at high margins &mdash; repeats across Pakistan&rsquo;s mineral sector. Investors who build processing capacity early are positioned to capture more of that value, though power, logistics and execution are real risks.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Explore chromite opportunities &rarr;</Link></div>
                 </article>
@@ -340,7 +340,7 @@ export default function InsightsPage() {
                       <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">Seed technology and precision agriculture &mdash; adoption still below 10%</li>
                       <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[9px] before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">Halal meat processing for Gulf export &mdash; demand far exceeds certified supply</li>
                     </ul>
-                    <p>Companies like Engro Foods and FrieslandCampina have demonstrated that corporate agriculture in Pakistan generates excellent returns. The sector is now ready for a broader wave of investment, particularly in processing, logistics, and export-oriented production.</p>
+                    <p>Companies like Engro Foods and FrieslandCampina have shown that corporate agriculture in Pakistan can be built at scale. The sector is now ready for a broader wave of investment, particularly in processing, logistics, and export-oriented production.</p>
                   </div>
                   <div className="mt-5"><Link href="/contact" className="raleway-text text-sm font-medium text-primary hover:underline inline-flex items-center gap-2">Explore agriculture investment &rarr;</Link></div>
                 </article>
@@ -387,6 +387,12 @@ export default function InsightsPage() {
             </div>
           </div>
         </section>
+
+        <p className="raleway-text text-xs leading-relaxed text-on-surface-variant/60 max-w-3xl mx-auto px-8 pb-12 text-center">
+          CZAAH Insights are market commentary for general information only &mdash; not investment, tax or
+          legal advice. Figures are drawn from public sources at the time of writing and may have changed.
+          Past performance is not a guide to future returns; take independent advice before investing.
+        </p>
 
         <div className="h-px bg-outline-variant/20"></div>
 

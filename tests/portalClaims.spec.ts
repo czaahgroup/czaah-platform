@@ -68,6 +68,32 @@ test.describe('shipped portal copy makes no unevidenced claims', () => {
   })
 })
 
+// The main site keeps public economic statistics ("23% of GDP"), so a bare
+// percentage is allowed there. What is banned is investment-performance
+// language and anything implying influence over officials.
+const MAIN_SITE_BANNED: [RegExp, string][] = [
+  [/apprecia\w*[^.]{0,40}\d+\s?(%|&ndash;|–)/i, 'an appreciation figure'],
+  // Asset yields and price growth — not market-size statistics like
+  // "a $4B+ market growing at 12% annually".
+  [/yields? of \d|\d+\s?(%|&ndash;\d+%)[^.]{0,20}yield|(values?|prices?|plots?)[^.]{0,40}\d+\s?%\s?(since|annually|a year)/i, 'a yield or price-growth figure'],
+  [/payback|outsized returns|excellent returns|lower-risk|risk-free/i, 'a return or risk claim'],
+  [/guarantee/i, 'a guarantee'],
+  [/\ba record\b|record inflows/i, 'a "record" claim'],
+  [/regardless of which government|government access|connections they have in customs/i, 'implied influence over officials'],
+  [/moving now|never been more clearly/i, 'urgency'],
+]
+
+test('main site pages make no investment-performance or influence claims', () => {
+  const root = join(__dirname, '..', 'src', 'app')
+  const problems = ['page.tsx', 'insights/page.tsx'].flatMap((f) => {
+    const code = readFileSync(join(root, f), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '')
+    return MAIN_SITE_BANNED.filter(([re]) => re.test(code)).map(([, what]) => `${f}: ${what}`)
+  })
+  expect(problems).toEqual([])
+})
+
 test.describe('why invest', () => {
   test('rows group by market in first-seen order and skip blanks', () => {
     const grouped = groupWhyInvest([
