@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
 import { LISTING_COLUMNS } from '@/lib/developments'
+import { allowedCountries } from '@/lib/propertyLocations'
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,9 +37,18 @@ export async function GET(request: NextRequest) {
     if (listingType) query = query.eq('listing_type', listingType)
     if (minPrice) query = query.gte('price', Number(minPrice))
     if (maxPrice) query = query.lte('price', Number(maxPrice))
-    if (search) query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%,country.ilike.%${search}%,development_name.ilike.%${search}%`)
-    if (countries) query = query.in('country', countries.split(',').map((c) => c.trim()))
-    if (country) query = query.eq('country', country)
+    if (search) {
+      // The term is interpolated into a PostgREST filter expression, where
+      // , ( ) : and * are syntax — strip them so a search can only ever be a
+      // search, and cap the length.
+      const term = search.replace(/[,()*:\\%]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80)
+      if (term) query = query.or(`title.ilike.%${term}%,location.ilike.%${term}%,description.ilike.%${term}%,city.ilike.%${term}%,country.ilike.%${term}%,development_name.ilike.%${term}%`)
+    }
+    // Only markets switched on in admin → Locations are ever returned, however
+    // the caller asks. Hidden markets used to be hidden by the browser alone.
+    const requested = [countries, country].filter(Boolean).join(',').split(',').map((c) => c.trim()).filter(Boolean)
+    const markets = await allowedCountries(requested.length ? requested : null)
+    if (markets) query = query.in('country', markets.length ? markets : ['__none__'])
     if (plotCategory) query = query.eq('plot_category', plotCategory)
     if (possession) query = query.eq('possession_status', possession)
     if (development) query = query.eq('development_id', development)

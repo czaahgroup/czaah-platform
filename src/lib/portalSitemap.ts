@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { loadPortalContent } from '@/lib/portalContent'
 import { logError } from '@/lib/logError'
 import { DESTINATIONS, type Destination } from '@/app/property-portal/_components/destinations'
+import { loadLocationTree, activeCountryNames } from '@/lib/propertyLocations'
 
 const BASE = 'https://property.czaah.com'
 
@@ -36,11 +37,13 @@ export async function portalSitemap(): Promise<MetadataRoute.Sitemap> {
     priority: p.priority,
   }))
 
-  const content = await loadPortalContent()
-  const countries = content.settings.countries
-  const destinations = (Array.isArray(content.destinations) && content.destinations.length
-    ? content.destinations
-    : DESTINATIONS) as Destination[]
+  const [content, tree] = await Promise.all([loadPortalContent(), loadLocationTree()])
+  // Admin → Locations decides the live markets and cities; the older
+  // settings/destination lists only apply if those tables are unreadable.
+  const countries = tree && activeCountryNames(tree).length ? activeCountryNames(tree) : content.settings.countries
+  const destinations: Pick<Destination, 'slug'>[] = tree
+    ? tree.flatMap((r) => r.countries.flatMap((c) => c.cities.map((ci) => ({ slug: ci.slug }))))
+    : ((Array.isArray(content.destinations) && content.destinations.length ? content.destinations : DESTINATIONS) as Destination[])
 
   for (const d of destinations) {
     if (!d?.slug) continue

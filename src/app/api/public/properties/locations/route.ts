@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
+import { allowedCountries } from '@/lib/propertyLocations'
 
 
 // Public autocomplete source — distinct cities and specific areas/locations
@@ -10,10 +11,14 @@ export async function GET() {
   try {
     const supabase = createAdminClient()
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('property_listings')
       .select('city, location, country')
       .eq('status', 'approved')
+    // Suggest places in active markets only (admin → Locations).
+    const markets = await allowedCountries(null)
+    if (markets) query = query.in('country', markets.length ? markets : ['__none__'])
+    const { data, error } = await query
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })

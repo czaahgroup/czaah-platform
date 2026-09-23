@@ -75,6 +75,14 @@ export const LISTING_META: Record<string, { label: string; className: string }> 
 // Editable in admin (Portal content → Settings); falls back to these.
 // A getter rather than a constant so a stored value applies on first render.
 export function portalCountries(): string[] {
+  // Admin → Locations is the switch for which markets are shown. The older
+  // settings list and the shipped default only apply if the location tables
+  // could not be read.
+  const tree = portalLocations();
+  if (tree) {
+    const names = tree.flatMap((r) => r.countries.map((c) => c.name));
+    if (names.length) return names;
+  }
   const countries = portalSettings()?.countries;
   return countries && countries.length ? countries : ['Pakistan', 'United Kingdom', 'United Arab Emirates'];
 }
@@ -108,7 +116,7 @@ export function resolveImage(image: string | null | undefined): string | null {
 // because every portal component already imports them from ./types.
 export { FX_PER_USD, CURRENCIES } from '@/lib/currencies';
 import { FX_PER_USD } from '@/lib/currencies';
-import { portalSettings } from './portalRuntime';
+import { portalSettings, portalLocations } from './portalRuntime';
 
 export function convertPrice(price: number, from: string, to: string): number | null {
   // Rates are editable in admin; the shipped table is the fallback.

@@ -6,7 +6,7 @@
 // A city with no entry here still appears (see destinationFor) with its name
 // and a generic label — it just won't have editorial copy until one is added.
 
-import { portalDestinations as portalRuntimeDestinations } from './portalRuntime';
+import { portalDestinations as portalRuntimeDestinations, portalLocations } from './portalRuntime';
 
 export interface Destination {
   slug: string;
@@ -83,7 +83,28 @@ export const DESTINATIONS: Destination[] = [
  */
 export function portalDestinations(): Destination[] {
   const stored = portalRuntimeDestinations();
-  return stored && stored.length ? (stored as Destination[]) : DESTINATIONS;
+  const editorial = stored && stored.length ? (stored as Destination[]) : DESTINATIONS;
+  // The cities come from Admin → Locations when available: only active cities
+  // in active markets, in admin order. Copy entered on a city there wins;
+  // otherwise the destination editorial (stored or shipped) fills in.
+  const tree = portalLocations();
+  if (!tree) return editorial;
+  const bySlug = new Map(editorial.map((d) => [d.slug, d]));
+  const cities = tree.flatMap((region) =>
+    region.countries.flatMap((country) =>
+      country.cities.map((city) => {
+        const e = bySlug.get(city.slug);
+        return {
+          slug: city.slug,
+          city: city.name,
+          country: country.name,
+          tagline: city.tagline || e?.tagline || '',
+          blurb: city.blurb || e?.blurb || '',
+        };
+      }),
+    ),
+  );
+  return cities.length ? cities : editorial;
 }
 
 export function destinationFor(city: string | null | undefined): Destination | null {

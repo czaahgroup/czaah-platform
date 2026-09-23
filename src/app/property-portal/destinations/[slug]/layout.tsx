@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { loadPortalContent } from '@/lib/portalContent'
+import { loadLocationTree } from '@/lib/propertyLocations'
 import { DESTINATIONS, type Destination } from '../../_components/destinations'
 import { portalMetadata } from '../../_components/seo'
 
@@ -12,11 +13,18 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const content = await loadPortalContent()
+  const [content, tree] = await Promise.all([loadPortalContent(), loadLocationTree()])
   const list = (Array.isArray(content.destinations) && content.destinations.length
     ? content.destinations
     : DESTINATIONS) as Destination[]
-  const d = list.find((x) => x?.slug === slug)
+  const editorial = list.find((x) => x?.slug === slug)
+  // Admin → Locations names the city and its country; editorial fills in.
+  const located = tree
+    ?.flatMap((r) => r.countries.flatMap((c) => c.cities.map((ci) => ({ ci, country: c.name }))))
+    .find((x) => x.ci.slug === slug)
+  const d = located
+    ? { city: located.ci.name, country: located.country, blurb: located.ci.blurb || editorial?.blurb || '' }
+    : editorial
 
   const city = d?.city || slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   const place = d?.country ? `${city}, ${d.country}` : city

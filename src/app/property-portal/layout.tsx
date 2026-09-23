@@ -4,6 +4,7 @@ import { MarkhorMark } from '@/components/MarkhorMark'
 import { PortalNav } from './_components/PortalNav'
 import { PortalContentProvider } from './_components/PortalContentProvider'
 import { loadPortalContent } from '@/lib/portalContent'
+import { loadLocationTree } from '@/lib/propertyLocations'
 import './_components/portal.css'
 
 const PORTAL_TITLE = 'CZAAH Properties — Global Property Investment & Real Estate'
@@ -50,7 +51,8 @@ const FOOTER_LINKS = [
 export default async function PropertyPortalLayout({ children }: { children: React.ReactNode }) {
   // Loaded server-side so the first render already has the stored settings —
   // useListings fires its request before any effect could update them.
-  const content = await loadPortalContent()
+  const [stored, locations] = await Promise.all([loadPortalContent(), loadLocationTree()])
+  const content = { ...stored, locations }
 
   return (
     <PortalContentProvider content={content}>

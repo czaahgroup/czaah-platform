@@ -256,15 +256,13 @@ export default function PortalContentPage() {
 
       {tab === 'settings' && (
         <div style={cardStyle}>
+          {/* Markets moved to Admin → Locations (2026-09-23). The stored list is
+              kept as a fallback only, used if the location tables are unreadable. */}
           <label style={labelStyle}>Countries listed on the portal</label>
-          <input
-            value={(settings.countries || []).join(', ')}
-            onChange={(e) => edit('settings', { countries: e.target.value.split(',').map((c) => c.trim()).filter(Boolean) })}
-            style={inputStyle}
-          />
-          <p style={hintStyle}>
-            Approved listings in any other country are hidden. Must match the country on the listing
-            exactly — &ldquo;United Kingdom&rdquo;, not &ldquo;UK&rdquo;.
+          <p style={{ ...hintStyle, marginTop: 0 }}>
+            Now managed in <a href="/admin/locations" style={{ color: '#C9A84C' }}>Locations</a> — switch a
+            country on or off there. (Fallback list, used only if Locations can&apos;t be read:{' '}
+            {(settings.countries || []).join(', ') || 'none'}.)
           </p>
 
           <div style={{ marginTop: 18 }}>

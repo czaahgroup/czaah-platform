@@ -107,6 +107,12 @@ export type PortalContent = {
   insights: unknown
   whyInvest: unknown
   testimonials: unknown
+  /**
+   * The public location tree (region → country → city → area). Not a
+   * portal_content section: the portal layout loads it from the location
+   * tables and adds it here so it reaches the runtime the same way.
+   */
+  locations?: unknown
 }
 
 /**

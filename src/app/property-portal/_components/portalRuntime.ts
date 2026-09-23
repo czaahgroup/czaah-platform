@@ -1,4 +1,5 @@
 import type { PortalContent, PortalSettings, HeroClip } from '@/lib/portalContent'
+import type { LocationTree } from '@/lib/propertyLocations'
 import { OFFICES, PORTAL_EMAIL } from './offices'
 
 /**
@@ -77,4 +78,15 @@ export function portalWhyInvest(): unknown[] | null {
 export function portalTestimonials(): unknown[] | null {
   const list = runtime?.testimonials as unknown[] | undefined
   return Array.isArray(list) ? list : null
+}
+
+/**
+ * The active location tree from Admin → Locations, or null if it could not be
+ * loaded — callers then fall back to their shipped values. Type-only import
+ * above: propertyLocations reads the database and must never reach the client
+ * bundle.
+ */
+export function portalLocations(): LocationTree | null {
+  const tree = runtime?.locations as LocationTree | undefined
+  return Array.isArray(tree) ? tree : null
 }
