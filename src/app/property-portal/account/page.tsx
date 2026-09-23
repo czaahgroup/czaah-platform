@@ -207,7 +207,7 @@ function NewPassword({ onDone }: { onDone: () => void }) {
   );
 }
 
-interface SavedSearch { id: string; name: string; path: string; created_at: string }
+interface SavedSearch { id: string; name: string; path: string; created_at: string; email_alerts: boolean }
 interface Activity {
   id: string; reference: string; kind: string; listing_id: string | null; listing_title: string | null; created_at: string; open: boolean
   viewing: { status: string; preferred_date: string | null; preferred_slot: string | null; scheduled_at: string | null; mode: string } | null
@@ -229,7 +229,7 @@ function Dashboard({ notice }: { notice: string }) {
 
   useEffect(() => {
     if (!user) return;
-    portalSupabase().from('saved_searches').select('id, name, path, created_at').eq('user_id', user.id).order('created_at', { ascending: false })
+    portalSupabase().from('saved_searches').select('id, name, path, created_at, email_alerts').eq('user_id', user.id).order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (error) setSearchError('We couldn’t load your saved searches just now.');
         setSearches((data as SavedSearch[]) || []);
@@ -242,6 +242,12 @@ function Dashboard({ notice }: { notice: string }) {
       .then((d) => setActivity(d || []))
       .catch(() => setActivity([]));
   }, [user]);
+
+  async function setAlerts(id: string, on: boolean) {
+    setSearches((s) => (s || []).map((x) => (x.id === id ? { ...x, email_alerts: on } : x)));
+    const { error } = await portalSupabase().from('saved_searches').update({ email_alerts: on }).eq('id', id);
+    if (error) setSearches((s) => (s || []).map((x) => (x.id === id ? { ...x, email_alerts: !on } : x)));
+  }
 
   async function removeSearch(id: string) {
     const { error } = await portalSupabase().from('saved_searches').delete().eq('id', id);
@@ -306,7 +312,7 @@ function Dashboard({ notice }: { notice: string }) {
           <Skeleton height={80} />
         ) : searches.length === 0 ? (
           <EmptyState title="No saved searches" action={<ButtonLink href="/property-portal/buy" variant="ghost">Start a search</ButtonLink>}>
-            Use &ldquo;Save this search&rdquo; on any results page to keep its filters.
+            Use &ldquo;Save this search&rdquo; on any results page to keep its filters, and get an email when new properties match.
           </EmptyState>
         ) : (
           <ul className="pp-saved-searches">
@@ -314,6 +320,10 @@ function Dashboard({ notice }: { notice: string }) {
               <li key={s.id}>
                 <Link href={s.path}>{s.name}</Link>
                 <span>Saved {new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                <label className="pp-alert-toggle">
+                  <input type="checkbox" checked={!!s.email_alerts} onChange={(e) => setAlerts(s.id, e.target.checked)} />
+                  Email me new matches
+                </label>
                 <button type="button" className="pp-link-btn" onClick={() => removeSearch(s.id)} aria-label={`Delete saved search ${s.name}`}>Delete</button>
               </li>
             ))}

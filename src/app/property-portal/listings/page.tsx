@@ -1,6 +1,8 @@
 'use client';
 // @ts-nocheck
 
+import { filterListings } from '@/lib/listingSearch';
+import { portalSettings } from '../_components/portalRuntime';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -133,55 +135,8 @@ function ListingsInner() {
   }
 
   const visible = useMemo(() => {
-    let list = all.filter((p) => matchesMarket(p, market));
-    // Investments: purchasable listings that state a yield.
-    if (params.get('with_yield')) list = list.filter((p) => p.yield_percentage != null && !isRental(p));
-    if (type) list = list.filter((p) => p.property_type === type);
-    // "For Rent" covers commercial leases too — both are tenancies.
-    if (listingType) list = list.filter((p) => (rentView ? isRental(p) : p.listing_type === listingType));
-    if (beds) list = list.filter((p) => (p.bedrooms ?? -1) >= Number(beds));
-    if (price) {
-      const [min, max] = price.split('-');
-      if (rentView) {
-        // Rent bands compare the monthly equivalent.
-        if (min) list = list.filter((p) => monthlyRent(p) >= Number(min));
-        if (max) list = list.filter((p) => monthlyRent(p) <= Number(max));
-      } else {
-        // Sale bands are capital prices; a monthly rent is not comparable.
-        list = list.filter((p) => !isRental(p));
-        if (min) list = list.filter((p) => (usd(p) ?? -1) >= Number(min));
-        if (max) list = list.filter((p) => usd(p) != null && usd(p) <= Number(max));
-      }
-    }
-    // Plot narrowing. Each one only ever removes rows, so a listing with no
-    // plot data simply drops out rather than being treated as a match.
-    if (plotSize) {
-      const [min, max] = plotSize.split('-');
-      list = list.filter((p) => {
-        const sqft = plotSizeInSqFt(p.plot_size, p.plot_size_unit);
-        if (sqft == null) return false;
-        if (min && sqft < Number(min)) return false;
-        if (max && sqft > Number(max)) return false;
-        return true;
-      });
-    }
-    if (plotCategory) list = list.filter((p) => p.plot_category === plotCategory);
-    if (possession) list = list.filter((p) => p.possession_status === possession);
-    for (const flag of PLOT_FLAGS) {
-      if (params.get(flag.key) === '1') list = list.filter((p) => !!p[flag.column]);
-    }
-    if (search) {
-      const s = search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.title?.toLowerCase().includes(s) ||
-          p.location?.toLowerCase().includes(s) ||
-          p.city?.toLowerCase().includes(s) ||
-          p.country?.toLowerCase().includes(s) ||
-          p.description?.toLowerCase().includes(s) ||
-          p.development_name?.toLowerCase().includes(s)
-      );
-    }
+    // Shared with the saved-search alerts: src/lib/listingSearch.ts.
+    let list = filterListings(all, 'listings', params, { fxPerUsd: portalSettings()?.fxPerUsd });
     const sorted = [...list];
     // Rents and purchase prices can't share one scale: sort each on its own
     // (rent by monthly equivalent) and keep sales ahead of rentals.

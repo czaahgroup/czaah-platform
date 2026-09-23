@@ -129,6 +129,9 @@ export async function middleware(request: NextRequest) {
     // without Authorization: Bearer CRON_SECRET, and only accepts POST.
     pathname === '/api/crm/tasks/reminders' ||
     pathname === '/api/reference/fx' ||
+    pathname === '/api/property-account/alerts' ||
+    // The "Stop alerts" link in an alert email: token-only, switches alerts off.
+    pathname === '/api/property-account/alerts/unsubscribe' ||
     // Meeting rooms allow guest join with no account, same as a Google
     // Meet link — the room page itself handles both a logged-in member
     // and a name-only guest.

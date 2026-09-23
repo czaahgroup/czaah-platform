@@ -1,13 +1,14 @@
 'use client';
 // @ts-nocheck
 
+import { filterListings } from '@/lib/listingSearch';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PropertyCard } from '../_components/PropertyCard';
 import { SaveSearchButton } from '../_components/SaveSearchButton';
 import { matchesMarket, CURRENCIES, isRental, convertPrice } from '../_components/types';
-import { portalLocations } from '../_components/portalRuntime';
+import { portalLocations, portalSettings } from '../_components/portalRuntime';
 import { resolveLocation, inLocation, locationLabel, locationHref } from '../_components/locationNav';
 import { LocationChips } from '../_components/LocationChips';
 import { LocationSearch, suggestionHref } from '../_components/LocationSearch';
@@ -102,30 +103,8 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
   }
 
   const visible = useMemo(() => {
-    // Rent and lease are both tenancies — residential lets and commercial leases.
-    let list = all.filter(isRental);
-    list = list.filter((p) => matchesMarket(p, market));
-    list = list.filter((p) => inLocation(p, loc));
-    list = applyMarketFilters(list, marketFilters, params);
-    if (type) list = list.filter((p) => p.property_type === type);
-    if (beds) list = list.filter((p) => (p.bedrooms ?? -1) >= Number(beds));
-    if (furnishing) list = list.filter((p) => p.furnishing === furnishing);
-    if (price) {
-      const [min, max] = price.split('-');
-      if (min) list = list.filter((p) => monthlyRent(p) >= Number(min));
-      if (max) list = list.filter((p) => monthlyRent(p) <= Number(max));
-    }
-    if (search) {
-      const s = search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.title?.toLowerCase().includes(s) ||
-          p.location?.toLowerCase().includes(s) ||
-          p.city?.toLowerCase().includes(s) ||
-          p.country?.toLowerCase().includes(s) ||
-          p.description?.toLowerCase().includes(s)
-      );
-    }
+    // Shared with the saved-search alerts: src/lib/listingSearch.ts.
+    let list = filterListings(all, 'rent', params, { fxPerUsd: portalSettings()?.fxPerUsd, loc, marketFilters });
     const sorted = [...list];
     // "Price on request" rentals sink to the bottom either way.
     const byRent = (dir) => (a, b) => {

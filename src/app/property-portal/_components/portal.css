@@ -4571,3 +4571,6 @@ a.pp-verified-badge { text-decoration: none; display: inline-flex; }
 @media (max-width: 560px) {
   .pp-hero-copy h1 { font-size: clamp(26px, 7.4vw, 34px); }
 }
+
+/* Saved-search alert switch on /account. */
+.pp-alert-toggle { display: inline-flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--pp-text-muted); cursor: pointer; min-height: 44px; }

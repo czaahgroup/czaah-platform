@@ -1,6 +1,8 @@
 'use client';
 // @ts-nocheck
 
+import { filterListings } from '@/lib/listingSearch';
+import { portalSettings } from '../_components/portalRuntime';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -68,25 +70,8 @@ function OffPlanInner() {
   }
 
   const visible = useMemo(() => {
-    let list = all.filter((p) => p.listing_type === 'off_plan');
-    list = list.filter((p) => matchesMarket(p, market));
-    if (type) list = list.filter((p) => p.property_type === type);
-    if (price) {
-      const [min, max] = price.split('-');
-      if (min) list = list.filter((p) => (usd(p) ?? -1) >= Number(min));
-      if (max) list = list.filter((p) => usd(p) != null && usd(p) <= Number(max));
-    }
-    if (search) {
-      const s = search.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.title?.toLowerCase().includes(s) ||
-          p.location?.toLowerCase().includes(s) ||
-          p.city?.toLowerCase().includes(s) ||
-          p.country?.toLowerCase().includes(s) ||
-          p.description?.toLowerCase().includes(s)
-      );
-    }
+    // Shared with the saved-search alerts: src/lib/listingSearch.ts.
+    let list = filterListings(all, 'off-plan', params, { fxPerUsd: portalSettings()?.fxPerUsd });
     const sorted = [...list];
     if (sort === 'price-asc') sorted.sort((a, b) => (usd(a) ?? Infinity) - (usd(b) ?? Infinity));
     if (sort === 'price-desc') sorted.sort((a, b) => (usd(b) ?? -1) - (usd(a) ?? -1));
