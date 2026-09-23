@@ -13,6 +13,8 @@ const STATIC_PAGES: { path: string; priority: number; changeFrequency: 'daily' |
   { path: '/buy', priority: 0.9, changeFrequency: 'daily' },
   { path: '/rent', priority: 0.9, changeFrequency: 'daily' },
   { path: '/off-plan', priority: 0.9, changeFrequency: 'daily' },
+  { path: '/new-projects', priority: 0.9, changeFrequency: 'daily' },
+  { path: '/developers', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/listings', priority: 0.8, changeFrequency: 'daily' },
   { path: '/destinations', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/sell', priority: 0.7, changeFrequency: 'monthly' },
@@ -62,10 +64,12 @@ export async function portalSitemap(): Promise<MetadataRoute.Sitemap> {
         .limit(5000),
       supabase
         .from('developments')
-        .select('slug, updated_at')
+        .select('slug, updated_at, country, developer_id')
         .eq('status', 'published')
+        .in('country', countries)
         .limit(1000),
     ])
+    const { data: developers } = await supabase.from('property_developers').select('id, slug, updated_at').eq('active', true)
 
     for (const l of listings.data || []) {
       entries.push({ url: `${BASE}/${l.id}`, lastModified: new Date(l.updated_at), changeFrequency: 'weekly', priority: 0.8 })
@@ -89,6 +93,17 @@ export async function portalSitemap(): Promise<MetadataRoute.Sitemap> {
     }
     for (const d of developments.data || []) {
       entries.push({ url: `${BASE}/developments/${d.slug}`, lastModified: new Date(d.updated_at), changeFrequency: 'weekly', priority: 0.8 })
+    }
+    // Developer pages and /new-projects/<country>, only where there are projects.
+    const withProjects = new Set((developments.data || []).map((d) => d.developer_id).filter(Boolean))
+    for (const dv of developers || []) {
+      if (withProjects.has(dv.id)) entries.push({ url: `${BASE}/developers/${dv.slug}`, lastModified: new Date(dv.updated_at), changeFrequency: 'weekly', priority: 0.6 })
+    }
+    if (tree) {
+      const projectCountries = new Set((developments.data || []).map((d) => String(d.country || '').toLowerCase()))
+      for (const c of tree.flatMap((r) => r.countries)) {
+        if (projectCountries.has(c.name.toLowerCase())) entries.push({ url: `${BASE}/new-projects/${c.slug}`, lastModified: now, changeFrequency: 'daily', priority: 0.8 })
+      }
     }
     if (listings.error) logError('lib.portalSitemap', listings.error, { step: 'listings' })
     if (developments.error) logError('lib.portalSitemap', developments.error, { step: 'developments' })

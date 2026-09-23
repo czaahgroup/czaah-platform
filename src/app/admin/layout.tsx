@@ -158,6 +158,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <NavLink href="/admin/properties" label="Properties" icon="apartment" />
         <NavLink href="/admin/submissions" label="Submissions" icon="move_to_inbox" />
         <NavLink href="/admin/developments" label="Developments" icon="location_city" />
+        <NavLink href="/admin/developers" label="Developers" icon="engineering" />
         <NavLink href="/admin/locations" label="Locations" icon="public" />
         <NavLink href="/admin/properties?subtype=plot" label="Plots / Land" icon="crop_square" />
         <NavLink href="/admin/developments?tab=plans" label="Payment Plans" icon="payments" />

@@ -26,6 +26,17 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     if (!development) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
+    // The linked developer's public page (active developers only).
+    let developer: { name: string; slug: string; verified: boolean } | null = null
+    if ((development as { developer_id?: string | null }).developer_id) {
+      const { data: dv } = await supabase
+        .from('property_developers')
+        .select('name, slug, verification_status, active')
+        .eq('id', (development as { developer_id: string }).developer_id)
+        .maybeSingle()
+      if (dv?.active) developer = { name: dv.name, slug: dv.slug, verified: dv.verification_status === 'verified' }
+    }
+
     const units = ((development.development_units || []) as { id: string; display_order?: number }[])
       .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
 
@@ -54,7 +65,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     })
 
     return NextResponse.json({
-      data: { ...development, development_units: undefined, units: unitsWithPlans },
+      data: { ...development, development_units: undefined, units: unitsWithPlans, developer },
     })
   } catch (err) {
     logError('api.public.developments.slug', err)

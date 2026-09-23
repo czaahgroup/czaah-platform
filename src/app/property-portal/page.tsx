@@ -440,7 +440,7 @@ export default function PropertyPortalHome() {
         </div>
       </section>
       {/* ── NEW & OFF-PLAN PROJECTS ─────────────────────── */}
-      <DevelopmentStrip eyebrow="New projects" title="New & off-plan projects" viewAllHref="/property-portal/off-plan" />
+      <DevelopmentStrip eyebrow="New projects" title="New & off-plan projects" viewAllHref="/property-portal/new-projects" />
       {/* ── INVESTMENT OPPORTUNITIES ────────────────────── */}
       <InvestmentOpportunities properties={properties} />
       {/* ── DESTINATIONS ───────────────────────────────────── */}

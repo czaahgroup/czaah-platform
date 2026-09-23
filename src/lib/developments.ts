@@ -12,7 +12,7 @@ export const DEVELOPMENT_COLUMNS = `
   approval_status, approval_authority, featured_image, gallery, features,
   video_url, video_poster_url, brochure_url, brochure_name,
   currency, development_status, possession_status, status, featured, verified,
-  agent_id, created_at, updated_at
+  agent_id, developer_id, created_at, updated_at
 `
 
 export const UNIT_COLUMNS = `

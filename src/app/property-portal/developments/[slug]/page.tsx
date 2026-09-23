@@ -272,7 +272,15 @@ export default function DevelopmentPage() {
           <p className="pp-detail-loc">{locationLine}</p>
           {(dev.developer_name || dev.marketing_agent) && (
             <p className="pp-dev-brands">
-              {dev.developer_name && <>Developed by <strong>{dev.developer_name}</strong></>}
+              {dev.developer_name && (
+                <>
+                  Developed by{' '}
+                  {dev.developer?.slug
+                    ? <Link href={`/property-portal/developers/${dev.developer.slug}`}><strong>{dev.developer_name}</strong></Link>
+                    : <strong>{dev.developer_name}</strong>}
+                  {dev.developer?.verified && <span className="pp-verified-badge">Verified</span>}
+                </>
+              )}
               {dev.developer_name && dev.marketing_agent && ' · '}
               {dev.marketing_agent && <>Marketed by <strong>{dev.marketing_agent}</strong></>}
             </p>
@@ -564,7 +572,16 @@ export default function DevelopmentPage() {
           <section className="pp-detail-section">
             <h2 className="pp-h2">Developer</h2>
             <div className="pp-spec-grid">
-              {dev.developer_name && <div className="pp-spec"><small>Developer</small><span>{dev.developer_name}</span></div>}
+              {dev.developer_name && (
+                <div className="pp-spec">
+                  <small>Developer</small>
+                  <span>
+                    {dev.developer?.slug
+                      ? <Link href={`/property-portal/developers/${dev.developer.slug}`}>{dev.developer_name}</Link>
+                      : dev.developer_name}
+                  </span>
+                </div>
+              )}
               {dev.marketing_agent && <div className="pp-spec"><small>Marketing</small><span>{dev.marketing_agent}</span></div>}
               {dev.approval_authority && <div className="pp-spec"><small>Approval authority</small><span>{dev.approval_authority}</span></div>}
               {dev.approval_status && <div className="pp-spec"><small>Approval status</small><span>{dev.approval_status}</span></div>}

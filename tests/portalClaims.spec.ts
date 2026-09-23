@@ -34,8 +34,16 @@ const BANNED: [RegExp, string][] = [
 ]
 
 function findClaims(label: string, text: string) {
-  return BANNED.filter(([re]) => re.test(text)).map(([, what]) => `${label}: ${what}`)
+  // A disclaimer ("No return is guaranteed", "never guaranteed") is the
+  // opposite of a claim — drop negated uses before checking.
+  const plain = text.replace(/\b(no|not|never)\b[^.]{0,30}guarantee\w*/gi, '')
+  return BANNED.filter(([re]) => re.test(plain)).map(([, what]) => `${label}: ${what}`)
 }
+
+test('a real guarantee is still caught; a disclaimer is not', () => {
+  expect(findClaims('x', 'Guaranteed 8% returns')).toHaveLength(2) // the figure and the guarantee
+  expect(findClaims('x', 'No return is guaranteed.')).toEqual([])
+})
 
 test.describe('shipped portal copy makes no unevidenced claims', () => {
   test('why-invest, destinations, insights and testimonials', () => {
@@ -52,7 +60,7 @@ test.describe('shipped portal copy makes no unevidenced claims', () => {
     const root = join(__dirname, '..', 'src', 'app', 'property-portal')
     // The allocator is left out: its percentages are computed from live listings
     // and carry their own disclaimer, and its tax notes quote statutory rates.
-    const files = ['page.tsx', 'about/page.tsx', 'layout.tsx', 'destinations/[slug]/page.tsx', 'insights/page.tsx', 'buy/BuyView.tsx', 'rent/RentView.tsx', 'off-plan/page.tsx', 'listings/page.tsx', 'sell/page.tsx', 'contact/page.tsx', '[id]/page.tsx']
+    const files = ['page.tsx', 'about/page.tsx', 'layout.tsx', 'destinations/[slug]/page.tsx', 'insights/page.tsx', 'buy/BuyView.tsx', 'rent/RentView.tsx', 'off-plan/page.tsx', 'listings/page.tsx', 'sell/page.tsx', 'contact/page.tsx', '[id]/page.tsx', 'developers/page.tsx', 'developers/[slug]/page.tsx', 'new-projects/NewProjectsView.tsx', '_components/HomeSections.tsx', '_components/ProjectCard.tsx', '_components/PropertyActions.tsx']
     const problems = files.flatMap((f) => {
       // Comments may name the banned phrases when explaining their removal.
       const code = readFileSync(join(root, f), 'utf8')
