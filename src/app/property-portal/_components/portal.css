@@ -3182,6 +3182,22 @@
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Segmented tabs and the pager measured 36–39px. */
+  .pp-market-tabs button,
+  .pp-why-tabs button,
+  .pp-insights-cats button,
+  .pp-pager button { min-height: 44px; }
+  .pp-pager button { min-width: 44px; }
+
+  /* An email address inside running text was an 18px target. Pad it and
+     cancel the padding with an equal negative margin so the line box — and
+     the paragraph around it — does not move. */
+  .pp-root p a[href^="mailto:"] {
+    display: inline-block;
+    padding: 13px 0;
+    margin: -13px 0;
+  }
 }
 
 /* The fixed cookie / install-app bars at the foot of the viewport used to

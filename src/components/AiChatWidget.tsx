@@ -42,6 +42,23 @@ export function AiChatWidget() {
     }
   }, [messages, open, handoffOpen])
 
+  // On a phone the bubble always sat over whatever you were reading. Tuck it
+  // away while the page scrolls down and bring it back on any scroll up —
+  // the usual pattern for a floating action button. Only applied below the
+  // sm breakpoint (see the max-sm: classes); desktop has room for it.
+  const [tucked, setTucked] = useState(false)
+  useEffect(() => {
+    let last = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      if (y > last + 8 && y > 160) setTucked(true)
+      else if (y < last - 8 || y <= 160) setTucked(false)
+      last = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   if (hidden) return null
 
   const send = () => {
@@ -121,7 +138,13 @@ export function AiChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+    // --app-bottom-bar is published by CookieConsent / InstallAppBanner, so the
+    // bubble sits above those bars rather than on them.
+    <div
+      className={`fixed right-4 sm:right-5 z-50 flex flex-col items-end gap-3 transition-[translate,opacity] duration-300 bottom-[calc(1rem+var(--app-bottom-bar,0px))] sm:bottom-[calc(1.25rem+var(--app-bottom-bar,0px))] ${
+        tucked && !open ? 'max-sm:translate-y-24 max-sm:opacity-0 max-sm:pointer-events-none' : ''
+      }`}
+    >
       {open && (
         <div className="w-[92vw] max-w-[380px] h-[70vh] max-h-[560px] bg-surface-container border border-outline-variant/20 shadow-2xl flex flex-col overflow-hidden rounded-lg">
           <div className="flex items-center justify-between px-5 py-4 border-b border-outline-variant/10 bg-surface-container-lowest">
@@ -225,14 +248,15 @@ export function AiChatWidget() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? 'Close CZAAH AI chat' : 'Open CZAAH AI chat'}
-        className="liquid-gold-bg text-on-primary rounded-full shadow-xl w-16 h-16 flex flex-col items-center justify-center gap-0.5 hover:scale-105 transition-transform"
+        className="liquid-gold-bg text-on-primary rounded-full shadow-xl w-12 h-12 sm:w-16 sm:h-16 flex flex-col items-center justify-center gap-0.5 hover:scale-105 transition-transform"
       >
         {open ? (
           <span className="text-2xl leading-none">&times;</span>
         ) : (
           <>
             <span className="material-symbols-outlined text-2xl leading-none">smart_toy</span>
-            <span className="raleway-text text-[9px] font-bold tracking-wide leading-none">CZAAH AI</span>
+            {/* 9px text is unreadable on a phone anyway; the aria-label names it. */}
+            <span className="max-sm:hidden raleway-text text-[9px] font-bold tracking-wide leading-none">CZAAH AI</span>
           </>
         )}
       </button>

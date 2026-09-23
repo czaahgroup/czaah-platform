@@ -313,7 +313,7 @@ export default function PropertyPortalHome() {
               <label className="pp-searchbar-field">
                 <span>Destination</span>
                 <select value={hDest} onChange={(e) => setHDest(e.target.value)}>
-                  <option value="">Any destination</option>
+                  <option value="">Anywhere</option>
                   {destOptions.map((d) => (
                     <option key={d.city} value={d.city}>{d.city} ({d.n})</option>
                   ))}
