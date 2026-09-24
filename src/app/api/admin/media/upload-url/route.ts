@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (auth.error) return auth.error
     const { supabase } = auth
 
-    const { folder, filename, contentType, size } = await request.json()
+    const { folder, filename, contentType, size, area } = await request.json()
 
     const resolvedType = resolveContentType(contentType, filename)
     if (!resolvedType) {
@@ -76,7 +76,9 @@ export async function POST(request: NextRequest) {
     // The folder is ours to decide, never the client's: a caller cannot write
     // outside the media area or traverse out of it.
     const slug = safeName(String(folder || 'new')).toLowerCase()
-    const path = `developments/${slug}/${Date.now()}_${safeName(String(filename || 'file'))}`
+    // Only two top-level areas exist; anything else falls back to developments.
+    const root = area === 'properties' ? 'properties' : 'developments'
+    const path = `${root}/${slug}/${Date.now()}_${safeName(String(filename || 'file'))}`
 
     const { data, error } = await supabase.storage
       .from(STORAGE_BUCKET)

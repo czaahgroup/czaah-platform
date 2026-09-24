@@ -11,6 +11,7 @@ import {
   isPlotListing,
   assetClassFor,
 } from '@/lib/plots'
+import { PhotoUploader, SingleFileUpload, FeatureChips } from './PhotoUploader'
 
 
 interface Property {
@@ -163,7 +164,15 @@ const hintStyle: React.CSSProperties = {
   color: 'rgba(228,224,218,0.5)',
 }
 
-function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm: (fn: (f: typeof emptyForm) => typeof emptyForm) => void }) {
+function PropertyFormFields({
+  form,
+  setForm,
+  onBusyChange,
+}: {
+  form: typeof emptyForm
+  setForm: (fn: (f: typeof emptyForm) => typeof emptyForm) => void
+  onBusyChange: (busy: boolean) => void
+}) {
   const update = (key: keyof typeof emptyForm, value: string) => setForm((f) => ({ ...f, [key]: value }))
   // Land has no bedrooms; asking for them is what blocked plots being listed.
   const isPlot = isPlotListing({ property_subtype: form.propertySubtype, property_type: form.propertyType })
@@ -473,19 +482,31 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
       </div>
 
       <div>
-        <label style={labelStyle}>Features (comma-separated)</label>
-        <input type="text" value={form.features} onChange={(e) => update('features', e.target.value)} placeholder="e.g. Concierge, Gym, River Views" style={inputStyle} />
+        <label style={labelStyle}>Photos</label>
+        <PhotoUploader
+          value={form.images}
+          title={form.title}
+          onChange={(v) => update('images', v)}
+          onBusyChange={onBusyChange}
+        />
       </div>
 
       <div>
-        <label style={labelStyle}>Image URLs or storage paths (comma-separated)</label>
-        <input type="text" value={form.images} onChange={(e) => update('images', e.target.value)} placeholder="/Images/canary-wharf.jpg" style={inputStyle} />
-        <p style={hintStyle}>The first image is the project&apos;s main picture — it is what appears on the home page and on cards.</p>
+        <label style={labelStyle}>Features</label>
+        <input type="text" value={form.features} onChange={(e) => update('features', e.target.value)} placeholder="Tap below, or type your own separated by commas" style={inputStyle} />
+        <FeatureChips value={form.features} onChange={(v) => update('features', v)} />
       </div>
 
       <div>
-        <label style={labelStyle}>Project video URL (optional)</label>
-        <input type="text" value={form.videoUrl} onChange={(e) => update('videoUrl', e.target.value)} placeholder="https://…/project.mp4" style={inputStyle} />
+        <label style={labelStyle}>Project video (optional)</label>
+        <SingleFileUpload
+          value={form.videoUrl}
+          title={form.title}
+          accept="video/mp4,video/webm,video/quicktime,.mp4,.mov,.webm"
+          label="Upload video"
+          onChange={(v) => update('videoUrl', v)}
+          onBusyChange={onBusyChange}
+        />
         <p style={hintStyle}>
           Plays behind this project in the home hero instead of the market clip. Must be a direct
           MP4 (H.264), silent, and ideally under 5MB — not a YouTube or Vimeo link.
@@ -494,7 +515,14 @@ function PropertyFormFields({ form, setForm }: { form: typeof emptyForm; setForm
 
       <div>
         <label style={labelStyle}>Video poster image (optional)</label>
-        <input type="text" value={form.videoPosterUrl} onChange={(e) => update('videoPosterUrl', e.target.value)} placeholder="https://…/project-still.jpg" style={inputStyle} />
+        <SingleFileUpload
+          value={form.videoPosterUrl}
+          title={form.title}
+          accept="image/*"
+          label="Upload image"
+          onChange={(v) => update('videoPosterUrl', v)}
+          onBusyChange={onBusyChange}
+        />
         <p style={hintStyle}>Shown while the video loads, and instead of it under reduced-motion. Defaults to the main picture.</p>
       </div>
     </div>
@@ -522,6 +550,9 @@ export default function AdminPropertiesPage() {
   const [editError, setEditError] = useState<string | null>(null)
 
   const [deleteLoading, setDeleteLoading] = useState(false)
+  // Saving mid-upload would publish the listing without the photos still in flight.
+  const [uploadsInFlight, setUploadsInFlight] = useState(0)
+  const onBusyChange = (busy: boolean) => setUploadsInFlight((n) => Math.max(0, n + (busy ? 1 : -1)))
 
   async function loadProperties() {
     setLoading(true)
@@ -757,13 +788,13 @@ export default function AdminPropertiesPage() {
               <p className="text-sm text-red-400">{addError}</p>
             </div>
           )}
-          <PropertyFormFields form={addForm} setForm={setAddForm} />
+          <PropertyFormFields form={addForm} setForm={setAddForm} onBusyChange={onBusyChange} />
           <button
             type="submit"
-            disabled={addLoading}
+            disabled={addLoading || uploadsInFlight > 0}
             className="mt-5 bg-primary text-on-primary font-semibold px-6 py-2.5 rounded-nonetext-sm hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {addLoading ? 'Creating...' : 'Publish Property'}
+            {uploadsInFlight > 0 ? 'Uploading photos...' : addLoading ? 'Publishing...' : 'Publish Property'}
           </button>
         </form>
       )}
@@ -835,14 +866,14 @@ export default function AdminPropertiesPage() {
                     <p className="text-sm text-red-400">{editError}</p>
                   </div>
                 )}
-                <PropertyFormFields form={editForm} setForm={setEditForm} />
+                <PropertyFormFields form={editForm} setForm={setEditForm} onBusyChange={onBusyChange} />
                 <div className="flex gap-3 mt-5">
                   <button
                     type="submit"
-                    disabled={editLoading}
+                    disabled={editLoading || uploadsInFlight > 0}
                     className="flex-1 bg-primary text-on-primary font-semibold py-2.5 rounded-nonetext-sm hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
-                    {editLoading ? 'Saving...' : 'Save Changes'}
+                    {uploadsInFlight > 0 ? 'Uploading photos...' : editLoading ? 'Saving...' : 'Save Changes'}
                   </button>
                   <button
                     type="button"
