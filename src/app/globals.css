@@ -122,6 +122,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* The cookie and install-app bars are position:fixed and publish their height
+   as --app-bottom-bar; reserve it so they never cover the end of the page.
+   The property portal reserves it on its own footer instead. */
+body:not(:has(.pp-root)) {
+  padding-bottom: var(--app-bottom-bar, 0px);
+}
+
 /* Overflow wrapper — prevents any child from widening the viewport */
 .page-wrap {
   overflow-x: hidden;
@@ -1809,7 +1816,7 @@ footer {
   position: fixed;
   top: calc(64px + env(safe-area-inset-top));
   right: 0;
-  bottom: 0;
+  bottom: var(--app-bottom-bar, 0px);
   width: 340px;
   max-width: 85vw;
   z-index: 99;
