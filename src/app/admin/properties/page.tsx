@@ -11,7 +11,7 @@ import {
   isPlotListing,
   assetClassFor,
 } from '@/lib/plots'
-import { PhotoUploader, SingleFileUpload, FeatureChips } from './PhotoUploader'
+import { PhotoUploader, SingleFileUpload, FeatureChips } from '@/components/PhotoUploader'
 
 
 interface Property {

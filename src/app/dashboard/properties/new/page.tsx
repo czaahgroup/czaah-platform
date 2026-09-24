@@ -1,9 +1,11 @@
 'use client'
 // @ts-nocheck
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PORTAL_COUNTRIES } from '@/app/property-portal/_components/types'
+import { PhotoUploader, FeatureChips, splitPaths } from '@/components/PhotoUploader'
+import { PARTNER_MAX_PHOTOS } from '@/lib/uploadSafety'
 
 const PROPERTY_TYPES = [
   { value: 'residential', label: 'Residential' },
@@ -21,7 +23,6 @@ const LISTING_TYPES = [
 
 export default function AddPropertyPage() {
   const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -46,34 +47,13 @@ export default function AddPropertyPage() {
     minTermMonths: '',
   })
   const isRentalListing = form.listingType === 'rent' || form.listingType === 'lease'
-  const [imageFiles, setImageFiles] = useState<{ name: string; preview: string; data: string }[]>([])
+  // Photos upload straight to storage as they are picked; the form keeps their paths.
+  const [photos, setPhotos] = useState('')
+  const [uploadsInFlight, setUploadsInFlight] = useState(0)
+  const onBusyChange = (busy: boolean) => setUploadsInFlight((n) => Math.max(0, n + (busy ? 1 : -1)))
 
   function updateField(key: string, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }))
-  }
-
-  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files
-    if (!files) return
-
-    Array.from(files).forEach((file) => {
-      if (imageFiles.length >= 10) return
-      const reader = new FileReader()
-      reader.onload = () => {
-        const result = reader.result as string
-        setImageFiles((prev) => {
-          if (prev.length >= 10) return prev
-          return [...prev, { name: file.name, preview: result, data: result }]
-        })
-      }
-      reader.readAsDataURL(file)
-    })
-
-    e.target.value = ''
-  }
-
-  function removeImage(index: number) {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -93,7 +73,7 @@ export default function AddPropertyPage() {
           bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
           deposit: form.deposit ? Number(form.deposit) : null,
           minTermMonths: form.minTermMonths ? Number(form.minTermMonths) : null,
-          images: imageFiles.map((img) => img.data),
+          images: splitPaths(photos),
         }),
       })
 
@@ -378,74 +358,25 @@ export default function AddPropertyPage() {
               type="text"
               value={form.features}
               onChange={(e) => updateField('features', e.target.value)}
-              placeholder="e.g. Parking, Security, Garden, Elevator, Central Heating"
+              placeholder="Tap below, or type your own separated by commas"
               style={inputStyle}
             />
+            <FeatureChips value={form.features} onChange={(v) => updateField('features', v)} />
           </div>
         </div>
 
         <div style={{ background: '#0e0e0e', border: '1px solid rgba(77,70,55,0.25)', borderRadius: '0px', padding: '32px', marginBottom: '24px' }}>
           <h2 style={{ fontFamily: "'Cinzel', serif", fontSize: '16px', color: 'rgba(201,168,76,0.7)', margin: '0 0 24px', letterSpacing: '2px' }}>Images</h2>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageSelect}
-            style={{ display: 'none' }}
+          <PhotoUploader
+            value={photos}
+            title={form.title}
+            onChange={setPhotos}
+            onBusyChange={onBusyChange}
+            endpoint="/api/partner/media/upload-url"
+            maxPhotos={PARTNER_MAX_PHOTOS}
+            allowLinks={false}
           />
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px dashed rgba(255,255,255,0.15)',
-              borderRadius: '0px',
-              padding: '24px',
-              width: '100%',
-              cursor: 'pointer',
-              color: 'rgba(255,255,255,0.4)',
-              fontFamily: "'Raleway', sans-serif",
-              fontSize: '13px',
-              marginBottom: imageFiles.length > 0 ? '16px' : '0',
-            }}
-          >
-            Click to upload images (max 10)
-          </button>
-
-          {imageFiles.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
-              {imageFiles.map((img, idx) => (
-                <div key={idx} style={{ position: 'relative', borderRadius: '0px', overflow: 'hidden', aspectRatio: '1', background: 'rgba(255,255,255,0.03)' }}>
-                  <img src={img.preview} alt={img.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(idx)}
-                    style={{
-                      position: 'absolute',
-                      top: '4px',
-                      right: '4px',
-                      background: 'rgba(0,0,0,0.7)',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '22px',
-                      height: '22px',
-                      color: '#ef4444',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    x
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
@@ -467,7 +398,7 @@ export default function AddPropertyPage() {
           </button>
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || uploadsInFlight > 0}
             style={{
               background: submitting ? 'rgba(201,168,76,0.5)' : 'linear-gradient(135deg, #8a6f2e 0%, #c9a84c 50%, #8a6f2e 100%)',
               color: '#000',
@@ -481,7 +412,7 @@ export default function AddPropertyPage() {
               letterSpacing: '0.5px',
             }}
           >
-            {submitting ? 'Submitting...' : 'Submit for Approval'}
+            {uploadsInFlight > 0 ? 'Uploading photos...' : submitting ? 'Submitting...' : 'Submit for Approval'}
           </button>
         </div>
       </form>

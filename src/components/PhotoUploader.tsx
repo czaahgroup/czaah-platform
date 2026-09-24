@@ -46,8 +46,10 @@ async function compressImage(file: File): Promise<File> {
   }
 }
 
-async function uploadToStorage(file: File, folder: string): Promise<string> {
-  const res = await fetch('/api/admin/media/upload-url', {
+const ADMIN_ENDPOINT = '/api/admin/media/upload-url'
+
+async function uploadToStorage(file: File, folder: string, endpoint = ADMIN_ENDPOINT): Promise<string> {
+  const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -96,9 +98,23 @@ interface PhotoUploaderProps {
   title: string
   onChange: (value: string) => void
   onBusyChange: (busy: boolean) => void
+  /** Signed-URL route to use; partners have their own. */
+  endpoint?: string
+  /** Hard cap on photos; extra picks are dropped with a message. */
+  maxPhotos?: number
+  /** Hide the "paste image links" escape hatch (partners can't reference arbitrary files). */
+  allowLinks?: boolean
 }
 
-export function PhotoUploader({ value, title, onChange, onBusyChange }: PhotoUploaderProps) {
+export function PhotoUploader({
+  value,
+  title,
+  onChange,
+  onBusyChange,
+  endpoint = ADMIN_ENDPOINT,
+  maxPhotos,
+  allowLinks = true,
+}: PhotoUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -107,9 +123,16 @@ export function PhotoUploader({ value, title, onChange, onBusyChange }: PhotoUpl
   const photos = splitPaths(value)
 
   async function addFiles(list: FileList | File[] | null) {
-    const files = Array.from(list || []).filter((f) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|avif|gif)$/i.test(f.name))
+    let files = Array.from(list || []).filter((f) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|avif|gif)$/i.test(f.name))
     if (!files.length) return
     setError(null)
+    let note: string | null = null
+    if (maxPhotos) {
+      const room = Math.max(0, maxPhotos - splitPaths(valueRef.current).length)
+      if (files.length > room) note = `Up to ${maxPhotos} photos — ${files.length - room} not added.`
+      files = files.slice(0, room)
+      if (!files.length) { setError(note); return }
+    }
     onBusyChange(true)
     setProgress({ done: 0, total: files.length })
     const added: string[] = []
@@ -120,7 +143,7 @@ export function PhotoUploader({ value, title, onChange, onBusyChange }: PhotoUpl
       while (next < files.length) {
         const file = files[next++]
         try {
-          added.push(await uploadToStorage(await compressImage(file), folderFor(title)))
+          added.push(await uploadToStorage(await compressImage(file), folderFor(title), endpoint))
         } catch (err) {
           failed.push(err instanceof Error ? err.message : file.name)
         }
@@ -130,7 +153,7 @@ export function PhotoUploader({ value, title, onChange, onBusyChange }: PhotoUpl
     await Promise.all([worker(), worker(), worker()])
     // Read the latest value at the end, so photos removed mid-upload stay removed.
     onChange([...splitPaths(valueRef.current), ...added].join(', '))
-    if (failed.length) setError(failed.join(' '))
+    if (failed.length || note) setError([note, ...failed].filter(Boolean).join(' '))
     setProgress(null)
     onBusyChange(false)
     if (inputRef.current) inputRef.current.value = ''
@@ -217,12 +240,15 @@ export function PhotoUploader({ value, title, onChange, onBusyChange }: PhotoUpl
       )}
 
       <p style={{ margin: '6px 0 0', fontSize: 11.5, lineHeight: 1.5, color: 'rgba(228,224,218,0.5)' }}>
-        The cover photo is what appears on cards and the home page. Use ★ to change it, ← → to reorder.{' '}
-        <button type="button" onClick={() => setShowPaths((s) => !s)} style={{ background: 'none', border: 0, padding: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}>
-          {showPaths ? 'Hide image links' : 'Paste image links instead'}
-        </button>
+        The cover photo is what appears on cards and the home page. Use ★ to change it, ← → to reorder.
+        {maxPhotos ? ` Up to ${maxPhotos} photos.` : ''}{' '}
+        {allowLinks && (
+          <button type="button" onClick={() => setShowPaths((s) => !s)} style={{ background: 'none', border: 0, padding: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit' }}>
+            {showPaths ? 'Hide image links' : 'Paste image links instead'}
+          </button>
+        )}
       </p>
-      {showPaths && (
+      {allowLinks && showPaths && (
         <input
           type="text"
           value={value}

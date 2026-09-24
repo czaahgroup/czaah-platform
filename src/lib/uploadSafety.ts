@@ -18,6 +18,16 @@ export const LISTING_IMAGE_TYPES: Record<string, string> = {
 /** Per-image cap for listing photos. */
 export const LISTING_IMAGE_MAX_BYTES = 10 * 1024 * 1024
 
+/** Most photos one partner listing may carry. */
+export const PARTNER_MAX_PHOTOS = 20
+
+/**
+ * Where a partner's browser uploads listing photos. The create route only
+ * accepts paths under the caller's own prefix, so one partner can never
+ * attach another's files.
+ */
+export const PARTNER_UPLOAD_PREFIX = (userId: string) => `properties/${userId}/uploads/`
+
 /**
  * A storage-safe file name: no directory parts, no traversal, no control or
  * shell-hostile characters, bounded length, extension kept.

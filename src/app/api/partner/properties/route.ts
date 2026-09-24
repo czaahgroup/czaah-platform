@@ -3,7 +3,14 @@ import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
-import { LISTING_IMAGE_TYPES, LISTING_IMAGE_MAX_BYTES, base64Bytes, sniffImageType } from '@/lib/uploadSafety'
+import {
+  LISTING_IMAGE_TYPES,
+  LISTING_IMAGE_MAX_BYTES,
+  PARTNER_MAX_PHOTOS,
+  PARTNER_UPLOAD_PREFIX,
+  base64Bytes,
+  sniffImageType,
+} from '@/lib/uploadSafety'
 import { rentalTermsForInsert } from '@/lib/rentalTerms'
 import { plotColumnsFromBody } from '@/lib/developments'
 import { assetClassFor, isPlotListing, validatePlotListing } from '@/lib/plots'
@@ -141,12 +148,33 @@ export async function POST(request: NextRequest) {
       ? (typeof features === 'string' ? features.split(',').map((f: string) => f.trim()).filter(Boolean) : features)
       : []
 
-    // Upload images from base64
+    // Images arrive either as storage paths the browser already uploaded to
+    // (the photo uploader) or as base64 data URLs (older clients).
     const imageUrls: string[] = []
     if (images && Array.isArray(images)) {
-      for (let i = 0; i < images.length && i < 10; i++) {
+      const ownPrefix = PARTNER_UPLOAD_PREFIX(user.id)
+      for (let i = 0; i < images.length && i < PARTNER_MAX_PHOTOS; i++) {
         const img = images[i]
-        if (!img) continue
+        if (!img || typeof img !== 'string') continue
+
+        if (!img.startsWith('data:')) {
+          // Only the caller's own staging folder, and no traversal out of it.
+          if (!img.startsWith(ownPrefix) || img.includes('..') || img.slice(ownPrefix.length).includes('/')) {
+            logError('api.partner.properties', new Error('image rejected: foreign path'), { index: i })
+            continue
+          }
+          // The bucket is public, so re-check what actually landed there.
+          const { data: blob, error: dlError } = await supabase.storage.from('property-images').download(img)
+          const head = blob ? new Uint8Array(await blob.slice(0, 16).arrayBuffer()) : null
+          const sniffedPath = head ? sniffImageType(head) : null
+          if (dlError || !blob || blob.size > LISTING_IMAGE_MAX_BYTES || !sniffedPath || !LISTING_IMAGE_TYPES[sniffedPath]) {
+            logError('api.partner.properties', new Error('image rejected: uploaded file failed checks'), { index: i })
+            if (blob) await supabase.storage.from('property-images').remove([img])
+            continue
+          }
+          imageUrls.push(img)
+          continue
+        }
 
         // Support both raw base64 and data URL format
         let base64Data = img
