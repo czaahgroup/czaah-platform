@@ -1,34 +1,30 @@
 # Database backups — P1A
 
-## Current state — 2026-08-30
+## Current state — 2026-09-24
 
-**There is no backup of the production database.**
+Project `rwmiegcwxkffkxuokesc` (eu-north-1, the live one) is on **Supabase Pro**.
 
-Checked via the Supabase management API for project `rwmiegcwxkffkxuokesc`
-(eu-north-1, the live one):
+- **Daily physical backups are running** — `npx supabase backups list
+  --project-ref rwmiegcwxkffkxuokesc` shows one COMPLETED backup per day
+  (~01:25 UTC), 7-day retention.
+- `pitr_enabled: false` — point-in-time recovery is an optional paid add-on
+  (Dashboard &rarr; Settings &rarr; Database). Without it, the worst case is
+  losing up to ~24 h of changes.
+- **No off-platform copy yet** — every backup lives inside the same Supabase
+  account. See step 2.
 
-- `pitr_enabled: false` — no point-in-time recovery
-- `backups: []` — no daily snapshots
-- `walg_enabled: true` — WAL archiving infra is on, but nothing is retained
-  without a paid plan
-
-This is consistent with the **Supabase Free plan**, which includes no managed
-backups. If the database is lost or corrupted, there is nothing to restore from.
+(2026-08-30 this project was on Free with no backups at all; it has since been
+upgraded.)
 
 There is also a second, **inactive** Supabase project (`uzkpritwklqdxxhmcarp`,
 eu-west-2) from an earlier setup — not used, can be deleted.
 
 ## What to do
 
-### 1. Managed safety net — upgrade Supabase to Pro (recommended, ~$25/mo)
+### 1. Managed safety net — DONE (Supabase Pro)
 
-Pro gives automatic **daily backups with 7-day retention** and makes
-**point-in-time recovery** available as an add-on. This is the baseline for
-running a business on this database.
-
-Dashboard &rarr; project &rarr; Settings &rarr; Billing &rarr; upgrade to Pro,
-then Settings &rarr; Database &rarr; enable PITR if the extra retention is
-worth it.
+Restore from Dashboard &rarr; project &rarr; Database &rarr; Backups. Consider
+the PITR add-on if losing a day of data would be costly.
 
 ### 2. Independent export — weekly `pg_dump` off-platform
 
