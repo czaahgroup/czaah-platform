@@ -161,7 +161,7 @@ export function SourcingForm() {
       <p className="pp-wizard-count">Step {step + 1} of {STEPS.length}</p>
 
       <div aria-hidden="true" className="pp-hp">
-        <label>Company website<input tabIndex={-1} autoComplete="off" value={form.company_site} onChange={(e) => setForm((f) => ({ ...f, company_site: e.target.value }))} /></label>
+        <label>Leave this field empty<input tabIndex={-1} autoComplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" aria-hidden="true" value={form.company_site} onChange={(e) => setForm((f) => ({ ...f, company_site: e.target.value }))} /></label>
       </div>
 
       {step === 0 && (

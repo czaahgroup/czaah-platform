@@ -121,7 +121,7 @@ export default function PortalContactPage() {
               ) : (
                 <form onSubmit={submit} className="pp-sell-form">
                   <div aria-hidden="true" className="pp-hp">
-                    <label>Company website<input tabIndex={-1} autoComplete="off" value={form.company_site} onChange={(e) => update('company_site', e.target.value)} /></label>
+                    <label>Leave this field empty<input tabIndex={-1} autoComplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" aria-hidden="true" value={form.company_site} onChange={(e) => update('company_site', e.target.value)} /></label>
                   </div>
                   <label>
                     Name

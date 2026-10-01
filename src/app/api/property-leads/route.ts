@@ -20,12 +20,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many attempts. Please try again later.' }, { status: 429 })
   }
   const body = await request.json().catch(() => null)
-  // Honeypot: bots that fill it get a normal-looking success.
-  if (body && typeof body.company_site === 'string' && body.company_site.trim()) {
-    return NextResponse.json({ success: true, reference: null })
-  }
+  // Honeypot: a hidden field real visitors never see. A request that fills
+  // it is kept as a lead marked spam (Admin → Property Leads → Spam) with no
+  // emails and no CRM contact — never thrown away, because a browser's
+  // autofill can fill the field for a real person.
+  const trapped = !!(body && typeof body.company_site === 'string' && body.company_site.trim())
   const { data: lead, error } = cleanLead(body)
-  if (error) return NextResponse.json({ error }, { status: 400 })
+  if (error) {
+    return trapped ? NextResponse.json({ success: true, reference: null }) : NextResponse.json({ error }, { status: 400 })
+  }
   if (!rateLimit(`lead-stored:${ip}`, 8, 3600_000).success) {
     return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
   }
@@ -47,7 +50,7 @@ export async function POST(request: NextRequest) {
       userId = user?.id ?? null
     } catch { /* anonymous */ }
 
-    const contactId = await upsertContact(db, lead!.name, lead!.email, lead!.phone)
+    const contactId = trapped ? null : await upsertContact(db, lead!.name, lead!.email, lead!.phone)
 
     const { data: row, error: insertError } = await db.from('property_leads').insert({
       kind: lead!.kind,
@@ -69,8 +72,10 @@ export async function POST(request: NextRequest) {
       source_page: lead!.source_page,
       user_id: userId,
       contact_id: contactId,
+      ...(trapped ? { status: 'spam', admin_notes: 'Held as spam: the hidden anti-spam field was filled in. If this is a real person, change the status.' } : {}),
     }).select('id, reference').single()
     if (insertError || !row) throw insertError || new Error('lead insert returned nothing')
+    if (trapped) return NextResponse.json({ success: true, reference: row.reference })
 
     if (lead!.kind === 'viewing_request') {
       const { error: vErr } = await db.from('property_viewings').insert({

@@ -140,7 +140,7 @@ function SignedOut({ view, setView, linkError, next }: { view: View; setView: (v
           {view === 'register' && (
             <>
               <div aria-hidden="true" className="pp-hp">
-                <label>Company website<input tabIndex={-1} autoComplete="off" value={form.company_site} onChange={(e) => set('company_site', e.target.value)} /></label>
+                <label>Leave this field empty<input tabIndex={-1} autoComplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" aria-hidden="true" value={form.company_site} onChange={(e) => set('company_site', e.target.value)} /></label>
               </div>
               <label><span>Full name</span><input required maxLength={200} autoComplete="name" value={form.full_name} onChange={(e) => set('full_name', e.target.value)} /></label>
             </>

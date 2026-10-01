@@ -60,3 +60,21 @@ test('portal forms post to the lead endpoint, which is public; admin and activit
   expect(mw).not.toContain("'/api/admin/property-leads'")
   expect(mw).not.toContain("'/api/property-account/activity'")
 })
+
+test('the hidden anti-spam field cannot be autofilled, and never discards an enquiry', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { readFileSync } = require('fs') as typeof import('fs')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { join } = require('path') as typeof import('path')
+  const read = (p: string) => readFileSync(join(__dirname, '..', p), 'utf8')
+  for (const form of ['account/page.tsx', 'contact/page.tsx', 'sell/page.tsx', '_components/PropertyActions.tsx', '_components/SourcingForm.tsx']) {
+    const src = read(`src/app/property-portal/${form}`)
+    // "Company website" is what browser autofill looks for; it filled the trap for real visitors.
+    expect(src).not.toContain('Company website')
+    expect(src).toContain('Leave this field empty')
+    expect(src).toContain('data-lpignore="true"')
+  }
+  const route = read('src/app/api/property-leads/route.ts')
+  expect(route).toContain("status: 'spam'")
+  expect(route).toContain('if (trapped) return NextResponse.json({ success: true, reference: row.reference })')
+})

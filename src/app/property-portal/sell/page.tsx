@@ -230,7 +230,7 @@ function SellInner() {
 
                   {/* Honeypot — hidden from people and assistive tech. */}
                   <div aria-hidden="true" className="pp-hp">
-                    <label>Company website<input name="company_site" tabIndex={-1} autoComplete="off" defaultValue="" /></label>
+                    <label>Leave this field empty<input name="company_site" tabIndex={-1} autoComplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" aria-hidden="true" defaultValue="" /></label>
                   </div>
 
                   <fieldset>

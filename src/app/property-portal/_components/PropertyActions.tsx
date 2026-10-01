@@ -124,7 +124,7 @@ export function EnquiryForm({
         ))}
       </div>
       <div aria-hidden="true" className="pp-hp">
-        <label>Company website<input tabIndex={-1} autoComplete="off" value={form.company_site} onChange={(e) => set('company_site', e.target.value)} /></label>
+        <label>Leave this field empty<input tabIndex={-1} autoComplete="new-password" data-lpignore="true" data-1p-ignore="true" data-form-type="other" aria-hidden="true" value={form.company_site} onChange={(e) => set('company_site', e.target.value)} /></label>
       </div>
       <label><span>Name *</span><input required maxLength={200} autoComplete="name" value={form.name} onChange={(e) => set('name', e.target.value)} /></label>
       <label><span>Email *</span><input required type="email" maxLength={254} autoComplete="email" value={form.email} onChange={(e) => set('email', e.target.value)} /></label>
