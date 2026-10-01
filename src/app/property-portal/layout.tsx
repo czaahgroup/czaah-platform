@@ -115,13 +115,13 @@ export default async function PropertyPortalLayout({ children }: { children: Rea
               <div className="pp-footer-col" key={col.title}>
                 <h4>{col.title}</h4>
                 {col.links.map((l) => <Link key={l.label} href={l.href}>{l.label}</Link>)}
-                {col.title === 'Company' && <a href="https://czaah.com">CZAAH Group</a>}
+                {col.title === 'Company' && <a href="https://czaah.com">CZAAH Group Ltd</a>}
               </div>
             ))}
           </div>
         </div>
         <div className="pp-footer-bottom">
-          <span>© {new Date().getFullYear()} CZAAH Properties · part of CZAAH Group. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} CZAAH Properties · part of CZAAH Group Ltd. All rights reserved.</span>
           <span>
             <Link href="/terms">Terms &amp; Conditions</Link> &nbsp;·&nbsp; <Link href="/privacy">Privacy Policy</Link> &nbsp;·&nbsp; <Link href="/privacy#cookies">Cookie Policy</Link>
           </span>

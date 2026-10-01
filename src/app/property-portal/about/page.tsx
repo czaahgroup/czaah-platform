@@ -59,7 +59,7 @@ export default async function PortalAboutPage() {
 
         <p className="pp-section-lead" style={{ maxWidth: 760 }}>
           Global Property. One Trusted Partner. CZAAH Properties is the property practice of CZAAH
-          Group. We are more than a listings directory: we help clients discover, compare and
+          Group Ltd. We are more than a listings directory: we help clients discover, compare and
           progress suitable property opportunities, with one point of contact from search to
           completion.
         </p>
