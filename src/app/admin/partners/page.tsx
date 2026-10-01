@@ -47,6 +47,44 @@ export default function AdminPartnersPage() {
   const [removingReferralId, setRemovingReferralId] = useState<string | null>(null)
 
   const [form, setForm] = useState({ email: '', fullName: '', companyName: '', sectorIds: [] as string[] })
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editDraft, setEditDraft] = useState({ fullName: '', email: '', phone: '', companyName: '' })
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
+
+  function startEdit(p: Partner) {
+    setEditError(null)
+    setEditDraft({
+      fullName: p.profiles?.full_name || '',
+      email: p.profiles?.email || '',
+      phone: p.profiles?.phone || '',
+      companyName: p.profiles?.company_name || '',
+    })
+    setEditingId(p.id)
+  }
+
+  async function saveEdit(p: Partner) {
+    const newEmail = editDraft.email.trim().toLowerCase()
+    if (newEmail !== (p.profiles?.email || '').toLowerCase() &&
+      !window.confirm(`Change this partner's sign-in email to ${newEmail}? They will sign in with the new address from now on; their password stays the same.`)) return
+    setSavingEdit(true)
+    setEditError(null)
+    try {
+      const res = await fetch(`/api/admin/partners/${p.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ details: editDraft }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.error || 'Failed to save details')
+      setEditingId(null)
+      await loadData()
+    } catch (err: unknown) {
+      setEditError(err instanceof Error ? err.message : 'Failed to save details')
+    } finally {
+      setSavingEdit(false)
+    }
+  }
 
   useEffect(() => {
     loadData()
@@ -344,7 +382,46 @@ export default function AdminPartnersPage() {
                     ) : (
                       <>
                         <div>
-                          <div className="text-xs text-on-surface-variant/60 mb-2">Partner Profile</div>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-xs text-on-surface-variant/60">Partner Profile</div>
+                            {editingId !== p.id && (
+                              <button onClick={() => startEdit(p)} className="text-xs px-3 py-1.5 border border-outline-variant/20 text-on-surface-variant hover:border-primary/40 transition-colors">
+                                Edit details
+                              </button>
+                            )}
+                          </div>
+                          {editingId === p.id && (
+                            <div className="bg-surface-container-high px-4 py-4 mb-2 flex flex-col gap-3">
+                              <div className="grid sm:grid-cols-2 gap-3">
+                                {([
+                                  ['fullName', 'Full name', 'text'],
+                                  ['email', 'Email (also their sign-in)', 'email'],
+                                  ['phone', 'Phone', 'tel'],
+                                  ['companyName', 'Company', 'text'],
+                                ] as const).map(([key, label, type]) => (
+                                  <label key={key} className="text-xs text-on-surface-variant/60 flex flex-col gap-1">
+                                    {label}
+                                    <input
+                                      type={type}
+                                      value={editDraft[key]}
+                                      onChange={(e) => setEditDraft((d) => ({ ...d, [key]: e.target.value }))}
+                                      className="bg-surface-container border border-outline-variant/20 px-3 py-2 text-sm text-on-surface"
+                                    />
+                                  </label>
+                                ))}
+                              </div>
+                              <p className="text-xs text-on-surface-variant/50">
+                                Changing the email changes the address the partner signs in with. Their password, Partner ID, listings and history stay the same.
+                              </p>
+                              {editError && <p className="text-xs text-red-400">{editError}</p>}
+                              <div className="flex gap-2">
+                                <button onClick={() => saveEdit(p)} disabled={savingEdit || !editDraft.fullName.trim() || !editDraft.email.trim()} className="text-xs px-4 py-2 bg-primary text-on-primary disabled:opacity-40">
+                                  {savingEdit ? 'Saving…' : 'Save details'}
+                                </button>
+                                <button onClick={() => setEditingId(null)} className="text-xs px-3 py-1.5 border border-outline-variant/20 text-on-surface-variant">Cancel</button>
+                              </div>
+                            </div>
+                          )}
                           <div className="bg-surface-container-high px-4 py-3 grid sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
                             <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Name:</span> {p.profiles?.full_name || '—'}</div>
                             <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Email:</span> {p.profiles?.email || '—'}</div>

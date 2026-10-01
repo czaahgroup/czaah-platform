@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
+import { cleanPartnerDetails } from '@/lib/partnerDetails'
 
 
 function createAuthClient(request: NextRequest) {
@@ -79,6 +80,46 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const body = await request.json()
     const { status, notes, sectorIds } = body
+
+    // Name, email, phone, company. The email is also the partner's login, so
+    // it is changed on the account first and the profile only follows if that
+    // worked — the two must never disagree.
+    if (body.details !== undefined) {
+      const cleaned = cleanPartnerDetails(body.details)
+      if (cleaned.error) return NextResponse.json({ error: cleaned.error }, { status: 400 })
+      const details = cleaned.data!
+
+      const { data: partner } = await supabase.from('partners').select('profile_id').eq('id', id).maybeSingle()
+      if (!partner?.profile_id) return NextResponse.json({ error: 'Partner not found' }, { status: 404 })
+      const { data: current } = await supabase.from('profiles').select('full_name, email, phone, company_name').eq('id', partner.profile_id).single()
+      if (!current) return NextResponse.json({ error: 'Partner profile not found' }, { status: 404 })
+
+      const emailChanged = details.email !== undefined && details.email !== String(current.email || '').toLowerCase()
+      if (emailChanged) {
+        // email_confirm: the admin vouches for the address, so no confirmation
+        // link is sent and the partner can sign in with it straight away.
+        const { error: authError } = await supabase.auth.admin.updateUserById(partner.profile_id, { email: details.email, email_confirm: true })
+        if (authError) {
+          const taken = /already|registered|exists|duplicate/i.test(authError.message)
+          return NextResponse.json({ error: taken ? 'Another account already uses that email address.' : authError.message }, { status: 400 })
+        }
+      }
+
+      const { error: profileError } = await supabase.from('profiles').update({ ...details, updated_at: new Date().toISOString() }).eq('id', partner.profile_id)
+      if (profileError) {
+        if (emailChanged) await supabase.auth.admin.updateUserById(partner.profile_id, { email: current.email, email_confirm: true })
+        return NextResponse.json({ error: profileError.message }, { status: 500 })
+      }
+
+      const changed = Object.keys(details).filter((k) => (details as Record<string, unknown>)[k] !== (current as Record<string, unknown>)[k])
+      await supabase.from('audit_log').insert({
+        actor_id: auth.userId,
+        action: 'partner_details_updated',
+        target_type: 'partner',
+        target_id: id,
+        metadata: { changed, ...(emailChanged ? { previous_email: current.email, new_email: details.email } : {}) },
+      })
+    }
 
     const updates: Record<string, unknown> = {}
     if (status !== undefined) {
