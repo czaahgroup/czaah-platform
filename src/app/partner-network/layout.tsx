@@ -20,6 +20,7 @@ const BASE_NAV_LINKS = [
 const WORKFORCE_NAV_LINK = { href: '/partner-network/recruitment', label: 'Recruitment', icon: 'groups' }
 const PROPERTIES_NAV_LINK = { href: '/partner-network/properties', label: 'My Properties', icon: 'apartment' }
 const PROJECTS_NAV_LINK = { href: '/partner-network/projects', label: 'My Projects', icon: 'domain' }
+const MINERALS_NAV_LINK = { href: '/partner-network/minerals', label: 'My Minerals', icon: 'diamond' }
 
 const TAIL_NAV_LINKS = [
   { href: '/partner-network/mail', label: 'Mail', icon: 'forward_to_inbox' },
@@ -34,6 +35,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
   const [fullName, setFullName] = useState('')
   const [showWorkforce, setShowWorkforce] = useState(false)
   const [showProperties, setShowProperties] = useState(false)
+  const [showMinerals, setShowMinerals] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -59,9 +61,12 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
         setShowWorkforce(sectors.some((s) => /human resources|workforce|recruitment/i.test(s.name)))
         // Same rule the API enforces: partners authorised for Real Estate list property.
         setShowProperties(sectors.some((s) => /real estate|property/i.test(s.name)))
+        // Likewise for Minerals & Mining (src/lib/minerals.ts isMineralSector).
+        setShowMinerals(sectors.some((s) => /mineral|mining/i.test(s.name)))
       } catch {
         setShowWorkforce(false)
         setShowProperties(false)
+        setShowMinerals(false)
       }
     }
     checkAuth()
@@ -70,6 +75,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
   const NAV_LINKS = [
     ...BASE_NAV_LINKS,
     ...(showProperties ? [PROPERTIES_NAV_LINK, PROJECTS_NAV_LINK] : []),
+    ...(showMinerals ? [MINERALS_NAV_LINK] : []),
     ...(showWorkforce ? [WORKFORCE_NAV_LINK] : []),
     ...TAIL_NAV_LINKS,
   ]

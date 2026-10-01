@@ -85,7 +85,9 @@ export async function PATCH(request: NextRequest, { params }: Ctx) {
     if (cleaned.problems.length) return NextResponse.json({ error: cleaned.problems.join(' ') }, { status: 400 })
     const next = cleaned.development!
 
-    const photos = await checkedPhotos(supabase, userId, body.photos, development.gallery || [])
+    // Photos are only replaced when the request carries them; an edit that
+    // sends none leaves the existing ones alone rather than wiping them.
+    const photos = body.photos === undefined ? development.gallery || [] : await checkedPhotos(supabase, userId, body.photos, development.gallery || [])
     if (cleaned.newDeveloper) {
       const logo = (await checkedPhotos(supabase, userId, body.newDeveloper?.logo ? [body.newDeveloper.logo] : [], []))[0] || null
       const proposed = await proposeDeveloper(supabase, userId, { ...cleaned.newDeveloper, logo_url: logo })

@@ -7,6 +7,14 @@ import { headers } from 'next/headers'
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const host = (await headers()).get('host') || ''
 
+  if (host === 'minerals.czaah.com') {
+    return {
+      rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', '/login', '/register', '/reset-password'] }],
+      sitemap: 'https://minerals.czaah.com/sitemap.xml',
+      host: 'https://minerals.czaah.com',
+    }
+  }
+
   if (host === 'property.czaah.com') {
     return {
       rules: [
@@ -36,6 +44,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
           '/pending',
           '/meet/',
           '/property-portal', // served canonically on property.czaah.com
+          '/minerals-portal', // served canonically on minerals.czaah.com
         ],
       },
     ],

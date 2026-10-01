@@ -853,6 +853,7 @@ export default function MineralsPage() {
             <h1 className="cinzel-text text-5xl md:text-7xl font-semibold text-on-surface leading-[1.1] mb-6">Minerals &<br /><span className="text-primary">Mining.</span></h1>
             <p className="raleway-text text-on-surface-variant text-lg leading-relaxed max-w-2xl mb-10">Pakistan holds an estimated $1 trillion in mineral reserves &mdash; copper, gold, rare earths, coal, and gemstones &mdash; largely unexplored. CZAAH provides the regulatory access and deal structuring to bring international capital to the sector.</p>
             <a href="/contact?interest=Minerals%20%26%20Mining#contact-form" className="liquid-gold-bg text-on-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block">Discuss Opportunities &rarr;</a>
+            <a href="https://minerals.czaah.com" className="border border-primary/60 text-primary px-10 py-5 font-bold tracking-[0.2em] uppercase text-sm inline-block ml-0 mt-4 sm:mt-0 sm:ml-4">Browse Mineral Offers &rarr;</a>
           </section>
 
           {/*  LME PRICES — floating inside hero  */}

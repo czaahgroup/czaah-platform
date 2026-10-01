@@ -34,7 +34,7 @@ interface PublicMessage {
   phone: string | null
   interest: string
   message: string
-  source: 'contact_form' | 'ai_chat' | 'property_portal'
+  source: 'contact_form' | 'ai_chat' | 'property_portal' | 'minerals_portal'
   status: 'new' | 'read' | 'replied'
   created_at: string
 }
@@ -106,6 +106,7 @@ const SOURCE_LABELS: Record<string, string> = {
   contact_form: 'Contact Form',
   ai_chat: 'CZAAH AI',
   property_portal: 'CZAAH Properties',
+  minerals_portal: 'CZAAH Minerals',
 }
 
 export default function AdminEnquiriesPage() {
@@ -455,6 +456,7 @@ export default function AdminEnquiriesPage() {
               <option value="contact_form">Contact Form</option>
               <option value="ai_chat">CZAAH AI</option>
               <option value="property_portal">CZAAH Properties</option>
+              <option value="minerals_portal">CZAAH Minerals</option>
             </select>
           )}
         </div>

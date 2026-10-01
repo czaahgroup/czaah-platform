@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireLister } from '@/lib/partnerListingAuth'
+import { requireUploader } from '@/lib/partnerListingAuth'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
 import { LISTING_IMAGE_TYPES, LISTING_IMAGE_MAX_BYTES, PARTNER_UPLOAD_PREFIX, safeFileName } from '@/lib/uploadSafety'
@@ -20,7 +20,7 @@ const BY_EXTENSION: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireLister(request)
+    const auth = await requireUploader(request)
     if (auth.error) return auth.error
     const { supabase } = auth
     const user = { id: auth.userId }

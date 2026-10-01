@@ -64,9 +64,11 @@ test.describe('partner listing edits', () => {
   })
 
   test('every partner listing route uses the shared access check and stays owner-scoped', () => {
-    for (const route of ['src/app/api/partner/properties/route.ts', 'src/app/api/partner/properties/[id]/route.ts', 'src/app/api/partner/media/upload-url/route.ts']) {
+    for (const route of ['src/app/api/partner/properties/route.ts', 'src/app/api/partner/properties/[id]/route.ts']) {
       expect(read(route)).toContain('requireLister(request)')
     }
+    // Photo uploads are shared with mineral partners.
+    expect(read('src/app/api/partner/media/upload-url/route.ts')).toContain('requireUploader(request)')
     const one = read('src/app/api/partner/properties/[id]/route.ts')
     expect(one).toContain('listing.partner_id !== auth.userId')
     // An edit to a live listing is held, never written to the listing.

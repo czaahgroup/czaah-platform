@@ -12,7 +12,8 @@
   "routes": [
     { "pattern": "czaah.com", "custom_domain": true },
     { "pattern": "www.czaah.com", "custom_domain": true },
-    { "pattern": "property.czaah.com", "custom_domain": true }
+    { "pattern": "property.czaah.com", "custom_domain": true },
+    { "pattern": "minerals.czaah.com", "custom_domain": true }
   ],
   "observability": {
     "enabled": true

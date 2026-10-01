@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
+import { isMineralSector } from '@/lib/minerals'
 import { LISTING_IMAGE_TYPES, LISTING_IMAGE_MAX_BYTES, PARTNER_MAX_PHOTOS, PARTNER_UPLOAD_PREFIX, sniffImageType } from '@/lib/uploadSafety'
 
 /** A sector that lets a partner list property (Admin → Partners → sector access). */
@@ -20,6 +21,29 @@ export const listingsHome = (role: string | null | undefined) =>
  * Everything a caller then does is still scoped to listings they own.
  */
 export async function requireLister(request: NextRequest) {
+  return requireSectorPartner(request, isPropertySector, 'Your partner account is not set up for property listings. Ask CZAAH to add Real Estate to your sectors.', true)
+}
+
+/**
+ * Who may add and manage mineral offers: a partner CZAAH has authorised for
+ * Minerals & Mining, or a super admin.
+ */
+export async function requireMineralPartner(request: NextRequest) {
+  return requireSectorPartner(request, isMineralSector, 'Your partner account is not set up for minerals. Ask CZAAH to add Minerals & Mining to your sectors.', false)
+}
+
+/** Photo uploads are shared: either kind of partner may use them. */
+export async function requireUploader(request: NextRequest) {
+  return requireSectorPartner(request, (name) => isPropertySector(name) || isMineralSector(name), 'Your partner account is not set up to upload photos.', true)
+}
+
+async function requireSectorPartner(
+  request: NextRequest,
+  allows: (sectorName: string | null | undefined) => boolean,
+  refusal: string,
+  /** The older "real estate partner" account type predates sectors and only ever listed property. */
+  legacyRealEstateRole: boolean,
+) {
   const userClient = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -34,18 +58,18 @@ export async function requireLister(request: NextRequest) {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   const role = profile?.role as string | undefined
 
-  if (role === 'real_estate_partner' || role === 'super_admin') return { supabase, userId: user.id, role }
+  if (role === 'super_admin' || (legacyRealEstateRole && role === 'real_estate_partner')) return { supabase, userId: user.id, role }
 
   if (role === 'partner') {
     const { data: partner } = await supabase.from('partners').select('id, status').eq('profile_id', user.id).maybeSingle()
     if (partner && partner.status !== 'suspended') {
       const { data: access } = await supabase.from('partner_sector_access').select('sectors(name)').eq('partner_id', partner.id)
-      const allowed = (access || []).some((row) => isPropertySector((row as unknown as { sectors: { name: string } | null }).sectors?.name))
+      const allowed = (access || []).some((row) => allows((row as unknown as { sectors: { name: string } | null }).sectors?.name))
       if (allowed) return { supabase, userId: user.id, role }
     }
     return {
       error: NextResponse.json(
-        { error: 'Your partner account is not set up for property listings. Ask CZAAH to add Real Estate to your sectors.' },
+        { error: refusal },
         { status: 403 },
       ),
     }

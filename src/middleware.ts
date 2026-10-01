@@ -29,6 +29,30 @@ export async function middleware(request: NextRequest) {
   // APIs) are intentionally left un-rewritten so they keep hitting the
   // main site's existing pages/routes, shared across both domains.
   const host = request.headers.get('host') || ''
+
+  // minerals.czaah.com is the same idea for CZAAH Minerals: it lives under
+  // /minerals-portal. Unlike the property portal it has no catch-all route,
+  // so an unknown path is a real 404.
+  if (host === 'minerals.czaah.com') {
+    const { pathname } = request.nextUrl
+    const shared = ['/robots.txt', '/login', '/register', '/reset-password', '/terms', '/privacy']
+    if (pathname === '/minerals-portal' || pathname.startsWith('/minerals-portal/')) {
+      const url = request.nextUrl.clone()
+      url.pathname = pathname.slice('/minerals-portal'.length) || '/'
+      url.protocol = 'https:'
+      url.host = host
+      url.port = ''
+      return NextResponse.redirect(url, 308)
+    }
+    if (!pathname.startsWith('/api/') && !shared.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/minerals-portal${pathname === '/' ? '' : pathname}`
+      const rewritten = NextResponse.rewrite(url)
+      applyPortalCacheHeaders(rewritten)
+      return rewritten
+    }
+  }
+
   if (host === 'property.czaah.com') {
     const { pathname } = request.nextUrl
     // Paths served by the MAIN site on this host too. Anything not listed here
@@ -113,6 +137,10 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/sectors') ||
     pathname.startsWith('/services') ||
     pathname.startsWith('/property-portal') ||
+    pathname.startsWith('/minerals-portal') ||
+    // Quote requests and enquiries from minerals.czaah.com — public by
+    // design; the route validates, rate-limits and stores.
+    pathname === '/api/mineral-rfqs' ||
     pathname.startsWith('/verify') ||
     pathname.startsWith('/api/public/') ||
     pathname === '/api/contact' ||
