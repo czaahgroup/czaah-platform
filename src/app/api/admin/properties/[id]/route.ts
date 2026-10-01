@@ -7,6 +7,9 @@ import { marketColumnsFromBody } from '@/lib/marketFields'
 import { rentalTermsForUpdate } from '@/lib/rentalTerms'
 import { plotColumnsFromBody, savePaymentPlan } from '@/lib/developments'
 import { assetClassFor } from '@/lib/plots'
+import { editableOnly } from '@/lib/listingEdits'
+import { listingsHome } from '@/lib/partnerListingAuth'
+import { escapeHtml } from '@/lib/escapeHtml'
 
 
 function createAuthClient(request: NextRequest) {
@@ -142,19 +145,68 @@ export async function PATCH(
       return NextResponse.json({ data: edited, warning })
     }
 
-    if (!['approve', 'reject'].includes(action)) {
-      return NextResponse.json({ error: 'Invalid action. Must be approve or reject.' }, { status: 400 })
+    if (!['approve', 'reject', 'approve_changes', 'reject_changes'].includes(action)) {
+      return NextResponse.json({ error: 'Invalid action.' }, { status: 400 })
     }
 
     // Get property with partner info
     const { data: property } = await supabase
       .from('property_listings')
-      .select('*, profiles!property_listings_partner_id_fkey(full_name, email)')
+      .select('*, profiles!property_listings_partner_id_fkey(full_name, email, role)')
       .eq('id', id)
       .single()
 
     if (!property) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 })
+    }
+    const home = listingsHome((property.profiles as { role?: string } | null)?.role)
+
+    // A partner's proposed edit to a live listing: accept it (copy the values
+    // onto the listing) or turn it down (keep the note for the partner).
+    if (action === 'approve_changes' || action === 'reject_changes') {
+      const { data: change } = await supabase
+        .from('property_listing_changes')
+        .select('changes, status')
+        .eq('listing_id', id)
+        .maybeSingle()
+      if (!change || change.status !== 'pending') {
+        return NextResponse.json({ error: 'There are no changes waiting on this listing.' }, { status: 404 })
+      }
+      const now = new Date().toISOString()
+      let result = property
+
+      if (action === 'approve_changes') {
+        const { data: applied, error: applyError } = await supabase
+          .from('property_listings')
+          .update({ ...editableOnly(change.changes), updated_at: now })
+          .eq('id', id)
+          .select()
+          .single()
+        if (applyError) return NextResponse.json({ error: applyError.message }, { status: 500 })
+        result = applied
+        await supabase.from('property_listing_changes').delete().eq('listing_id', id)
+      } else {
+        const { error: rejectError } = await supabase
+          .from('property_listing_changes')
+          .update({ status: 'rejected', note: String(notes || '').trim().slice(0, 1000) || 'No reason given.', reviewed_by: user.id, reviewed_at: now })
+          .eq('listing_id', id)
+        if (rejectError) return NextResponse.json({ error: rejectError.message }, { status: 500 })
+      }
+
+      if (property.partner_id) {
+        const accepted = action === 'approve_changes'
+        await supabase.from('notifications').insert({
+          user_id: property.partner_id,
+          type: accepted ? 'property_approved' : 'property_rejected',
+          title: accepted ? 'Listing changes approved' : 'Listing changes not approved',
+          body: accepted
+            ? `Your changes to "${property.title}" are now live.`
+            : `Your changes to "${property.title}" were not approved. ${notes || ''} The listing is still live as it was.`,
+          link: home,
+          is_read: false,
+        })
+      }
+      return NextResponse.json({ data: result })
     }
 
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
@@ -189,7 +241,7 @@ export async function PATCH(
       body: action === 'approve'
         ? `Your property "${property.title}" has been approved and is now live.`
         : `Your property "${property.title}" has been rejected. ${notes || ''}`,
-      link: '/dashboard/properties',
+      link: home,
       is_read: false,
     })
 
@@ -207,19 +259,19 @@ export async function PATCH(
               ? `
                 <h2 style="color: #C9A84C; font-size: 20px; margin: 0 0 16px 0;">Property Approved</h2>
                 <p style="color: rgba(255,255,255,0.6); line-height: 1.6;">
-                  Your property listing "<strong style="color: #fff;">${property.title}</strong>" has been approved and is now visible to all members.
+                  Your property listing "<strong style="color: #fff;">${escapeHtml(property.title)}</strong>" has been approved and is now live on CZAAH Properties.
                 </p>
-                <a href="https://czaah.com/dashboard/properties" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px;">
+                <a href="https://czaah.com${home}" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px;">
                   View Listing &rarr;
                 </a>
               `
               : `
                 <h2 style="color: #ef4444; font-size: 20px; margin: 0 0 16px 0;">Property Rejected</h2>
                 <p style="color: rgba(255,255,255,0.6); line-height: 1.6;">
-                  Your property listing "<strong style="color: #fff;">${property.title}</strong>" was not approved.
+                  Your property listing "<strong style="color: #fff;">${escapeHtml(property.title)}</strong>" was not approved.
                 </p>
-                ${notes ? `<p style="color: rgba(255,255,255,0.6); line-height: 1.6;"><strong>Reason:</strong> ${notes}</p>` : ''}
-                <a href="https://czaah.com/dashboard/properties" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px;">
+                ${notes ? `<p style="color: rgba(255,255,255,0.6); line-height: 1.6;"><strong>Reason:</strong> ${escapeHtml(notes)}</p>` : ''}
+                <a href="https://czaah.com${home}" style="display: inline-block; background: #C9A84C; color: #000000; padding: 12px 32px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; margin-top: 16px;">
                   View Details &rarr;
                 </a>
               `

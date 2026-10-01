@@ -50,7 +50,17 @@ export async function GET(request: NextRequest) {
       .select('*, profiles!property_listings_partner_id_fkey(full_name, email)')
       .order('created_at', { ascending: false })
 
-    if (status) {
+    // Edits partners have proposed to live listings. They count as pending
+    // work, so the Pending tab shows those listings too.
+    const { data: held } = await supabase
+      .from('property_listing_changes')
+      .select('listing_id, changes, submitted_at')
+      .eq('status', 'pending')
+    const heldById = new Map((held || []).map((h) => [h.listing_id, h]))
+
+    if (status === 'pending' && heldById.size) {
+      query = query.or(`status.eq.pending,id.in.(${[...heldById.keys()].join(',')})`)
+    } else if (status) {
       query = query.eq('status', status)
     }
 
@@ -60,7 +70,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ data: properties })
+    return NextResponse.json({
+      data: (properties || []).map((p) => ({ ...p, pending_change: heldById.get(p.id) || null })),
+    })
   } catch (err) {
     logError("api.admin.properties", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

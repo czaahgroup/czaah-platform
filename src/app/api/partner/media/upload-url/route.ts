@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { requireLister } from '@/lib/partnerListingAuth'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
 import { LISTING_IMAGE_TYPES, LISTING_IMAGE_MAX_BYTES, PARTNER_UPLOAD_PREFIX, safeFileName } from '@/lib/uploadSafety'
@@ -21,19 +20,10 @@ const BY_EXTENSION: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const userClient = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { getAll() { return request.cookies.getAll() }, setAll() {} } }
-    )
-    const { data: { user } } = await userClient.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const supabase = createAdminClient()
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    if (!profile || (profile.role !== 'real_estate_partner' && profile.role !== 'super_admin')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    const auth = await requireLister(request)
+    if (auth.error) return auth.error
+    const { supabase } = auth
+    const user = { id: auth.userId }
 
     const { success } = rateLimit(`partner-photo-upload:${user.id}`, 120, 3600000)
     if (!success) return NextResponse.json({ error: 'Too many uploads — try again in an hour.' }, { status: 429 })

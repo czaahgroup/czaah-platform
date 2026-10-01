@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
 import {
@@ -15,52 +13,39 @@ import { rentalTermsForInsert } from '@/lib/rentalTerms'
 import { plotColumnsFromBody } from '@/lib/developments'
 import { assetClassFor, isPlotListing, validatePlotListing } from '@/lib/plots'
 import { CURRENCIES } from '@/lib/currencies'
+import { requireLister, notifyAdmins } from '@/lib/partnerListingAuth'
 
-
-function createAuthClient(request: NextRequest) {
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return request.cookies.getAll() },
-        setAll() {},
-      },
-    }
-  )
-}
 
 export async function GET(request: NextRequest) {
   try {
-    const userClient = createAuthClient(request)
-    const { data: { user }, error: authError } = await userClient.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const supabase = createAdminClient()
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || (profile.role !== 'real_estate_partner' && profile.role !== 'super_admin')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
+    const auth = await requireLister(request)
+    if (auth.error) return auth.error
+    const { supabase, userId } = auth
 
     const { data: properties, error } = await supabase
       .from('property_listings')
       .select('*')
-      .eq('partner_id', user.id)
+      .eq('partner_id', userId)
       .order('created_at', { ascending: false })
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ data: properties })
+    // Whether each listing has an edit waiting for approval, or one that was turned down.
+    const ids = (properties || []).map((p) => p.id)
+    const { data: changes } = ids.length
+      ? await supabase.from('property_listing_changes').select('listing_id, status, note').in('listing_id', ids)
+      : { data: [] }
+    const byListing = new Map((changes || []).map((c) => [c.listing_id, c]))
+
+    return NextResponse.json({
+      data: (properties || []).map((p) => ({
+        ...p,
+        change_status: byListing.get(p.id)?.status || null,
+        change_note: byListing.get(p.id)?.note || null,
+      })),
+    })
   } catch (err) {
     logError("api.partner.properties", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -69,27 +54,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const userClient = createAuthClient(request)
-    const { data: { user }, error: authError } = await userClient.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await requireLister(request)
+    if (auth.error) return auth.error
+    const { supabase } = auth
+    const user = { id: auth.userId }
 
     const { success: rateLimitOk } = rateLimit(`property-create:${user.id}`, 10, 3600000)
     if (!rateLimitOk) {
       return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
-    }
-
-    const supabase = createAdminClient()
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || (profile.role !== 'real_estate_partner' && profile.role !== 'super_admin')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const body = await request.json()
@@ -250,23 +222,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: insertError?.message || 'Failed to create property' }, { status: 500 })
     }
 
-    // Notify super admins
-    const { data: superAdmins } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('role', 'super_admin')
-
-    if (superAdmins && superAdmins.length > 0) {
-      const notifications = superAdmins.map((admin) => ({
-        user_id: admin.id,
-        type: 'property_submitted' as const,
-        title: 'New Property Listing',
-        body: `New property "${title}" submitted for approval.`,
-        link: `/admin/properties`,
-        is_read: false,
-      }))
-      await supabase.from('notifications').insert(notifications)
-    }
+    await notifyAdmins(supabase, 'New Property Listing', `New property "${title}" submitted for approval.`)
 
     return NextResponse.json({ data: property }, { status: 201 })
   } catch (err) {

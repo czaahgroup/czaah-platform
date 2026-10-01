@@ -11,7 +11,8 @@ import {
   isPlotListing,
   assetClassFor,
 } from '@/lib/plots'
-import { PhotoUploader, SingleFileUpload, FeatureChips } from '@/components/PhotoUploader'
+import { PhotoUploader, SingleFileUpload, FeatureChips, publicUrl } from '@/components/PhotoUploader'
+import { EDIT_LABELS, describeValue, editableOnly } from '@/lib/listingEdits'
 
 
 interface Property {
@@ -53,6 +54,8 @@ interface Property {
   partner_id: string | null
   created_at: string
   profiles: { full_name: string; email: string } | null
+  /** A partner's proposed edit to this live listing, waiting for a decision. */
+  pending_change?: { changes: Record<string, unknown>; submitted_at: string } | null
 }
 
 type TabFilter = 'all' | 'pending' | 'approved' | 'rejected'
@@ -574,7 +577,7 @@ export default function AdminPropertiesPage() {
 
   const selected = properties.find((p) => p.id === selectedId)
 
-  async function handleAction(action: 'approve' | 'reject') {
+  async function handleAction(action: 'approve' | 'reject' | 'approve_changes' | 'reject_changes') {
     if (!selectedId) return
     setActionLoading(true)
     setError(null)
@@ -587,7 +590,11 @@ export default function AdminPropertiesPage() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || `Failed to ${action}`)
-      setSuccess(`Property ${action === 'approve' ? 'approved' : 'rejected'} successfully.`)
+      setSuccess(
+        action === 'approve_changes' ? 'Changes approved — the listing has been updated.'
+          : action === 'reject_changes' ? 'Changes turned down — the listing is unchanged and the partner has been told.'
+          : `Property ${action === 'approve' ? 'approved' : 'rejected'} successfully.`
+      )
       setRejectNotes('')
       setSelectedId(null)
       await loadProperties()
@@ -841,6 +848,9 @@ export default function AdminPropertiesPage() {
                           <td className="px-5 py-3 text-on-surface-variant hidden sm:table-cell capitalize">{prop.property_type.replace('_', ' ')}</td>
                           <td className="px-5 py-3">
                             <span style={{ background: sc.bg, color: sc.text, padding: '3px 10px', borderRadius: 0, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>{prop.status}</span>
+                            {prop.pending_change && (
+                              <span style={{ display: 'inline-block', marginLeft: 6, background: 'rgba(234,179,8,0.15)', color: '#eab308', padding: '3px 10px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>Changes</span>
+                            )}
                           </td>
                           <td className="px-5 py-3 text-on-surface-variant/50 hidden sm:table-cell">{new Date(prop.created_at).toLocaleDateString()}</td>
                         </tr>
@@ -945,6 +955,57 @@ export default function AdminPropertiesPage() {
                   <div className="px-6 py-4 border-b border-outline-variant/10">
                     <p className="text-xs text-red-400 font-semibold mb-1">Rejection Notes</p>
                     <p className="text-sm text-on-surface-variant">{selected.rejection_notes}</p>
+                  </div>
+                )}
+
+                {/* A partner's proposed changes to a live listing */}
+                {selected.pending_change && (
+                  <div className="px-6 py-4 border-b border-outline-variant/10">
+                    <p className="text-xs text-yellow-400 font-semibold mb-1">Proposed changes</p>
+                    <p className="text-xs text-on-surface-variant mb-3">
+                      Sent {new Date(selected.pending_change.submitted_at).toLocaleString('en-GB')}. The site shows the current values until you approve.
+                    </p>
+                    <div className="space-y-2 mb-4">
+                      {Object.entries(editableOnly(selected.pending_change.changes)).map(([column, value]) => (
+                        <div key={column} className="text-sm">
+                          <p className="text-xs text-on-surface-variant">{EDIT_LABELS[column]}</p>
+                          <p className="text-on-surface-variant/60 line-through break-words">{describeValue(column, (selected as unknown as Record<string, unknown>)[column])}</p>
+                          <p className="text-on-surface break-words">{describeValue(column, value)}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {Array.isArray(selected.pending_change.changes.images) && (
+                      <div className="flex gap-1.5 flex-wrap mb-4">
+                        {(selected.pending_change.changes.images as string[]).map((img) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img key={img} src={publicUrl(img)} alt="Proposed photo" style={{ width: 64, height: 48, objectFit: 'cover' }} />
+                        ))}
+                      </div>
+                    )}
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => handleAction('approve_changes')}
+                        disabled={actionLoading}
+                        className="w-full bg-green-500/20 text-green-400 font-semibold py-2.5 rounded-nonetext-sm hover:bg-green-500/30 transition-colors disabled:opacity-50 border border-green-500/30"
+                      >
+                        {actionLoading ? 'Processing...' : 'Approve changes'}
+                      </button>
+                      <textarea
+                        value={rejectNotes}
+                        onChange={(e) => setRejectNotes(e.target.value)}
+                        placeholder="Reason for turning the changes down (the partner sees this)..."
+                        rows={2}
+                        className="w-full bg-surface-container-lowest border border-outline-variant/10 px-3 py-2 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-red-500/30"
+                        style={{ resize: 'none' }}
+                      />
+                      <button
+                        onClick={() => handleAction('reject_changes')}
+                        disabled={actionLoading}
+                        className="w-full bg-red-500/20 text-red-400 font-semibold py-2.5 rounded-nonetext-sm hover:bg-red-500/30 transition-colors disabled:opacity-50 border border-red-500/30"
+                      >
+                        Turn changes down
+                      </button>
+                    </div>
                   </div>
                 )}
 

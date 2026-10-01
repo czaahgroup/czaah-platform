@@ -18,6 +18,7 @@ const BASE_NAV_LINKS = [
 ]
 
 const WORKFORCE_NAV_LINK = { href: '/partner-network/recruitment', label: 'Recruitment', icon: 'groups' }
+const PROPERTIES_NAV_LINK = { href: '/partner-network/properties', label: 'My Properties', icon: 'apartment' }
 
 const TAIL_NAV_LINKS = [
   { href: '/partner-network/mail', label: 'Mail', icon: 'forward_to_inbox' },
@@ -31,6 +32,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
   const [userId, setUserId] = useState('')
   const [fullName, setFullName] = useState('')
   const [showWorkforce, setShowWorkforce] = useState(false)
+  const [showProperties, setShowProperties] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -54,16 +56,22 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
         const json = await res.json()
         const sectors: { name: string }[] = json.data || []
         setShowWorkforce(sectors.some((s) => /human resources|workforce|recruitment/i.test(s.name)))
+        // Same rule the API enforces: partners authorised for Real Estate list property.
+        setShowProperties(sectors.some((s) => /real estate|property/i.test(s.name)))
       } catch {
         setShowWorkforce(false)
+        setShowProperties(false)
       }
     }
     checkAuth()
   }, [])
 
-  const NAV_LINKS = showWorkforce
-    ? [...BASE_NAV_LINKS, WORKFORCE_NAV_LINK, ...TAIL_NAV_LINKS]
-    : [...BASE_NAV_LINKS, ...TAIL_NAV_LINKS]
+  const NAV_LINKS = [
+    ...BASE_NAV_LINKS,
+    ...(showProperties ? [PROPERTIES_NAV_LINK] : []),
+    ...(showWorkforce ? [WORKFORCE_NAV_LINK] : []),
+    ...TAIL_NAV_LINKS,
+  ]
 
   if (loading) {
     return (
@@ -119,7 +127,8 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
         </div>
         <div className="px-3 py-4 flex flex-col gap-1">
           {NAV_LINKS.map((link) => {
-            const active = pathname === link.href
+            // A section stays highlighted on its sub-pages (the dashboard is the root of all of them).
+            const active = pathname === link.href || (link.href !== '/partner-network' && pathname.startsWith(link.href + '/'))
             return (
               <Link
                 key={link.href}
