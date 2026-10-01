@@ -125,7 +125,7 @@ test.describe('brand', () => {
 
   test('the home page opens with the brief’s sections, in order', () => {
     expect(DEFAULT_HOME_LAYOUT.filter((s) => s.visible).map((s) => s.key)).toEqual([
-      'featured', 'markets', 'sourcing', 'compare', 'projects', 'about', 'howItWorks', 'insights', 'owner', 'cta',
+      'featured', 'map', 'markets', 'sourcing', 'compare', 'projects', 'about', 'howItWorks', 'insights', 'owner', 'cta',
     ])
   })
 

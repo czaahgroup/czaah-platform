@@ -8,6 +8,7 @@
 // Homepage but start hidden, so the page stays short and brand-led.
 export const HOME_SECTIONS = [
   { key: 'featured', label: 'Featured properties', hint: 'Listings marked Featured below come first.' },
+  { key: 'map', label: 'Explore on the map', hint: 'Every live listing as a pin. Hidden automatically when no listing can be placed.' },
   { key: 'markets', label: 'Explore global markets', hint: 'One card per active market (order: Admin → Locations).' },
   { key: 'sourcing', label: 'Personal property sourcing', hint: '"Can\u2019t find what you\u2019re looking for?" — leads to the property request form.' },
   { key: 'compare', label: 'Compare property markets', hint: 'Built from live listings; nothing is shown that the data does not support.' },

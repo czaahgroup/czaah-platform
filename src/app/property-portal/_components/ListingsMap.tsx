@@ -58,7 +58,19 @@ function pinText(group: MapGroup<LiveProperty>, currency?: string): string {
  * a pin narrows the list to that pin; the list is also how the results are
  * reached without a pointer or without sight of the map.
  */
-export function ListingsMap({ listings, displayCurrency }: { listings: LiveProperty[]; displayCurrency?: string }) {
+export function ListingsMap({
+  listings,
+  displayCurrency,
+  limit,
+  moreHref,
+}: {
+  listings: LiveProperty[];
+  displayCurrency?: string;
+  /** Show only this many rows until a pin is selected (the home page). */
+  limit?: number;
+  /** Where "View all" leads when the rows are limited. */
+  moreHref?: string;
+}) {
   const tree = portalLocations();
   const { currency } = useCurrencyPref();
   const shownCurrency = displayCurrency || currency || undefined;
@@ -170,11 +182,13 @@ export function ListingsMap({ listings, displayCurrency }: { listings: LivePrope
     layer.current = null;
   }, []);
 
-  const rows = active ? active.listings : [...groups.flatMap((g) => g.listings), ...unplaced];
+  const everything = [...groups.flatMap((g) => g.listings), ...unplaced];
+  const rows = active ? active.listings : limit ? everything.slice(0, limit) : everything;
+  const cut = !active && everything.length > rows.length;
   const hasApprox = groups.some((g) => g.precision !== 'exact');
 
   return (
-    <div className="pp-mapview">
+    <div className={limit ? 'pp-mapview pp-mapview--embedded' : 'pp-mapview'}>
       <div className="pp-mapview-map">
         {failed ? (
           <p className="pp-map-failed">The map could not be loaded. The properties are listed below.</p>
@@ -226,7 +240,12 @@ export function ListingsMap({ listings, displayCurrency }: { listings: LivePrope
             );
           })}
         </ul>
-        {!active && unplaced.length > 0 && (
+        {cut && moreHref && (
+          <p className="pp-mapview-more">
+            <Link href={moreHref} className="pp-link-arrow">View all {listings.length} on the map →</Link>
+          </p>
+        )}
+        {!active && !cut && unplaced.length > 0 && (
           <p className="pp-mapview-precision">
             {unplaced.length} {unplaced.length === 1 ? 'property has' : 'properties have'} no map location on record and {unplaced.length === 1 ? 'is' : 'are'} listed here only.
           </p>

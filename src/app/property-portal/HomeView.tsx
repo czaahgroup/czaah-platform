@@ -16,6 +16,7 @@ import { useCurrencyPref } from './_components/usePortalPrefs';
 import { FeaturedMarkets, InvestmentOpportunities, OwnerCta, SourcingBand, CompareMarkets, WhyPillars, HowItWorks, AdvisorCta } from './_components/HomeSections';
 import { DevelopmentStrip } from './_components/DevelopmentStrip';
 import { ButtonLink } from './_components/ui';
+import { ListingsMap } from './_components/ListingsMap';
 import { portalWhyInvest, portalTestimonials } from './_components/portal-content';
 import { destinationFor, slugForCity } from './_components/destinations';
 import { LocationSearch, suggestionHref, type SearchSection } from './_components/LocationSearch';
@@ -288,6 +289,26 @@ export default function PropertyPortalHome() {
               </div>
             </div>
           </section>
+      </>
+    ),
+    map: (
+      <>
+          {!loading && !error && properties.length > 0 && (
+            <section className="pp-section" id="map">
+              <div className="pp-container">
+                <div className="pp-section-head">
+                  <div>
+                    <div className="pp-eyebrow">Map</div>
+                    <h2 className="pp-h2">Explore on the map</h2>
+                  </div>
+                  <Link href="/property-portal/listings?view=map" className="pp-link-arrow">
+                    Open the full map →
+                  </Link>
+                </div>
+                <ListingsMap listings={properties} limit={4} moreHref="/property-portal/listings?view=map" />
+              </div>
+            </section>
+          )}
       </>
     ),
     sourcing: (

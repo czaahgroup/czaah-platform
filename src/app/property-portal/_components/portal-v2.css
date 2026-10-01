@@ -707,6 +707,9 @@ ul.pp-features .pp-feature { border-radius: 999px; font-size: 13px; padding: 8px
 
 .pp-listpage-grid[hidden] { display: none; }
 .pp-mapview { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); gap: 24px; padding: 24px 0 100px; align-items: start; }
+.pp-mapview--embedded { padding: 0; }
+.pp-mapview--embedded .pp-mapview-map .pp-map { height: 480px; }
+.pp-mapview-more { margin: 16px 0 0; }
 .pp-mapview-map { position: sticky; top: calc(var(--pp-nav-h, 72px) + 16px); }
 .pp-mapview-map .pp-map { height: min(640px, calc(100vh - var(--pp-nav-h, 72px) - 90px)); }
 .pp-mapview-list-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--pp-border); }
@@ -729,7 +732,7 @@ ul.pp-features .pp-feature { border-radius: 999px; font-size: 13px; padding: 8px
 @media (max-width: 900px) {
   .pp-mapview { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .pp-mapview-map { position: static; }
-  .pp-mapview-map .pp-map { height: 56vh; min-height: 300px; }
+  .pp-mapview-map .pp-map, .pp-mapview--embedded .pp-mapview-map .pp-map { height: 56vh; min-height: 300px; }
   .pp-map--detail { height: 260px; }
   .pp-viewtoggle button { min-height: 44px; }
 }
