@@ -1253,6 +1253,12 @@ export default function AdminDevelopmentsPage() {
                   {dev.developer_name ? ` · ${dev.developer_name}` : ''}
                   {dev.marketing_agent ? ` · marketed by ${dev.marketing_agent}` : ''}
                 </p>
+                {(dev as { submitted_by?: string | null }).submitted_by && (
+                  <p style={{ ...hintStyle, color: '#eab308' }}>
+                    Submitted by partner {(dev as { submitted_by?: string | null }).submitted_by}
+                    {dev.status === 'draft' ? ' — waiting for you to review and Publish.' : ''}
+                  </p>
+                )}
                 <p style={hintStyle}>
                   /property-portal/developments/{dev.slug} · {dev.development_units?.length || 0} plot variant(s)
                 </p>

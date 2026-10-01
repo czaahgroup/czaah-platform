@@ -93,11 +93,11 @@ export async function checkedPhotos(
 }
 
 /** Tells every super admin that a partner's listing needs a decision. */
-export async function notifyAdmins(supabase: SupabaseClient, title: string, body: string) {
+export async function notifyAdmins(supabase: SupabaseClient, title: string, body: string, link = '/admin/properties') {
   const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'super_admin')
   if (!admins?.length) return
   const { error } = await supabase.from('notifications').insert(
-    admins.map((a) => ({ user_id: a.id, type: 'property_submitted', title, body, link: '/admin/properties', is_read: false })),
+    admins.map((a) => ({ user_id: a.id, type: 'property_submitted', title, body, link, is_read: false })),
   )
   if (error) logError('lib.partnerListingAuth', error, { step: 'notify-admins' })
 }

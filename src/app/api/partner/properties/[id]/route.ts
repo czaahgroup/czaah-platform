@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { logError } from '@/lib/logError'
 import { rateLimit } from '@/lib/rateLimit'
 import { requireLister, checkedPhotos, notifyAdmins } from '@/lib/partnerListingAuth'
-import { cleanListingEdit, changedOnly, ownerActionResult } from '@/lib/listingEdits'
+import { cleanListingEdit, changedOnly, ownerActionResult, cleanPaymentPlan, planFromStored } from '@/lib/listingEdits'
+import { loadPlanForListing, savePaymentPlan } from '@/lib/developments'
 
 /**
  * One of the caller's own listings.
@@ -37,7 +38,8 @@ export async function GET(request: NextRequest, { params }: Ctx) {
       .select('changes, status, note, submitted_at, reviewed_at')
       .eq('listing_id', id)
       .maybeSingle()
-    return NextResponse.json({ data: { ...own.listing, change: change || null } })
+    const paymentPlan = planFromStored(await loadPlanForListing(own.supabase, id))
+    return NextResponse.json({ data: { ...own.listing, payment_plan: paymentPlan, change: change || null } })
   } catch (err) {
     logError('api.partner.properties.id', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -88,14 +90,25 @@ export async function PATCH(request: NextRequest, { params }: Ctx) {
     }
     const changes = changedOnly(columns, listing)
 
+    // The payment plan travels with the edit: sent = replace it, null = remove
+    // it, absent = leave it alone. Only an actual difference counts.
+    let planChange: { plan: ReturnType<typeof planFromStored> } | null = null
+    if (body.paymentPlan !== undefined) {
+      const cleaned = cleanPaymentPlan(body.paymentPlan, String(columns.currency || listing.currency || 'PKR'))
+      if (cleaned.problems.length) return NextResponse.json({ error: cleaned.problems.join(' ') }, { status: 400 })
+      const current = planFromStored(await loadPlanForListing(supabase, id))
+      if (JSON.stringify(cleaned.plan) !== JSON.stringify(current)) planChange = { plan: cleaned.plan }
+    }
+
     if (listing.status === 'approved') {
-      if (!Object.keys(changes).length) {
+      if (!Object.keys(changes).length && !planChange) {
         await supabase.from('property_listing_changes').delete().eq('listing_id', id)
         return NextResponse.json({ data: listing, message: 'Nothing was changed.' })
       }
       const { error } = await supabase.from('property_listing_changes').upsert({
         listing_id: id,
-        changes,
+        // payment_plan is not a listing column; it is applied separately on approval.
+        changes: planChange ? { ...changes, payment_plan: planChange.plan } : changes,
         status: 'pending',
         note: null,
         submitted_by: userId,
@@ -120,6 +133,10 @@ export async function PATCH(request: NextRequest, { params }: Ctx) {
       .select()
       .single()
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (planChange) {
+      const saved = await savePaymentPlan(supabase, { propertyId: id }, planChange.plan)
+      if (saved.errors.length) return NextResponse.json({ error: saved.errors.join(' ') }, { status: 400 })
+    }
     if (resubmit) await notifyAdmins(supabase, 'Property resubmitted', `"${data.title}" was edited and sent back for approval.`)
 
     return NextResponse.json({

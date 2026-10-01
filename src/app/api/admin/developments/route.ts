@@ -41,7 +41,18 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    return NextResponse.json({ data })
+    // Projects a partner submitted from the Partner Network carry the partner
+    // as agent; name them so a draft waiting for approval is recognisable.
+    const rows = (data || []) as unknown as { agent_id: string | null }[]
+    const agentIds = [...new Set(rows.map((d) => d.agent_id).filter(Boolean))] as string[]
+    const { data: agents } = agentIds.length
+      ? await supabase.from('profiles').select('id, full_name, role').in('id', agentIds)
+      : { data: [] }
+    const partners = new Map((agents || []).filter((a) => a.role === 'partner').map((a) => [a.id, a.full_name]))
+
+    return NextResponse.json({
+      data: rows.map((d) => ({ ...d, submitted_by: d.agent_id ? partners.get(d.agent_id) || null : null })),
+    })
   } catch (err) {
     logError('api.admin.developments', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

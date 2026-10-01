@@ -10,7 +10,8 @@ import {
   sniffImageType,
 } from '@/lib/uploadSafety'
 import { rentalTermsForInsert } from '@/lib/rentalTerms'
-import { plotColumnsFromBody } from '@/lib/developments'
+import { plotColumnsFromBody, savePaymentPlan } from '@/lib/developments'
+import { cleanPaymentPlan } from '@/lib/listingEdits'
 import { assetClassFor, isPlotListing, validatePlotListing } from '@/lib/plots'
 import { CURRENCIES } from '@/lib/currencies'
 import { requireLister, notifyAdmins } from '@/lib/partnerListingAuth'
@@ -96,6 +97,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // An optional payment plan, checked before anything is stored.
+    const { plan: paymentPlan, problems: planProblems } = cleanPaymentPlan(body.paymentPlan, currency || 'PKR')
+    if (planProblems.length) return NextResponse.json({ error: planProblems.join(' ') }, { status: 400 })
+
     // Plots are checked against plot rules — a plot has no bedrooms, and
     // demanding them is exactly what stopped land being listed before.
     if (isPlotListing({ property_subtype: subtype, property_type: resolvedType })) {
@@ -108,6 +113,7 @@ export async function POST(request: NextRequest) {
         currency: currency || 'PKR',
         // Images are uploaded further down; check the incoming payload.
         images,
+        hasPaymentPlan: !!paymentPlan,
         supportedCurrencies: CURRENCIES,
       })
       if (problems.length) {
@@ -220,6 +226,13 @@ export async function POST(request: NextRequest) {
 
     if (insertError || !property) {
       return NextResponse.json({ error: insertError?.message || 'Failed to create property' }, { status: 500 })
+    }
+
+    // The schedule is stored as given; if it does not add up to the price the
+    // admin sees that when reviewing, it is not corrected here.
+    if (paymentPlan) {
+      const saved = await savePaymentPlan(supabase, { propertyId: property.id }, paymentPlan)
+      if (saved.errors.length) logError('api.partner.properties', new Error(saved.errors.join(' ')), { step: 'payment-plan', listing: property.id })
     }
 
     await notifyAdmins(supabase, 'New Property Listing', `New property "${title}" submitted for approval.`)

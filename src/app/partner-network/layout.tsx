@@ -19,6 +19,7 @@ const BASE_NAV_LINKS = [
 
 const WORKFORCE_NAV_LINK = { href: '/partner-network/recruitment', label: 'Recruitment', icon: 'groups' }
 const PROPERTIES_NAV_LINK = { href: '/partner-network/properties', label: 'My Properties', icon: 'apartment' }
+const PROJECTS_NAV_LINK = { href: '/partner-network/projects', label: 'My Projects', icon: 'domain' }
 
 const TAIL_NAV_LINKS = [
   { href: '/partner-network/mail', label: 'Mail', icon: 'forward_to_inbox' },
@@ -68,7 +69,7 @@ export default function PartnerNetworkLayout({ children }: { children: React.Rea
 
   const NAV_LINKS = [
     ...BASE_NAV_LINKS,
-    ...(showProperties ? [PROPERTIES_NAV_LINK] : []),
+    ...(showProperties ? [PROPERTIES_NAV_LINK, PROJECTS_NAV_LINK] : []),
     ...(showWorkforce ? [WORKFORCE_NAV_LINK] : []),
     ...TAIL_NAV_LINKS,
   ]

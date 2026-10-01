@@ -157,6 +157,11 @@ export default function DevelopersAdminPage() {
                   {STATUS[d.verification_status]}{d.verified_at ? ` · ${new Date(d.verified_at).toLocaleDateString()}` : ''}
                 </span>
                 {!d.active && <span style={{ fontSize: 11, opacity: 0.6 }}>Hidden</span>}
+                {!d.active && d.created_by && (
+                  <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 999, background: 'rgba(234,179,8,0.15)', color: '#eab308' }}>
+                    Proposed by a partner — Edit and tick &ldquo;Shown on the portal&rdquo; to approve
+                  </span>
+                )}
               </span>
               <span style={{ display: 'inline-flex', gap: 6 }}>
                 <button type="button" style={ghost} onClick={() => setEditing({ ...d })}>Edit</button>

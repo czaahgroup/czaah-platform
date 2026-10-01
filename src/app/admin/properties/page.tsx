@@ -12,7 +12,7 @@ import {
   assetClassFor,
 } from '@/lib/plots'
 import { PhotoUploader, SingleFileUpload, FeatureChips, publicUrl } from '@/components/PhotoUploader'
-import { EDIT_LABELS, describeValue, editableOnly } from '@/lib/listingEdits'
+import { EDIT_LABELS, describeValue, editableOnly, describePlan, type CleanPlan } from '@/lib/listingEdits'
 
 
 interface Property {
@@ -974,6 +974,18 @@ export default function AdminPropertiesPage() {
                         </div>
                       ))}
                     </div>
+                    {'payment_plan' in selected.pending_change.changes && (
+                      <div className="text-sm mb-4">
+                        <p className="text-xs text-on-surface-variant">Payment plan</p>
+                        <p className="text-on-surface break-words">{describePlan(selected.pending_change.changes.payment_plan as CleanPlan | null)}</p>
+                        {((selected.pending_change.changes.payment_plan as CleanPlan | null)?.installments || []).map((r) => (
+                          <p key={r.installment_number} className="text-xs text-on-surface-variant">
+                            {r.label || `Instalment ${r.installment_number}`}: {r.amount.toLocaleString('en-GB')}
+                            {r.due_after_months != null ? ` · month ${r.due_after_months}` : ''}
+                          </p>
+                        ))}
+                      </div>
+                    )}
                     {Array.isArray(selected.pending_change.changes.images) && (
                       <div className="flex gap-1.5 flex-wrap mb-4">
                         {(selected.pending_change.changes.images as string[]).map((img) => (

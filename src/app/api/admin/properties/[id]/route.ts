@@ -184,6 +184,11 @@ export async function PATCH(
           .single()
         if (applyError) return NextResponse.json({ error: applyError.message }, { status: 500 })
         result = applied
+        const held = change.changes as Record<string, unknown>
+        if (held && 'payment_plan' in held) {
+          const saved = await savePaymentPlan(supabase, { propertyId: id }, held.payment_plan as Parameters<typeof savePaymentPlan>[2])
+          if (saved.errors.length) return NextResponse.json({ error: saved.errors.join(' '), data: applied }, { status: 400 })
+        }
         await supabase.from('property_listing_changes').delete().eq('listing_id', id)
       } else {
         const { error: rejectError } = await supabase

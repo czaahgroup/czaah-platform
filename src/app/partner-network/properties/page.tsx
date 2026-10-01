@@ -91,7 +91,8 @@ export default function PartnerPropertiesPage() {
       </div>
       <p className="text-sm text-on-surface-variant/70 mb-6 max-w-2xl">
         New properties and changes to a live property are reviewed by CZAAH before they appear on CZAAH Properties.
-        Marking a property sold or withdrawing it takes effect straight away.
+        Marking a property sold or withdrawing it takes effect straight away. For a development with several plot sizes or home types,
+        use <Link href="/partner-network/projects" className="text-primary hover:underline">My Projects</Link>.
       </p>
 
       {error && <div className="bg-red-500/10 border border-red-500/20 px-4 py-3 mb-5"><p className="text-sm text-red-400">{error}</p></div>}
