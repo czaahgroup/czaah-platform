@@ -154,3 +154,49 @@ test.describe('guide to Pakistan\'s minerals', () => {
     for (const gone of ['mn-panel', 'METALS_API_KEY', 'Live Metal Prices', 'FALLBACK_PRICES']) expect(page).not.toContain(gone)
   })
 })
+
+test.describe('metal prices', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { METALS, priceFromFeed, assessPrices } = require('@/lib/metalPrices') as typeof import('@/lib/metalPrices')
+  const now = new Date('2026-10-01T12:00:00Z')
+  const gold = METALS[0]
+  const copper = METALS.find((m) => m.symbol === 'HG')!
+  const row = (symbol: string, minutesAgo: number) => ({ symbol, name: symbol, price_usd: 10, unit: 'US$ / troy oz', source_updated_at: null, fetched_at: new Date(now.getTime() - minutesAgo * 60_000).toISOString() })
+
+  test('a price is taken only from a well-formed reply for that metal', () => {
+    expect(priceFromFeed(gold, { symbol: 'XAU', currency: 'USD', price: 4176.899902, updatedAt: '2026-10-01T11:59:00Z' }, now))
+      .toEqual({ symbol: 'XAU', name: 'Gold', price_usd: 4176.9, unit: 'US$ / troy oz', source_updated_at: '2026-10-01T11:59:00.000Z', fetched_at: now.toISOString() })
+    for (const bad of [null, {}, { symbol: 'XAG', currency: 'USD', price: 30 }, { symbol: 'XAU', currency: 'EUR', price: 30 }, { symbol: 'XAU', currency: 'USD', price: 0 }, { symbol: 'XAU', currency: 'USD', price: 'n/a' }]) {
+      expect(priceFromFeed(gold, bad, now)).toBeNull()
+    }
+  })
+
+  test('copper is converted from US$ per pound to US$ per tonne', () => {
+    const p = priceFromFeed(copper, { symbol: 'HG', currency: 'USD', price: 5 }, now)!
+    expect(p.unit).toBe('US$ / tonne')
+    expect(p.price_usd).toBeCloseTo(11023.11, 1)
+  })
+
+  test('stale prices are hidden, not shown as current', () => {
+    const all = (minutes: number) => METALS.map((m) => row(m.symbol, minutes))
+    expect(assessPrices(all(5), now)).toMatchObject({ refresh: false })
+    expect(assessPrices(all(5), now).show).toHaveLength(METALS.length)
+    expect(assessPrices(all(45), now).refresh).toBe(true)
+    expect(assessPrices(all(45), now).show).toHaveLength(METALS.length)
+    expect(assessPrices(all(25 * 60), now).show).toEqual([])
+    expect(assessPrices([], now)).toEqual({ show: [], refresh: true })
+  })
+
+  test('no daily change is invented, no fallback price is hard-coded, no key ships to the browser', () => {
+    const lib = read('src/lib/metalPrices.ts')
+    const panel = read('src/app/minerals-portal/_components/MetalPrices.tsx')
+    for (const src of [lib, panel]) {
+      expect(src).not.toMatch(/Math\.(sin|random)/)
+      expect(src).not.toMatch(/api_key|apikey/i)
+      expect(src).not.toMatch(/FALLBACK/)
+      expect(src).not.toMatch(/London Metal Exchange|\bLME\b/)
+    }
+    expect(panel).not.toContain("'use client'")
+    expect(panel).toContain('As of')
+  })
+})

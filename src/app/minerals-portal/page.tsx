@@ -3,6 +3,8 @@ import { loadPublicOffers } from '@/lib/mineralStore'
 import { MINERAL_CATEGORIES } from '@/lib/minerals'
 import { OfferCard } from './_components/OfferCard'
 import { RfqForm } from './_components/RfqForm'
+import { MetalPrices } from './_components/MetalPrices'
+import { loadMetalPrices } from '@/lib/metalPrices'
 
 // Offers change when an admin approves one, so the page is rendered per request.
 export const dynamic = 'force-dynamic'
@@ -14,7 +16,7 @@ const STEPS = [
 ]
 
 export default async function MineralsHome() {
-  const offers = await loadPublicOffers()
+  const [offers, prices] = await Promise.all([loadPublicOffers(), loadMetalPrices()])
   const latest = (offers || []).slice(0, 6)
   // Only categories that actually have an offer are linked.
   const live = MINERAL_CATEGORIES.filter((c) => (offers || []).some((o) => o.category === c.value))
@@ -40,6 +42,8 @@ export default async function MineralsHome() {
           </p>
         </div>
       </section>
+
+      <MetalPrices prices={prices} />
 
       <section className="max-w-[1280px] mx-auto px-4 sm:px-8 py-14">
         <div className="flex items-end justify-between gap-4 flex-wrap mb-6">
