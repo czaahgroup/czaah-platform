@@ -10,7 +10,9 @@ import { cleanLead, listingRef, LEAD_KIND_LABEL, VIEWING_MODE_LABEL } from '@/li
 /**
  * Public: an enquiry, viewing request or investment enquiry from
  * property.czaah.com. Stored as a lead (Admin → Property Leads), linked to a
- * CRM contact, then emailed to info@ with a confirmation to the visitor.
+ * CRM contact, copied into the group inbox (Admin → Enquiries) so every
+ * enquiry CZAAH receives is in one list, then emailed to info@ with a
+ * confirmation to the visitor.
  */
 export async function POST(request: NextRequest) {
   const ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown'
@@ -77,6 +79,18 @@ export async function POST(request: NextRequest) {
       if (vErr) logError('api.property-leads', vErr, { step: 'viewing-insert', lead: row.reference })
     }
 
+    // The same enquiry in Admin → Enquiries, beside the ones from czaah.com.
+    // Best-effort: the lead is already stored, so a failure here is only logged.
+    const { error: inboxError } = await db.from('public_messages').insert({
+      name: lead!.name,
+      email: lead!.email,
+      phone: lead!.phone,
+      interest: inboxInterest(lead!.kind, row.reference, listing?.title),
+      message: lead!.message || '(No message — see Property Leads for the details.)',
+      source: 'property_portal',
+    })
+    if (inboxError) logError('api.property-leads', inboxError, { step: 'enquiries-inbox', lead: row.reference })
+
     await sendEmails(lead!, row.reference, listing, new URL(request.url).origin).catch((err) =>
       logError('api.property-leads', err, { step: 'email', lead: row.reference }),
     )
@@ -88,6 +102,17 @@ export async function POST(request: NextRequest) {
 }
 
 type Db = ReturnType<typeof createAdminClient>
+
+/** How a portal enquiry is titled in Admin → Enquiries: "Viewing request — Nine Elms… (LEAD-1002)". */
+function inboxInterest(kind: keyof typeof LEAD_KIND_LABEL, reference: string, listingTitle?: string | null) {
+  return `${LEAD_KIND_LABEL[kind]}${listingTitle ? ` — ${listingTitle.slice(0, 80)}` : ''} (${reference})`
+}
+
+/** Resend reports a refused send in its result rather than throwing; make it an error we log. */
+async function deliver(message: Parameters<typeof resend.emails.send>[0]) {
+  const { error } = await resend.emails.send(message)
+  if (error) throw new Error(`${error.name || 'send failed'}: ${error.message}`)
+}
 
 /** One CRM contact per email: reuse it (touching activity), or create a lead contact. */
 async function upsertContact(db: Db, name: string, email: string, phone: string | null): Promise<string | null> {
@@ -150,7 +175,7 @@ async function sendEmails(
   const adminBase = origin.includes('property.czaah.com') ? 'https://czaah.com' : origin
   const wrap = (inner: string) => `<div style="font-family:'Raleway',Arial,sans-serif;background:#000;color:#fff;padding:40px 20px;max-width:600px;margin:0 auto"><div style="text-align:center;margin-bottom:28px"><h1 style="color:#C9A84C;font-family:'Cinzel',Georgia,serif;font-size:26px;letter-spacing:6px;margin:0">CZAAH</h1><p style="color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:4px;margin-top:8px">PROPERTIES</p></div><div style="background:#080808;border:1px solid #1A1A1A;border-radius:8px;padding:28px">${inner}</div></div>`
 
-  await resend.emails.send({
+  await deliver({
     from: FROM_EMAIL,
     to: 'info@czaah.com',
     replyTo: lead.email,
@@ -159,7 +184,7 @@ async function sendEmails(
   })
 
   const what = lead.kind === 'viewing_request' ? 'viewing request' : lead.kind === 'investment_enquiry' ? 'investment enquiry' : lead.kind === 'property_sourcing_request' ? 'property requirements' : lead.kind === 'advisor_request' ? 'message' : 'enquiry'
-  await resend.emails.send({
+  await deliver({
     from: FROM_EMAIL,
     to: lead.email,
     subject: `We've received your ${what} (${reference})`,

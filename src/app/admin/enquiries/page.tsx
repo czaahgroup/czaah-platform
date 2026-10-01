@@ -34,7 +34,7 @@ interface PublicMessage {
   phone: string | null
   interest: string
   message: string
-  source: 'contact_form' | 'ai_chat'
+  source: 'contact_form' | 'ai_chat' | 'property_portal'
   status: 'new' | 'read' | 'replied'
   created_at: string
 }
@@ -105,6 +105,7 @@ const MESSAGE_STATUS_BADGES: Record<string, string> = {
 const SOURCE_LABELS: Record<string, string> = {
   contact_form: 'Contact Form',
   ai_chat: 'CZAAH AI',
+  property_portal: 'CZAAH Properties',
 }
 
 export default function AdminEnquiriesPage() {
@@ -380,9 +381,9 @@ export default function AdminEnquiriesPage() {
 
   return (
     <div>
-      {/* Since Phase 9, property.czaah.com enquiries are stored as leads, not here. */}
+      {/* property.czaah.com enquiries are leads first; a copy lands here so this is the one list of everything. */}
       <a href="/admin/property-leads" className="block mb-4 px-4 py-2.5 text-sm border border-primary/30 text-on-surface-variant hover:text-primary">
-        Enquiries and viewing requests from property.czaah.com are now in <strong className="text-primary">Property Leads</strong> →
+        Enquiries from property.czaah.com appear here too, marked CZAAH Properties. Manage their viewings, status and deals in <strong className="text-primary">Property Leads</strong> →
       </a>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -453,6 +454,7 @@ export default function AdminEnquiriesPage() {
               <option value="all">All Sources</option>
               <option value="contact_form">Contact Form</option>
               <option value="ai_chat">CZAAH AI</option>
+              <option value="property_portal">CZAAH Properties</option>
             </select>
           )}
         </div>
