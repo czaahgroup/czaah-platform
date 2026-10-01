@@ -8,7 +8,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/request' },
 }
 
-export default function RequestPage() {
+export default async function RequestPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const raw = (await searchParams).mineral
+  // Shown in a form field, so only a plain short name is accepted.
+  const mineral = typeof raw === 'string' && /^[\p{L}\p{N} &,.()'-]{2,80}$/u.test(raw.trim()) ? raw.trim() : ''
   return (
     <div className="max-w-[900px] mx-auto px-4 sm:px-8 py-10">
       <p className="text-xs text-on-surface-variant mb-3"><Link href="/minerals-portal" className="hover:text-primary">Home</Link> / Request a mineral</p>
@@ -17,7 +20,7 @@ export default function RequestPage() {
         Not seeing what you need among the <Link href="/minerals-portal/offers" className="text-primary underline">current offers</Link>?
         Tell us the mineral, the grade and the quantity, and where it needs to go.
       </p>
-      <RfqForm />
+      <RfqForm mineral={mineral} />
     </div>
   )
 }

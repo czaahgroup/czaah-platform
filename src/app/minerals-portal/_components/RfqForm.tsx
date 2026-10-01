@@ -13,12 +13,15 @@ const labelClass = 'text-xs font-medium tracking-[0.05em] uppercase text-on-surf
  */
 export function RfqForm({
   offer,
+  mineral = '',
 }: {
   offer?: { id: string; title: string; reference: string; quantity_unit: string; supply: boolean }
+  /** Prefills "Mineral wanted" on a sourcing request (e.g. arriving from the guide). */
+  mineral?: string
 }) {
   const trade = !offer || offer.supply
   const [form, setForm] = useState({
-    name: '', company: '', email: '', phone: '', country: '', commodity: '',
+    name: '', company: '', email: '', phone: '', country: '', commodity: mineral,
     quantity: '', quantity_unit: offer?.quantity_unit || 'MT', incoterm: '', destination_port: '', message: '', hp_field: '',
   })
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')

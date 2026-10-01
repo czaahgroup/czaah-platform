@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 const LINKS = [
   { href: '/minerals-portal/offers', label: 'Offers' },
-  { href: '/minerals-portal/offers?type=supply', label: 'For sale' },
-  { href: '/minerals-portal/offers?type=opportunity', label: 'Opportunities' },
+  { href: '/minerals-portal/resources', label: 'Resources' },
+  { href: '/minerals-portal/about', label: 'About' },
   { href: '/minerals-portal/request', label: 'Request a mineral' },
 ]
 
@@ -61,7 +61,6 @@ export default function MineralsLayout({ children }: { children: React.ReactNode
             <p className="text-xs uppercase tracking-[0.15em] text-on-surface-variant/70 mb-3">Minerals</p>
             <ul className="space-y-2">
               {LINKS.map((l) => <li key={l.href}><Link href={l.href} className="text-on-surface-variant hover:text-primary">{l.label}</Link></li>)}
-              <li><a href="https://czaah.com/sectors/minerals" className="text-on-surface-variant hover:text-primary">Minerals &amp; mining at CZAAH</a></li>
             </ul>
           </div>
           <div>

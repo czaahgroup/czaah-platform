@@ -96,17 +96,61 @@ test.describe('CZAAH Minerals', () => {
     expect(read('wrangler.jsonc')).toContain('"pattern": "minerals.czaah.com"')
     expect(read('src/app/robots.ts')).toContain('https://minerals.czaah.com/sitemap.xml')
     // No <nav> element: the group site's global nav rule would pin it over the page.
-    for (const f of ['layout.tsx', 'page.tsx', 'offers/page.tsx', 'offers/[id]/page.tsx', 'request/page.tsx']) {
+    for (const f of ['layout.tsx', 'page.tsx', 'offers/page.tsx', 'offers/[id]/page.tsx', 'request/page.tsx', 'resources/page.tsx', 'about/page.tsx']) {
       expect(read(`src/app/minerals-portal/${f}`)).not.toMatch(/<nav[\s>]/)
     }
   })
 
   test('copy makes no claim CZAAH has not checked', () => {
-    const pages = ['layout.tsx', 'page.tsx', 'offers/page.tsx', 'offers/[id]/page.tsx', 'request/page.tsx', '_components/OfferCard.tsx', '_components/RfqForm.tsx']
-      .map((f) => read(`src/app/minerals-portal/${f}`)).join('\n')
-    for (const banned of [/guarantee/i, /\bcertified\b/i, /world[- ]class/i, /\$\s?1 trillion/i, /risk[- ]free/i, /proven reserves/i]) {
+    const pages = ['layout.tsx', 'page.tsx', 'offers/page.tsx', 'offers/[id]/page.tsx', 'request/page.tsx', 'resources/page.tsx', 'about/page.tsx', '_components/OfferCard.tsx', '_components/RfqForm.tsx']
+      .map((f) => read(`src/app/minerals-portal/${f}`)).join('\n') + read('src/app/sectors/minerals/page.tsx')
+    for (const banned of [/guarantee/i, /\bcertified\b/i, /world[- ]class/i, /\$\s?1 ?(trillion|T\+)/i, /risk[- ]free/i, /proven reserves/i, /investment[- ]ready/i, /verified investment/i, /untapped/i, /unprecedented/i]) {
       expect(pages).not.toMatch(banned)
     }
     expect(pages).toContain('as stated by the seller')
+  })
+})
+
+test.describe('guide to Pakistan\'s minerals', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { MINERAL_RESOURCES, PROVINCES } = require('@/app/minerals-portal/_components/resources') as typeof import('@/app/minerals-portal/_components/resources')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { MINERAL_CATEGORIES } = require('@/lib/minerals') as typeof import('@/lib/minerals')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { existsSync } = require('fs') as typeof import('fs')
+
+  test('all 21 minerals came across, each with a real image, category and province', () => {
+    expect(MINERAL_RESOURCES).toHaveLength(21)
+    expect(new Set(MINERAL_RESOURCES.map((r) => r.slug)).size).toBe(21)
+    for (const r of MINERAL_RESOURCES) {
+      expect(MINERAL_CATEGORIES.map((c) => c.value), r.name).toContain(r.category)
+      expect(PROVINCES, r.name).toContain(r.province)
+      expect(existsSync(join(__dirname, '..', 'public', r.image)), `${r.name}: ${r.image}`).toBe(true)
+    }
+  })
+
+  test('the guide rates nothing and promises nothing', () => {
+    const text = MINERAL_RESOURCES.map((r) => `${r.name} ${r.description} ${r.uses} ${r.places}`).join('\n')
+    for (const banned of [/world[- ]class/i, /world'?s (largest|finest|second)/i, /\bfinest\b/i, /premium/i, /tier 1/i, /exceptional/i, /massive/i, /untapped/i, /upside/i, /opportunit/i, /investment/i, /unprecedented/i, /\bboom\b/i, /\d+ ?%/]) {
+      expect(text).not.toMatch(banned)
+    }
+  })
+
+  test('a figure only appears with a named source beside it', () => {
+    for (const r of MINERAL_RESOURCES) {
+      const hasFigure = /\d[\d,.]* ?(million|billion|tonnes|ounces|km)/i.test(r.description)
+      if (hasFigure) {
+        expect(r.source, `${r.name} states a figure`).toBeTruthy()
+        expect(r.source!.url).toMatch(/^https:\/\//)
+      }
+    }
+    // The three that carry figures today.
+    expect(MINERAL_RESOURCES.filter((r) => r.source).map((r) => r.slug)).toEqual(['copper', 'gold', 'coal-thar'])
+  })
+
+  test('the group page no longer carries the directory or a price panel', () => {
+    const page = read('src/app/sectors/minerals/page.tsx')
+    expect(page).toContain('https://minerals.czaah.com')
+    for (const gone of ['mn-panel', 'METALS_API_KEY', 'Live Metal Prices', 'FALLBACK_PRICES']) expect(page).not.toContain(gone)
   })
 })

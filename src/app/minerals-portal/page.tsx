@@ -35,6 +35,9 @@ export default async function MineralsHome() {
             <Link href="/minerals-portal/offers" className="liquid-gold-bg text-on-primary px-8 py-4 font-bold tracking-[0.15em] uppercase text-sm inline-block">Browse offers</Link>
             <Link href="/minerals-portal/request" className="border border-primary/50 text-primary px-8 py-4 font-bold tracking-[0.15em] uppercase text-sm inline-block">Request a mineral</Link>
           </div>
+          <p className="text-on-surface-variant mt-8">
+            New to Pakistan&rsquo;s minerals? Read the <Link href="/minerals-portal/resources" className="text-primary underline">guide by type and province</Link>.
+          </p>
         </div>
       </section>
 
