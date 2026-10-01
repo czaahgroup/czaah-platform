@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { portalPhone, portalWhatsApp } from './portalRuntime';
 import { track } from './analytics';
 import { Button } from './ui';
-import { VIEWING_SLOTS } from '@/lib/propertyLeads';
+import { VIEWING_SLOTS, VIEWING_MODES, VIEWING_MODE_LABEL, type ViewingMode } from '@/lib/propertyLeads';
 
 // Listing actions (brief §11, §33): enquire and request a viewing without an
 // account, Call / WhatsApp to CZAAH's own numbers (never the owner's), share.
@@ -57,7 +57,7 @@ export function EnquiryForm({
   rental: boolean;
 }) {
   const ref = listingReference(listing.id);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', date: '', slot: SLOTS[3], company_site: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '', date: '', slot: SLOTS[3], viewing: 'in_person' as ViewingMode, company_site: '' });
   const [leadRef, setLeadRef] = useState<string | null>(null);
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
@@ -81,6 +81,7 @@ export function EnquiryForm({
           message: form.message.trim() || (mode === 'viewing' ? 'I would like to arrange a viewing.' : 'I would like more information about this property.'),
           preferred_date: mode === 'viewing' ? form.date : undefined,
           preferred_slot: mode === 'viewing' ? form.slot : undefined,
+          viewing_mode: mode === 'viewing' ? form.viewing : undefined,
           source_page: window.location.pathname,
           company_site: form.company_site,
         }),
@@ -99,10 +100,12 @@ export function EnquiryForm({
   if (state === 'sent') {
     return (
       <div className="pp-enquiry-done" role="status">
-        <strong>{mode === 'viewing' ? 'Viewing request sent.' : 'Enquiry sent.'}</strong>
+        <strong>{mode === 'viewing' ? 'Viewing request received' : 'Request received'}</strong>
         <p>
-          The CZAAH Properties team will be in touch{mode === 'viewing' ? ' to confirm a time' : ''}. Your
-          reference is {leadRef || ref}.
+          {mode === 'viewing'
+            ? 'This is a request, not a booking: the CZAAH Properties team will contact you to agree a time.'
+            : 'The CZAAH Properties team will be in touch.'}{' '}
+          Your reference is {leadRef || ref}.
         </p>
         <button type="button" className="pp-link-btn" onClick={() => { setState('idle'); setForm((f) => ({ ...f, message: '' })); }}>
           Send another message
@@ -115,8 +118,8 @@ export function EnquiryForm({
     <form className="pp-enquiry-form" onSubmit={submit} id="enquiry-form">
       <div className="pp-enquiry-modes" role="radiogroup" aria-label="Request type">
         {(['enquiry', 'viewing'] as Mode[]).map((m) => (
-          <button key={m} type="button" role="radio" aria-checked={mode === m} className={mode === m ? 'is-active' : undefined} onClick={() => onModeChange(m)}>
-            {m === 'enquiry' ? 'Enquire' : 'Book a viewing'}
+          <button key={m} type="button" role="radio" aria-checked={mode === m} className={mode === m ? 'is-active' : undefined} onClick={() => { if (m === 'viewing' && mode !== 'viewing') track('viewing_started', { listing_id: listing.id }); onModeChange(m); }}>
+            {m === 'enquiry' ? 'Request details' : 'Book a viewing'}
           </button>
         ))}
       </div>
@@ -126,6 +129,16 @@ export function EnquiryForm({
       <label><span>Name *</span><input required maxLength={200} autoComplete="name" value={form.name} onChange={(e) => set('name', e.target.value)} /></label>
       <label><span>Email *</span><input required type="email" maxLength={254} autoComplete="email" value={form.email} onChange={(e) => set('email', e.target.value)} /></label>
       <label><span>Phone</span><input type="tel" maxLength={50} autoComplete="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} /></label>
+      {mode === 'viewing' && (
+        <div className="pp-enquiry-viewmode" role="radiogroup" aria-label="Viewing type">
+          {VIEWING_MODES.map((v) => (
+            <label key={v} className={form.viewing === v ? 'is-on' : undefined}>
+              <input type="radio" name="viewing_mode" checked={form.viewing === v} onChange={() => set('viewing', v)} />
+              {VIEWING_MODE_LABEL[v]}
+            </label>
+          ))}
+        </div>
+      )}
       {mode === 'viewing' && (
         <div className="pp-enquiry-row">
           <label><span>Preferred date</span><input type="date" min={today} value={form.date} onChange={(e) => set('date', e.target.value)} /></label>
@@ -149,7 +162,7 @@ export function EnquiryForm({
       </label>
       {state === 'error' && <p className="pp-sell-err" role="alert">{error}</p>}
       <Button type="submit" disabled={state === 'sending'}>
-        {state === 'sending' ? 'Sending…' : mode === 'viewing' ? 'Request viewing' : 'Send enquiry'}
+        {state === 'sending' ? 'Sending…' : mode === 'viewing' ? 'Request Viewing' : 'Request Details'}
       </Button>
       <p className="pp-enquire-note">No account needed. Your details go to the CZAAH Properties team only.</p>
     </form>
@@ -168,7 +181,7 @@ export function ContactButtons({ listing, className }: { listing: ActionListing;
       )}
       {wa && (
         <a href={wa} target="_blank" rel="noopener noreferrer" className="pp-btn pp-btn--ghost pp-btn-whatsapp" onClick={() => track('whatsapp_click', { listing_id: listing.id })}>
-          WhatsApp
+          Chat on WhatsApp
         </a>
       )}
     </div>
@@ -204,11 +217,23 @@ export function ShareButton({ listing }: { listing: ActionListing }) {
 }
 
 /**
- * Sticky bottom bar on phones (brief §11, §28): Call · WhatsApp · Enquire.
- * It flags <html> so the AI bubble and the footer make room for it.
+ * Sticky bottom bar on phones: Enquire · Book Viewing · Save (plus WhatsApp
+ * once CZAAH's number is set). It flags <html> so the AI bubble and the footer
+ * make room for it.
  */
-export function StickyActions({ listing, onEnquire }: { listing: ActionListing; onEnquire: () => void }) {
-  const tel = phoneHref();
+export function StickyActions({
+  listing,
+  onEnquire,
+  onViewing,
+  saved,
+  onSave,
+}: {
+  listing: ActionListing;
+  onEnquire: () => void;
+  onViewing: () => void;
+  saved: boolean;
+  onSave: () => void;
+}) {
   const wa = whatsappHref(listing);
   const bar = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -218,13 +243,20 @@ export function StickyActions({ listing, onEnquire }: { listing: ActionListing; 
   }, []);
   return (
     <div className="pp-sticky-cta" ref={bar} role="region" aria-label="Contact about this property">
-      {tel && <a href={tel} onClick={() => track('phone_click', { listing_id: listing.id, via: 'sticky' })}>Call</a>}
+      <button type="button" className="is-primary" onClick={onEnquire}>Enquire</button>
+      <button type="button" onClick={onViewing}>Book Viewing</button>
       {wa && (
-        <a href={wa} target="_blank" rel="noopener noreferrer" onClick={() => track('whatsapp_click', { listing_id: listing.id, via: 'sticky' })}>
-          WhatsApp
+        <a href={wa} target="_blank" rel="noopener noreferrer" className="is-icon" aria-label="Chat on WhatsApp" onClick={() => track('whatsapp_click', { listing_id: listing.id, via: 'sticky' })}>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 20l1.3-4.2A8 8 0 1 1 8.4 19L4 20Z" />
+          </svg>
         </a>
       )}
-      <button type="button" className="is-primary" onClick={onEnquire}>Enquire</button>
+      <button type="button" className={`is-icon${saved ? ' is-saved' : ''}`} aria-pressed={saved} aria-label={saved ? 'Remove from saved' : 'Save property'} onClick={onSave}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+          <path d="M12 20s-7-4.6-7-9.3A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.7C19 15.4 12 20 12 20Z" />
+        </svg>
+      </button>
     </div>
   );
 }

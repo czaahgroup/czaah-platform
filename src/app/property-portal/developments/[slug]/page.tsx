@@ -32,7 +32,7 @@ function displayPrice(amount, currency, display) {
   if (amount == null) return 'Price on request';
   if (display && display !== currency) {
     const converted = convertPrice(amount, currency, display);
-    if (converted != null) return `~ ${display} ${Math.round(converted).toLocaleString()}`;
+    if (converted != null) return `~ ${display} ${Math.round(converted).toLocaleString('en-GB')}`;
   }
   return formatMoney(amount, currency);
 }

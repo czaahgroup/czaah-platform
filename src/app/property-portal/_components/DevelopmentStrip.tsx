@@ -49,7 +49,7 @@ export function DevelopmentStrip({
     if (amount == null) return 'Price on request';
     if (prefCcy && prefCcy !== currency) {
       const converted = convertPrice(amount, currency, prefCcy);
-      if (converted != null) return `~ ${prefCcy} ${Math.round(converted).toLocaleString()}`;
+      if (converted != null) return `~ ${prefCcy} ${Math.round(converted).toLocaleString('en-GB')}`;
     }
     return formatMoney(amount, currency);
   };

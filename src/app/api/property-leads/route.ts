@@ -5,7 +5,7 @@ import { rateLimit } from '@/lib/rateLimit'
 import { logError } from '@/lib/logError'
 import { escapeHtml } from '@/lib/escapeHtml'
 import { resend, FROM_EMAIL } from '@/lib/resend/client'
-import { cleanLead, listingRef, LEAD_KIND_LABEL } from '@/lib/propertyLeads'
+import { cleanLead, listingRef, LEAD_KIND_LABEL, VIEWING_MODE_LABEL } from '@/lib/propertyLeads'
 
 /**
  * Public: an enquiry, viewing request or investment enquiry from
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     if (lead!.kind === 'viewing_request') {
       const { error: vErr } = await db.from('property_viewings').insert({
-        lead_id: row.id, listing_id: listing?.id ?? null, preferred_date: lead!.preferred_date, preferred_slot: lead!.preferred_slot,
+        lead_id: row.id, listing_id: listing?.id ?? null, preferred_date: lead!.preferred_date, preferred_slot: lead!.preferred_slot, mode: lead!.viewing_mode || 'in_person',
       })
       if (vErr) logError('api.property-leads', vErr, { step: 'viewing-insert', lead: row.reference })
     }
@@ -134,11 +134,13 @@ async function sendEmails(
     ['Property', listing ? `${listing.title} (${listingRef(listing.id)})` : null],
     ['Preferred date', lead.preferred_date],
     ['Preferred time', lead.preferred_slot],
+    ['Viewing type', lead.viewing_mode ? VIEWING_MODE_LABEL[lead.viewing_mode] : null],
+    ['Looking to', lead.kind === 'property_sourcing_request' ? lead.purpose : null],
     ['Budget', lead.budget_amount ? `${lead.budget_currency || ''} ${lead.budget_amount.toLocaleString('en-GB')}`.trim() : null],
     ['Location', [lead.city, lead.country].filter(Boolean).join(', ') || null],
     ['Property type', lead.property_type],
     ['Funding', lead.funding],
-    ['Purpose', lead.purpose],
+    ['Purpose', lead.kind === 'property_sourcing_request' ? null : lead.purpose],
     ['Timeline', lead.timeline],
     ['Message', lead.message],
   ]
@@ -156,11 +158,11 @@ async function sendEmails(
     html: wrap(`<h2 style="color:#C9A84C;font-size:19px;margin:0 0 16px">${e(kind)}</h2><table style="width:100%;border-collapse:collapse">${table}</table><p style="margin:22px 0 0"><a href="${adminBase}/admin/property-leads" style="display:inline-block;background:#C9A84C;color:#000;padding:11px 26px;border-radius:4px;text-decoration:none;font-weight:600;font-size:14px">Open in Property Leads &rarr;</a></p>`),
   })
 
-  const what = lead.kind === 'viewing_request' ? 'viewing request' : lead.kind === 'investment_enquiry' ? 'investment enquiry' : 'enquiry'
+  const what = lead.kind === 'viewing_request' ? 'viewing request' : lead.kind === 'investment_enquiry' ? 'investment enquiry' : lead.kind === 'property_sourcing_request' ? 'property requirements' : lead.kind === 'advisor_request' ? 'message' : 'enquiry'
   await resend.emails.send({
     from: FROM_EMAIL,
     to: lead.email,
     subject: `We've received your ${what} (${reference})`,
-    html: wrap(`<h2 style="color:#C9A84C;font-size:19px;margin:0 0 16px">Thank you, ${e(lead.name)}</h2><p style="color:rgba(255,255,255,0.7);line-height:1.6;margin:0 0 14px">We've received your ${what}${listing ? ` about <strong style="color:#fff">${e(listing.title)}</strong>` : ''}. A member of the CZAAH Properties team will be in touch${lead.kind === 'viewing_request' ? ' to confirm a time' : ''}.</p><p style="color:rgba(255,255,255,0.7);line-height:1.6;margin:0">Your reference is <strong style="color:#fff">${e(reference)}</strong>.</p>`),
+    html: wrap(`<h2 style="color:#C9A84C;font-size:19px;margin:0 0 16px">Thank you, ${e(lead.name)}</h2><p style="color:rgba(255,255,255,0.7);line-height:1.6;margin:0 0 14px">We've received your ${what}${listing ? ` about <strong style="color:#fff">${e(listing.title)}</strong>` : ''}. A member of the CZAAH Properties team will be in touch${lead.kind === 'viewing_request' ? ' to arrange a time. Your viewing is not confirmed until we have agreed one with you' : ''}.</p><p style="color:rgba(255,255,255,0.7);line-height:1.6;margin:0">Your reference is <strong style="color:#fff">${e(reference)}</strong>.</p>`),
   })
 }

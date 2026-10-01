@@ -17,7 +17,14 @@ export type PortalEvent =
   | 'seller_submission'
   | 'save_search'
   | 'account_created'
-  | 'account_sign_in';
+  | 'account_sign_in'
+  | 'search_performed'
+  | 'filter_used'
+  | 'viewing_started'
+  | 'advisor_clicked'
+  | 'advisor_request'
+  | 'property_sourcing_started'
+  | 'property_sourcing_submitted';
 
 export function track(event: PortalEvent, data: Record<string, string | number | boolean | null | undefined> = {}) {
   if (typeof window === 'undefined') return;

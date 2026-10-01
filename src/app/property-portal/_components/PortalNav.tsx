@@ -7,20 +7,21 @@ import { MarkhorMark } from '@/components/MarkhorMark';
 import { CURRENCIES } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 import { useBuyer } from './buyerSession';
+import { track } from './analytics';
 
-// The CZAAH Properties brief's navigation. Allocate Capital and Insights
-// moved to the footer.
+// Seven links, no dropdowns. Home is the logo; About and Contact are in the
+// footer, and "Speak to an Advisor" is the bar's one button.
 const LINKS: { label: string; href: string; neverActive?: boolean }[] = [
-  { label: 'Home', href: '/property-portal' },
   { label: 'Buy', href: '/property-portal/buy' },
   { label: 'Rent', href: '/property-portal/rent' },
-  { label: 'Sell', href: '/property-portal/sell' },
-  { label: 'Investments', href: '/property-portal/investments' },
-  { label: 'New Projects', href: '/property-portal/new-projects' },
+  { label: 'Off-Plan', href: '/property-portal/new-projects' },
+  { label: 'Invest', href: '/property-portal/investments' },
   { label: 'Locations', href: '/property-portal/destinations' },
-  { label: 'About', href: '/property-portal/about' },
-  { label: 'Contact', href: '/property-portal/contact' },
+  { label: 'Sell', href: '/property-portal/sell' },
+  { label: 'Insights', href: '/property-portal/insights' },
 ];
+// The drawer leads with what a phone visitor does most.
+const DRAWER_FIRST = ['Buy', 'Rent', 'Off-Plan', 'Locations'];
 
 const CTA_HREF = '/property-portal/contact';
 const SEARCH_HREF = '/property-portal/listings';
@@ -136,10 +137,11 @@ export function PortalNav() {
     <div className="pp-navwrap">
       <header className={`pp-nav${overHero ? ' is-over-hero' : ' is-solid'}${lifted ? ' is-lifted' : ''}`}>
       <div className="pp-nav-inner" ref={barRef}>
-        <Link href="/property-portal" className="pp-logo" onClick={() => setOpen(false)}>
+        <Link href="/property-portal" className="pp-logo" onClick={() => setOpen(false)} aria-label="CZAAH Properties — home">
           <MarkhorMark className="pp-logo-mark" />
           <span className="pp-logo-divider" />
           <span className="pp-logo-word">CZAAH</span>
+          <span className="pp-logo-sub">Properties</span>
         </Link>
 
         <nav className="pp-nav-links" aria-label="Primary">
@@ -197,6 +199,11 @@ export function PortalNav() {
               <circle cx="12" cy="8.5" r="3.6" />
               <path d="M4.8 20c.9-3.6 3.8-5.6 7.2-5.6s6.3 2 7.2 5.6" strokeLinecap="round" />
             </svg>
+            <span className="pp-nav-account-text">{user ? 'Account' : 'Sign In'}</span>
+          </Link>
+
+          <Link href={CTA_HREF} className="pp-nav-advisor" onClick={() => track('advisor_clicked', { via: 'nav' })}>
+            Speak to an Advisor
           </Link>
 
           <button
@@ -219,7 +226,14 @@ export function PortalNav() {
         ref={drawerRef}
         className={`pp-mobile-menu${open ? ' open' : ''}`}
       >
-        {LINKS.map((l) => (
+        <Link href={SEARCH_HREF} className="pp-mobile-search" onClick={() => setOpen(false)}>
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="M16 16l4.5 4.5" />
+          </svg>
+          Search properties
+        </Link>
+        {[...LINKS.filter((l) => DRAWER_FIRST.includes(l.label)), ...LINKS.filter((l) => !DRAWER_FIRST.includes(l.label))].map((l) => (
           <Link
             key={l.label}
             href={l.href}
@@ -229,7 +243,12 @@ export function PortalNav() {
             {l.label}
           </Link>
         ))}
-        <Link href={SEARCH_HREF} onClick={() => setOpen(false)}>Search</Link>
+        <Link href="/property-portal/saved" onClick={() => setOpen(false)}>
+          Saved{count > 0 ? ` (${count})` : ''}
+        </Link>
+        <Link href="/property-portal/account" onClick={() => setOpen(false)}>
+          {user ? 'Your account' : 'Sign in / Create account'}
+        </Link>
         {/* On the smallest phones the bar has no room for the currency
             picker, so it lives here too. */}
         <label className="pp-mobile-ccy">
@@ -241,14 +260,8 @@ export function PortalNav() {
             ))}
           </select>
         </label>
-        <Link href="/property-portal/saved" onClick={() => setOpen(false)}>
-          Saved{count > 0 ? ` (${count})` : ''}
-        </Link>
-        <Link href="/property-portal/account" onClick={() => setOpen(false)}>
-          {user ? 'Your account' : 'Sign in / Create account'}
-        </Link>
-        <Link href={CTA_HREF} className="pp-mobile-cta" onClick={() => setOpen(false)}>
-          Speak to CZAAH
+        <Link href={CTA_HREF} className="pp-mobile-cta" onClick={() => { track('advisor_clicked', { via: 'drawer' }); setOpen(false); }}>
+          Speak to an Advisor
         </Link>
       </div>
       </header>

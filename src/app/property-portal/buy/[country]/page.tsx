@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { BuyView } from '../BuyView'
 import { loadRouteLocation, locationPageMetadata } from '@/lib/locationPages'
+import { ListingsSeed } from '../../_components/useListings'
+import { loadPortalListings } from '@/lib/publicListings'
 
 type Params = { params: Promise<{ country: string }> }
 
@@ -15,5 +17,9 @@ export default async function Page({ params }: Params) {
   const loc = await loadRouteLocation(country)
   // A market that is off, or never existed, is a real 404.
   if (loc === null) notFound()
-  return <BuyView countrySlug={country} />
+  return (
+    <ListingsSeed data={await loadPortalListings()}>
+      <BuyView countrySlug={country} />
+    </ListingsSeed>
+  )
 }

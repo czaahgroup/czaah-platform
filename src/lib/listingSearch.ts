@@ -11,9 +11,9 @@ export type SearchSection = 'buy' | 'rent' | 'listings' | 'off-plan'
 
 /** The query parameters each section filters on (sort, page, ccy only order/display). */
 export const SECTION_FILTER_PARAMS: Record<SearchSection, string[]> = {
-  buy: ['market', 'search', 'type', 'beds', 'price', 'stage'],
-  rent: ['market', 'search', 'type', 'beds', 'price', 'furnishing'],
-  listings: ['market', 'search', 'type', 'beds', 'price', 'listing_type', 'with_yield', 'plot_size', 'plot_category', 'possession', 'corner', 'main_road', 'canal_facing', 'approved'],
+  buy: ['market', 'search', 'type', 'beds', 'baths', 'price', 'stage'],
+  rent: ['market', 'search', 'type', 'beds', 'baths', 'price', 'furnishing'],
+  listings: ['market', 'search', 'type', 'beds', 'baths', 'price', 'listing_type', 'with_yield', 'plot_size', 'plot_category', 'possession', 'corner', 'main_road', 'canal_facing', 'approved'],
   'off-plan': ['market', 'search', 'type', 'price'],
 }
 
@@ -61,12 +61,17 @@ export const usdMonthlyRent = (p: Listing, fx?: Record<string, number>) => {
   return toUsd(perMonth, p.currency, fx) ?? perMonth
 }
 
+export const marketKey = (name: string) => name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+/**
+ * ?market= on the All properties and Off-plan pages. A key is a country or a
+ * city name in slug form ("united-kingdom", "dubai"), so a market added in
+ * Admin → Locations needs no code. Older links used london / dubai / pakistan,
+ * which are a city, a city and a country — all three still match.
+ */
 export function matchesMarketKey(p: Listing, market: string) {
   if (!market || market === 'all') return true
-  if (market === 'london') return p.city?.toLowerCase() === 'london'
-  if (market === 'dubai') return p.city?.toLowerCase() === 'dubai'
-  if (market === 'pakistan') return p.country?.toLowerCase() === 'pakistan'
-  return true
+  return marketKey(p.country || '') === market || marketKey(p.city || '') === market
 }
 
 function inSearchLocation(p: Listing, loc: SearchLocation | null | undefined) {
@@ -136,6 +141,8 @@ export function filterListings<T>(input: T[], section: SearchSection, params: UR
   }
   if (type) list = list.filter((p) => p.property_type === type)
   if (beds && section !== 'off-plan') list = list.filter((p) => (p.bedrooms ?? -1) >= Number(beds))
+  const baths = get('baths')
+  if (baths && section !== 'off-plan') list = list.filter((p) => (p.bathrooms ?? -1) >= Number(baths))
 
   if (section === 'listings') {
     const listingType = get('listing_type')

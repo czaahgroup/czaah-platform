@@ -77,8 +77,12 @@ export function startBuyerSession() {
 
 /** The signed-in visitor; `ready` is false until the session has been checked. */
 export function useBuyer() {
-  const [user, setUser] = useState<User | null>(current);
-  const [ready, setReady] = useState(known);
+  // Always start signed-out and not ready, so the server and the first client
+  // render agree; the real session arrives in the effect below. Starting from
+  // the module's `known` made a component that hydrates late (inside a
+  // Suspense boundary) render differently from its server HTML.
+  const [user, setUser] = useState<User | null>(null);
+  const [ready, setReady] = useState(false);
   useEffect(() => {
     startBuyerSession();
     const fn = (u: User | null) => { setUser(u); setReady(true); };

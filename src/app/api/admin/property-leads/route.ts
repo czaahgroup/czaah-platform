@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     const { data: listing } = lead.listing_id
       ? await db.from('property_listings').select('listing_type, price, currency').eq('id', lead.listing_id).maybeSingle()
       : { data: null }
-    const d = dealFromLead({ kind: lead.kind as LeadKind, listing_title: lead.listing_title, name: lead.name, reference: lead.reference }, listing)
+    const d = dealFromLead({ kind: lead.kind as LeadKind, listing_title: lead.listing_title, name: lead.name, reference: lead.reference, purpose: lead.purpose }, listing)
 
     // deals.country is a 2-letter code; map the market name via Admin → Locations.
     let country: string | null = null

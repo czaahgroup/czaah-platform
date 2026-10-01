@@ -4,11 +4,20 @@ import Link from 'next/link';
 import { LiveProperty, LISTING_META, formatPrice, isNewListing, isRental, sizedImage, fallbackToOriginal } from './types';
 import { useCurrencyPref, useWishlist } from './usePortalPrefs';
 import { yieldLabel } from '@/lib/marketFields';
+import { track } from './analytics';
 
-// Image-led portrait card: the photograph IS the card, with the detail laid
-// over a gradient at its foot. Replaces the old image-plus-white-body layout,
-// which spent half its height on chrome and two buttons the whole card could
-// do on its own.
+const TYPE_LABEL: Record<string, string> = {
+  residential: 'Residential',
+  commercial: 'Commercial',
+  industrial: 'Industrial',
+  mixed_use: 'Mixed use',
+  land: 'Land',
+};
+
+// Photograph on top, facts underneath. Only what the listing actually states
+// is shown: a missing bedroom count or size leaves no gap and no placeholder.
+// The title link is stretched over the whole card, so the card is one tap
+// target; the save button sits above it.
 export function PropertyCard({
   prop,
   displayCurrency,
@@ -26,59 +35,73 @@ export function PropertyCard({
   const shownCurrency = displayCurrency || currency || undefined;
   const saved = ready && has(prop.id);
 
-  // A compact "3 bed, Commercial" line, the way a developer states stock.
-  const summary = [
-    prop.bedrooms != null ? (prop.bedrooms === 0 ? 'Studio' : `${prop.bedrooms} BR`) : null,
-    prop.area_sqft != null ? `${prop.area_sqft.toLocaleString()} ft²` : null,
-    prop.property_type ? prop.property_type.replace('_', ' ') : null,
-  ]
-    .filter(Boolean)
-    .join(', ');
+  const specs = [
+    prop.bedrooms != null ? (prop.bedrooms === 0 ? 'Studio' : `${prop.bedrooms} bed`) : null,
+    prop.bathrooms != null ? `${prop.bathrooms} bath` : null,
+    prop.area_sqft != null ? `${prop.area_sqft.toLocaleString('en-GB')} ft²` : null,
+    prop.property_type ? TYPE_LABEL[prop.property_type] || prop.property_type.replace('_', ' ') : null,
+  ].filter(Boolean) as string[];
+
+  // Sourced extras only — each is shown exactly as recorded on the listing.
+  const completion = prop.completion_date ? new Date(prop.completion_date) : null;
+  const notes = [
+    prop.yield_percentage != null ? `${prop.yield_percentage}% ${yieldLabel(prop.yield_source).toLowerCase()}` : null,
+    completion && !Number.isNaN(completion.getTime())
+      ? `Completion ${completion.toLocaleDateString('en-GB', { timeZone: 'UTC', month: 'short', year: 'numeric' })}`
+      : null,
+    prop.has_payment_plan ? 'Payment plan' : null,
+    prop.developer_name ? `By ${prop.developer_name}` : null,
+  ].filter(Boolean) as string[];
+
+  const place = [prop.location, prop.city, prop.country].filter(Boolean).join(', ');
 
   return (
-    <article className="pp-card">
-      {/* The whole card is the link; the save button sits above it. */}
-      <Link href={href} className="pp-card-link" aria-label={prop.title}>
+    <article className="pp-pcard">
+      <div className="pp-pcard-media">
         {imageSrc ? (
-          <img className="pp-card-img" src={imageSrc} alt="" loading="lazy" decoding="async" onError={fallbackToOriginal} />
+          <img src={imageSrc} alt="" loading="lazy" decoding="async" onError={fallbackToOriginal} />
         ) : (
-          <div className="pp-card-img pp-card-img--empty">&#8962;</div>
+          <div className="pp-pcard-noimg" aria-hidden="true">&#8962;</div>
         )}
-
-        <div className="pp-card-flags">
-          <span className={`pp-card-status ${meta.className}`}>{meta.label}</span>
-          {isNewListing(prop) && <span className="pp-card-new">New</span>}
+        <div className="pp-pcard-flags">
+          <span className={`pp-pcard-flag ${meta.className}`}>{meta.label}</span>
+          {isNewListing(prop) && <span className="pp-pcard-flag is-new">New</span>}
           {/* Set only through Admin → Verification, with its checks recorded. */}
-          {prop.verified && <span className="pp-card-verified" title="Checked by CZAAH — see About us">Verified</span>}
+          {prop.verified && <span className="pp-pcard-flag is-verified" title="Checked by CZAAH — see About us">Verified</span>}
         </div>
+      </div>
 
-        <div className="pp-card-overlay">
-          <h3 className="pp-card-title">{prop.title}</h3>
-          <p className="pp-card-place">
-            {prop.location}
-            {prop.city ? `, ${prop.city}` : ''}
-            {prop.country ? `, ${prop.country}` : ''}
-          </p>
-          <p className="pp-card-price">
-            {prop.price && !isRental(prop) ? 'From ' : ''}
-            {formatPrice(prop, shownCurrency)}
-          </p>
-          {summary && <p className="pp-card-summary">{summary}</p>}
-          {prop.yield_percentage != null && (
-            <p className="pp-card-yield">{prop.yield_percentage}% {yieldLabel(prop.yield_source).toLowerCase()}</p>
-          )}
-        </div>
-      </Link>
+      <div className="pp-pcard-body">
+        <p className="pp-pcard-price">
+          {prop.price && !isRental(prop) && prop.listing_type === 'off_plan' ? <small>From </small> : null}
+          {formatPrice(prop, shownCurrency)}
+        </p>
+        <h3 className="pp-pcard-title">
+          <Link href={href} className="pp-pcard-link">{prop.title}</Link>
+        </h3>
+        {place && <p className="pp-pcard-place">{place}</p>}
+        {specs.length > 0 && (
+          <ul className="pp-pcard-specs">
+            {specs.map((s) => <li key={s}>{s}</li>)}
+          </ul>
+        )}
+        {notes.length > 0 && (
+          <ul className="pp-pcard-notes">
+            {notes.map((n) => <li key={n}>{n}</li>)}
+          </ul>
+        )}
+        <span className="pp-pcard-cta" aria-hidden="true">View property <i>→</i></span>
+      </div>
 
       <button
         type="button"
-        className={`pp-card-save${saved ? ' is-saved' : ''}`}
+        className={`pp-pcard-save${saved ? ' is-saved' : ''}`}
         aria-pressed={saved}
         aria-label={saved ? `Remove ${prop.title} from saved` : `Save ${prop.title}`}
         title={saved ? 'Remove from saved' : 'Save this property'}
-        onClick={() => toggle(prop.id)}
+        onClick={() => { if (!saved) track('property_save', { listing_id: prop.id }); toggle(prop.id); }}
       >
-        <svg viewBox="0 0 24 24" width="17" height="17" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill={saved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
           <path d="M12 20s-7-4.6-7-9.3A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.7C19 15.4 12 20 12 20Z" />
         </svg>
       </button>

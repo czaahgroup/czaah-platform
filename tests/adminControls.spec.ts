@@ -56,7 +56,7 @@ test.describe('home layout', () => {
   })
 
   test('every configurable section is rendered by the home page', () => {
-    const home = readFileSync(join(__dirname, '..', 'src/app/property-portal/page.tsx'), 'utf8')
+    const home = readFileSync(join(__dirname, '..', 'src/app/property-portal/HomeView.tsx'), 'utf8')
     for (const s of HOME_SECTIONS) expect(home).toMatch(new RegExp(`\\n    ${s.key}: \\(`))
   })
 })

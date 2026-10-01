@@ -34,8 +34,8 @@ export function AcquisitionCost({
 
   const fmt = (n: number) => {
     const v = ccy === prop.currency ? n : convertPrice(n, prop.currency, ccy);
-    if (v == null) return `${prop.currency} ${Math.round(n).toLocaleString()}`;
-    return `${ccy} ${Math.round(v).toLocaleString()}`;
+    if (v == null) return `${prop.currency} ${Math.round(n).toLocaleString('en-GB')}`;
+    return `${ccy} ${Math.round(v).toLocaleString('en-GB')}`;
   };
 
   const isPakistan = (prop.country || '').toLowerCase() === 'pakistan';

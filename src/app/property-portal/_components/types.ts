@@ -42,6 +42,8 @@ export interface LiveProperty {
   yield_percentage: number | null;
   partner_id?: string | null;
   created_at?: string | null;
+  developer_name?: string | null;
+  development_name?: string | null;
 }
 
 // A listing counts as "new" for this many days after it's published. The API
@@ -70,7 +72,7 @@ export function listedAgo(prop: Pick<LiveProperty, 'created_at'>): string | null
   if (d < 2) return 'Added yesterday';
   if (d < 14) return `Added ${Math.floor(d)} days ago`;
   if (d < 60) return `Added ${Math.floor(d / 7)} weeks ago`;
-  return new Date(prop.created_at as string).toLocaleDateString(undefined, {
+  return new Date(prop.created_at as string).toLocaleDateString('en-GB', { timeZone: 'UTC',
     month: 'long',
     year: 'numeric',
   });
@@ -113,6 +115,14 @@ export const MARKETS = [
   { key: 'pakistan', label: 'Pakistan' },
 ];
 
+/** Market tabs from Admin → Locations: one per active country. */
+export function portalMarketTabs(): { key: string; label: string }[] {
+  return [
+    { key: 'all', label: 'All Markets' },
+    ...portalCountries().map((name) => ({ key: marketKey(name), label: name })),
+  ];
+}
+
 export function matchesMarket(prop: LiveProperty, market: string) {
   if (!market || market === 'all') return true;
   if (market === 'london') return prop.city?.toLowerCase() === 'london';
@@ -136,6 +146,20 @@ export function resolveImage(image: string | null | undefined): string | null {
 export function sizedImage(image: string | null | undefined, width = 800): string | null {
   const url = resolveImage(image);
   if (!url) return null;
+  // Unsplash serves any width on request; ask for the one this slot needs
+  // rather than whatever size happened to be pasted into the listing.
+  if (url.startsWith('https://images.unsplash.com/')) {
+    try {
+      const u = new URL(url);
+      u.searchParams.set('w', String(width));
+      u.searchParams.set('q', '75');
+      u.searchParams.set('auto', 'format');
+      u.searchParams.set('fit', 'crop');
+      return u.toString();
+    } catch {
+      return url;
+    }
+  }
   const marker = '/storage/v1/object/public/';
   const at = url.indexOf(marker);
   if (at < 0 || !url.startsWith(process.env.NEXT_PUBLIC_SUPABASE_URL || '\u0000')) return url;
@@ -156,6 +180,7 @@ export function fallbackToOriginal(e: { currentTarget: HTMLImageElement }) {
 export { FX_PER_USD, CURRENCIES } from '@/lib/currencies';
 import { FX_PER_USD } from '@/lib/currencies';
 import { portalSettings, portalLocations } from './portalRuntime';
+import { marketKey } from '@/lib/listingSearch';
 
 export function convertPrice(price: number, from: string, to: string): number | null {
   // Rates are editable in admin; the shipped table is the fallback.
@@ -197,8 +222,8 @@ export function formatPrice(
   if (display && display !== prop.currency) {
     const converted = convertPrice(prop.price, prop.currency, display);
     if (converted != null) {
-      return `~ ${display} ${Math.round(converted).toLocaleString()}${per}`;
+      return `~ ${display} ${Math.round(converted).toLocaleString('en-GB')}${per}`;
     }
   }
-  return `${prop.currency} ${prop.price.toLocaleString()}${per}`;
+  return `${prop.currency} ${prop.price.toLocaleString('en-GB')}${per}`;
 }

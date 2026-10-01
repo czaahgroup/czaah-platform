@@ -73,6 +73,47 @@ export function EmptyState({
   );
 }
 
+/**
+ * No results on a search page: say why, and offer both ways forward — clear
+ * the filters, or ask CZAAH to source one (the request form opens pre-filled
+ * with what the visitor was searching for).
+ */
+export function NoResults({
+  what = 'properties',
+  filtered,
+  clearHref,
+  goal,
+  country,
+  city,
+}: {
+  what?: string;
+  filtered: boolean;
+  clearHref: string;
+  goal?: string;
+  country?: string | null;
+  city?: string | null;
+}) {
+  const q = new URLSearchParams();
+  if (goal) q.set('goal', goal);
+  if (country) q.set('country', country);
+  if (city) q.set('city', city);
+  const qs = q.toString();
+  return (
+    <div className="pp-empty pp-noresults" role="status">
+      <strong>{filtered ? `No ${what} match your filters.` : `No ${what} are listed here yet.`}</strong>
+      <p>
+        {filtered
+          ? 'Try changing your price range, location or property type.'
+          : 'Tell us what you need and our team can search the market for you.'}
+      </p>
+      <div className="pp-noresults-actions">
+        {filtered && <Link href={clearHref} className="pp-btn pp-btn--ghost">Clear Filters</Link>}
+        <Link href={`/property-portal/find-a-property${qs ? `?${qs}` : ''}`} className="pp-btn pp-btn--gold">Ask CZAAH to Find One</Link>
+      </div>
+    </div>
+  );
+}
+
 /** Eyebrow + heading + optional link, the standard section opener. */
 export function SectionHead({
   eyebrow,

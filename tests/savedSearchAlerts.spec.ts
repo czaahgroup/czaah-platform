@@ -84,8 +84,8 @@ test('every filter a search page reads is known to the shared matcher', () => {
   const pages: [SearchSection, string][] = [
     ['buy', 'app/property-portal/buy/BuyView.tsx'],
     ['rent', 'app/property-portal/rent/RentView.tsx'],
-    ['listings', 'app/property-portal/listings/page.tsx'],
-    ['off-plan', 'app/property-portal/off-plan/page.tsx'],
+    ['listings', 'app/property-portal/listings/ListingsView.tsx'],
+    ['off-plan', 'app/property-portal/off-plan/OffPlanView.tsx'],
   ]
   for (const [section, file] of pages) {
     const code = readFileSync(join(__dirname, '..', 'src', file), 'utf8')

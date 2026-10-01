@@ -68,7 +68,7 @@ export async function generateMetadata({
   const facts = [
     label,
     p.bedrooms != null ? (p.bedrooms === 0 ? 'Studio' : `${p.bedrooms} bed`) : null,
-    p.area_sqft != null ? `${p.area_sqft.toLocaleString()} ft²` : null,
+    p.area_sqft != null ? `${p.area_sqft.toLocaleString('en-GB')} ft²` : null,
     place(p),
   ].filter(Boolean).join(' · ')
   const text = (p.description || '').replace(/\s+/g, ' ').trim()

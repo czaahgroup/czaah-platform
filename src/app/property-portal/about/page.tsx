@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { portalOffices, portalEmail } from '../_components/portalRuntime';
-import { portalWhyInvest } from '../_components/portal-content';
+import { loadLocationTree } from '@/lib/propertyLocations';
 import { portalMetadata } from '../_components/seo';
 import { VERIFICATION_CHECKS } from '@/lib/verification';
 
@@ -8,29 +8,42 @@ export const metadata = portalMetadata({
   path: '/about',
   title: 'About Us',
   description:
-    'CZAAH Properties is a London-based international property company — residential, commercial and investment property across the United Kingdom, Dubai and Pakistan.',
+    'CZAAH Properties is an international property advisory and marketplace. Global Property. One Trusted Partner.',
 });
 
+// What a client can rely on. Deliberately free of absolutes: nothing here
+// promises an outcome or a legal position.
 const PILLARS = [
   {
-    t: 'Title checks built in',
-    d: 'Title and encumbrance checks form part of our transaction support, so they are done before you commit, not after.',
+    t: 'Clear property information',
+    d: 'Each listing states what we know — price, size, terms and the source of any stated yield. Where something is not known, it is left out rather than estimated.',
   },
   {
-    t: 'Local partners, not a remote feed',
-    d: 'Each core market is covered by a CZAAH partner on the ground who can view and represent an asset for you.',
+    t: 'Direct enquiry support',
+    d: 'Enquiries and viewing requests go to the CZAAH Properties team and are given a reference you can quote.',
   },
   {
-    t: 'One counterparty, start to finish',
-    d: 'From first viewing through negotiation, payment structuring and completion, you deal with CZAAH — not a chain of introducers each taking a cut.',
+    t: 'Property sourcing',
+    d: 'Tell us what you need and our team can search the market and shortlist suitable opportunities.',
   },
   {
-    t: 'Built for cross-border buyers',
-    d: 'Currency, tax treatment, remittance routes and non-resident ownership rules differ in every market. We handle that complexity as standard, not as an extra.',
+    t: 'Cross-market assistance',
+    d: 'Currencies, ownership rules and buying processes differ between markets. We help you understand the steps in each.',
+  },
+  {
+    t: 'Secure account experience',
+    d: 'Saved properties and searches are kept in an account confirmed by email. Your contact details are never shown on the site.',
+  },
+  {
+    t: 'Professional support',
+    d: 'Property and documentation checks may be carried out as appropriate to the market and transaction. We recommend independent legal advice before you commit.',
   },
 ];
 
-export default function PortalAboutPage() {
+export default async function PortalAboutPage() {
+  // Loaded here: the runtime seed belongs to the client tree, and a server
+  // component rendering before it would see no markets.
+  const markets = ((await loadLocationTree()) || []).flatMap((r) => r.countries);
   return (
     <main>
       <div className="pp-container">
@@ -45,15 +58,16 @@ export default function PortalAboutPage() {
         </div>
 
         <p className="pp-section-lead" style={{ maxWidth: 760 }}>
-          CZAAH Properties is the real estate practice of CZAAH — a London-based international
-          investment facilitation group. We give investors a single, accountable route into
-          property across three markets that rarely share a common standard of diligence.
+          Global Property. One Trusted Partner. CZAAH Properties is the property practice of CZAAH
+          Group. We are more than a listings directory: we help clients discover, compare and
+          progress suitable property opportunities, with one point of contact from search to
+          completion.
         </p>
       </div>
 
       <section className="pp-section pp-stats-band">
         <div className="pp-container">
-          <h2 className="pp-h2" style={{ marginBottom: 34 }}>How we work</h2>
+          <h2 className="pp-h2" style={{ marginBottom: 34 }}>What you can expect</h2>
           <div className="pp-why-grid">
             {PILLARS.map((p) => (
               <div className="pp-why-tile" key={p.t}>
@@ -67,18 +81,18 @@ export default function PortalAboutPage() {
 
       <section className="pp-section">
         <div className="pp-container">
-          <h2 className="pp-h2" style={{ marginBottom: 14 }}>Our markets</h2>
+          <h2 className="pp-h2" style={{ marginBottom: 14 }}>Where we operate</h2>
           <p className="pp-section-lead" style={{ marginBottom: 34, maxWidth: 720 }}>
-            Three markets, one desk. Each is covered by a local CZAAH partner, and each is
-            chosen for a different reason.
+            These are the markets CZAAH Properties works in today. The list grows as we open new
+            ones.
           </p>
           <div className="pp-presence-grid">
-            {portalWhyInvest().map((m) => (
-              <div className="pp-presence" key={m.market}>
-                <strong>{m.market}</strong>
-                <span>{m.points[0].title}</span>
-                <small>{m.points.length} reasons</small>
-              </div>
+            {markets.map((c) => (
+              <Link className="pp-presence" key={c.id} href={`/property-portal/buy/${c.slug}`}>
+                <strong>{c.name}</strong>
+                <span>{c.cities.map((ci) => ci.name).slice(0, 5).join(' · ') || 'Properties'}</span>
+                <small>View properties →</small>
+              </Link>
             ))}
           </div>
         </div>
@@ -121,13 +135,14 @@ export default function PortalAboutPage() {
 
       <section className="pp-section--tight">
         <div className="pp-container" style={{ textAlign: 'center' }}>
-          <h2 className="pp-h2" style={{ marginBottom: 12 }}>Speak to the property desk</h2>
+          <h2 className="pp-h2" style={{ marginBottom: 12 }}>Speak to an advisor</h2>
           <p className="pp-section-lead" style={{ marginBottom: 26 }}>
-            Tell us the market, budget and asset class — we&apos;ll come back with what actually
-            fits, including anything not yet published.
+            Tell us the market, budget and objective. We will come back with suitable options and
+            clear next steps.
           </p>
           <div className="pp-cta-row">
-            <Link href="/property-portal/contact" className="pp-btn pp-btn--gold">Contact us</Link>
+            <Link href="/property-portal/contact" className="pp-btn pp-btn--gold">Speak to an Advisor</Link>
+            <Link href="/property-portal/find-a-property" className="pp-btn pp-btn--ghost">Request a Property Shortlist</Link>
             <a href={`mailto:${portalEmail()}`} className="pp-btn pp-btn--ghost">{portalEmail()}</a>
           </div>
         </div>

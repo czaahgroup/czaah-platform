@@ -34,7 +34,7 @@ test('the portal has a skip link to its content', () => {
 })
 
 test('every filter dropdown on the search pages has an accessible name', () => {
-  for (const f of ['app/property-portal/buy/BuyView.tsx', 'app/property-portal/rent/RentView.tsx', 'app/property-portal/listings/page.tsx', 'app/property-portal/off-plan/page.tsx']) {
+  for (const f of ['app/property-portal/buy/BuyView.tsx', 'app/property-portal/rent/RentView.tsx', 'app/property-portal/listings/ListingsView.tsx', 'app/property-portal/off-plan/OffPlanView.tsx']) {
     const code = src(f)
     // A <select> is fine inside a <label>; otherwise it needs aria-label.
     const unnamed = [...code.matchAll(/<select(?![^>]*aria-label)[^>]*>/g)].filter((m) => {

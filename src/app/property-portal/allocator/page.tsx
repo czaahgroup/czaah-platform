@@ -76,7 +76,7 @@ export default function AllocatorPage() {
     if (usd == null) return '—';
     const v = ccy === 'USD' ? usd : convertPrice(usd, 'USD', ccy);
     if (v == null) return '—';
-    return `${ccy} ${Math.round(v).toLocaleString()}`;
+    return `${ccy} ${Math.round(v).toLocaleString('en-GB')}`;
   };
 
   const best = markets.length ? markets[0] : null;
@@ -181,7 +181,7 @@ export default function AllocatorPage() {
 
                     <div className="pp-alloc-headline">
                       <span className="pp-alloc-sqft">
-                        {Math.round(m.sqft).toLocaleString()}
+                        {Math.round(m.sqft).toLocaleString('en-GB')}
                       </span>
                       <small>ft² for {fmt(budgetUsd)}</small>
                     </div>

@@ -15,6 +15,9 @@ import { LocationSearch, suggestionHref } from '../_components/LocationSearch';
 import { MarketFilters } from '../_components/MarketFilters';
 import { marketFiltersFor, applyMarketFilters } from '@/lib/marketFields';
 import { useListings } from '../_components/useListings';
+import { PriceRange } from '../_components/PriceRange';
+import { NoResults } from '../_components/ui';
+import { track } from '../_components/analytics';
 
 
 const PAGE_SIZE = 9;
@@ -38,13 +41,12 @@ const BEDS = [
 
 // Bands are per MONTH in USD; annual rents (the UAE convention) are divided by
 // 12 and every rent converted, so all three markets share one filter.
-const RENTS = [
-  { v: '', l: 'Any rent' },
-  { v: '0-1500', l: 'Up to $1.5k / mo' },
-  { v: '1500-3000', l: '$1.5k – 3k / mo' },
-  { v: '3000-6000', l: '$3k – 6k / mo' },
-  { v: '6000-12000', l: '$6k – 12k / mo' },
-  { v: '12000-', l: '$12k+ / mo' },
+// Offered only when at least one listing states its bathrooms.
+const BATHS = [
+  { v: '', l: 'Any baths' },
+  { v: '1', l: '1+ bath' },
+  { v: '2', l: '2+ baths' },
+  { v: '3', l: '3+ baths' },
 ];
 
 const FURNISHING = [
@@ -99,6 +101,7 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
       else next.delete(k);
     });
     if (!('page' in patch)) next.delete('page');
+    if (!('page' in patch) && !('sort' in patch) && !('ccy' in patch)) track('filter_used', { filter: Object.keys(patch).join(',') });
     router.push(`${basePath}?${next.toString()}`);
   }
 
@@ -122,7 +125,9 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
     return sorted;
   }, [all, market, loc, type, beds, furnishing, price, search, sort, params]);
 
-  const hasFilters = !!(search || type || beds || furnishing || price || (market && market !== 'all') || marketFilters.some((f) => params.get(f.param)));
+  const baths = params.get('baths') || '';
+  const hasBaths = all.some((p) => p.bathrooms != null);
+  const hasFilters = !!(search || type || beds || baths || furnishing || price || (market && market !== 'all') || marketFilters.some((f) => params.get(f.param)));
   const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const paged = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -202,9 +207,12 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
           <select aria-label="Bedrooms" value={beds} onChange={(e) => setParam({ beds: e.target.value })}>
             {BEDS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
           </select>
-          <select aria-label="Price range" value={price} onChange={(e) => setParam({ price: e.target.value })}>
-            {RENTS.map((p) => <option key={p.v} value={p.v}>{p.l}</option>)}
-          </select>
+          {hasBaths && (
+            <select aria-label="Bathrooms" value={baths} onChange={(e) => setParam({ baths: e.target.value })}>
+              {BATHS.map((b) => <option key={b.v} value={b.v}>{b.l}</option>)}
+            </select>
+          )}
+          <PriceRange value={price} onChange={(v) => setParam({ price: v })} rent />
           <select aria-label="Furnishing" value={furnishing} onChange={(e) => setParam({ furnishing: e.target.value })}>
             {FURNISHING.map((f) => <option key={f.v} value={f.v}>{f.l}</option>)}
           </select>
@@ -241,18 +249,7 @@ function RentInner({ countrySlug, citySlug }: { countrySlug?: string; citySlug?:
               </div>
             )}
             {!loading && !error && visible.length === 0 && (
-              hasFilters ? (
-                <div className="pp-empty">
-                  No rentals match these filters.{' '}
-                  <Link href={basePath} className="pp-gold">Clear filters</Link>
-                </div>
-              ) : (
-                <div className="pp-empty">
-                  New rentals are being added. Tell us what you&apos;re looking for and we&apos;ll
-                  match you before it lists.{' '}
-                  <Link href="/property-portal/contact" className="pp-gold">Get in touch</Link>
-                </div>
-              )
+              <NoResults what="rentals" filtered={hasFilters} clearHref={basePath} goal="Rent" country={loc?.country.name} city={loc?.city?.name} />
             )}
             {!loading && !error && paged.map((prop) => (
               <PropertyCard key={prop.id} prop={prop} displayCurrency={ccy || undefined} />
