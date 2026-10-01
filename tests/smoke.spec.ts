@@ -55,7 +55,20 @@ test.describe('public pages', () => {
 
       // give client hydration a beat, then check for thrown errors
       await page.waitForTimeout(500)
-      const realErrors = errors.filter((e) => !/ResizeObserver|Lock broken/i.test(e))
+      let realErrors = errors.filter((e) => !/ResizeObserver|Lock broken/i.test(e))
+
+      // Under the parallel load of this suite, a local `next start` now and then
+      // throws React #418 (hydration) on a portal page — about 1 load in 60,
+      // measured the same on the build before 2026-10-01, and 0 in 192 loads on
+      // production. So a lone #418 gets one quiet reload; anything else (a
+      // ReferenceError, a failed render) fails straight away, and a hydration
+      // bug that is really there fails the reload too.
+      if (realErrors.length && realErrors.every((e) => /Minified React error #418/.test(e))) {
+        errors.length = 0
+        await page.reload({ waitUntil: 'domcontentloaded' })
+        await page.waitForTimeout(800)
+        realErrors = errors.filter((e) => !/ResizeObserver|Lock broken/i.test(e))
+      }
       expect(realErrors, `${path} console errors`).toEqual([])
     })
   }

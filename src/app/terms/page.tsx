@@ -30,8 +30,9 @@ export default function TermsPage() {
             <div className="h-px bg-outline-variant/10 mb-10"></div>
 
             <h2 className="cinzel-text text-2xl font-bold text-on-surface mb-6">2. About CZAAH</h2>
-            <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4">CZAAH is a diversified investment facilitation and advisory group operating through its principal entity:</p>
+            <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4">CZAAH is a diversified investment facilitation and advisory group operating through the following entities:</p>
             <ul className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4 ml-6 space-y-2 list-none">
+              <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[10px] before:w-1.5 before:h-1.5 before:bg-primary"><strong className="text-on-surface">CZAAH Group Ltd</strong> &mdash; a private limited company registered in England and Wales (company number 17447314), with its registered office at 124 City Road, London, EC1V 2NX, United Kingdom.</li>
               <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[10px] before:w-1.5 before:h-1.5 before:bg-primary"><strong className="text-on-surface">CZAAH Capital &amp; Ventures (Private) Limited</strong> &mdash; a private limited company registered with the Securities and Exchange Commission of Pakistan (SECP), with its principal office in Islamabad, Pakistan.</li>
             </ul>
             <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-10">CZAAH provides investment facilitation, advisory, and consulting services across multiple sectors including minerals and mining, government infrastructure, technology, textiles, aviation, and real estate.</p>
@@ -127,6 +128,8 @@ export default function TermsPage() {
             <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85] mb-4">If you have questions or concerns regarding these Terms &amp; Conditions, please contact us:</p>
             <p className="raleway-text text-on-surface-variant text-[15px] leading-[1.85]">
               <strong className="text-on-surface">Email:</strong> <a href="mailto:info@czaah.com" className="text-primary hover:underline">info@czaah.com</a><br />
+              <strong className="text-on-surface">CZAAH Group Ltd</strong><br />
+              124 City Road, London, EC1V 2NX, United Kingdom<br />
               <strong className="text-on-surface">CZAAH Capital &amp; Ventures (Private) Limited</strong><br />
               Islamabad, Pakistan
             </p>

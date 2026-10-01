@@ -640,6 +640,7 @@ ul.pp-features .pp-feature { border-radius: 999px; font-size: 13px; padding: 8px
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 .pp-footer .pp-footer-grid { grid-template-columns: 1.7fr repeat(4, minmax(0, 1fr)); gap: 40px; }
 .pp-footer-line { margin: 18px 0 10px; font-family: var(--font-heading, 'Cinzel', serif); font-size: 15px; letter-spacing: 0.04em; color: var(--pp-gold-light); }
+.pp-footer-legal { display: block; margin-top: 6px; font-size: 12px; line-height: 1.6; opacity: 0.75; }
 .pp-footer-offices { margin-top: 14px; font-size: 12.5px; color: rgba(255, 255, 255, 0.6); }
 @media (max-width: 1000px) {
   .pp-footer .pp-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px 28px; }

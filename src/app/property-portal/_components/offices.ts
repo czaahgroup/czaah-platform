@@ -4,7 +4,7 @@ export const OFFICES = [
   {
     city: 'London',
     role: 'Group headquarters',
-    lines: ['CZAAH International', '124 City Road', 'London, EC1V 2NX'],
+    lines: ['CZAAH Group Ltd', '124 City Road', 'London, EC1V 2NX'],
   },
   {
     city: 'Islamabad',

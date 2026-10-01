@@ -121,7 +121,14 @@ export default async function PropertyPortalLayout({ children }: { children: Rea
           </div>
         </div>
         <div className="pp-footer-bottom">
-          <span>© {new Date().getFullYear()} CZAAH Properties · part of CZAAH Group Ltd. All rights reserved.</span>
+          <span>
+            © {new Date().getFullYear()} CZAAH Properties · part of CZAAH Group Ltd. All rights reserved.
+            {/* Company details as recorded at Companies House (checked 2026-10-01). */}
+            <span className="pp-footer-legal">
+              CZAAH Group Ltd is registered in England and Wales, company number 17447314. Registered
+              office: 124 City Road, London, EC1V 2NX.
+            </span>
+          </span>
           <span>
             <Link href="/terms">Terms &amp; Conditions</Link> &nbsp;·&nbsp; <Link href="/privacy">Privacy Policy</Link> &nbsp;·&nbsp; <Link href="/privacy#cookies">Cookie Policy</Link>
           </span>
