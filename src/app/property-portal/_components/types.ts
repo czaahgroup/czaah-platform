@@ -22,6 +22,8 @@ export interface LiveProperty {
   price: number | null;
   currency: string;
   location: string;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
   city: string;
   country: string | null;
   area_sqft: number | null;

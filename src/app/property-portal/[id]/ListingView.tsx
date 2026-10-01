@@ -13,6 +13,7 @@ import { TENURE_LABEL, BUILD_STATUS_LABEL, yieldLabel } from '@/lib/marketFields
 import { EnquiryForm, ContactButtons, ShareButton, StickyActions, listingReference, whatsappHref } from '../_components/PropertyActions';
 import { slugForCity } from '../_components/destinations';
 import { track } from '../_components/analytics';
+import { ListingLocationMap } from '../_components/ListingsMap';
 
 const TYPE_LABEL = { residential: 'Residential', commercial: 'Commercial', industrial: 'Industrial', mixed_use: 'Mixed use', land: 'Land' };
 
@@ -324,6 +325,7 @@ export default function ListingView({ initial = null }: { initial?: LiveProperty
                 <section className="pp-detail-section" aria-labelledby="sec-location">
                   <h2 id="sec-location">Location</h2>
                   <p className="pp-detail-desc">{place}</p>
+                  <ListingLocationMap prop={prop} />
                   {prop.city && (
                     <div className="pp-listing-links">
                       <Link href={`/property-portal/destinations/${slugForCity(prop.city)}`} className="pp-link-arrow">

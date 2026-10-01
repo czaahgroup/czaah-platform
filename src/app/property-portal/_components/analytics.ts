@@ -24,7 +24,9 @@ export type PortalEvent =
   | 'advisor_clicked'
   | 'advisor_request'
   | 'property_sourcing_started'
-  | 'property_sourcing_submitted';
+  | 'property_sourcing_submitted'
+  | 'results_view'
+  | 'map_pin_click';
 
 export function track(event: PortalEvent, data: Record<string, string | number | boolean | null | undefined> = {}) {
   if (typeof window === 'undefined') return;

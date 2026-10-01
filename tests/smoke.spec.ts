@@ -25,6 +25,7 @@ const PUBLIC_PAGES = [
   '/property-portal/buy',
   '/property-portal/rent',
   '/property-portal/listings',
+  '/property-portal/listings?view=map',
   '/property-portal/off-plan',
   '/property-portal/new-projects',
   '/property-portal/find-a-property',

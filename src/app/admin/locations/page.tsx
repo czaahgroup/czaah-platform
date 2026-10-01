@@ -55,8 +55,14 @@ const EXTRA: Record<Kind, { key: string; label: string; textarea?: boolean; hint
   city: [
     { key: 'tagline', label: 'Tagline', hint: 'Short line on the city card, e.g. "The mature safe haven".' },
     { key: 'blurb', label: 'Blurb', textarea: true, hint: 'Intro on the city page. Leave empty to keep the current text.' },
+    { key: 'latitude', label: 'Map latitude' },
+    { key: 'longitude', label: 'Map longitude', hint: 'Centre point for the map. Listings without their own coordinates are shown here, marked as an approximate location. Right-click a spot in Google Maps to copy its latitude and longitude.' },
   ],
-  area: [{ key: 'postcode_prefix', label: 'Postcode prefix', hint: 'Optional, e.g. E14' }],
+  area: [
+    { key: 'postcode_prefix', label: 'Postcode prefix', hint: 'Optional, e.g. E14' },
+    { key: 'latitude', label: 'Map latitude' },
+    { key: 'longitude', label: 'Map longitude', hint: 'Centre point for the map. Listings without their own coordinates are shown here, marked as an approximate location. Right-click a spot in Google Maps to copy its latitude and longitude.' },
+  ],
 }
 
 export default function LocationsAdminPage() {

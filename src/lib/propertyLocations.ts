@@ -33,16 +33,22 @@ export interface CityRow extends LocationRow {
   tagline: string | null
   blurb: string | null
   image_url: string | null
+  // Centre point, for placing listings without their own coordinates on the map.
+  latitude?: number | string | null
+  longitude?: number | string | null
 }
 export interface AreaRow extends LocationRow {
   city_id: string
   postcode_prefix: string | null
+  latitude?: number | string | null
+  longitude?: number | string | null
 }
 
-export interface AreaNode { id: string; name: string; slug: string; postcode_prefix: string | null }
+export interface AreaNode { id: string; name: string; slug: string; postcode_prefix: string | null; lat: number | null; lng: number | null }
 export interface CityNode {
   id: string; name: string; slug: string
   tagline: string | null; blurb: string | null; image_url: string | null
+  lat: number | null; lng: number | null
   areas: AreaNode[]
 }
 export interface CountryNode {
@@ -63,6 +69,14 @@ export interface LocationRows {
   areas: AreaRow[]
 }
 
+/** A stored centre point as numbers, or nulls unless both halves are usable. */
+function centre(row: { latitude?: number | string | null; longitude?: number | string | null }) {
+  const lat = row.latitude == null || row.latitude === '' ? NaN : Number(row.latitude)
+  const lng = row.longitude == null || row.longitude === '' ? NaN : Number(row.longitude)
+  const ok = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180
+  return ok ? { lat, lng } : { lat: null, lng: null }
+}
+
 const byOrder = (a: LocationRow, b: LocationRow) =>
   a.display_order - b.display_order || a.name.localeCompare(b.name)
 
@@ -77,7 +91,7 @@ export function buildLocationTree(rows: LocationRows): LocationTree {
   for (const a of [...rows.areas].sort(byOrder)) {
     if (!a.active) continue
     const list = areasByCity.get(a.city_id) || []
-    list.push({ id: a.id, name: a.name, slug: a.slug, postcode_prefix: a.postcode_prefix })
+    list.push({ id: a.id, name: a.name, slug: a.slug, postcode_prefix: a.postcode_prefix, ...centre(a) })
     areasByCity.set(a.city_id, list)
   }
 
@@ -88,6 +102,7 @@ export function buildLocationTree(rows: LocationRows): LocationTree {
     list.push({
       id: c.id, name: c.name, slug: c.slug,
       tagline: c.tagline, blurb: c.blurb, image_url: c.image_url,
+      ...centre(c),
       areas: areasByCity.get(c.id) || [],
     })
     citiesByCountry.set(c.country_id, list)
@@ -126,8 +141,8 @@ export async function loadLocationRows(): Promise<LocationRows | null> {
     const [regions, countries, cities, areas] = await Promise.all([
       supabase.from('property_regions').select('id, name, slug, description, display_order, active'),
       supabase.from('property_countries').select('id, region_id, country_code, name, slug, currency, tagline, description, image_url, display_order, active'),
-      supabase.from('property_cities').select('id, country_id, name, slug, tagline, blurb, image_url, display_order, active'),
-      supabase.from('property_areas').select('id, city_id, name, slug, postcode_prefix, display_order, active'),
+      supabase.from('property_cities').select('id, country_id, name, slug, tagline, blurb, image_url, latitude, longitude, display_order, active'),
+      supabase.from('property_areas').select('id, city_id, name, slug, postcode_prefix, latitude, longitude, display_order, active'),
     ])
     const failed = [regions, countries, cities, areas].find((r) => r.error)
     if (failed?.error) {

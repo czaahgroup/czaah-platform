@@ -31,6 +31,28 @@ const text = (v: unknown, max: number) => {
 const int = (v: unknown) => (Number.isFinite(Number(v)) ? Math.round(Number(v)) : 0)
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+/**
+ * The map centre point of a city or area. Both halves or neither: half a
+ * coordinate would be stored and then silently ignored by the map.
+ */
+function coords(body: Record<string, unknown>, d: Record<string, unknown>): string | null {
+  if (!('latitude' in body) && !('longitude' in body)) return null
+  const blank = (v: unknown) => v == null || String(v).trim() === ''
+  if (blank(body.latitude) && blank(body.longitude)) {
+    d.latitude = null
+    d.longitude = null
+    return null
+  }
+  const lat = blank(body.latitude) ? NaN : Number(body.latitude)
+  const lng = blank(body.longitude) ? NaN : Number(body.longitude)
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+    return 'Enter both a latitude (-90 to 90) and a longitude (-180 to 180), or leave both empty.'
+  }
+  d.latitude = lat
+  d.longitude = lng
+  return null
+}
+
 /** Whitelists and normalises the fields a caller may set for one kind. */
 function clean(kind: Kind, body: Record<string, unknown>, creating: boolean): { data?: Record<string, unknown>; error?: string } {
   const d: Record<string, unknown> = {}
@@ -80,6 +102,8 @@ function clean(kind: Kind, body: Record<string, unknown>, creating: boolean): { 
     if (has('tagline')) d.tagline = text(body.tagline, 200)
     if (has('blurb')) d.blurb = text(body.blurb, 1500)
     if (has('image_url')) d.image_url = text(body.image_url, 1000)
+    const bad = coords(body, d)
+    if (bad) return { error: bad }
   }
   if (kind === 'area') {
     if (creating) {
@@ -87,6 +111,8 @@ function clean(kind: Kind, body: Record<string, unknown>, creating: boolean): { 
       d.city_id = body.city_id
     }
     if (has('postcode_prefix')) d.postcode_prefix = text(body.postcode_prefix, 12)
+    const bad = coords(body, d)
+    if (bad) return { error: bad }
   }
   return { data: d }
 }

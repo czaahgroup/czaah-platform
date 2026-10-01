@@ -661,3 +661,75 @@ ul.pp-features .pp-feature { border-radius: 999px; font-size: 13px; padding: 8px
 @media (max-width: 560px) {
   .pp-dev-strip-head { flex-wrap: wrap; row-gap: 4px; }
 }
+
+/* ── Map search ─────────────────────────────────────────────────────────── */
+/* Leaflet's panes use z-indexes up to 1000; keep them under the site header. */
+.pp-map { position: relative; z-index: 0; isolation: isolate; width: 100%; height: 100%; min-height: 320px; background: var(--pp-panel); border: 1px solid var(--pp-border); font: inherit; }
+.pp-map--detail { height: 340px; margin-top: 16px; }
+.pp-map-failed { padding: 24px; border: 1px solid var(--pp-border); background: var(--pp-panel); color: var(--pp-text-muted); }
+.pp-map-note { margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: var(--pp-text-muted); }
+.pp-map-note a { color: var(--pp-gold-deep); text-decoration: underline; }
+.pp-map .leaflet-control-attribution { font-size: 11px; }
+.pp-map .leaflet-control-attribution a { color: #14130f; text-decoration: underline; }
+.pp-map .leaflet-bar a { width: 40px; height: 40px; line-height: 40px; color: #14130f; }
+
+.pp-map-pin-anchor { width: 0 !important; height: 0 !important; overflow: visible; }
+.pp-map-pin {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, calc(-100% - 7px));
+  padding: 6px 10px; white-space: nowrap; font-size: 12.5px; font-weight: 600; line-height: 1.2;
+  background: #14130f; color: #ffffff; border: 1.5px solid #14130f; border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28); cursor: pointer;
+}
+.pp-map-pin::after {
+  content: ''; position: absolute; left: 50%; top: 100%; margin-left: -5px;
+  border: 5px solid transparent; border-top-color: #14130f; border-bottom-width: 0;
+}
+.pp-map-pin--approx { background: #ffffff; color: #14130f; border-style: dashed; }
+.pp-map-pin--cluster { background: var(--pp-gold-deep); border-color: var(--pp-gold-deep); }
+.pp-map-pin--cluster::after { border-top-color: var(--pp-gold-deep); }
+.pp-map-pin.is-active, .pp-map-pin:hover { background: var(--pp-gold); color: #14130f; border-color: #14130f; }
+.pp-map-pin.is-active::after, .pp-map-pin:hover::after { border-top-color: #14130f; }
+.pp-map-pin--key { position: static; display: inline-block; transform: none; margin-right: 8px; padding: 2px 8px; font-size: 11px; box-shadow: none; cursor: default; }
+.pp-map-pin--key::after { display: none; }
+.pp-map-pin--key:hover { background: #ffffff; }
+.pp-map-dot {
+  position: absolute; left: 0; top: 0; width: 22px; height: 22px; transform: translate(-50%, -50%);
+  border-radius: 50%; background: var(--pp-gold); border: 3px solid #14130f; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.pp-viewtoggle { display: inline-flex; border: 1px solid var(--pp-border-strong); }
+.pp-viewtoggle button {
+  min-height: 36px; padding: 0 16px; font: inherit; font-size: 13px; color: var(--pp-text);
+  background: transparent; border: 0; cursor: pointer;
+}
+.pp-viewtoggle button + button { border-left: 1px solid var(--pp-border-strong); }
+.pp-viewtoggle button.active { background: var(--pp-text); color: var(--pp-bg); font-weight: 600; }
+
+.pp-listpage-grid[hidden] { display: none; }
+.pp-mapview { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); gap: 24px; padding: 24px 0 100px; align-items: start; }
+.pp-mapview-map { position: sticky; top: calc(var(--pp-nav-h, 72px) + 16px); }
+.pp-mapview-map .pp-map { height: min(640px, calc(100vh - var(--pp-nav-h, 72px) - 90px)); }
+.pp-mapview-list-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--pp-border); }
+.pp-mapview-list-head h2 { margin: 0; font-size: 17px; font-weight: 600; color: var(--pp-text); }
+.pp-mapview-list-head button { background: none; border: 0; cursor: pointer; color: var(--pp-gold-deep); font-family: inherit; }
+.pp-mapview-precision { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--pp-text-muted); }
+.pp-mapview-list ul { list-style: none; margin: 0; padding: 0; }
+.pp-mapview-list li { border-bottom: 1px solid var(--pp-border); }
+.pp-maprow { display: flex; gap: 14px; padding: 14px 0; color: var(--pp-text); text-decoration: none; }
+.pp-maprow img, .pp-maprow-noimg { flex: 0 0 104px; width: 104px; height: 78px; object-fit: cover; background: var(--pp-panel); }
+.pp-maprow-noimg { display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--pp-text-dim); }
+.pp-maprow-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pp-maprow-body b { font-size: 15px; }
+.pp-maprow-title { font-size: 14px; line-height: 1.35; }
+.pp-maprow-place { font-size: 12.5px; color: var(--pp-text-muted); }
+.pp-maprow:hover .pp-maprow-title { text-decoration: underline; }
+
+/* position: sticky is dead under the root layout's overflow-x: hidden, and on
+   a phone the map should scroll away anyway: map first, list underneath. */
+@media (max-width: 900px) {
+  .pp-mapview { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .pp-mapview-map { position: static; }
+  .pp-mapview-map .pp-map { height: 56vh; min-height: 300px; }
+  .pp-map--detail { height: 260px; }
+  .pp-viewtoggle button { min-height: 44px; }
+}

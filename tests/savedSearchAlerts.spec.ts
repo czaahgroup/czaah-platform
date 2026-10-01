@@ -80,7 +80,7 @@ test('only listings live since the last alert are new', () => {
 })
 
 test('every filter a search page reads is known to the shared matcher', () => {
-  const DISPLAY_ONLY = new Set(['sort', 'page', 'ccy', 'q'])
+  const DISPLAY_ONLY = new Set(['sort', 'page', 'ccy', 'q', 'view'])
   const pages: [SearchSection, string][] = [
     ['buy', 'app/property-portal/buy/BuyView.tsx'],
     ['rent', 'app/property-portal/rent/RentView.tsx'],

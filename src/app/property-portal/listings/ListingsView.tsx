@@ -12,6 +12,7 @@ import { portalMarketTabs, matchesMarket, CURRENCIES, isRental, convertPrice } f
 import { useListings } from '../_components/useListings';
 import { PriceRange } from '../_components/PriceRange';
 import { NoResults } from '../_components/ui';
+import { ListingsMap, ViewToggle } from '../_components/ListingsMap';
 import { track } from '../_components/analytics';
 
 
@@ -110,6 +111,7 @@ function ListingsInner() {
   const hasBaths = all.some((p) => p.bathrooms != null);
   const ccy = params.get('ccy') || '';
   const page = Math.max(1, Number(params.get('page')) || 1);
+  const view = params.get('view') === 'map' ? 'map' : 'list';
 
   const [searchInput, setSearchInput] = useState(search);
   useEffect(() => setSearchInput(search), [search]);
@@ -169,6 +171,7 @@ function ListingsInner() {
           </h1>
           <div className="pp-listpage-meta">
             <span>{loading ? 'Loading…' : error ? 'Unavailable' : `${visible.length} ${visible.length === 1 ? 'listing' : 'listings'}`}</span>
+            <ViewToggle view={view} onChange={(v) => setParam({ view: v === 'map' ? 'map' : '' })} />
             <SaveSearchButton />
             <label>
               Sort:{' '}
@@ -268,7 +271,11 @@ function ListingsInner() {
           )}
         </form>
 
-        <div className="pp-listpage-grid">
+        {/* The map shows every result, so the paged grid steps aside for it. */}
+        {view === 'map' && !loading && !error && visible.length > 0 && (
+          <ListingsMap listings={visible} displayCurrency={ccy || undefined} />
+        )}
+        <div className="pp-listpage-grid" hidden={view === 'map' && !loading && !error && visible.length > 0}>
           <div className="pp-grid">
             {loading && Array.from({ length: 6 }).map((_, i) => <div key={i} className="pp-skeleton" />)}
             {!loading && error && (
