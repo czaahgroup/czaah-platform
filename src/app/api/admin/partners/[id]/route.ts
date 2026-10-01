@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logError } from '@/lib/logError'
-import { cleanPartnerDetails } from '@/lib/partnerDetails'
+import { cleanPartnerDetails, emailChangeNotice } from '@/lib/partnerDetails'
+import { resend, FROM_EMAIL } from '@/lib/resend/client'
 
 
 function createAuthClient(request: NextRequest) {
@@ -80,6 +81,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const body = await request.json()
     const { status, notes, sectorIds } = body
+    // Whether each address was told about an email change (null = no change).
+    let emailNotice: { old: boolean; new: boolean } | null = null
 
     // Name, email, phone, company. The email is also the partner's login, so
     // it is changed on the account first and the profile only follows if that
@@ -119,6 +122,24 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         target_id: id,
         metadata: { changed, ...(emailChanged ? { previous_email: current.email, new_email: details.email } : {}) },
       })
+
+      // Both addresses are told. A failed send never undoes the change — the
+      // admin is shown which notice did not go out instead.
+      if (emailChanged) {
+        const who = { name: details.full_name || current.full_name, oldEmail: current.email, newEmail: details.email! }
+        const send = async (to: 'old' | 'new') => {
+          try {
+            const { error: sendError } = await resend.emails.send({ from: FROM_EMAIL, to: to === 'old' ? who.oldEmail : who.newEmail, ...emailChangeNotice(to, who) })
+            if (sendError) throw new Error(sendError.message)
+            return true
+          } catch (err) {
+            logError('api.admin.partners.id', err, { step: `email-change-notice-${to}` })
+            return false
+          }
+        }
+        const [oldSent, newSent] = await Promise.all([send('old'), send('new')])
+        emailNotice = { old: oldSent, new: newSent }
+      }
     }
 
     const updates: Record<string, unknown> = {}
@@ -161,7 +182,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, emailNotice })
   } catch (err) {
     logError("api.admin.partners.id", err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

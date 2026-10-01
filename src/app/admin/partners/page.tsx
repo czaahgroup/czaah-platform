@@ -51,6 +51,7 @@ export default function AdminPartnersPage() {
   const [editDraft, setEditDraft] = useState({ fullName: '', email: '', phone: '', companyName: '' })
   const [savingEdit, setSavingEdit] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
+  const [editNotice, setEditNotice] = useState<{ id: string; text: string; ok: boolean } | null>(null)
 
   function startEdit(p: Partner) {
     setEditError(null)
@@ -66,7 +67,7 @@ export default function AdminPartnersPage() {
   async function saveEdit(p: Partner) {
     const newEmail = editDraft.email.trim().toLowerCase()
     if (newEmail !== (p.profiles?.email || '').toLowerCase() &&
-      !window.confirm(`Change this partner's sign-in email to ${newEmail}? They will sign in with the new address from now on; their password stays the same.`)) return
+      !window.confirm(`Change this partner's sign-in email to ${newEmail}? They will sign in with the new address from now on; their password stays the same. A notice is emailed to both the old and the new address.`)) return
     setSavingEdit(true)
     setEditError(null)
     try {
@@ -77,6 +78,18 @@ export default function AdminPartnersPage() {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(json.error || 'Failed to save details')
+      if (json.emailNotice) {
+        const { old: oldSent, new: newSent } = json.emailNotice
+        setEditNotice({
+          id: p.id,
+          ok: oldSent && newSent,
+          text: oldSent && newSent
+            ? 'Email changed. A notice was sent to both the old and the new address.'
+            : `Email changed, but the notice to the ${!oldSent && !newSent ? 'old and new addresses' : !oldSent ? 'old address' : 'new address'} could not be sent — please tell the partner yourself.`,
+        })
+      } else {
+        setEditNotice({ id: p.id, ok: true, text: 'Details saved.' })
+      }
       setEditingId(null)
       await loadData()
     } catch (err: unknown) {
@@ -411,7 +424,7 @@ export default function AdminPartnersPage() {
                                 ))}
                               </div>
                               <p className="text-xs text-on-surface-variant/50">
-                                Changing the email changes the address the partner signs in with. Their password, Partner ID, listings and history stay the same.
+                                Changing the email changes the address the partner signs in with, and a notice is emailed to both the old and the new address. Their password, Partner ID, listings and history stay the same.
                               </p>
                               {editError && <p className="text-xs text-red-400">{editError}</p>}
                               <div className="flex gap-2">
@@ -421,6 +434,9 @@ export default function AdminPartnersPage() {
                                 <button onClick={() => setEditingId(null)} className="text-xs px-3 py-1.5 border border-outline-variant/20 text-on-surface-variant">Cancel</button>
                               </div>
                             </div>
+                          )}
+                          {editNotice?.id === p.id && editingId !== p.id && (
+                            <p className={`text-xs mb-2 ${editNotice.ok ? 'text-green-400' : 'text-orange-400'}`}>{editNotice.text}</p>
                           )}
                           <div className="bg-surface-container-high px-4 py-3 grid sm:grid-cols-2 gap-x-6 gap-y-1 text-xs">
                             <div className="text-on-surface-variant"><span className="text-on-surface-variant/50">Name:</span> {p.profiles?.full_name || '—'}</div>
